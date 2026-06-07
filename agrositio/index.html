@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSítio | Plantas, Pet Shop e Jardinagem em Mongaguá</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        accent: {
+                            default: '#f59e0b',
+                            hover: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-header border-b border-stone-200/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-brand-900 text-brand-100 p-2.5 rounded-xl shadow-md shadow-brand-900/10">
+                        <i class="fa-solid fa-leaf text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold tracking-tight text-brand-950 block leading-none">AgroSítio</span>
+                        <span class="text-xs text-brand-600 font-semibold tracking-wider uppercase">Agro & Pet Center</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Desktop -->
+                <nav class="hidden md:flex items-center gap-8 font-medium text-stone-600">
+                    <a href="#inicio" class="hover:text-brand-700 transition-colors">Início</a>
+                    <a href="#servicos" class="hover:text-brand-700 transition-colors">Produtos & Serviços</a>
+                    <a href="#sobre" class="hover:text-brand-700 transition-colors">Sobre Nós</a>
+                    <a href="#depoimentos" class="hover:text-brand-700 transition-colors">Avaliações</a>
+                    <a href="#contato" class="hover:text-brand-700 transition-colors">Contato</a>
+                </nav>
+
+                <!-- CTA Button -->
+                <div class="flex items-center gap-4">
+                    <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Vim%20do%20site%20e%20gostaria%20de%20atendimento." target="_blank" class="hidden sm:inline-flex items-center justify-center px-5  py-2.5 rounded-full bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-all duration-300 shadow-md shadow-brand-600/20 hover:shadow-lg hover:shadow-brand-600/30 text-sm gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        (13) 99164-4364
+                    </a>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="md:hidden text-stone-700 hover:text-brand-700 p-2 rounded-lg focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-stone-200 px-4 pt-2 pb-6 space-y-3 shadow-lg">
+            <a href="#inicio" class="block px-3 py-2 rounded-lg text-stone-700 hover:bg-stone-50 hover:text-brand-700 font-medium transition-colors">Início</a>
+            <a href="#servicos" class="block px-3 py-2 rounded-lg text-stone-700 hover:bg-stone-50 hover:text-brand-700 font-medium transition-colors">Produtos & Serviços</a>
+            <a href="#sobre" class="block px-3 py-2 rounded-lg text-stone-700 hover:bg-stone-50 hover:text-brand-700 font-medium transition-colors">Sobre Nós</a>
+            <a href="#depoimentos" class="block px-3 py-2 rounded-lg text-stone-700 hover:bg-stone-50 hover:text-brand-700 font-medium transition-colors">Avaliações</a>
+            <a href="#contato" class="block px-3 py-2 rounded-lg text-stone-700 hover:bg-stone-50 hover:text-brand-700 font-medium transition-colors">Contato</a>
+            <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Vim%20do%20site%20e%20gostaria%20de%20atendimento." target="_blank" class="flex items-center justify-center gap-2 w-full px-5 py-3 rounded-lg bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-all text-center">
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+                Falar no WhatsApp
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section id="inicio" class="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden bg-brand-950 text-white">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1920&q=80" alt="AgroSítio Greenhouse" class="w-full h-full object-cover object-center opacity-30">
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/80 to-transparent"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                <!-- Hero Content -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-900/80 border border-brand-500/30 text-brand-300 text-xs sm:text-sm font-semibold tracking-wide uppercase mx-auto lg:mx-0">
+                        <i class="fa-solid fa-star text-accent-default"></i>
+                        <span>Nota 4.6 no Google com excelente atendimento</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] font-serif">
+                        Tudo para seu <span class="text-brand-400">lar, pet</span> e <span class="text-brand-400">jardim</span> em Mongaguá.
+                    </h1>
+
+                    <p class="text-lg sm:text-xl text-stone-300 font-normal max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        Encontre mudas de plantas saudáveis, flores exuberantes, rações premium para cães e gatos, peixes ornamentais e medicamentos veterinários em um só lugar.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                        <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Vim%20do%20site%20e%20gostaria%20de%20atendimento." target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-brand-500 text-brand-950 font-bold text-lg hover:bg-brand-400 transition-all duration-300 shadow-xl shadow-brand-500/20 hover:-translate-y-0.5 gap-3">
+                            <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            Fale Conosco Agora
+                        </a>
+                        <a href="#servicos" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-transparent border-2 border-stone-400/80 text-white font-semibold text-lg hover:bg-white/10 transition-all duration-300 gap-2">
+                            Ver Nossos Serviços
+                        </a>
+                    </div>
+
+                    <!-- Trust factors -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-stone-800/80 max-w-md mx-auto lg:mx-0">
+                        <div>
+                            <span class="block text-2xl sm:text-3xl font-bold text-brand-400">100%</span>
+                            <span class="text-xs sm:text-sm text-stone-400">Acessível</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl sm:text-3xl font-bold text-brand-400">4.6⭐</span>
+                            <span class="text-xs sm:text-sm text-stone-400">Avaliação Média</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl sm:text-3xl font-bold text-brand-400">+8</span>
+                            <span class="text-xs sm:text-sm text-stone-400">Anos na Região</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Visual - Standardized Premium Frame of Store Real Image mixed with brand assets -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative mx-auto max-w-[450px] lg:max-w-none">
+                        <!-- Background glow effect -->
+                        <div class="absolute -inset-4 bg-brand-500/20 rounded-3xl blur-3xl"></div>
+                        
+                        <!-- Main Frame -->
+                        <div class="relative bg-brand-900 border-4 border-brand-800 rounded-3xl overflow-hidden shadow-2xl">
+                            <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFXdnHQgXLGZUSInEu3m9QiUqg9Y3o3TLqaKPHIZ0ESoIhdXONrVeB1DTTFZ5PhycaEFjn2gexXbqBbj-QUNKdapkObhsXyrOoDMILWS75bKYwkHVr3GsYP6mHxqLPFRYIriu4w=w408-h306-k-no" alt="AgroSítio Fachada" class="w-full h-80 object-cover object-center transform hover:scale-105 transition-transform duration-700">
+                            <div class="p-6 bg-gradient-to-t from-brand-950 to-brand-900">
+                                <h3 class="text-xl font-bold text-white mb-2">Visite Nossa Loja Física</h3>
+                                <p class="text-stone-300 text-sm">Oferecemos estacionamento e rampa de acessibilidade para sua total comodidade e conforto.</p>
+                                <div class="mt-4 flex items-center gap-2 text-brand-400 font-semibold text-sm">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Vila Atlântica, Mongaguá - SP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- KEY HIGHLIGHTS -->
+    <section class="py-12 bg-white border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Highlight 1 -->
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-4 p-4 rounded-2xl hover:bg-stone-50 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-brand-100 text-brand-800 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-wheelchair text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-stone-900 mb-1">Acessibilidade Total</h4>
+                        <p class="text-stone-600 text-sm">Entrada e corredor projetados com total acessibilidade para cadeirantes.</p>
+                    </div>
+                </div>
+
+                <!-- Highlight 2 -->
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-4 p-4 rounded-2xl hover:bg-stone-50 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-brand-100 text-brand-800 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-truck-fast text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-stone-900 mb-1">Entrega Rápida</h4>
+                        <p class="text-stone-600 text-sm">Comprou e precisa receber em casa? Fazemos entregas com total agilidade na região.</p>
+                    </div>
+                </div>
+
+                <!-- Highlight 3 -->
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-4 p-4 rounded-2xl hover:bg-stone-50 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-brand-100 text-brand-800 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-handshake text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-stone-900 mb-1">Atendimento Atencioso</h4>
+                        <p class="text-stone-600 text-sm">Uma equipe apaixonada e prestativa sempre pronta para tirar suas dúvidas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES / CATEGORIES SECTION -->
+    <section id="servicos" class="py-20 bg-stone-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-600 font-bold tracking-wider uppercase text-sm block mb-2">Variedade & Qualidade</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 font-serif">O que você encontra na AgroSítio</h2>
+                <p class="text-stone-600 mt-4 text-lg">Oferecemos uma curadoria completa de produtos para cuidar da saúde de seus animais e da beleza do seu jardim.</p>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Service 1 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-stone-200">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=800&q=80" alt="Plantas e Mudas" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <span class="absolute bottom-4 left-4 bg-brand-600 text-white font-semibold text-xs px-2.5 py-1 rounded-full uppercase">Jardinagem</span>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-900 mb-2">Plantas, Flores & Mudas</h3>
+                            <p class="text-stone-600 text-sm leading-relaxed mb-4">Mudas de hortaliças frescas, plantas ornamentais de interior e exterior, adubos de alta qualidade e tudo para seu cultivo.</p>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20as%20mudas%20e%20plantas." target="_blank" class="inline-flex items-center text-brand-600 font-bold hover:text-brand-700 text-sm gap-2 mt-auto">
+                            Consultar estoque <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-stone-200">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="Pet Shop e Ração" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <span class="absolute bottom-4 left-4 bg-brand-600 text-white font-semibold text-xs px-2.5 py-1 rounded-full uppercase">Pet Shop</span>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-900 mb-2">Ração & Acessórios</h3>
+                            <p class="text-stone-600 text-sm leading-relaxed mb-4">Grande variedade de rações premium e super premium para cães, gatos, aves e roedores com os melhores preços.</p>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Gostaria%20de%20saber%20os%20preços%20das%20rações." target="_blank" class="inline-flex items-center text-brand-600 font-bold hover:text-brand-700 text-sm gap-2 mt-auto">
+                            Pedir orçamento <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-stone-200">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80" alt="Aquarismo" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <span class="absolute bottom-4 left-4 bg-brand-600 text-white font-semibold text-xs px-2.5 py-1 rounded-full uppercase">Aquários</span>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-900 mb-2">Peixes & Aquarismo</h3>
+                            <p class="text-stone-600 text-sm leading-relaxed mb-4">Uma seção dedicada a peixes de água doce, rações específicas, filtros, ornamentos e produtos para manter seu aquário saudável.</p>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Gostaria%20de%20ver%20as%20opções%20de%20peixes%20e%20aquários." target="_blank" class="inline-flex items-center text-brand-600 font-bold hover:text-brand-700 text-sm gap-2 mt-auto">
+                            Ver opções <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 4 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-stone-200">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=800&q=80" alt="Medicamentos Veterinários" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <span class="absolute bottom-4 left-4 bg-brand-600 text-white font-semibold text-xs px-2.5 py-1 rounded-full uppercase">Farmácia</span>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-900 mb-2">Saúde Veterinária</h3>
+                            <p class="text-stone-600 text-sm leading-relaxed mb-4">Medicamentos, vermífugos, anti-pulgas e produtos de higiene essenciais para garantir o bem-estar e a longevidade dos seus pets.</p>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Estou%20precisando%20de%20um%20medicamento%20veterinário%20específico." target="_blank" class="inline-flex items-center text-brand-600 font-bold hover:text-brand-700 text-sm gap-2 mt-auto">
+                            Consultar farmácia <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REAL GALLERY SECTION -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-600 font-bold tracking-wider uppercase text-sm block mb-2">Nossa Estrutura</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 font-serif">Conheça o AgroSítio por Dentro</h2>
+                <p class="text-stone-600 mt-4 text-lg">Fotos reais do nosso estabelecimento preparado com muito carinho para receber você.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Image 1 -->
+                <div class="relative overflow-hidden rounded-2xl shadow-md group h-64 border border-stone-200">
+                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGUDJaVldB7_Wu1nzyZMaCs8oQhi9OZxmX91-5aG4AvjnRFQM4RM7rwR38dyS9bW9AKDd8nsz5I3QMRAOyGiIwVi_GY49B7kqNQR4HNTjGHVrSVaui5cXX9mI9vovQI8iTYXXP7=w397-h298-k-no" alt="Interior da Loja" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent flex items-end p-6">
+                        <div>
+                            <p class="text-brand-400 font-semibold text-xs tracking-wider uppercase">Loja Física</p>
+                            <h4 class="text-white text-lg font-bold">Variedade no Interior</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image 2 -->
+                <div class="relative overflow-hidden rounded-2xl shadow-md group h-64 border border-stone-200">
+                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGwqbEsY0vM-Lejh2OjOGDaNZ917GF1BxopkHU6LvLnosML2BKWONkkqr0SAChNBR-Xc3AKO3lPY_fM8KqaHYTKaiBC67TpgNMHKf1cBv9vJhonvNeTU_bx8OlK3sO_s1OUFEQz=w224-h298-k-no" alt="Planta de interior" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent flex items-end p-6">
+                        <div>
+                            <p class="text-brand-400 font-semibold text-xs tracking-wider uppercase">Estoque</p>
+                            <h4 class="text-white text-lg font-bold">Plantas e Vasos</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image 3 -->
+                <div class="relative overflow-hidden rounded-2xl shadow-md group h-64 border border-stone-200">
+                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAH-4vLYFisnrFiz3q4W0y_hzwj1u0HiTYj7W_UsrOSleOcgATV-dxks-0LgHqKGd4tshCdj3bVkXXrkKWcB16DmcWwmY2Nt8RgqsfbqQjPgcI8NFA1o4TkHzcG_wZYXZPOjtDmo=w224-h398-k-no" alt="Exterior" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent flex items-end p-6">
+                        <div>
+                            <p class="text-brand-400 font-semibold text-xs tracking-wider uppercase">Fachada</p>
+                            <h4 class="text-white text-lg font-bold">Fácil Acesso na Marginal</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ACCESSIBILITY & ABOUT -->
+    <section id="sobre" class="py-20 bg-stone-100 border-t border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Graphic/Visual container using Unsplash Premium -->
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl h-[450px]">
+                    <img src="https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?auto=format&fit=crop&w=1000&q=80" alt="Beautiful greenhouse family plants store" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brand-950/80 via-transparent to-transparent flex items-end p-8">
+                        <div class="max-w-md bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-stone-100">
+                            <span class="text-brand-600 font-bold text-xs tracking-widest uppercase block mb-1">Nosso Diferencial</span>
+                            <p class="text-stone-800 text-sm font-medium">"Excelente atendimento, equipe prestativa e uma estrutura impecável para você e sua família."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Content -->
+                <div class="space-y-6">
+                    <span class="text-brand-600 font-bold tracking-wider uppercase text-sm block">Tradição & Cuidado</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 font-serif">O melhor Agro e Pet Center da região de Mongaguá</h2>
+                    <p class="text-stone-600 leading-relaxed text-lg">
+                        Fundado com o objetivo de aproximar o melhor da natureza e o cuidado com os animais de estimação aos moradores e visitantes de Mongaguá, o <strong>AgroSítio</strong> é referência em atendimento humanizado e diversidade de produtos.
+                    </p>
+                    <p class="text-stone-600 leading-relaxed">
+                        Nossa nova administração investe constantemente em trazer novidades e manter a loja organizada, limpa e de fácil circulação. Além disso, somos <strong>altamente acessíveis</strong>, com rampa de acesso e espaços amplos pensados para cadeirantes.
+                    </p>
+
+                    <!-- Accessibility Badge / Highlights -->
+                    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-start gap-4">
+                        <div class="bg-brand-100 text-brand-700 p-3 rounded-xl shrink-0">
+                            <i class="fa-solid fa-wheelchair text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-stone-900 font-bold text-base mb-1">Espaço 100% Acessível</h4>
+                            <p class="text-stone-600 text-sm">Contamos com entrada com acessibilidade projetada especialmente para pessoas em cadeira de rodas, garantindo conforto e autonomia na sua visita.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS (REAL GOOGLE REVIEWS) -->
+    <section id="depoimentos" class="py-20 bg-stone-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-600 font-bold tracking-wider uppercase text-sm block mb-2">Quem compra, recomenda</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 font-serif">Opinião de Nossos Clientes</h2>
+                <p class="text-stone-600 mt-4 text-lg">Transparência e satisfação real. Veja o que dizem nossos clientes no Google.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Review 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-200/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center gap-1 text-accent-default mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-stone-700 leading-relaxed italic text-sm sm:text-base">"A melhor loja da região! Muito cuidadosos com seus produtos e extremamente atenciosos. Não existe nenhuma agro melhor!"</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-stone-100">
+                        <img src="https://lh3.googleusercontent.com/a-/ALV-UjWVkjQJBZrrhVlQ6JQx4pzFpccLOGxBzG2BTnxAtH49BWSKYt4-=s120-c-rp-mo-br100" alt="Bahamutis" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-stone-900 font-bold text-sm">Bahamutis</h4>
+                            <span class="text-stone-400 text-xs">Cliente Google</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-200/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center gap-1 text-accent-default mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-stone-700 leading-relaxed italic text-sm sm:text-base">"Sou cliente deles lá tem mudas de plantas hortaliças peixinhos de aquário ração para cães e gatos, medicamentos veterinários etc."</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-stone-100">
+                        <img src="https://lh3.googleusercontent.com/a-/ALV-UjXDI2s0Z-BrTjOQTa1J4uVIu2UiKwhZnht1WYe7OWOj78YoBsmtmg=s120-c-rp-mo-ba12-br100" alt="Edvaldo Przybysz" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-stone-900 font-bold text-sm">edvaldo przybysz</h4>
+                            <span class="text-stone-400 text-xs">Cliente Google</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-200/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center gap-1 text-accent-default mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-stone-700 leading-relaxed italic text-sm sm:text-base">"Excelente atendimento, preços bons, os atendentes são maravilhosos, entrega rápida recomendo!!!"</p>
+                    </div>
+                    <div class="flex items-center gap-4 mt-6 pt-6 border-t border-stone-100">
+                        <img src="https://lh3.googleusercontent.com/a/ACg8ocKwN9oRR736TxdA6UuG2JqQ1C5Cj_P1X3r3rmTROd7pxrwN8A=s120-c-rp-mo-br100" alt="MelEvelyn" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-stone-900 font-bold text-sm">MelEvelyn</h4>
+                            <span class="text-stone-400 text-xs">Cliente Google</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT, HOURS & MAP SECTION -->
+    <section id="contato" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- Contact info & Hours (5 Cols) -->
+                <div class="lg:col-span-5 space-y-8">
+                    <div>
+                        <span class="text-brand-600 font-bold tracking-wider uppercase text-sm block mb-2">Venha nos visitar</span>
+                        <h2 class="text-3xl font-extrabold tracking-tight text-stone-900 font-serif">Horário & Endereço</h2>
+                        <p class="text-stone-600 mt-2">Estamos localizados em uma área de fácil acesso em Mongaguá.</p>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center shrink-0 text-brand-700">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-stone-900">Endereço</h4>
+                                <p class="text-stone-600 text-sm">AgroSítio - Av. Monteiro Lobato, 4444 - Vila Atlântica, Mongaguá - SP, 11730-000</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center shrink-0 text-brand-700">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-stone-900">Telefone / WhatsApp</h4>
+                                <p class="text-stone-600 text-sm">(13) 99164-4364</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hours Table -->
+                    <div class="p-6 bg-stone-50 rounded-2xl border border-stone-200">
+                        <h3 class="font-bold text-stone-900 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-clock text-brand-600"></i>
+                            Horário de Funcionamento
+                        </h3>
+                        <div class="space-y-2 text-sm text-stone-600">
+                            <div class="flex justify-between pb-2 border-b border-stone-200">
+                                <span class="font-medium">Segunda-feira</span>
+                                <span class="text-stone-900 font-semibold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between pb-2 border-b border-stone-200">
+                                <span class="font-medium">Terça-feira</span>
+                                <span class="text-stone-900 font-semibold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between pb-2 border-b border-stone-200">
+                                <span class="font-medium">Quarta-feira</span>
+                                <span class="text-stone-900 font-semibold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between pb-2 border-b border-stone-200">
+                                <span class="font-medium">Quinta-feira</span>
+                                <span class="text-stone-900 font-semibold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between pb-2 border-b border-stone-200">
+                                <span class="font-medium">Sexta-feira</span>
+                                <span class="text-stone-900 font-semibold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between pb-2 border-b border-stone-200">
+                                <span class="font-medium">Sábado</span>
+                                <span class="text-stone-900 font-semibold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-brand-600">Domingo</span>
+                                <span class="text-brand-750 font-semibold">08:00 – 13:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Google Map Block & Direct Contact CTA (7 Cols) -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+                    <!-- Embedded Map Design (Premium Mockup or Actual Embed) -->
+                    <div class="w-full h-80 lg:h-96 rounded-3xl overflow-hidden shadow-md border border-stone-200 relative">
+                        <!-- Standard dynamic map embedding for the location -->
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3637.3621404100657!2d-46.6433299!3d-24.116669!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce18617d1e8ef9%3A0xc3f178229b1be38b!2sAgroS%C3%ADtio!5e0!3m2!1spt-BR!2sbr!4v1680000000000!5m2!1spt-BR!2sbr" 
+                            class="w-full h-full border-0" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+
+                    <!-- Direct Contact Call To Action -->
+                    <div class="bg-brand-950 text-white p-8 rounded-3xl relative overflow-hidden">
+                        <div class="absolute right-0 bottom-0 translate-x-10 translate-y-10 text-brand-800/20 text-9xl font-bold">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <h3 class="text-xl sm:text-2xl font-bold mb-2">Quer tirar alguma dúvida de estoque ou preço?</h3>
+                            <p class="text-stone-300 text-sm sm:text-base mb-6 max-w-lg">Clique no botão abaixo para iniciar uma conversa direto no WhatsApp com um de nossos colaboradores.</p>
+                            <a href="https://api.whatsapp.com/send?phone=5513991644364&text=Olá!%20Gostaria%20de%20atendimento." target="_blank" class="inline-flex items-center gap-2 bg-brand-500 text-brand-950 font-bold px-6 py-3 rounded-full hover:bg-brand-400 transition-colors shadow-lg">
+                                <i class="fa-brands fa-whatsapp text-xl"></i>
+                                Chame no WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-stone-900 text-stone-400 py-12 border-t border-stone-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-stone-800">
+                <!-- Logo brand footer -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-brand-800 text-brand-100 p-2 rounded-xl">
+                        <i class="fa-solid fa-leaf text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-white block">AgroSítio</span>
+                        <span class="text-xs text-stone-500 uppercase">Mongaguá - SP</span>
+                    </div>
+                </div>
+
+                <!-- Footer Quick links -->
+                <div class="flex flex-wrap justify-center gap-6 text-sm">
+                    <a href="#inicio" class="hover:text-white transition-colors">Início</a>
+                    <a href="#servicos" class="hover:text-white transition-colors">Produtos</a>
+                    <a href="#sobre" class="hover:text-white transition-colors">Sobre</a>
+                    <a href="#depoimentos" class="hover:text-white transition-colors">Depoimentos</a>
+                    <a href="#contato" class="hover:text-white transition-colors">Contato</a>
+                </div>
+            </div>
+
+            <!-- Footer Meta/Credits -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-stone-500">
+                <p>&copy; 2026 AgroSítio. Todos os direitos reservados.</p>
+                <p class="font-semibold tracking-wider text-stone-400">Site criado e mantido por STUDIOTESTA.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu Handler script -->
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+        
+        // Close menu on click link
+        const links = menu.querySelectorAll('a');
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
