@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop Mar Cão - Banho, Tosa e Acessórios em Mongaguá</title>
+    <meta name="description" content="O melhor pet shop de Mongaguá. Banho e tosa feitos com carinho, entrega rápida, rações e os melhores produtos para o seu pet. Avaliação 4.8 estrelas!">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        petGreen: '#00ba74',
+                        petYellow: '#ffe400',
+                        petBlack: '#000000',
+                        petMagenta: '#e920a3',
+                        petDark: '#0b0f19'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Alpine JS for minimal interactive stuff -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .gradient-text {
+            background: linear-gradient(135deg, #00ba74 0%, #e920a3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bg-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#00ba74 0.5px, transparent 0.5px), radial-gradient(#e920a3 0.5px, #ffffff 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            opacity: 0.03;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 overflow-x-hidden antialiased">
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="bg-petBlack text-white py-2 px-4 text-center text-xs md:text-sm font-semibold tracking-wide flex items-center justify-center gap-2 relative z-50">
+        <span class="inline-flex items-center justify-center bg-petMagenta text-white text-[10px] px-2 py-0.5 rounded-full uppercase font-bold animate-pulse">Novidade</span>
+        <span>Atendimento rápido via WhatsApp e entregas em toda Mongaguá!</span>
+    </div>
+
+    <!-- NAVIGATION HEADER -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300" x-data="{ mobileMenu: false }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- LOGO PLACEHOLDER (PRE-CONFIGURED FOR EASY MANUAL SIZING AND REPLACEMENT) -->
+            <div class="flex items-center gap-3">
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-12 h-12 bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105" title="Espaço reservado para o Logo oficial">
+                        <!-- Substitua este placeholder de imagem pelo link do seu logo real -->
+                        <span class="text-xs text-gray-400 font-bold text-center leading-none">LOGO<br>AQUI</span>
+                    </div>
+                    <div>
+                        <span class="font-display text-2xl font-bold tracking-tight text-petBlack block leading-none">Mar Cão</span>
+                        <span class="text-[10px] uppercase tracking-widest text-petGreen font-bold block mt-1">Pet Shop</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- DESKTOP NAV -->
+            <nav class="hidden md:flex items-center gap-8 font-semibold text-sm text-gray-700">
+                <a href="#inicio" class="hover:text-petGreen transition-colors">Início</a>
+                <a href="#servicos" class="hover:text-petGreen transition-colors">Serviços</a>
+                <a href="#sobre" class="hover:text-petGreen transition-colors">Sobre Nós</a>
+                <a href="#avaliacoes" class="hover:text-petGreen transition-colors">Depoimentos</a>
+                <a href="#contato" class="hover:text-petGreen transition-colors">Contato</a>
+            </nav>
+
+            <!-- CTA BUTTON -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20agendar%20um%20serviço%20no%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="bg-petGreen hover:bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-full shadow-lg shadow-emerald-200 transition-all duration-300 hover:scale-105 flex items-center gap-2 text-sm">
+                    <i class="fab fa-whatsapp text-lg"></i>
+                    Agendar Horário
+                </a>
+            </div>
+
+            <!-- MOBILE MENU BUTTON -->
+            <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 text-gray-700 hover:text-petGreen focus:outline-none">
+                <i class="fa-solid" :class="mobileMenu ? 'fa-xmark text-2xl' : 'fa-bars text-2xl'"></i>
+            </button>
+        </div>
+
+        <!-- MOBILE NAV DRAWER -->
+        <div x-show="mobileMenu" x-transition x-cloak class="md:hidden bg-white border-b border-gray-200 py-4 px-6 space-y-4 absolute top-20 left-0 w-full shadow-xl">
+            <a href="#inicio" @click="mobileMenu = false" class="block font-semibold text-gray-700 hover:text-petGreen py-1">Início</a>
+            <a href="#servicos" @click="mobileMenu = false" class="block font-semibold text-gray-700 hover:text-petGreen py-1">Serviços</a>
+            <a href="#sobre" @click="mobileMenu = false" class="block font-semibold text-gray-700 hover:text-petGreen py-1">Sobre Nós</a>
+            <a href="#avaliacoes" @click="mobileMenu = false" class="block font-semibold text-gray-700 hover:text-petGreen py-1">Depoimentos</a>
+            <a href="#contato" @click="mobileMenu = false" class="block font-semibold text-gray-700 hover:text-petGreen py-1">Contato</a>
+            <div class="pt-2">
+                <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20agendar%20um%20serviço%20no%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="w-full bg-petGreen hover:bg-emerald-600 text-white font-bold py-3 rounded-full text-center block shadow-md flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp text-lg"></i>
+                    Falar com Atendente
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section id="inicio" class="relative overflow-hidden bg-white pt-8 pb-16 lg:pt-16 lg:pb-24">
+        <!-- Background elements -->
+        <div class="absolute inset-0 bg-pattern"></div>
+        <div class="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-emerald-100 blur-3xl opacity-50"></div>
+        <div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-pink-100 blur-3xl opacity-50"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                
+                <!-- Hero Text -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-4 py-1.5 rounded-full text-petGreen font-bold text-xs md:text-sm tracking-wide mx-auto lg:mx-0">
+                        <i class="fa-solid fa-star text-petYellow"></i>
+                        <span>Pet Shop Favorito de Mongaguá • Nota 4.8</span>
+                    </div>
+
+                    <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-petDark leading-[1.1]">
+                        O carinho e cuidado que o seu <span class="text-petGreen">melhor amigo</span> merece!
+                    </h1>
+
+                    <p class="text-gray-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 font-medium">
+                        No <strong class="text-petBlack font-bold">Pet Shop Mar Cão</strong>, combinamos carinho, profissionais dedicados e produtos de alta qualidade para garantir a felicidade e o bem-estar do seu pet. Banho & Tosa e entregas rápidas na porta da sua casa!
+                    </p>
+
+                    <!-- CTAs -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                        <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20agendar%20um%20serviço%20no%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="w-full sm:w-auto bg-petGreen hover:bg-emerald-600 text-white font-bold px-8 py-4 rounded-full shadow-xl shadow-emerald-200 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 text-lg">
+                            <i class="fab fa-whatsapp text-2xl"></i>
+                            Agendar Banho e Tosa
+                        </a>
+                        <a href="#servicos" class="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-200 font-bold px-8 py-4 rounded-full transition-all duration-300 hover:scale-105 block text-center text-lg">
+                            Conhecer Serviços
+                        </a>
+                    </div>
+
+                    <!-- Small Social Proof Info -->
+                    <div class="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">
+                        <div class="flex -space-x-2">
+                            <img class="inline-block h-10 w-10 rounded-full ring-2 ring-white" src="https://lh3.googleusercontent.com/a-/ALV-UjULgJN62EFmHO2D1-jHRnR_Adjb_BRs5VMYYd_ufRx5sPQMRbg9cQ=s120" alt="Cliente">
+                            <img class="inline-block h-10 w-10 rounded-full ring-2 ring-white" src="https://lh3.googleusercontent.com/a-/ALV-UjXlogED8Vbv2asLFNu00TiGMczGtD74Z1VH-YbkEClmAO8gKbVN=s120" alt="Cliente">
+                            <img class="inline-block h-10 w-10 rounded-full ring-2 ring-white" src="https://lh3.googleusercontent.com/a-/ALV-UjWHPOjTFx3dCLEfQDviqwAwMbF7TGhOIMhAzNE-UlcT9bKiEzn7fA=s120" alt="Cliente">
+                        </div>
+                        <div class="text-sm text-gray-500 text-center lg:text-left">
+                            <div class="flex justify-center lg:justify-start text-petYellow text-xs gap-1">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <span>Aprovado por mais de <strong>117+ famílias</strong> na Baixada Santista!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Images (Interactive Frame & Visuals) -->
+                <div class="lg:col-span-5 relative">
+                    <!-- Premium visual framework for main image -->
+                    <div class="relative mx-auto max-w-[400px] lg:max-w-none">
+                        <!-- Magenta Decorative Frame -->
+                        <div class="absolute -inset-1.5 bg-gradient-to-r from-petGreen to-petMagenta rounded-[2.5rem] blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                        <div class="relative bg-white p-3 rounded-[2.3rem] shadow-2xl">
+                            <img src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=600" alt="Cachorrinho feliz tomando banho no Pet Shop Mar Cão" class="rounded-[1.8rem] w-full object-cover h-[350px] lg:h-[450px]">
+                        </div>
+
+                        <!-- Floating Badge 1 (Trust badge) -->
+                        <div class="absolute -top-6 -left-6 bg-white p-4 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 animate-bounce" style="animation-duration: 4s;">
+                            <div class="w-10 h-10 bg-pink-100 text-petMagenta rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-heart text-xl"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block font-semibold">Cuidado com Amor</span>
+                                <span class="text-sm text-petBlack font-bold">Grooming Premium</span>
+                            </div>
+                        </div>
+
+                        <!-- Floating Badge 2 (Fast delivery badge) -->
+                        <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 animate-bounce" style="animation-duration: 5s;">
+                            <div class="w-10 h-10 bg-emerald-100 text-petGreen rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-truck text-xl"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 block font-semibold">Entrega Rápida</span>
+                                <span class="text-sm text-petBlack font-bold">Rações & Medicamentos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TRUST STATS SECTION -->
+    <section class="bg-petDark text-white py-12 relative overflow-hidden">
+        <div class="absolute inset-0 bg-opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <span class="block font-display text-4xl lg:text-5xl font-extrabold text-petGreen">4.8</span>
+                    <span class="block text-gray-400 text-xs uppercase tracking-wider mt-2">Nota no Google</span>
+                </div>
+                <div>
+                    <span class="block font-display text-4xl lg:text-5xl font-extrabold text-petYellow">117+</span>
+                    <span class="block text-gray-400 text-xs uppercase tracking-wider mt-2">Avaliações Reais</span>
+                </div>
+                <div>
+                    <span class="block font-display text-4xl lg:text-5xl font-extrabold text-petMagenta">100%</span>
+                    <span class="block text-gray-400 text-xs uppercase tracking-wider mt-2">Pet-Friendly</span>
+                </div>
+                <div>
+                    <span class="block font-display text-4xl lg:text-5xl font-extrabold text-white">Anos</span>
+                    <span class="block text-gray-400 text-xs uppercase tracking-wider mt-2">de Experiência</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section id="servicos" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <span class="text-petMagenta font-bold text-sm uppercase tracking-widest block">O que fazemos de melhor</span>
+                <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-petDark">Nossos Serviços & Produtos</h2>
+                <p class="text-gray-600 font-medium">Oferecemos tudo o que seu pet precisa para se manter saudável, limpo e extremamente feliz!</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Service 1: Banho & Tosa -->
+                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-100 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="relative overflow-hidden rounded-2xl mb-6">
+                            <img src="https://images.unsplash.com/photo-1541599540903-216a46cc1cf0?auto=format&fit=crop&q=80&w=600" alt="Banho e Tosa" class="w-full h-48 object-cover group-hover:scale-105 transition-all duration-300">
+                            <div class="absolute top-4 right-4 bg-petMagenta text-white font-bold text-xs px-3 py-1 rounded-full">Destaque</div>
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-petDark mb-3">Banho e Tosa Premium</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-6">Equipe altamente capacitada para cuidar do visual e higiene do seu companheiro com muito amor, carinho e paciência. Utilizamos produtos dermatológicos testados.</p>
+                    </div>
+                    <div>
+                        <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20agendar%20Banho%20e%20Tosa%20no%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="w-full bg-petGreen hover:bg-emerald-600 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all">
+                            <i class="fab fa-whatsapp"></i> Agendar pelo WhatsApp
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 2: Ração & Suprimentos -->
+                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-100 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="relative overflow-hidden rounded-2xl mb-6">
+                            <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=600" alt="Ração e brinquedos" class="w-full h-48 object-cover group-hover:scale-105 transition-all duration-300">
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-petDark mb-3">Rações & Farmácia</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-6">Tudo em nutrição de alta performance, rações premium e super premium, medicamentos, antipulgas, brinquedos variados e acessórios diferenciados para todas as idades.</p>
+                    </div>
+                    <div>
+                        <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20verificar%20disponibilidade%20de%20rações/produtos%20no%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="w-full bg-petDark hover:bg-neutral-800 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-solid fa-magnifying-glass"></i> Consultar Disponibilidade
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 3: Delivery Rápido -->
+                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-100 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="relative overflow-hidden rounded-2xl mb-6">
+                            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=600" alt="Entrega em domicílio" class="w-full h-48 object-cover group-hover:scale-105 transition-all duration-300">
+                            <div class="absolute top-4 right-4 bg-petGreen text-white font-bold text-xs px-3 py-1 rounded-full">Super Rápido</div>
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-petDark mb-3">Entrega & Coleta</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-6">Bateu a preguiça ou está sem tempo? Oferecemos um serviço de entrega rápida de rações e acessórios em toda região de Mongaguá com atendimento agilizado pelo WhatsApp!</p>
+                    </div>
+                    <div>
+                        <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20pedir%20entrega/delivery%20de%20rações%20do%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="w-full bg-petGreen hover:bg-emerald-600 text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-solid fa-motorcycle"></i> Pedir Delivery Agora
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION & EXPERIENCE COMODITIES -->
+    <section id="sobre" class="py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                
+                <!-- Left Details -->
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-petGreen font-bold text-sm uppercase tracking-widest block">Compromisso com o Bem Estar</span>
+                    <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-petDark">Mais que um Pet Shop, o segundo lar do seu Pet</h2>
+                    <p class="text-gray-600 leading-relaxed font-medium">
+                        Localizado estrategicamente na <strong class="text-petBlack">Av. Monteiro Lobato, 7866</strong> em Mongaguá, o Pet Shop Mar Cão se consagrou como líder no segmento de cuidados animais por prezar pelo tratamento atencioso, preços honestos e qualidade premium.
+                    </p>
+
+                    <!-- Features/Benefits List (Extracted from Data) -->
+                    <div class="grid sm:grid-cols-2 gap-4 pt-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-petGreen flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-gray-700 font-semibold text-sm">Entrega Residencial</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-petGreen flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-gray-700 font-semibold text-sm">Retirada Rápida na Loja</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-petGreen flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-gray-700 font-semibold text-sm">Entrada Acessível</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-petGreen flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-gray-700 font-semibold text-sm">Pagamento por NFC / Cartão</span>
+                        </div>
+                    </div>
+
+                    <!-- Highlighted Quote -->
+                    <div class="border-l-4 border-petMagenta bg-pink-50 p-4 rounded-r-2xl">
+                        <p class="italic text-gray-600 text-sm">
+                            "O melhor de Mongaguá, atendimento rápido por WhatsApp, entrega rápida também. Bons preços e tem muita promoção. Recomendo."
+                        </p>
+                        <span class="block font-bold text-petDark text-xs mt-2">— Vitória Lucio Cirino, Cliente Satisfeita</span>
+                    </div>
+                </div>
+
+                <!-- Right Grid/Image Visual (Extracted Actual Pictures Mix) -->
+                <div class="lg:col-span-6 grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div class="overflow-hidden rounded-3xl bg-gray-100 border border-gray-200">
+                            <!-- Actual Client image replacement link for high contextual look -->
+                            <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGPwVGAJ1SLlj0eKrWRi4rsv2KVWWdYWTn2oRAomOaTsrNsIKrMFsNi6OGOz7hNU1SdqN6JXgr7IDh5UVCLZV_Na7yqmb5tWIsT6JNZbzeJbG_ne835klgTfKFRMyhspYsjPpc=w408-h544-k-no" alt="Pet Shop Mar Cão Interior/Fachada" class="w-full object-cover h-60 hover:scale-105 transition duration-300">
+                        </div>
+                        <div class="bg-petYellow text-petBlack p-6 rounded-3xl flex flex-col justify-center text-center">
+                            <i class="fa-solid fa-wifi text-3xl mb-2"></i>
+                            <span class="font-bold text-lg block">Wi-Fi Grátis</span>
+                            <span class="text-xs font-semibold opacity-80">Conexão garantida enquanto aguarda seu pet</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-8">
+                        <div class="bg-petMagenta text-white p-6 rounded-3xl flex flex-col justify-center text-center">
+                            <i class="fa-solid fa-wheelchair text-3xl mb-2"></i>
+                            <span class="font-bold text-lg block">Acessibilidade</span>
+                            <span class="text-xs font-semibold opacity-85">Espaço preparado para todos os clientes</span>
+                        </div>
+                        <div class="overflow-hidden rounded-3xl bg-gray-100 border border-gray-200">
+                            <img src="https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&q=80&w=400" alt="Cachorro Feliz" class="w-full object-cover h-60 hover:scale-105 transition duration-300">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS (REAL GOOGLE REVIEWS SECTION) -->
+    <section id="avaliacoes" class="py-20 bg-gray-50 overflow-hidden relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto space-y-4 mb-16">
+                <span class="text-petGreen font-bold text-sm uppercase tracking-widest block">Quem conhece aprova</span>
+                <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-petDark">O que dizem os donos de pets</h2>
+                <p class="text-gray-600 font-medium">Transparência total! Depoimentos de clientes retirados diretamente do Google Maps.</p>
+            </div>
+
+            <!-- Review Cards Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Review 1 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-md shadow-gray-100 hover:shadow-xl transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://lh3.googleusercontent.com/a-/ALV-UjULgJN62EFmHO2D1-jHRnR_Adjb_BRs5VMYYd_ufRx5sPQMRbg9cQ=s120" alt="Lika Tavares" class="w-12 h-12 rounded-full border-2 border-petGreen">
+                            <div>
+                                <h4 class="font-bold text-petDark text-base leading-none">Lika Tavares</h4>
+                                <span class="text-xs text-gray-400 block mt-1">Google Review • 5 Estrelas</span>
+                            </div>
+                        </div>
+                        <div class="text-petYellow flex gap-1 mb-4 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            "Atendimento excelente, tudo o que você procura tem..🐈🐈‍⬛🐕🐩🐾"
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-50 text-xs text-petGreen font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Recomenda o estabelecimento</span>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-md shadow-gray-100 hover:shadow-xl transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://lh3.googleusercontent.com/a-/ALV-UjXlogED8Vbv2asLFNu00TiGMczGtD74Z1VH-YbkEClmAO8gKbVN=s120" alt="Vitória Lucio Cirino" class="w-12 h-12 rounded-full border-2 border-petGreen">
+                            <div>
+                                <h4 class="font-bold text-petDark text-base leading-none">Vitória Lucio Cirino</h4>
+                                <span class="text-xs text-gray-400 block mt-1">Google Review • 5 Estrelas</span>
+                            </div>
+                        </div>
+                        <div class="text-petYellow flex gap-1 mb-4 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            "O melhor de Mongagua, atendimento rápido por WhatsApp, entrega rápida também. Bons preços e tem muita promoção. Recomendo. O melhor."
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-50 text-xs text-petGreen font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Recomenda o estabelecimento</span>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-md shadow-gray-100 hover:shadow-xl transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://lh3.googleusercontent.com/a-/ALV-UjWHPOjTFx3dCLEfQDviqwAwMbF7TGhOIMhAzNE-UlcT9bKiEzn7fA=s120" alt="Ana Sorce" class="w-12 h-12 rounded-full border-2 border-petGreen">
+                            <div>
+                                <h4 class="font-bold text-petDark text-base leading-none">Ana Sorce</h4>
+                                <span class="text-xs text-gray-400 block mt-1">Google Review • 5 Estrelas</span>
+                            </div>
+                        </div>
+                        <div class="text-petYellow flex gap-1 mb-4 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            "Atendimento excelente. Super recomendo, fiz banho e tosa na minha York, rápidos e cuidadosos."
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-50 text-xs text-petGreen font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Recomenda o estabelecimento</span>
+                    </div>
+                </div>
+
+                <!-- Review 4 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-md shadow-gray-100 hover:shadow-xl transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://lh3.googleusercontent.com/a-/ALV-UjU2cFJLoDoIl3yedQjORryJL6E2sCrIBjfb8lxcEkRvvd-332-q=s120" alt="Monica Rodrigues" class="w-12 h-12 rounded-full border-2 border-petGreen">
+                            <div>
+                                <h4 class="font-bold text-petDark text-base leading-none">Monica Rodrigues</h4>
+                                <span class="text-xs text-gray-400 block mt-1">Google Review • 5 Estrelas</span>
+                            </div>
+                        </div>
+                        <div class="text-petYellow flex gap-1 mb-4 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            "Super recomendo, atendimento muito bom só compro com eles."
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-50 text-xs text-petGreen font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Recomenda o estabelecimento</span>
+                    </div>
+                </div>
+
+                <!-- Review 5 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-md shadow-gray-100 hover:shadow-xl transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://lh3.googleusercontent.com/a-/ALV-UjWysCTdlZSuAW-YRo1iaCUHa1ZoGj6dVYpU6fnWxzXeQummc1waPA=s120" alt="Marcelo Sollitto" class="w-12 h-12 rounded-full border-2 border-petGreen">
+                            <div>
+                                <h4 class="font-bold text-petDark text-base leading-none">Marcelo Sollitto</h4>
+                                <span class="text-xs text-gray-400 block mt-1">Google Review • 5 Estrelas</span>
+                            </div>
+                        </div>
+                        <div class="text-petYellow flex gap-1 mb-4 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            "Loja completa, atendimento excelente, banho e tosa feita com carinho, recomendo!!!"
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-50 text-xs text-petGreen font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Recomenda o estabelecimento</span>
+                    </div>
+                </div>
+
+                <!-- Review 6 -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-md shadow-gray-100 hover:shadow-xl transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://lh3.googleusercontent.com/a-/ALV-UjX6HySLrDA1tigDf7bvGJiUqX7z9N0TByoJiUVB-NjNrLm_mWcX=s120" alt="Tonny Law" class="w-12 h-12 rounded-full border-2 border-petGreen">
+                            <div>
+                                <h4 class="font-bold text-petDark text-base leading-none">Tonny Law</h4>
+                                <span class="text-xs text-gray-400 block mt-1">Google Review • 5 Estrelas</span>
+                            </div>
+                        </div>
+                        <div class="text-petYellow flex gap-1 mb-4 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            "Ótimo serviço, atendimento excelente e entrega sempre muito rápida, já sou cliente deles há anos, sempre tiveram muito cuidado e carinho com os meus doguinhos!"
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-50 text-xs text-petGreen font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Recomenda o estabelecimento</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Call to action on testimonials -->
+            <div class="mt-12 text-center">
+                <a href="https://www.google.com/maps/place/Pet+Shop+Mar+C%C3%A3o/data=!4m7!3m6!1s0x94ce280bf31d9085:0xca490b8bebfbd19!8m2!3d-24.1192821!4d-46.6730254!16s%2Fg%2F11gf8h9_28!19sChIJhZAd8wsozpQRGb2_vriQpAw?authuser=0&hl=pt-BR&rclk=1" target="_blank" class="inline-flex items-center gap-2 text-petGreen font-bold hover:underline">
+                    Ver todas as avaliações no Google Maps
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- HIGHLIGHT OFFERS BAR -->
+    <section class="bg-petYellow text-petBlack py-6 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+            <div>
+                <span class="font-display text-2xl font-extrabold block">Procurando promoções especiais?</span>
+                <p class="text-sm font-semibold opacity-90">Temos sempre os melhores descontos do mês em rações e acessórios!</p>
+            </div>
+            <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20saber%20as%20promoções%20e%20ofertas%20do%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="bg-petBlack hover:bg-neutral-800 text-white font-bold px-8 py-3.5 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                Ver Promoções no WhatsApp
+            </a>
+        </div>
+    </section>
+
+    <!-- GALLERY SECTION -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto space-y-4 mb-12">
+                <span class="text-petMagenta font-bold text-sm uppercase tracking-widest block font-display">Sempre Alegres</span>
+                <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-petDark">Nossa Galeria de Clientes Felizes</h2>
+                <p class="text-gray-600 font-medium">Veja cliques reais dos amiguinhos que visitam e recebem nossos cuidados.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="overflow-hidden rounded-2xl border border-gray-100 shadow-sm h-64">
+                    <img src="https://images.unsplash.com/photo-1537151625747-7ae8704189d4?auto=format&fit=crop&q=80&w=400" alt="Pet Mar Cão" class="w-full h-full object-cover hover:scale-110 transition duration-500">
+                </div>
+                <div class="overflow-hidden rounded-2xl border border-gray-100 shadow-sm h-64">
+                    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400" alt="Gato Mar Cão" class="w-full h-full object-cover hover:scale-110 transition duration-500">
+                </div>
+                <div class="overflow-hidden rounded-2xl border border-gray-100 shadow-sm h-64">
+                    <img src="https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&q=80&w=400" alt="Banho Feliz" class="w-full h-full object-cover hover:scale-110 transition duration-500">
+                </div>
+                <div class="overflow-hidden rounded-2xl border border-gray-100 shadow-sm h-64">
+                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=400" alt="Grooming" class="w-full h-full object-cover hover:scale-110 transition duration-500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT, HOURS AND MAP SECTION -->
+    <section id="contato" class="py-20 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 items-start">
+                
+                <!-- Hours & Info -->
+                <div class="lg:col-span-5 space-y-8">
+                    <div>
+                        <span class="text-petGreen font-bold text-sm uppercase tracking-widest block">Venha nos visitar</span>
+                        <h2 class="font-display text-3xl font-extrabold text-petDark mt-2">Endereço & Horários</h2>
+                        <p class="text-gray-600 mt-2">Estamos prontos para receber você e seu bichinho!</p>
+                    </div>
+
+                    <!-- Contact details -->
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-petGreen flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-petDark block">Endereço</span>
+                                <span class="text-sm text-gray-600">Av. Monteiro Lobato, 7866 - Balneário Itaóca, Mongaguá - SP, 11730-000</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-pink-50 text-petMagenta flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-petDark block">WhatsApp para Agendamento</span>
+                                <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20agendar%20um%20serviço%20no%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="text-sm text-petGreen font-semibold hover:underline">(13) 99700-0000 (Toque para falar)</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Hours -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-md">
+                        <h3 class="font-display font-bold text-xl text-petDark mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-clock text-petGreen"></i> Horário de Atendimento
+                        </h3>
+                        <div class="space-y-2.5 text-sm text-gray-700">
+                            <div class="flex justify-between border-b border-gray-50 pb-2">
+                                <span class="font-semibold">Segunda-feira</span>
+                                <span class="text-gray-600">09:00 – 18:30</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-50 pb-2">
+                                <span class="font-semibold">Terça-feira</span>
+                                <span class="text-gray-600">09:00 – 18:30</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-50 pb-2">
+                                <span class="font-semibold">Quarta-feira</span>
+                                <span class="text-gray-600">09:00 – 18:30</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-50 pb-2">
+                                <span class="font-semibold">Quinta-feira</span>
+                                <span class="text-gray-600">09:00 – 18:30</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-50 pb-2">
+                                <span class="font-semibold">Sexta-feira</span>
+                                <span class="text-gray-600">09:00 – 18:30</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-50 pb-2">
+                                <span class="font-semibold">Sábado</span>
+                                <span class="text-gray-600">09:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold text-pink-600">Domingo</span>
+                                <span class="text-pink-600 font-semibold">09:30 – 13:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Google Maps Embed & Interactive Card -->
+                <div class="lg:col-span-7 h-full flex flex-col justify-between">
+                    <div class="bg-white p-3 rounded-3xl border border-gray-100 shadow-xl overflow-hidden h-[380px] lg:h-[450px]">
+                        <!-- Embed Google Map -->
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3641.5282574044155!2d-46.675600324652234!3d-24.1192771784236!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce280bf31d9085%3A0xca490b8bebfbd19!2sPet%20Shop%20Mar%20C%C3%A3o!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" class="rounded-2xl" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 mt-4">
+                        <a href="https://www.google.com/maps/place/Pet+Shop+Mar+C%C3%A3o/data=!4m7!3m6!1s0x94ce280bf31d9085:0xca490b8bebfbd19!8m2!3d-24.1192821!4d-46.6730254!16s%2Fg%2F11gf8h9_28!19sChIJhZAd8wsozpQRGb2_vriQpAw?authuser=0&hl=pt-BR&rclk=1" target="_blank" class="w-full sm:w-auto bg-petBlack hover:bg-neutral-800 text-white font-bold py-3 px-6 rounded-2xl flex items-center justify-center gap-2 transition duration-300">
+                            <i class="fa-solid fa-map-location-dot"></i> Como Chegar pelo Google Maps
+                        </a>
+                        <a href="https://www.instagram.com/petshop_marcao/" target="_blank" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-95 text-white font-bold py-3 px-6 rounded-2xl flex items-center justify-center gap-2 transition duration-300">
+                            <i class="fab fa-instagram"></i> Seguir no Instagram
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PREMIUM FOOTER -->
+    <footer class="bg-petDark text-white pt-16 pb-12 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid md:grid-cols-4 gap-12 pb-12 border-b border-gray-800">
+                
+                <!-- About Info -->
+                <div class="space-y-4">
+                    <!-- LOGO PLACEHOLDER IN FOOTER -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center overflow-hidden" title="Espaço reservado para o Logo oficial no rodapé">
+                            <span class="text-[10px] text-gray-500 font-bold">LOGO</span>
+                        </div>
+                        <span class="font-display text-2xl font-bold tracking-tight text-white block">Mar Cão</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        O melhor amigo do seu pet em Mongaguá. Banho, tosa, entrega domiciliar e as melhores rações com o carinho e cuidado de sempre.
+                    </p>
+                </div>
+
+                <!-- Navigation links -->
+                <div>
+                    <h4 class="font-display font-bold text-lg text-white mb-4">Navegação</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#inicio" class="hover:text-petGreen transition-colors">Início</a></li>
+                        <li><a href="#servicos" class="hover:text-petGreen transition-colors">Nossos Serviços</a></li>
+                        <li><a href="#sobre" class="hover:text-petGreen transition-colors">Sobre a Loja</a></li>
+                        <li><a href="#avaliacoes" class="hover:text-petGreen transition-colors">Avaliações reais</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact & Socials -->
+                <div>
+                    <h4 class="font-display font-bold text-lg text-white mb-4">Atendimento</h4>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Av. Monteiro Lobato, 7866<br>
+                        Balneário Itaóca, Mongaguá - SP<br>
+                        <strong class="text-white">Fale conosco:</strong> (13) 99700-0000
+                    </p>
+                    <div class="flex items-center gap-4 mt-4">
+                        <a href="https://www.instagram.com/petshop_marcao/" target="_blank" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gradient-to-tr hover:from-purple-500 hover:to-pink-500 transition-all">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="http://www.facebook.com/racaomarco/" target="_blank" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-blue-600 transition-all">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Google Rating Badge -->
+                <div class="bg-neutral-900 p-6 rounded-2xl border border-neutral-800 text-center">
+                    <span class="block font-bold text-lg mb-1">Avaliação do Estabelecimento</span>
+                    <div class="text-petYellow flex justify-center gap-1 mb-2">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <span class="text-xs text-gray-400 block mb-3">Excelente • 4.8 / 5.0 estrelas</span>
+                    <a href="https://www.google.com/maps/place/Pet+Shop+Mar+C%C3%A3o/data=!4m7!3m6!1s0x94ce280bf31d9085:0xca490b8bebfbd19!8m2!3d-24.1192821!4d-46.6730254!16s%2Fg%2F11gf8h9_28!19sChIJhZAd8wsozpQRGb2_vriQpAw?authuser=0&hl=pt-BR&rclk=1" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-xs block transition">
+                        Ver no Google Maps
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+                <span>&copy; 2026 Pet Shop Mar Cão. Todos os direitos reservados.</span>
+                <span>Site criado e mantido por STUDIOTESTA.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- STICKY FLOATING WHATSAPP ICON -->
+    <a href="https://wa.me/5513997000000?text=Olá!%20Gostaria%20de%20agendar%20um%20serviço%20no%20Pet%20Shop%20Mar%20Cão!" target="_blank" class="fixed bottom-6 right-6 z-50 bg-petGreen text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-300 hover:scale-110 group cursor-pointer" title="Fale pelo WhatsApp">
+        <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping -z-10"></span>
+        <i class="fab fa-whatsapp text-3xl"></i>
+    </a>
+
+</body>
+</html>
