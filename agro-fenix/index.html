@@ -3,187 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agro Fenix | Pet Shop e Agropecuária em Mongaguá</title>
-    <meta name="description" content="Tudo para o seu pet em Mongaguá. Rações, medicamentos veterinários, acessórios, jardinagem e muito mais. Entrega rápida e o melhor atendimento da região.">
+    <title>Agro Fenix | Pet Shop, Jardinagem e Agro em Mongaguá</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#1f1f49',
-                        secondary: '#cda451',
-                        'primary-light': '#2c2c63',
-                        'secondary-dark': '#b58f3f',
+                        primary: '#1e1e4b',
+                        secondary: '#d2a54b',
+                        secondaryHover: '#b88d36',
+                        accentBg: '#f8f6f0',
                     },
                     fontFamily: {
-                        sans: ['Montserrat', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
                     }
                 }
             }
         }
     </script>
     <style>
-        .custom-gradient {
-            background: linear-gradient(135deg, #1f1f49 0%, #10102b 100%);
+        .glow-button {
+            box-shadow: 0 4px 20px rgba(210, 165, 75, 0.4);
         }
-        .gold-glow:hover {
-            box-shadow: 0 0 20px rgba(205, 164, 81, 0.4);
+        .whatsapp-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
     </style>
 </head>
-<body class="font-sans bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden">
 
     <!-- Top Info Bar -->
-    <div class="bg-primary text-white text-xs py-2 px-4 border-b border-white/10 hidden md:block">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-6">
-                <span><i class="fas fa-map-marker-alt text-secondary mr-2"></i>Av. Monteiro Lobato, 8730 - Mongaguá - SP</span>
-                <span><i class="fas fa-phone-alt text-secondary mr-2"></i>(13) 3448-2068</span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span><i class="fas fa-clock text-secondary mr-2"></i>Seg a Sáb: 08:00 - 19:00 | Dom: 08:00 - 13:00</span>
-            </div>
+    <div class="bg-primary text-white text-xs py-2 px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center border-b border-white/10 gap-2">
+        <div class="flex items-center gap-4">
+            <span><i class="fa-solid fa-location-dot text-secondary mr-1"></i> Av. Monteiro Lobato, 8730 - Mongaguá - SP</span>
+            <span class="hidden md:inline">|</span>
+            <span class="hidden md:inline"><i class="fa-solid fa-clock text-secondary mr-1"></i> Segunda a Sábado: 08h às 19h | Domingo: 08h às 13h</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="tel:1334482068" class="hover:text-secondary transition-colors"><i class="fa-solid fa-phone text-secondary mr-1"></i> (13) 3448-2068</a>
+            <a href="https://www.facebook.com/diskagrofenix" target="_blank" class="hover:text-secondary transition-colors text-sm"><i class="fa-brands fa-facebook"></i></a>
         </div>
     </div>
 
     <!-- Header / Navbar -->
-    <header class="sticky top-0 z-50 bg-[#1f1f49]/95 backdrop-blur-md border-b border-[#cda451]/20 shadow-lg">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <!-- Logo & Brand Name -->
-            <a href="#" class="flex items-center space-x-3 group">
-                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logo-images/1781053182960_logo_agrofenix.png" alt="Agro Fenix Logo" class="h-12 w-12 object-contain bg-white rounded-full p-1 transition-transform group-hover:scale-105">
-                <div class="flex flex-col">
-                    <span class="text-white font-extrabold text-xl tracking-wider leading-none">AGRO FENIX</span>
-                    <span class="text-secondary text-xs font-semibold tracking-widest mt-0.5">PET SHOP & AGROPECUÁRIA</span>
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-secondary border-2 border-secondary/30 group-hover:border-secondary transition-all">
+                    <!-- Phoenix/Bird + Pet thematic concept SVG -->
+                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 6C13.66 6 15 7.34 15 9C15 10.66 13.66 12 12 12C10.34 12 9 10.66 9 9C9 7.34 10.34 6 12 6ZM12 18C9.58 18 7.46 16.73 6.25 14.83C6.28 12.92 10.1 11.9 12 11.9C13.89 11.9 17.71 12.92 17.75 14.83C16.54 16.73 14.42 18 12 18Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-wider text-primary block leading-none">AGRO FENIX</span>
+                    <span class="text-[10px] text-secondary font-bold uppercase tracking-widest leading-none">Pet Shop & Jardinagem</span>
                 </div>
             </a>
 
-            <!-- Desktop Menu -->
-            <nav class="hidden lg:flex items-center space-x-8 text-white font-medium text-sm">
-                <a href="#inicio" class="hover:text-secondary transition-colors duration-300">Início</a>
-                <a href="#sobre" class="hover:text-secondary transition-colors duration-300">Quem Somos</a>
-                <a href="#servicos" class="hover:text-secondary transition-colors duration-300">Serviços e Produtos</a>
-                <a href="#galeria" class="hover:text-secondary transition-colors duration-300">Nossa Loja</a>
-                <a href="#depoimentos" class="hover:text-secondary transition-colors duration-300">Avaliações</a>
-                <a href="#contato" class="hover:text-secondary transition-colors duration-300">Contato</a>
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#inicio" class="text-primary hover:text-secondary font-semibold text-sm transition-colors">Início</a>
+                <a href="#sobre" class="text-primary hover:text-secondary font-semibold text-sm transition-colors">Sobre Nós</a>
+                <a href="#servicos" class="text-primary hover:text-secondary font-semibold text-sm transition-colors">Produtos e Serviços</a>
+                <a href="#depoimentos" class="text-primary hover:text-secondary font-semibold text-sm transition-colors">Avaliações</a>
+                <a href="#contato" class="text-primary hover:text-secondary font-semibold text-sm transition-colors">Contato</a>
             </nav>
 
-            <!-- CTA Desktop Button -->
-            <div class="hidden lg:block">
-                <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20falar%20com%20a%20Agro%20Fenix." target="_blank" class="bg-secondary hover:bg-secondary-dark text-primary font-bold px-5 py-2.5 rounded-full transition-all duration-300 transform hover:-translate-y-0.5 flex items-center space-x-2 shadow-md hover:shadow-lg">
-                    <i class="fab fa-whatsapp text-lg"></i>
-                    <span>Falar no WhatsApp</span>
+            <!-- CTA Button Header -->
+            <div class="flex items-center gap-3">
+                <a href="https://wa.me/551334482068" target="_blank" class="hidden sm:inline-flex items-center gap-2 bg-secondary text-primary font-bold px-5 py-2.5 rounded-xl hover:bg-secondaryHover transition-all text-sm glow-button">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Fale Conosco
                 </a>
+                <button id="mobile-menu-btn" class="md:hidden text-primary text-2xl focus:outline-none" aria-label="Abrir Menu">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
             </div>
-
-            <!-- Mobile Menu Toggle -->
-            <button id="mobileMenuBtn" class="lg:hidden text-white hover:text-secondary focus:outline-none" aria-label="Abrir Menu">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>
         </div>
 
-        <!-- Mobile Drawer Menu -->
-        <div id="mobileMenu" class="hidden lg:hidden bg-primary border-t border-secondary/20 px-4 py-6 space-y-4 text-white">
-            <a href="#inicio" class="block py-2 hover:text-secondary border-b border-white/5">Início</a>
-            <a href="#sobre" class="block py-2 hover:text-secondary border-b border-white/5">Quem Somos</a>
-            <a href="#servicos" class="block py-2 hover:text-secondary border-b border-white/5">Serviços e Produtos</a>
-            <a href="#galeria" class="block py-2 hover:text-secondary border-b border-white/5">Nossa Loja</a>
-            <a href="#depoimentos" class="block py-2 hover:text-secondary border-b border-white/5">Avaliações</a>
-            <a href="#contato" class="block py-2 hover:text-secondary">Contato</a>
-            <div class="pt-4">
-                <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20falar%20com%20a%20Agro%20Fenix." target="_blank" class="w-full text-center bg-secondary hover:bg-secondary-dark text-primary font-bold px-5 py-3 rounded-xl block transition-all">
-                    <i class="fab fa-whatsapp mr-2"></i>Chamar no WhatsApp
-                </a>
-            </div>
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 px-4 py-6 space-y-4 shadow-xl transition-all duration-300">
+            <a href="#inicio" class="block text-primary font-semibold text-base py-2 border-b border-slate-50">Início</a>
+            <a href="#sobre" class="block text-primary font-semibold text-base py-2 border-b border-slate-50">Sobre Nós</a>
+            <a href="#servicos" class="block text-primary font-semibold text-base py-2 border-b border-slate-50">Produtos e Serviços</a>
+            <a href="#depoimentos" class="block text-primary font-semibold text-base py-2 border-b border-slate-50">Avaliações</a>
+            <a href="#contato" class="block text-primary font-semibold text-base py-2">Contato</a>
+            <a href="https://wa.me/551334482068" target="_blank" class="flex items-center justify-center gap-2 bg-secondary text-primary font-bold py-3 rounded-xl w-full">
+                <i class="fa-brands fa-whatsapp text-lg"></i> Chamar no WhatsApp
+            </a>
         </div>
     </header>
 
-    <!-- Hero Section (High Conversion) -->
-    <section id="inicio" class="relative custom-gradient text-white overflow-hidden py-20 lg:py-32">
-        <!-- Abstract Background Glows -->
-        <div class="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-primary-light/30 rounded-full blur-3xl"></div>
+    <!-- Hero Section -->
+    <section id="inicio" class="relative bg-primary overflow-hidden min-h-[85vh] flex items-center">
+        <!-- Background Overlay / Premium Unsplash Pet Image -->
+        <div class="absolute inset-0 opacity-25">
+            <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=1600" alt="Pet de estimação feliz" class="w-full h-full object-cover object-center">
+        </div>
+        <!-- Absolute Decorative Shapes -->
+        <div class="absolute -top-12 -left-12 w-64 h-64 rounded-full bg-secondary/10 blur-3xl"></div>
+        <div class="absolute -bottom-12 -right-12 w-96 h-96 rounded-full bg-secondary/15 blur-3xl"></div>
 
-        <div class="container mx-auto px-4 relative z-10">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 z-10">
             <div class="grid lg:grid-cols-12 gap-12 items-center">
                 
-                <!-- Left Content -->
-                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-                    <div class="inline-flex items-center space-x-2 bg-secondary/10 border border-secondary/30 px-4 py-2 rounded-full text-secondary text-xs sm:text-sm font-semibold tracking-wide uppercase">
-                        <i class="fas fa-star text-amber-400"></i>
-                        <span>★ 4.7 no Google (616 avaliações)</span>
+                <!-- Hero Left Content -->
+                <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
+                    <!-- Google Rating Badge -->
+                    <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-white text-xs sm:text-sm backdrop-blur-sm mx-auto lg:mx-0">
+                        <span class="flex items-center text-yellow-400 gap-1"><i class="fa-solid fa-star"></i> 4.7</span>
+                        <span class="text-white/60">|</span>
+                        <span>Destaque em Mongaguá</span>
+                        <span class="text-white/60">|</span>
+                        <span class="font-semibold text-secondary">616+ Avaliações</span>
                     </div>
-                    
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-                        Seu Pet merece o <span class="text-secondary">melhor cuidado</span> e carinho!
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight font-serif">
+                        Tudo para o seu <span class="text-secondary">Pet</span>, Casa & <span class="text-secondary">Jardim</span>.
                     </h1>
-                    
-                    <p class="text-lg text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                        A <strong class="text-white">Agro Fenix</strong> é a agropecuária e pet shop mais completa de Mongaguá. Oferecemos rações premium, medicamentos, acessórios exclusivos, jardinagem e muito carinho para o seu melhor amigo.
+
+                    <p class="text-slate-300 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                        A <span class="text-white font-semibold">Agro Fenix</span> combina amor pelos animais com tradição e variedade. Aqui você encontra as melhores rações, medicamentos especializados, acessórios modernos e tudo para jardinagem com o melhor preço de Mongaguá!
                     </p>
 
-                    <!-- Trust Signals / Features Badge -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 max-w-lg mx-auto lg:mx-0">
-                        <div class="flex items-center space-x-2 bg-white/5 p-3 rounded-xl border border-white/10">
-                            <i class="fas fa-truck text-secondary text-xl"></i>
-                            <span class="text-xs font-semibold text-slate-200">Entrega Rápida</span>
-                        </div>
-                        <div class="flex items-center space-x-2 bg-white/5 p-3 rounded-xl border border-white/10">
-                            <i class="fas fa-prescription-bottle-alt text-secondary text-xl"></i>
-                            <span class="text-xs font-semibold text-slate-200">Medicamentos</span>
-                        </div>
-                        <div class="flex items-center space-x-2 bg-white/5 p-3 rounded-xl border border-white/10 col-span-2 sm:col-span-1">
-                            <i class="fas fa-store text-secondary text-xl"></i>
-                            <span class="text-xs font-semibold text-slate-200">Retirada em Loja</span>
-                        </div>
+                    <!-- Features Highlights tags -->
+                    <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
+                        <span class="bg-white/5 border border-white/10 text-slate-200 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-truck text-secondary"></i> Entrega Rápida
+                        </span>
+                        <span class="bg-white/5 border border-white/10 text-slate-200 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-store text-secondary"></i> Retirada na Loja
+                        </span>
+                        <span class="bg-white/5 border border-white/10 text-slate-200 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-wheelchair text-secondary"></i> Acessibilidade Total
+                        </span>
                     </div>
 
-                    <!-- Direct Action CTAs -->
-                    <div class="pt-6 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                        <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20fazer%20um%20pedido%20de%20entrega." target="_blank" class="w-full sm:w-auto bg-secondary hover:bg-secondary-dark text-primary font-bold px-8 py-4 rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-3 text-lg gold-glow">
-                            <i class="fab fa-whatsapp text-2xl"></i>
-                            <span>Peça no Delivery</span>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-2">
+                        <a href="https://wa.me/551334482068" target="_blank" class="w-full sm:w-auto text-center bg-secondary text-primary font-bold px-8 py-4 rounded-xl hover:bg-secondaryHover transition-all text-base glow-button flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-xl"></i> Fazer Pedido / Atendimento
                         </a>
-                        <a href="#servicos" class="w-full sm:w-auto bg-transparent hover:bg-white/5 border-2 border-slate-400 hover:border-white text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 text-center">
-                            Conhecer Produtos
+                        <a href="#contato" class="w-full sm:w-auto text-center border-2 border-white/20 text-white hover:border-secondary hover:text-secondary font-bold px-8 py-4 rounded-xl transition-all text-base flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-map-location-dot"></i> Como Chegar
                         </a>
                     </div>
                 </div>
 
-                <!-- Right Content (Premium Main Image) -->
+                <!-- Hero Right Content / Visual Card -->
                 <div class="lg:col-span-5 relative mt-8 lg:mt-0">
-                    <div class="relative mx-auto max-w-md lg:max-w-none">
-                        <!-- Golden Decorative Frame -->
-                        <div class="absolute -inset-2 bg-gradient-to-tr from-secondary to-primary-light rounded-2xl blur-lg opacity-40 animate-pulse"></div>
+                    <div class="relative bg-white p-4 rounded-3xl shadow-2xl border-4 border-white overflow-hidden max-w-md mx-auto transform hover:scale-[1.02] transition-transform">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGcVg29W-2XsdBh0t2lPilkQ0-ILEVmrKzEjUzo4vtjwiuClJ2DfZa7ZsJKAWyWwZyZ6lTiJFlO_eqB_1k6hcP_DnVzqwSjHeJbhpRAbRqmvDLBhIhSR9Ick8SfZjZFTGrvxjIAqA=w408-h306-k-no" alt="Fachada Agro Fenix" class="w-full h-64 object-cover rounded-2xl mb-4">
                         
-                        <!-- High Quality Main Image (Dog and Cat) -->
-                        <div class="relative bg-primary rounded-2xl overflow-hidden shadow-2xl border-4 border-[#cda451]/30">
-                            <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=80" alt="Pet Saudável e Feliz - Agro Fenix" class="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700">
-                            
-                            <!-- Overlay Card -->
-                            <div class="absolute bottom-4 left-4 right-4 bg-[#1f1f49]/90 backdrop-blur-md p-4 rounded-xl border border-secondary/30 flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div class="p-2 bg-secondary rounded-lg">
-                                        <i class="fas fa-heart text-primary text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-slate-300 font-medium">Desde a infância</p>
-                                        <p class="text-sm font-bold text-white">Tradição & Qualidade</p>
-                                    </div>
-                                </div>
-                                <span class="text-secondary font-extrabold text-lg">❤️ Mongaguá</span>
+                        <div class="p-2 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-emerald-100 text-emerald-800 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Aberto Agora
+                                </span>
+                                <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-star text-amber-500"></i> 4.7 (616 avaliações)</span>
                             </div>
+                            <h3 class="font-extrabold text-primary text-lg">Visite nossa Mega Loja Física</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed">
+                                Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP. Amplo estacionamento e excelente variedade.
+                            </p>
                         </div>
+                    </div>
+                    
+                    <!-- Small decorative badge -->
+                    <div class="absolute -bottom-6 -left-6 bg-secondary text-primary p-4 rounded-2xl shadow-xl flex items-center gap-3 max-w-[200px] border-2 border-white">
+                        <i class="fa-solid fa-shield-dog text-3xl"></i>
+                        <span class="text-xs font-bold leading-tight">Melhores marcas do mercado pet</span>
                     </div>
                 </div>
 
@@ -191,462 +193,424 @@
         </div>
     </section>
 
-    <!-- Trust Stats Bar -->
-    <section class="bg-white py-8 border-y border-slate-200 shadow-inner">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div class="space-y-1 border-r border-slate-100 last:border-none">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">616+</h3>
-                    <p class="text-xs md:text-sm text-slate-500 font-medium uppercase tracking-wider">Avaliações no Google</p>
+    <!-- Strengths / Diferenciais -->
+    <section class="py-12 bg-accentBg border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-4 space-y-2">
+                    <div class="text-secondary text-3xl mb-1"><i class="fa-solid fa-bicycle"></i></div>
+                    <h4 class="font-bold text-primary text-sm sm:text-base">Disk Entrega</h4>
+                    <p class="text-slate-500 text-xs">Receba com rapidez no conforto da sua casa</p>
                 </div>
-                <div class="space-y-1 border-r border-slate-100 last:border-none">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-secondary">4.7★</h3>
-                    <p class="text-xs md:text-sm text-slate-500 font-medium uppercase tracking-wider">Nota de Satisfação</p>
+                <div class="p-4 space-y-2">
+                    <div class="text-secondary text-3xl mb-1"><i class="fa-solid fa-basket-shopping"></i></div>
+                    <h4 class="font-bold text-primary text-sm sm:text-base">Retirada na Loja</h4>
+                    <p class="text-slate-500 text-xs">Compre online e retire rapidamente sem filas</p>
                 </div>
-                <div class="space-y-1 border-r border-slate-100 last:border-none">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-primary">100%</h3>
-                    <p class="text-xs md:text-sm text-slate-500 font-medium uppercase tracking-wider">Amor pelos Pets</p>
+                <div class="p-4 space-y-2">
+                    <div class="text-secondary text-3xl mb-1"><i class="fa-solid fa-credit-card"></i></div>
+                    <h4 class="font-bold text-primary text-sm sm:text-base">Múltiplas Formas</h4>
+                    <p class="text-slate-500 text-xs">Crédito, Débito e pagamentos por NFC</p>
                 </div>
-                <div class="space-y-1 last:border-none">
-                    <h3 class="text-3xl md:text-4xl font-extrabold text-secondary">Mongaguá</h3>
-                    <p class="text-xs md:text-sm text-slate-500 font-medium uppercase tracking-wider">Excelente Localização</p>
+                <div class="p-4 space-y-2">
+                    <div class="text-secondary text-3xl mb-1"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                    <h4 class="font-bold text-primary text-sm sm:text-base">Atendimento Especializado</h4>
+                    <p class="text-slate-500 text-xs">Paixão pelo que fazemos e dedicação total</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section (Quem Somos & História) -->
-    <section id="sobre" class="py-20 bg-slate-50">
-        <div class="container mx-auto px-4">
+    <!-- About Section -->
+    <section id="sobre" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
-                
-                <!-- Left: Real Store Visual Concept -->
-                <div class="relative">
-                    <div class="absolute top-0 left-0 w-72 h-72 bg-secondary/10 rounded-full blur-2xl"></div>
-                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFmgt0bKa0Nz6c0vi6_w4767JOrsn6rR43T7SWkNXg7emDx8zzMjME0wgM_mDREDA-LOR1y6ACHAkV_U7Mo7EBRpC3LfT3xqYjfas49mZ-JivaFUolpI3m9KA9_wgxYddX7czIRZA=w408-h306-k-no" alt="Fachada da Agro Fenix" class="w-full h-96 object-cover rounded-2xl shadow-xl border-4 border-white relative z-10">
-                    <div class="absolute -bottom-6 -right-6 bg-primary text-white p-6 rounded-2xl shadow-2xl z-20 max-w-xs border border-secondary/30">
-                        <p class="text-secondary font-bold text-lg mb-1">"Atendimento Nota 10!"</p>
-                        <p class="text-xs text-slate-300 italic">"Mega atenciosos, pronto atendimento, variedades, jardinagem, medicamentos..."</p>
-                        <span class="block mt-2 text-xs font-bold text-right text-secondary">- Marcia Regina</span>
-                    </div>
-                </div>
-
-                <!-- Right: Content -->
+                <!-- Left: Text -->
                 <div class="space-y-6">
-                    <div class="space-y-2">
-                        <span class="text-secondary font-bold text-sm tracking-wider uppercase">Mais do que um Pet Shop</span>
-                        <h2 class="text-3xl sm:text-4xl font-extrabold text-primary">Uma história de paixão, dedicação e cuidado animal</h2>
+                    <div class="inline-block bg-secondary/15 text-primary font-bold text-xs uppercase tracking-widest px-3.5 py-1.5 rounded-full">
+                        Nossa História
                     </div>
-                    <p class="text-slate-600 leading-relaxed">
-                        A <strong>Agro Fenix</strong> é sinônimo de lembrança afetiva e dedicação em Mongaguá. Atendendo gerações de famílias, nos orgulhamos de ser um porto seguro para a saúde, bem-estar e alegria dos seus animais de estimação.
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-primary font-serif">
+                        Amor pelos animais e compromisso com o seu lar de geração em geração.
+                    </h2>
+                    <p class="text-slate-600 leading-relaxed text-base">
+                        A <span class="text-primary font-bold">Agro Fenix</span> faz parte da história e do cotidiano de Mongaguá. Desde a infância de muitos de nossos clientes, oferecemos um atendimento impecável pautado na dedicação extrema aos animais de estimação, jardinagem e cuidados domésticos.
                     </p>
-                    <p class="text-slate-600 leading-relaxed">
-                        Aqui você encontra de tudo: as melhores marcas de ração, farmácia veterinária completa para garantir a saúde do seu pet, acessórios confortáveis, itens de jardinagem, e claro, uma equipe apaixonada pelo que faz.
+                    <p class="text-slate-600 leading-relaxed text-base">
+                        Não somos apenas um Pet Shop: somos um centro completo de soluções. Com profissionais que trazem "paixão no que fazem", oferecemos desde os medicamentos veterinários mais específicos até belíssimos artigos de jardinagem e as rações mais conceituadas do mercado. Tudo isso com ótimos preços e a simpatia que você merece.
                     </p>
 
-                    <!-- Core Values Grid -->
-                    <div class="grid sm:grid-cols-2 gap-4 pt-4">
-                        <div class="flex items-start space-x-3">
-                            <div class="p-2 bg-primary/5 rounded-lg text-primary mt-1">
-                                <i class="fas fa-heart text-lg"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-primary">Dedicação Total</h4>
-                                <p class="text-xs text-slate-500">Amor e carinho reais na recepção de cada tutor e pet.</p>
-                            </div>
+                    <!-- Features bullets list -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
+                        <div class="flex items-center gap-2.5 text-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-secondary text-primary flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-sm font-semibold">Medicamentos Veterinários</span>
                         </div>
-                        <div class="flex items-start space-x-3">
-                            <div class="p-2 bg-primary/5 rounded-lg text-primary mt-1">
-                                <i class="fas fa-boxes text-lg"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-primary">Variedade Incomparável</h4>
-                                <p class="text-xs text-slate-500">Desde rações a itens exclusivos para jardinagem e casa.</p>
-                            </div>
+                        <div class="flex items-center gap-2.5 text-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-secondary text-primary flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-sm font-semibold">Tudo de Jardinagem</span>
                         </div>
-                    </div>
-
-                    <div class="pt-6">
-                        <a href="#contato" class="inline-flex items-center space-x-2 text-primary font-bold hover:text-secondary transition-colors group">
-                            <span>Ver localização e horário de funcionamento</span>
-                            <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                        </a>
+                        <div class="flex items-center gap-2.5 text-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-secondary text-primary flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-sm font-semibold">Rações Premium & Super Premium</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 text-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-secondary text-primary flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></span>
+                            <span class="text-sm font-semibold">Acessórios Importados e Nacionais</span>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Right: High quality visuals grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400" alt="Gato fofo no petshop" class="rounded-2xl shadow-md w-full h-48 object-cover object-center transform hover:scale-[1.03] transition-transform">
+                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&q=80&w=400" alt="Planta de jardinagem" class="rounded-2xl shadow-md w-full h-64 object-cover object-center transform hover:scale-[1.03] transition-transform">
+                    </div>
+                    <div class="space-y-4 pt-8">
+                        <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&q=80&w=400" alt="Atendimento e cuidados" class="rounded-2xl shadow-md w-full h-64 object-cover object-center transform hover:scale-[1.03] transition-transform">
+                        <img src="https://images.unsplash.com/photo-1535268647977-a403b69fc756?auto=format&fit=crop&q=80&w=400" alt="Cão feliz" class="rounded-2xl shadow-md w-full h-48 object-cover object-center transform hover:scale-[1.03] transition-transform">
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Services / Products Section -->
-    <section id="servicos" class="py-20 bg-primary text-white relative overflow-hidden">
-        <!-- Decoration -->
-        <div class="absolute top-1/2 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl"></div>
-
-        <div class="container mx-auto px-4 relative z-10">
+    <section id="servicos" class="py-20 bg-accentBg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
-                <span class="text-secondary font-bold text-sm tracking-widest uppercase">O que oferecemos</span>
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold">Variedade Completa para seu Pet e sua Casa</h2>
-                <div class="w-24 h-1 bg-secondary mx-auto rounded-full"></div>
-                <p class="text-slate-300 text-sm sm:text-base">Trabalhamos apenas com marcas renomadas e produtos de altíssima qualidade para garantir a máxima segurança dos seus companheiros.</p>
+                <div class="inline-block bg-secondary/15 text-primary font-bold text-xs uppercase tracking-widest px-3.5 py-1.5 rounded-full">
+                    O que Oferecemos
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-primary font-serif">
+                    Os Melhores Produtos Para Seus Pets & Lar
+                </h2>
+                <p class="text-slate-600 leading-relaxed">
+                    Trabalhamos apenas com marcas renomadas e fornecedores de excelência, garantindo segurança para a saúde do seu pet e a beleza de sua casa.
+                </p>
             </div>
 
-            <!-- Services Grid -->
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                
-                <!-- Service 1 -->
-                <div class="bg-primary-light/40 border border-white/10 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
-                    <div class="space-y-4">
-                        <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-                            <img src="https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=600&q=80" alt="Rações Premium" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors">Rações & Nutrição</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">As melhores marcas de rações secas, úmidas e específicas para cada etapa da vida do seu cão ou gato.</p>
+                <!-- Service Card 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group border border-slate-100 flex flex-col h-full">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=500" alt="Nutrição e Rações" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <span class="absolute top-4 left-4 bg-primary text-secondary text-xs font-bold px-3 py-1 rounded-full">Alimentação</span>
                     </div>
-                    <div class="pt-6 border-t border-white/5 mt-6">
-                        <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20consultar%20marcas%20e%20preços%20de%20rações." target="_blank" class="text-secondary font-semibold text-xs uppercase tracking-wider hover:text-white flex items-center space-x-1">
-                            <span>Consultar Marcas</span>
-                            <i class="fas fa-chevron-right text-[10px]"></i>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <h3 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors">Rações Especiais</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Oferecemos as marcas líderes do mercado como PremieR, Royal Canin, Golden, entre outras. Fórmulas de nutrição de excelência.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/551334482068?text=Olá! Gostaria de consultar preços de rações." target="_blank" class="mt-4 text-primary font-bold text-xs flex items-center gap-1 hover:text-secondary">
+                            Consultar Marcas <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Service 2 -->
-                <div class="bg-primary-light/40 border border-white/10 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
-                    <div class="space-y-4">
-                        <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-                            <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80" alt="Farmácia Veterinária" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors">Farmácia Veterinária</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">Medicamentos, antipulgas, carrapaticidas, vermífugos e vitaminas para manter a saúde do seu amiguinho em dia.</p>
+                <!-- Service Card 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group border border-slate-100 flex flex-col h-full">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&q=80&w=500" alt="Medicamentos Veterinários" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <span class="absolute top-4 left-4 bg-primary text-secondary text-xs font-bold px-3 py-1 rounded-full">Farmácia</span>
                     </div>
-                    <div class="pt-6 border-t border-white/5 mt-6">
-                        <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20saber%20se%20vocês%20têm%20um%20determinado%20medicamento%20veterinário." target="_blank" class="text-secondary font-semibold text-xs uppercase tracking-wider hover:text-white flex items-center space-x-1">
-                            <span>Falar com Atendente</span>
-                            <i class="fas fa-chevron-right text-[10px]"></i>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <h3 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors">Medicamentos</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Completa farmácia veterinária com analgésicos, antibióticos, antiparasitários, vermífugos e suplementos das melhores marcas.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/551334482068?text=Olá! Gostaria de consultar um medicamento veterinário." target="_blank" class="mt-4 text-primary font-bold text-xs flex items-center gap-1 hover:text-secondary">
+                            Consultar Receita <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Service 3 -->
-                <div class="bg-primary-light/40 border border-white/10 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
-                    <div class="space-y-4">
-                        <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-                            <img src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=600&q=80" alt="Acessórios e Brinquedos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors">Acessórios Premium</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">Coleiras, guias, brinquedos interativos, casinhas, caixas de transporte e caminhas aconchegantes.</p>
+                <!-- Service Card 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group border border-slate-100 flex flex-col h-full">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1541599540903-216a46ca1ad0?auto=format&fit=crop&q=80&w=500" alt="Acessórios e Brinquedos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <span class="absolute top-4 left-4 bg-primary text-secondary text-xs font-bold px-3 py-1 rounded-full">Pet</span>
                     </div>
-                    <div class="pt-6 border-t border-white/5 mt-6">
-                        <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20ver%20opções%20de%20acessórios%20para%20pet." target="_blank" class="text-secondary font-semibold text-xs uppercase tracking-wider hover:text-white flex items-center space-x-1">
-                            <span>Ver Acessórios</span>
-                            <i class="fas fa-chevron-right text-[10px]"></i>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <h3 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors">Acessórios & Mimos</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Camas macias, coleiras de segurança, caixas de transporte confortáveis e arranhadores. Brinquedos inteligentes para o bem-estar do pet.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/551334482068?text=Olá! Gostaria de ver opções de acessórios para pet." target="_blank" class="mt-4 text-primary font-bold text-xs flex items-center gap-1 hover:text-secondary">
+                            Ver Novidades <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Service 4 -->
-                <div class="bg-primary-light/40 border border-white/10 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
-                    <div class="space-y-4">
-                        <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-                            <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80" alt="Jardinagem e Agropecuária" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors">Jardinagem & Casa</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">Artigos para cuidar do seu quintal e jardim: sementes, adubos, ferramentas e tudo para o cuidado de plantas.</p>
+                <!-- Service Card 4 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group border border-slate-100 flex flex-col h-full">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=500" alt="Jardinagem" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <span class="absolute top-4 left-4 bg-primary text-secondary text-xs font-bold px-3 py-1 rounded-full">Agro</span>
                     </div>
-                    <div class="pt-6 border-t border-white/5 mt-6">
-                        <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20de%20jardinagem%20e%20agro." target="_blank" class="text-secondary font-semibold text-xs uppercase tracking-wider hover:text-white flex items-center space-x-1">
-                            <span>Conhecer Catálogo</span>
-                            <i class="fas fa-chevron-right text-[10px]"></i>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <h3 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors">Jardinagem & Agro</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Adubos, sementes selecionadas, vasos ornamentais, ferramentas para cuidar do seu jardim e produtos agrícolas específicos.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/551334482068?text=Olá! Gostaria de saber mais sobre itens de jardinagem." target="_blank" class="mt-4 text-primary font-bold text-xs flex items-center gap-1 hover:text-secondary">
+                            Saber Mais <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
-
             </div>
 
-            <!-- Bottom CTA -->
-            <div class="mt-16 text-center bg-white/5 border border-white/10 rounded-2xl p-8 max-w-4xl mx-auto">
-                <h4 class="text-xl sm:text-2xl font-bold mb-2">Precisa de Entrega Rápida em Mongaguá?</h4>
-                <p class="text-slate-300 text-sm mb-6">Oferecemos serviço de delivery eficiente para você receber tudo no conforto do seu lar.</p>
-                <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20fazer%20um%20pedido%20pelo%20delivery%20da%20Agro%20Fenix." target="_blank" class="inline-flex items-center space-x-3 bg-secondary hover:bg-secondary-dark text-primary font-bold px-8 py-4 rounded-xl shadow-lg transition-transform duration-300 transform hover:-translate-y-1 text-lg">
-                    <i class="fab fa-whatsapp text-2xl"></i>
-                    <span>Solicitar Entrega Agora</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Real Store Gallery Section -->
-    <section id="galeria" class="py-20 bg-slate-100">
-        <div class="container mx-auto px-4">
-            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
-                <span class="text-secondary font-bold text-sm tracking-widest uppercase">Nossa Loja Física</span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-primary">Conheça a Nossa Estrutura</h2>
-                <div class="w-24 h-1 bg-secondary mx-auto rounded-full"></div>
-                <p class="text-slate-600">Venha nos visitar pessoalmente ou veja fotos reais de nossa loja e ampla variedade de produtos em estoque.</p>
-            </div>
-
-            <!-- Gallery Grid with real maps images and premium touch -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                
-                <!-- Photo 1 -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-lg aspect-square bg-slate-200">
-                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFmgt0bKa0Nz6c0vi6_w4767JOrsn6rR43T7SWkNXg7emDx8zzMjME0wgM_mDREDA-LOR1y6ACHAkV_U7Mo7EBRpC3LfT3xqYjfas49mZ-JivaFUolpI3m9KA9_wgxYddX7czIRZA=w408-h306-k-no" alt="Foto Real Agro Fenix 1" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                        <span class="text-white text-sm font-bold border border-white/30 px-4 py-2 rounded-lg">Frente da Loja</span>
-                    </div>
+            <!-- Banner Delivery CTA Inside section -->
+            <div class="mt-16 bg-primary text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 shadow-xl">
+                <div class="absolute inset-0 opacity-10">
+                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=800" alt="Pets felizes brincando" class="w-full h-full object-cover">
                 </div>
-
-                <!-- Photo 2 -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-lg aspect-square bg-slate-200">
-                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAG_JNBPQLEsyavQL7edfG3Siss6CTRhRa0c0fxZaXX5rfIa4km_fk5rALFiVKcIBMKhSryxPeWdIKvClR06T8jVG3Z_-gzrd7wOevVB_-bb4hfgBJz1ie4sDEDHY6y_n4HV3Xcu_Q=w224-h472-k-no" alt="Foto Real Agro Fenix 2" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                        <span class="text-white text-sm font-bold border border-white/30 px-4 py-2 rounded-lg">Grandes Variedades</span>
-                    </div>
+                <div class="relative z-10 space-y-4 max-w-2xl text-center lg:text-left">
+                    <h3 class="text-2xl sm:text-3xl font-extrabold font-serif">Não quer sair de casa? Nós entregamos para você!</h3>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Faça seu pedido com extrema facilidade pelo nosso WhatsApp e receba os produtos rapidamente em sua residência em Mongaguá. Atendimento prático e sem estresse.
+                    </p>
                 </div>
-
-                <!-- Photo 3 -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-lg aspect-square bg-slate-200">
-                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEOZXTP6348ahBzQHcRLmt69ONWozk02WicwLdq7J5lUQIOTsLtbOIxkj_f7fAYjKYUuqlufVpQrNSroopuJztiq2B3f7qK_Ulhh9sF-Snccqv0dKbYIucE5Z4tXTBNLyORpFY=w224-h398-k-no" alt="Foto Real Agro Fenix 3" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                        <span class="text-white text-sm font-bold border border-white/30 px-4 py-2 rounded-lg">Acessórios em Estoque</span>
-                    </div>
+                <div class="relative z-10 w-full lg:w-auto text-center">
+                    <a href="https://wa.me/551334482068?text=Olá! Gostaria de fazer um pedido para entrega rápida." target="_blank" class="inline-flex items-center gap-3 bg-secondary text-primary font-bold px-8 py-4 rounded-xl hover:bg-secondaryHover transition-all text-base glow-button w-full sm:w-auto justify-center">
+                        <i class="fa-solid fa-phone-volume"></i> Chamar Disk Fenix
+                    </a>
                 </div>
-
-                <!-- Photo 4 -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-lg aspect-square bg-slate-200">
-                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGiLRQ1eH-ETPBsfBQ7QdeWP4eXCDcWDNdhAZyLn2efCCg7NfyD55XwKXoQA2a4w-bToz_MUr1i90RKBmGgLWbyhFCOfOv0-NYfBz1Ha5Kwu-c2JNWqzsvLPYisiQZQMTutT0IB8Q=w224-h298-k-no" alt="Foto Real Agro Fenix 4" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                        <span class="text-white text-sm font-bold border border-white/30 px-4 py-2 rounded-lg">Seção Pet Care</span>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- View Street View Call to Action -->
-            <div class="mt-8 text-center">
-                <a href="https://www.google.com/maps/@?api=1&map_action=pano&pano=ImuYe5-vTdD8Wv2ubjCuyg" target="_blank" class="inline-flex items-center space-x-2 text-primary hover:text-secondary font-bold transition-colors">
-                    <i class="fas fa-street-view text-xl"></i>
-                    <span>Ver Vista da Rua (Google Street View)</span>
-                </a>
             </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
     <section id="depoimentos" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
-                <span class="text-secondary font-bold text-sm tracking-widest uppercase">Depoimentos reais</span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-primary">O que nossos clientes dizem</h2>
-                <div class="w-24 h-1 bg-secondary mx-auto rounded-full"></div>
+                <div class="inline-block bg-secondary/15 text-primary font-bold text-xs uppercase tracking-widest px-3.5 py-1.5 rounded-full">
+                    Opinião de Clientes
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-primary font-serif">
+                    O que dizem os mais de 616 clientes atendidos?
+                </h2>
+                <div class="flex justify-center items-center gap-2 text-yellow-400 text-lg">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <span class="text-slate-700 font-bold ml-1">4.7 / 5</span>
+                </div>
             </div>
 
-            <!-- Review Cards Grid -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Review 1 -->
-                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
+                <!-- Review Card 1 -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:scale-[1.02] transition-transform">
                     <div class="space-y-4">
-                        <div class="flex items-center space-x-1 text-amber-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <div class="flex items-center gap-1.5 text-yellow-400 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                         </div>
-                        <p class="text-slate-600 italic text-sm">"Pense em lugar que tem tudo para animais, o atendimento é muito bom, atencioso e sempre tem desconto. Super recomendo!!!"</p>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Lugar perfeito para comprar tudo para o pet. Sou cliente fiel. Adoro o atendimento. Preço e variedade de produtos. Recomendo."
+                        </p>
                     </div>
-                    <div class="mt-6 flex items-center space-x-3 border-t border-slate-200/60 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">CL</div>
+                    <div class="mt-6 flex items-center gap-3 border-t border-slate-200/60 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                            AC
+                        </div>
                         <div>
-                            <h4 class="font-bold text-sm text-primary">Claudia Leite</h4>
-                            <p class="text-xs text-slate-400">Cliente Google</p>
+                            <h4 class="font-bold text-primary text-sm">Andreia Capellari</h4>
+                            <span class="text-xs text-slate-400">Cliente Recorrente</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Review 2 -->
-                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
+                <!-- Review Card 2 -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:scale-[1.02] transition-transform">
                     <div class="space-y-4">
-                        <div class="flex items-center space-x-1 text-amber-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <div class="flex items-center gap-1.5 text-yellow-400 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                         </div>
-                        <p class="text-slate-600 italic text-sm">"Lugar perfeito para comprar tudo para o pet. Sou cliente fiel. Adoro o atendimento. Preço e variedade de produtos. Recomendo."</p>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Super recomendo! Mega atenciosos, pronto atendimento, variedades, jardinagem, medicamentos e acima de tudo paixão no que faz. Dedicação e carinho aos animais."
+                        </p>
                     </div>
-                    <div class="mt-6 flex items-center space-x-3 border-t border-slate-200/60 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">AC</div>
+                    <div class="mt-6 flex items-center gap-3 border-t border-slate-200/60 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                            MR
+                        </div>
                         <div>
-                            <h4 class="font-bold text-sm text-primary">Andreia Capellari</h4>
-                            <p class="text-xs text-slate-400">Cliente Google</p>
+                            <h4 class="font-bold text-primary text-sm">Marcia Regina Luzzi</h4>
+                            <span class="text-xs text-slate-400">Cliente Fiel</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Review 3 -->
-                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
+                <!-- Review Card 3 -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:scale-[1.02] transition-transform">
                     <div class="space-y-4">
-                        <div class="flex items-center space-x-1 text-amber-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <div class="flex items-center gap-1.5 text-yellow-400 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                         </div>
-                        <p class="text-slate-600 italic text-sm">"Super recomendo! Mega atenciosos, pronto atendimento, variedades, jardinagem, medicamentos e acima de tudo paixão no que faz. Dedicação e carinho aos animais."</p>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Literalmente lembrança da infância. Sempre fui ao local com meus pais desde pequeno. Qualidade e atendimento nos mínimos detalhes."
+                        </p>
                     </div>
-                    <div class="mt-6 flex items-center space-x-3 border-t border-slate-200/60 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">ML</div>
+                    <div class="mt-6 flex items-center gap-3 border-t border-slate-200/60 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                            BS
+                        </div>
                         <div>
-                            <h4 class="font-bold text-sm text-primary">Marcia Regina Luzzi</h4>
-                            <p class="text-xs text-slate-400">Cliente Google</p>
+                            <h4 class="font-bold text-primary text-sm">Bruno Sorru</h4>
+                            <span class="text-xs text-slate-400">Cliente de Infância</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Review 4 -->
-                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
+                <!-- Review Card 4 -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:scale-[1.02] transition-transform">
                     <div class="space-y-4">
-                        <div class="flex items-center space-x-1 text-amber-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <div class="flex items-center gap-1.5 text-yellow-400 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                         </div>
-                        <p class="text-slate-600 italic text-sm">"Literalmente lembrança da infância. Sempre fui ao local com meus pais desde pequeno. Qualidade e atendimento nos mínimos detalhes."</p>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Pense em lugar que tem tudo para animais, o atendimento é muito bom, atencioso e sempre tem desconto. Super recomendo!!!"
+                        </p>
                     </div>
-                    <div class="mt-6 flex items-center space-x-3 border-t border-slate-200/60 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">BS</div>
+                    <div class="mt-6 flex items-center gap-3 border-t border-slate-200/60 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                            CL
+                        </div>
                         <div>
-                            <h4 class="font-bold text-sm text-primary">Bruno Sorru</h4>
-                            <p class="text-xs text-slate-400">Cliente Google</p>
+                            <h4 class="font-bold text-primary text-sm">Claudia Leite</h4>
+                            <span class="text-xs text-slate-400">Cliente</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Review 5 -->
-                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
+                <!-- Review Card 5 -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:scale-[1.02] transition-transform">
                     <div class="space-y-4">
-                        <div class="flex items-center space-x-1 text-amber-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <div class="flex items-center gap-1.5 text-yellow-400 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                         </div>
-                        <p class="text-slate-600 italic text-sm">"Melhor loja em mongaguá, com excelente atendimento, tem tudo ali."</p>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Melhor loja em mongaguá, com excelente atendimento, tem tudo ali."
+                        </p>
                     </div>
-                    <div class="mt-6 flex items-center space-x-3 border-t border-slate-200/60 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">MM</div>
+                    <div class="mt-6 flex items-center gap-3 border-t border-slate-200/60 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                            MM
+                        </div>
                         <div>
-                            <h4 class="font-bold text-sm text-primary">Michele Morais</h4>
-                            <p class="text-xs text-slate-400">Cliente Google</p>
+                            <h4 class="font-bold text-primary text-sm">Michele Morais</h4>
+                            <span class="text-xs text-slate-400">Cliente Satisfeita</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Review 6 -->
-                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between">
+                <!-- Review Card 6 -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:scale-[1.02] transition-transform">
                     <div class="space-y-4">
-                        <div class="flex items-center space-x-1 text-amber-400">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <div class="flex items-center gap-1.5 text-yellow-400 text-sm">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                         </div>
-                        <p class="text-slate-600 italic text-sm">"Ótimo atendimento e o melhor preço que encontrei na cidade de Mongaguá."</p>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Ótimos preços e bom atendimento."
+                        </p>
                     </div>
-                    <div class="mt-6 flex items-center space-x-3 border-t border-slate-200/60 pt-4">
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">AS</div>
+                    <div class="mt-6 flex items-center gap-3 border-t border-slate-200/60 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">
+                            CB
+                        </div>
                         <div>
-                            <h4 class="font-bold text-sm text-primary">Anderson Souza</h4>
-                            <p class="text-xs text-slate-400">Cliente Google</p>
+                            <h4 class="font-bold text-primary text-sm">Claudio de Brito</h4>
+                            <span class="text-xs text-slate-400">Cliente</span>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
-    <!-- Info, Hours & Map Section -->
-    <section id="contato" class="py-20 bg-slate-100">
-        <div class="container mx-auto px-4">
+    <!-- Map & Contact Info Section -->
+    <section id="contato" class="py-20 bg-accentBg relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-12 gap-12 items-start">
                 
-                <!-- Left Details (8 cols on lg) -->
-                <div class="lg:col-span-5 space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+                <!-- Contact info details (5 cols) -->
+                <div class="lg:col-span-5 space-y-8">
                     <div>
-                        <span class="text-secondary font-bold text-sm uppercase tracking-wider">Como nos encontrar</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-primary mt-1">Contato & Funcionamento</h2>
+                        <div class="inline-block bg-secondary/15 text-primary font-bold text-xs uppercase tracking-widest px-3.5 py-1.5 rounded-full mb-3">
+                            Onde nos encontrar
+                        </div>
+                        <h2 class="text-3xl font-extrabold text-primary font-serif">Agro Fenix</h2>
+                        <p class="text-slate-600 mt-2 text-sm">Fácil acesso, ampla variedade e o melhor atendimento.</p>
                     </div>
 
+                    <!-- Address & Phone blocks -->
                     <div class="space-y-4">
-                        <!-- Address -->
-                        <div class="flex items-start space-x-4">
-                            <div class="p-3 bg-primary/10 rounded-xl text-primary mt-1">
-                                <i class="fas fa-map-marked-alt text-xl"></i>
-                            </div>
+                        <div class="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100">
+                            <div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary text-lg"><i class="fa-solid fa-location-dot"></i></div>
                             <div>
-                                <h4 class="font-bold text-primary">Endereço</h4>
-                                <p class="text-sm text-slate-600 mt-0.5">Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000</p>
-                                <a href="https://www.google.com/maps/place/Agro+Fenix/data=!4m7!3m6!1s0x94ce280e18ba1d71:0x2cf41e45a8465f8a!8m2!3d-24.122787!4d-46.679817!16s%2Fg%2F11g6b10pyq!19sChIJcR26GA4ozpQRil9GqEUe9Cw?authuser=0&hl=pt-BR&rclk=1" target="_blank" class="text-xs text-secondary font-bold hover:underline inline-block mt-2">
-                                    <i class="fas fa-directions mr-1"></i>Como chegar pelo Google Maps
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Phone & WhatsApp -->
-                        <div class="flex items-start space-x-4">
-                            <div class="p-3 bg-primary/10 rounded-xl text-primary mt-1">
-                                <i class="fas fa-phone-alt text-xl"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-primary">Contatos rápidos</h4>
-                                <p class="text-sm text-slate-600 mt-0.5">Telefone: (13) 3448-2068</p>
-                                <p class="text-sm text-slate-600">WhatsApp: (13) 99757-7697</p>
-                            </div>
-                        </div>
-
-                        <!-- Hours of Operation -->
-                        <div class="flex items-start space-x-4">
-                            <div class="p-3 bg-primary/10 rounded-xl text-primary mt-1">
-                                <i class="fas fa-clock text-xl"></i>
-                            </div>
-                            <div class="w-full">
-                                <h4 class="font-bold text-primary">Horário de Funcionamento</h4>
-                                <div class="text-sm text-slate-600 mt-1 space-y-1">
-                                    <p class="flex justify-between"><span>Segunda a Sexta:</span> <span class="font-semibold">08:00 – 19:00</span></p>
-                                    <p class="flex justify-between"><span>Sábado:</span> <span class="font-semibold">08:00 – 19:00</span></p>
-                                    <p class="flex justify-between text-secondary font-semibold"><span>Domingo:</span> <span>08:00 – 13:00</span></p>
+                                <h4 class="font-bold text-primary text-sm">Endereço</h4>
+                                <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+                                    Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000
+                                </p>
+                                <div class="flex gap-2 mt-2">
+                                    <a href="https://www.google.com/maps/place/Agro+Fenix/data=!4m7!3m6!1s0x94ce280e18ba1d71:0x2cf41e45a8465f8a!8m2!3d-24.122787!4d-46.679817!16s%2Fg%2F11g6b10pyq!19sChIJcR26GA4ozpQRil9GqEUe9Cw?authuser=0&hl=pt-BR&rclk=1" target="_blank" class="text-xs text-secondary font-bold hover:underline flex items-center gap-1">
+                                        <i class="fa-solid fa-directions"></i> Rota do Google Maps
+                                    </a>
+                                    <span class="text-slate-300">|</span>
+                                    <a href="https://www.google.com/maps/@?api=1&map_action=pano&pano=ImuYe5-vTdD8Wv2ubjCuyg" target="_blank" class="text-xs text-secondary font-bold hover:underline flex items-center gap-1">
+                                        <i class="fa-solid fa-street-view"></i> Ver Vista da Rua
+                                    </a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Payments accepted -->
-                        <div class="pt-4 border-t border-slate-100">
-                            <h4 class="font-bold text-primary text-sm mb-3">Formas de Pagamento</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-medium"><i class="fas fa-credit-card mr-1 text-primary"></i> Cartão de Crédito</span>
-                                <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-medium"><i class="fas fa-credit-card mr-1 text-primary"></i> Cartão de Débito</span>
-                                <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-medium"><i class="mobile-alt fas fa-mobile-alt mr-1 text-primary"></i> NFC / Pix</span>
+                        <div class="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100">
+                            <div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary text-lg"><i class="fa-solid fa-phone"></i></div>
+                            <div>
+                                <h4 class="font-bold text-primary text-sm">Telefones e WhatsApp</h4>
+                                <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+                                    Telefone Fixo: <a href="tel:1334482068" class="font-semibold text-primary hover:underline">(13) 3448-2068</a><br>
+                                    WhatsApp: <a href="https://wa.me/551334482068" target="_blank" class="font-semibold text-primary hover:underline">(13) 3448-2068</a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Horários de Funcionamento -->
+                        <div class="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100">
+                            <div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary text-lg"><i class="fa-solid fa-calendar-days"></i></div>
+                            <div class="w-full">
+                                <h4 class="font-bold text-primary text-sm">Horário de Funcionamento</h4>
+                                <div class="grid grid-cols-2 gap-2 mt-2 text-xs text-slate-600">
+                                    <div>Segunda-feira:</div> <div class="font-semibold text-right">08:00–19:00</div>
+                                    <div>Terça-feira:</div> <div class="font-semibold text-right">08:00–19:00</div>
+                                    <div>Quarta-feira:</div> <div class="font-semibold text-right">08:00–19:00</div>
+                                    <div>Quinta-feira:</div> <div class="font-semibold text-right">08:00–19:00</div>
+                                    <div>Sexta-feira:</div> <div class="font-semibold text-right">08:00–19:00</div>
+                                    <div>Sábado:</div> <div class="font-semibold text-right">08:00–19:00</div>
+                                    <div>Domingo:</div> <div class="font-semibold text-right text-amber-600">08:00–13:00</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Map Area (7 cols on lg) -->
-                <div class="lg:col-span-7 h-full min-h-[450px] w-full relative rounded-2xl overflow-hidden shadow-xl border border-slate-200">
-                    <!-- Google Maps Iframe using coordinates -->
+                <!-- Map Frame Embed (7 cols) -->
+                <div class="lg:col-span-7 h-[420px] rounded-3xl overflow-hidden shadow-xl border-4 border-white relative">
+                    <!-- Leaflet / Google Maps Mockup Embed with exact lat long -->
                     <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3637.2647895475173!2d-46.68239192464761!3d-24.122782078415712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce280e18ba1d71%3A0x2cf41e45a8465f8a!2sAgro%20Fenix!5e0!3m2!1spt-BR!2sbr!4v1716382101235!5m2!1spt-BR!2sbr" 
-                        class="absolute inset-0 w-full h-full border-0"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3637.319323755498!2d-46.68239192464769!3d-24.122782178418933!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce280e18ba1d71%3A0x2cf41e45a8465f8a!2sAgro%20Fenix!5e0!3m2!1spt-BR!2sbr!4v1690000000000!5m2!1spt-BR!2sbr" 
+                        class="w-full h-full border-0" 
                         allowfullscreen="" 
                         loading="lazy" 
                         referrerpolicy="no-referrer-when-downgrade">
@@ -658,81 +622,90 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-primary text-white border-t border-secondary/20">
-        <div class="container mx-auto px-4 py-12">
-            <div class="grid md:grid-cols-12 gap-12">
+    <footer class="bg-primary text-white pt-16 pb-8 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-12 border-b border-white/10">
                 
-                <!-- Col 1: Brand & Logo -->
-                <div class="md:col-span-5 space-y-4">
-                    <div class="flex items-center space-x-3">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logo-images/1781053182960_logo_agrofenix.png" alt="Agro Fenix Logo" class="h-14 w-14 object-contain bg-white rounded-full p-1">
-                        <div>
-                            <span class="text-white font-extrabold text-2xl tracking-wider block">AGRO FENIX</span>
-                            <span class="text-secondary text-xs font-semibold tracking-widest block">PET SHOP & AGROPECUÁRIA</span>
+                <!-- Footer Column 1: Brand -->
+                <div class="md:col-span-4 space-y-4">
+                    <a href="#" class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-secondary border border-secondary/30">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 6C13.66 6 15 7.34 15 9C15 10.66 13.66 12 12 12C10.34 12 9 10.66 9 9C9 7.34 10.34 6 12 6ZM12 18C9.58 18 7.46 16.73 6.25 14.83C6.28 12.92 10.1 11.9 12 11.9C13.89 11.9 17.71 12.92 17.75 14.83C16.54 16.73 14.42 18 12 18Z" fill="currentColor"/>
+                            </svg>
                         </div>
-                    </div>
-                    <p class="text-slate-400 text-sm max-w-sm leading-relaxed">
-                        Atendendo Mongaguá com amor, variedade e compromisso com o bem-estar animal. O melhor pet shop da região pertinho de você.
+                        <div>
+                            <span class="text-lg font-bold tracking-wider block">AGRO FENIX</span>
+                            <span class="text-[9px] text-secondary font-semibold uppercase tracking-widest leading-none">Pet Shop & Jardinagem</span>
+                        </div>
+                    </a>
+                    <p class="text-slate-400 text-xs leading-relaxed">
+                        Atendimento com carinho, dedicação extrema aos animais e excelente variedade para o seu lar e jardim em Mongaguá - SP.
                     </p>
-                    <div class="flex space-x-4 pt-2">
-                        <a href="https://www.facebook.com/diskagrofenix" target="_blank" class="w-10 h-10 rounded-full bg-white/5 hover:bg-secondary/20 hover:text-secondary flex items-center justify-center transition-all text-slate-300">
-                            <i class="fab fa-facebook-f text-lg"></i>
-                        </a>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="https://www.facebook.com/diskagrofenix" target="_blank" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-300 hover:bg-secondary hover:text-primary transition-all text-sm"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://wa.me/551334482068" target="_blank" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-300 hover:bg-secondary hover:text-primary transition-all text-sm"><i class="fa-brands fa-whatsapp"></i></a>
                     </div>
                 </div>
 
-                <!-- Col 2: Navigation Links -->
-                <div class="md:col-span-3 space-y-4">
-                    <h4 class="font-bold text-secondary text-lg">Navegação</h4>
-                    <ul class="space-y-2 text-sm text-slate-400">
+                <!-- Footer Column 2: Quick Links -->
+                <div class="md:col-span-4 space-y-4">
+                    <h4 class="font-extrabold text-sm uppercase tracking-widest text-secondary">Navegação</h4>
+                    <ul class="space-y-2 text-xs text-slate-400">
                         <li><a href="#inicio" class="hover:text-white transition-colors">Início</a></li>
-                        <li><a href="#sobre" class="hover:text-white transition-colors">Quem Somos</a></li>
-                        <li><a href="#servicos" class="hover:text-white transition-colors">Serviços e Produtos</a></li>
-                        <li><a href="#galeria" class="hover:text-white transition-colors">Nossa Loja</a></li>
-                        <li><a href="#depoimentos" class="hover:text-white transition-colors">Avaliações</a></li>
+                        <li><a href="#sobre" class="hover:text-white transition-colors">Sobre Nós</a></li>
+                        <li><a href="#servicos" class="hover:text-white transition-colors">Produtos e Serviços</a></li>
+                        <li><a href="#depoimentos" class="hover:text-white transition-colors">Avaliações de Clientes</a></li>
+                        <li><a href="#contato" class="hover:text-white transition-colors">Contato e Localização</a></li>
                     </ul>
                 </div>
 
-                <!-- Col 3: Legal & Support -->
+                <!-- Footer Column 3: Contact & Payments -->
                 <div class="md:col-span-4 space-y-4">
-                    <h4 class="font-bold text-secondary text-lg">Atendimento</h4>
-                    <p class="text-sm text-slate-400 leading-relaxed">Fale diretamente com nossa equipe de vendas e delivery pelo WhatsApp.</p>
-                    <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida." target="_blank" class="inline-flex items-center space-x-2 bg-secondary text-primary font-bold px-5 py-3 rounded-xl hover:bg-secondary-dark transition-colors w-full justify-center">
-                        <i class="fab fa-whatsapp text-lg"></i>
-                        <span>Iniciar Atendimento</span>
-                    </a>
+                    <h4 class="font-extrabold text-sm uppercase tracking-widest text-secondary">Sobre o Estabelecimento</h4>
+                    <p class="text-slate-400 text-xs leading-relaxed">
+                        <i class="fa-solid fa-credit-card text-secondary mr-1"></i> Aceitamos cartões de crédito, débito e pagamentos por aproximação (NFC).
+                    </p>
+                    <p class="text-slate-400 text-xs leading-relaxed">
+                        <i class="fa-solid fa-wheelchair text-secondary mr-1"></i> Ambiente estruturado com total acessibilidade para cadeirantes.
+                    </p>
                 </div>
 
             </div>
 
-            <div class="mt-12 pt-8 border-t border-white/10 text-center md:flex md:justify-between md:items-center text-xs text-slate-500">
-                <p>&copy; 2024 Agro Fenix. Todos os direitos reservados.</p>
-                <p class="mt-2 md:mt-0">Site criado e mantido por <span class="font-bold text-slate-400">STUDIOTESTA</span>.</p>
+            <!-- Footer Bottom Copy -->
+            <div class="flex flex-col sm:flex-row justify-between items-center pt-8 text-xs text-slate-400 gap-4">
+                <span>&copy; <span id="year"></span> Agro Fenix. Todos os direitos reservados.</span>
+                <span class="font-semibold tracking-wider text-slate-300">Site criado e mantido por STUDIOTESTA.</span>
             </div>
         </div>
     </footer>
 
-    <!-- Floating WhatsApp Action Button (High Conversion) -->
-    <a href="https://wa.me/5513997577697?text=Olá!%20Gostaria%20de%20falar%20com%20a%20Agro%20Fenix." target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25d366] hover:bg-[#20ba5a] text-white p-4 rounded-full shadow-2xl transition-transform duration-300 hover:scale-110 flex items-center justify-center" aria-label="Falar no WhatsApp">
-        <i class="fab fa-whatsapp text-3xl"></i>
+    <!-- Sticky WhatsApp Button -->
+    <a href="https://wa.me/551334482068" target="_blank" class="fixed bottom-6 right-6 bg-emerald-500 hover:bg-emerald-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl z-50 whatsapp-pulse hover:scale-105 transition-all" aria-label="Chamar no WhatsApp">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
     </a>
 
-    <!-- Basic Menu Logic -->
+    <!-- Mobile Menu Toggle Script -->
     <script>
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
 
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
         });
 
-        // Close menu on link click
-        const mobileLinks = mobileMenu.querySelectorAll('a');
+        // Close mobile menu when clicking a link
+        const mobileLinks = menu.querySelectorAll('a');
         mobileLinks.forEach(link => {
             link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
+                menu.classList.add('hidden');
             });
         });
+
+        // Update year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
     </script>
+
 </body>
 </html>
