@@ -1,1 +1,811 @@
-<!-- StudioTesta Sandbox: Evento de Escuta Ativa -->
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Agro Jeca's - O maior e mais completo pet shop e agropecuária de Juquitiba. Rações, medicamentos, acessórios e tudo para o seu animal com entrega rápida!">
+    <title>Agro Jeca's | Tudo para o seu Pet em Juquitiba</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#ff5a00',
+                            light: '#ff7a33',
+                            dark: '#cc4800',
+                        },
+                        secondary: {
+                            DEFAULT: '#0fa5a5',
+                            light: '#14c2c2',
+                            dark: '#0c8484',
+                        },
+                        accent: '#ff5a00',
+                        neutralBg: '#fcfbfa',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        title: ['"Outfit"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 90, 0, 0.08);
+        }
+        .hero-bg {
+            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.5) 100%), url('https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+        }
+        .text-glow {
+            text-shadow: 0 4px 12px rgba(255, 90, 0, 0.3);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-neutralBg text-slate-800 font-sans antialiased overflow-x-hidden">
+
+    <!-- HEADER & NAVIGATION -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo & Brand Name -->
+                <a href="#" class="flex items-center space-x-3 group">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1781389402767_logo_agrojecas.jpg" 
+                         alt="Agro Jeca's Logo" 
+                         class="h-14 w-auto rounded-full border border-primary/20 shadow-md group-hover:scale-105 transition-all duration-300">
+                    <div class="flex flex-col">
+                        <span class="text-xl font-bold font-title tracking-tight text-slate-900 group-hover:text-primary transition-colors duration-300">
+                            Agro Jeca's
+                        </span>
+                        <span class="text-xs text-secondary font-medium tracking-wider uppercase -mt-1">Pet & Agro</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#diferenciais" class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors duration-200">Diferenciais</a>
+                    <a href="#servicos" class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors duration-200">Produtos & Serviços</a>
+                    <a href="#depoimentos" class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors duration-200">Avaliações</a>
+                    <a href="#sobre" class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors duration-200">Quem Somos</a>
+                    <a href="#faq" class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors duration-200">Dúvidas</a>
+                </nav>
+
+                <!-- CTA Button Desktop -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="https://wa.me/5511941814145" target="_blank" 
+                       class="relative inline-flex items-center justify-center px-6 h-12 text-sm font-bold text-white bg-primary rounded-full overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:bg-primary-dark shadow-lg shadow-primary/25">
+                        <i class="fa-brands fa-whatsapp mr-2 text-base"></i>
+                        Peça no WhatsApp
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex md:hidden">
+                    <button id="mobile-menu-btn" type="button" class="text-slate-700 hover:text-primary focus:outline-none p-2" aria-label="Abrir menu">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-lg border-b border-primary/10">
+            <div class="px-4 pt-2 pb-6 space-y-3 shadow-inner">
+                <a href="#diferenciais" class="mobile-nav-link block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary transition-all">Diferenciais</a>
+                <a href="#servicos" class="mobile-nav-link block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary transition-all">Produtos & Serviços</a>
+                <a href="#depoimentos" class="mobile-nav-link block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary transition-all">Avaliações</a>
+                <a href="#sobre" class="mobile-nav-link block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary transition-all">Quem Somos</a>
+                <a href="#faq" class="mobile-nav-link block px-3 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary transition-all">Dúvidas</a>
+                <a href="https://wa.me/5511941814145" target="_blank" class="block w-full text-center py-3 px-4 font-bold text-white bg-primary rounded-xl shadow-lg shadow-primary/25 hover:bg-primary-dark transition-all">
+                    <i class="fa-brands fa-whatsapp mr-2"></i>Chamar no WhatsApp
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-28 pb-20 md:pt-40 md:pb-32 hero-bg text-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Content -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20">
+                        <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs md:text-sm font-semibold tracking-wider text-orange-200">A melhor da região • Nota 4.7 no Google</span>
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold font-title leading-tight tracking-tight">
+                        Tudo para o seu <span class="text-primary-light">Pet</span> e sua rotina em um só lugar!
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto lg:mx-0 font-light">
+                        Rações premium, farmácia completa, acessórios e atendimento com carinho e tradição que você só encontra na <strong class="font-semibold text-white">Agro Jeca's</strong> em Juquitiba.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="https://wa.me/5511941814145" target="_blank" 
+                           class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary rounded-full hover:bg-primary-light transition-all duration-300 transform hover:scale-105 shadow-xl shadow-primary/30">
+                            <i class="fa-brands fa-whatsapp mr-3 text-xl"></i>
+                            Fazer Pedido / Entrega
+                        </a>
+                        <a href="#servicos" 
+                           class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all duration-300 backdrop-blur-sm">
+                            Ver Nossos Serviços
+                        </a>
+                    </div>
+
+                    <!-- Small Badges -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-white/10 max-w-md mx-auto lg:mx-0">
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl md:text-3xl font-bold font-title text-primary-light">362+</p>
+                            <p class="text-xs text-slate-300">Clientes Avaliados</p>
+                        </div>
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl md:text-3xl font-bold font-title text-primary-light">4.7⭐</p>
+                            <p class="text-xs text-slate-300">Nota Excelente</p>
+                        </div>
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl md:text-3xl font-bold font-title text-primary-light">Rápida</p>
+                            <p class="text-xs text-slate-300">Opção de Entrega</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual / Storefront Preview -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative mx-auto max-w-md lg:max-w-none">
+                        <!-- Decorative glow -->
+                        <div class="absolute -inset-2 bg-gradient-to-r from-primary to-secondary rounded-2xl opacity-30 blur-xl animate-pulse"></div>
+                        
+                        <!-- Main Card -->
+                        <div class="relative bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden p-6 shadow-2xl">
+                            <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=600" 
+                                 alt="Pet Care" 
+                                 class="w-full h-56 object-cover rounded-xl mb-6 shadow-md border border-white/5">
+                            
+                            <!-- Google Card Mockup -->
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-bold text-lg text-white">Agro Jeca's Juquitiba</h3>
+                                    <span class="px-2.5 py-1 text-xs font-semibold text-emerald-400 bg-emerald-500/10 rounded-full border border-emerald-500/20">Aberto</span>
+                                </div>
+                                <div class="flex items-center space-x-1 text-amber-400">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                    <span class="text-xs text-slate-300 ml-1">(4.7 com 362 avaliações)</span>
+                                </div>
+                                <p class="text-sm text-slate-300">
+                                    <i class="fa-solid fa-location-dot text-primary mr-2"></i>R. José Antonio Nunes, 254 - Centro, Juquitiba - SP
+                                </p>
+                                <a href="https://wa.me/5511941814145" target="_blank" 
+                                   class="flex items-center justify-center space-x-2 w-full py-3 bg-secondary hover:bg-secondary-light text-white rounded-xl font-bold transition-all text-sm">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>Falar Conosco Agora</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PROPOSTA ÚNICA DE VALOR (Diferenciais) -->
+    <section id="diferenciais" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-secondary block mb-3">Diferenciais Elite</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold font-title text-slate-900 tracking-tight">
+                    Por que a Agro Jeca's é a escolha número #1 de Juquitiba?
+                </h2>
+                <div class="w-16 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <!-- Card 1 -->
+                <div class="p-8 rounded-2xl bg-[#fcfbfa] hover:bg-white border border-slate-100 hover:border-primary/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-primary mb-6">
+                        <i class="fa-solid fa-truck-fast text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold font-title text-slate-900 mb-3">Entrega Inteligente</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Esqueceu a ração? Nós entregamos direto na sua residência com rapidez e total segurança para você não se preocupar.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="p-8 rounded-2xl bg-[#fcfbfa] hover:bg-white border border-slate-100 hover:border-primary/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center text-secondary mb-6">
+                        <i class="fa-solid fa-wheelchair text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold font-title text-slate-900 mb-3">Acessibilidade Total</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Entrada e estacionamento totalmente planejados e adaptados para receber cadeirantes e pessoas com mobilidade reduzida.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="p-8 rounded-2xl bg-[#fcfbfa] hover:bg-white border border-slate-100 hover:border-primary/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-primary mb-6">
+                        <i class="fa-solid fa-credit-card text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold font-title text-slate-900 mb-3">Pagamento Facilitado</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Aceitamos cartões de crédito, débito e os modernos pagamentos digitais via NFC direto do celular ou smartwatch.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="p-8 rounded-2xl bg-[#fcfbfa] hover:bg-white border border-slate-100 hover:border-primary/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center text-secondary mb-6">
+                        <i class="fa-solid fa-mug-hot text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold font-title text-slate-900 mb-3">Recepção com Café</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Aqui o cliente é tratado como família! Temos sempre um café fresco esperando por você enquanto faz suas compras.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVIÇOS & PRODUTOS -->
+    <section id="servicos" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-primary block mb-3">Variedade Incalculável</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold font-title text-slate-900 tracking-tight">
+                    Tudo o que você busca está na Agro Jeca's
+                </h2>
+                <p class="text-slate-600 mt-3">Os melhores produtos com marcas consagradas para cuidar do seu amigo animal.</p>
+                <div class="w-16 h-1 bg-secondary mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Produto 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-slate-100">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1589924691126-3309e85155a7?auto=format&fit=crop&q=80&w=600" alt="Rações e Alimentação" class="w-full h-full object-cover hover:scale-105 transition-all duration-500">
+                        <span class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">Premium</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Rações e Nutrição</h3>
+                        <p class="text-slate-600 text-sm mb-4">Marcas conceituadas que garantem a vitalidade e a saúde do seu pet em todas as fases da vida.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center text-xs text-slate-700 font-medium">
+                                <i class="fa-solid fa-circle-check text-secondary mr-2"></i> Rações Secas e Úmidas
+                            </li>
+                            <li class="flex items-center text-xs text-slate-700 font-medium">
+                                <i class="fa-solid fa-circle-check text-secondary mr-2"></i> Petiscos e Sachês Especiais
+                            </li>
+                        </ul>
+                        <a href="https://wa.me/5511941814145?text=Olá,%20gostaria%20de%20saber%20sobre%20as%20rações%20disponíveis." target="_blank" class="block text-center py-2.5 bg-slate-100 hover:bg-primary hover:text-white text-slate-800 font-bold rounded-xl transition-colors duration-300">Consultar Marcas</a>
+                    </div>
+                </div>
+
+                <!-- Produto 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-slate-100">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&q=80&w=600" alt="Farmácia Pet" class="w-full h-full object-cover hover:scale-105 transition-all duration-500">
+                        <span class="absolute top-4 left-4 bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">Completa</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Farmácia & Saúde Vet</h3>
+                        <p class="text-slate-600 text-sm mb-4">Setor especializado em medicamentos de confiança para prevenir e tratar qualquer problema do seu pet.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center text-xs text-slate-700 font-medium">
+                                <i class="fa-solid fa-circle-check text-secondary mr-2"></i> Antipulgas e Vermífugos
+                            </li>
+                            <li class="flex items-center text-xs text-slate-700 font-medium">
+                                <i class="fa-solid fa-circle-check text-secondary mr-2"></i> Vitaminas e Medicamentos Específicos
+                            </li>
+                        </ul>
+                        <a href="https://wa.me/5511941814145?text=Olá,%20gostaria%20de%20consultar%20um%20medicamento%20veterinário." target="_blank" class="block text-center py-2.5 bg-slate-100 hover:bg-primary hover:text-white text-slate-800 font-bold rounded-xl transition-colors duration-300">Consultar Remédio</a>
+                    </div>
+                </div>
+
+                <!-- Produto 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-slate-100">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&q=80&w=600" alt="Linha Agro e Campo" class="w-full h-full object-cover hover:scale-105 transition-all duration-500">
+                        <span class="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">Agro</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Linha Agro & Quintal</h3>
+                        <p class="text-slate-600 text-sm mb-4">Ferramentas, adubos, sementes e tudo para o cuidado de plantas e criação de aves ou animais rurais.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center text-xs text-slate-700 font-medium">
+                                <i class="fa-solid fa-circle-check text-secondary mr-2"></i> Sementes e Fertilizantes
+                            </li>
+                            <li class="flex items-center text-xs text-slate-700 font-medium">
+                                <i class="fa-solid fa-circle-check text-secondary mr-2"></i> Equipamentos de Jardinagem
+                            </li>
+                        </ul>
+                        <a href="https://wa.me/5511941814145?text=Olá,%20gostaria%20de%20informações%20sobre%20produtos%20agropecuários." target="_blank" class="block text-center py-2.5 bg-slate-100 hover:bg-primary hover:text-white text-slate-800 font-bold rounded-xl transition-colors duration-300">Ver Itens Agro</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PROVA SOCIAL (Google Reviews) -->
+    <section id="depoimentos" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Section Header inside Proof -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
+                <div class="lg:col-span-6 text-center lg:text-left">
+                    <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-secondary block mb-3">Reconhecimento Real</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold font-title text-slate-900 tracking-tight leading-tight">
+                        Quem conhece a nossa casa, recomenda de verdade!
+                    </h2>
+                    <div class="w-16 h-1 bg-primary mt-4 mx-auto lg:mx-0 rounded-full"></div>
+                </div>
+                
+                <div class="lg:col-span-6 flex items-center justify-center lg:justify-end space-x-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <div class="text-center">
+                        <p class="text-5xl font-extrabold text-slate-950 font-title">4.7</p>
+                        <div class="flex text-amber-400 my-1 justify-center">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase">Nota Google</p>
+                    </div>
+                    <div class="w-[1px] h-14 bg-slate-200"></div>
+                    <div>
+                        <p class="text-3xl font-extrabold text-slate-900 font-title">362+</p>
+                        <p class="text-xs text-slate-500 font-semibold uppercase">Avaliações de Clientes</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonials Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Testimonial 1 -->
+                <div class="bg-[#fcfbfa] p-8 rounded-2xl border border-slate-100 flex flex-col justify-between shadow-sm hover:shadow-lg transition-shadow">
+                    <div class="space-y-4">
+                        <div class="flex text-amber-400">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Ambiente agradável, um super atendimento. Loja ampla, variedades de produtos com qualidade e garantia."
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 pt-6 border-t border-slate-100 mt-6">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                            FG
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">fenix gold</h4>
+                            <p class="text-xs text-slate-400">Cliente Local</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-[#fcfbfa] p-8 rounded-2xl border border-slate-100 flex flex-col justify-between shadow-sm hover:shadow-lg transition-shadow">
+                    <div class="space-y-4">
+                        <div class="flex text-amber-400">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Opções para todo tipo de animal, farmácia para pet impecável, me instruíram muito bem na escolha para os itens dos meus pets."
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 pt-6 border-t border-slate-100 mt-6">
+                        <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold">
+                            XA
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">xXAbAcAxAXx Br</h4>
+                            <p class="text-xs text-slate-400">Cliente Recorrente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-[#fcfbfa] p-8 rounded-2xl border border-slate-100 flex flex-col justify-between shadow-sm hover:shadow-lg transition-shadow">
+                    <div class="space-y-4">
+                        <div class="flex text-amber-400">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed italic">
+                            "Essa loja deveria chamar TEM DE TUDO, pessoas super simpáticas atendendo, creio que seja a melhor loja desse ramo na região. Amplo estacionamento e ainda um ótimo café para os clientes."
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 pt-6 border-t border-slate-100 mt-6">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                            OS
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">ORLANDO APARECIDO DE SOUZA</h4>
+                            <p class="text-xs text-slate-400">Guia Local</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SOBRE NÓS HUMANIZADO -->
+    <section id="sobre" class="py-20 bg-slate-50 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Story Content -->
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-primary block">Amor por Animais</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold font-title text-slate-900 leading-tight">
+                        Tradição e Comprometimento no Coração de Juquitiba
+                    </h2>
+                    <p class="text-slate-600 text-base leading-relaxed">
+                        Nascemos com um propósito muito claro: ser a casa definitiva para tudo o que o seu companheiro pet ou a sua chácara precisam. Com um amplo espaço localizado na região central de Juquitiba, a Agro Jeca's se consolidou como uma referência em excelência no atendimento.
+                    </p>
+                    <p class="text-slate-600 text-base leading-relaxed">
+                        Mais do que apenas um comércio, nós acolhemos os nossos clientes. Da entrada planejada com total acessibilidade ao aroma do cafezinho fresco servido na hora, nossa dedicação diária é fazer você se sentir confortável enquanto encontra soluções completas.
+                    </p>
+
+                    <!-- Fast Facts Icons -->
+                    <div class="grid grid-cols-2 gap-6 pt-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <i class="fa-solid fa-heart"></i>
+                            </div>
+                            <span class="text-sm font-bold text-slate-800">Atendimento Humanizado</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                            </div>
+                            <span class="text-sm font-bold text-slate-800">Estoque Completo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual (Store Image / Gallery Mockup) -->
+                <div class="lg:col-span-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400" 
+                             alt="Dog Playing" 
+                             class="w-full h-64 object-cover rounded-2xl shadow-md transform hover:-translate-y-2 transition-all duration-300">
+                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400" 
+                             alt="Cat Face" 
+                             class="w-full h-64 object-cover rounded-2xl shadow-md translate-y-6 transform hover:-translate-y-2 transition-all duration-300">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- HORÁRIOS & ATENDIMENTO INTELIGENTE -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+                    
+                    <!-- Horários -->
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="inline-block bg-primary/20 border border-primary/30 text-primary-light px-3.5 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                            Planeje sua visita
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-extrabold font-title tracking-tight text-white">
+                            Horário de Funcionamento
+                        </h2>
+                        <p class="text-slate-300 text-sm max-w-xl">
+                            Estamos prontos para atender você e seu pet durante toda a semana. Dica: Os sábados e domingos de manhã são os períodos mais movimentados!
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 text-sm text-slate-200">
+                            <div class="flex justify-between border-b border-white/10 pb-2">
+                                <span class="font-medium text-slate-400">Segunda a Sexta</span>
+                                <span class="font-bold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between border-b border-white/10 pb-2">
+                                <span class="font-medium text-slate-400">Sábado</span>
+                                <span class="font-bold">08:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between border-b border-white/10 pb-2 sm:col-span-2">
+                                <span class="font-medium text-slate-400">Domingo</span>
+                                <span class="font-bold text-primary-light">08:00 – 12:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Localização direta / Google Maps Callout -->
+                    <div class="lg:col-span-5 bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                        <h3 class="font-bold text-lg text-white mb-2">Venha nos Visitar</h3>
+                        <p class="text-sm text-slate-300 mb-6">Estamos em localização acessível com amplo estacionamento no coração de Juquitiba.</p>
+                        
+                        <div class="space-y-4">
+                            <a href="https://www.google.com/maps/place/Agro+Jeca%27s/data=!4m7!3m6!1s0x94cfbf8ffe413a77:0x2c199fce180ed682!8m2!3d-23.9329561!4d-47.0713741!16s%2Fg%2F11j0lmb7sq!19sChIJdzpB_o-_z5QRgtYOGM6fGSw?authuser=0&hl=pt-BR&rclk=1" target="_blank" 
+                               class="flex items-center justify-center space-x-2 w-full py-3.5 bg-primary hover:bg-primary-light text-white rounded-xl font-bold transition-all text-sm">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                <span>Ver Rota no Google Maps</span>
+                            </a>
+                            <a href="https://www.google.com/maps/@?api=1&map_action=pano&pano=7QgmLfX4Z_2zntdQa8_SEA" target="_blank" 
+                               class="flex items-center justify-center space-x-2 w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold border border-white/10 transition-all text-sm">
+                                <i class="fa-solid fa-street-view"></i>
+                                <span>Ver Vista da Rua</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION (Accordion) -->
+    <section id="faq" class="py-20 bg-slate-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-secondary block mb-3">Dúvidas Frequentes</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold font-title text-slate-900 tracking-tight">
+                    Perguntas Frequentes
+                </h2>
+                <div class="w-16 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-white border border-slate-100 rounded-xl overflow-hidden transition-all duration-300">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
+                        <span class="text-base md:text-lg font-bold text-slate-900">Vocês fazem entregas em domicílio?</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <p class="px-6 pb-6 text-sm md:text-base text-slate-600">
+                            Sim! Oferecemos opções rápidas de entrega para Juquitiba e arredores. Entre em contato conosco via WhatsApp para consultar as condições de envio para o seu endereço.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item bg-white border border-slate-100 rounded-xl overflow-hidden transition-all duration-300">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
+                        <span class="text-base md:text-lg font-bold text-slate-900">Quais as formas de pagamento aceitas na loja?</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <p class="px-6 pb-6 text-sm md:text-base text-slate-600">
+                            Trabalhamos com cartões de crédito, débito, transferências Pix e com as principais carteiras digitais via NFC (pagamento por aproximação de celular ou relógio inteligente).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="faq-item bg-white border border-slate-100 rounded-xl overflow-hidden transition-all duration-300">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
+                        <span class="text-base md:text-lg font-bold text-slate-900">A Agro Jeca's possui acessibilidade?</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <p class="px-6 pb-6 text-sm md:text-base text-slate-600">
+                            Sim! Temos orgulho de ser uma loja totalmente acessível, contando com rampas de acesso facilitadas, além de vagas de estacionamento exclusivas para pessoas em cadeira de rodas ou com mobilidade reduzida.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item bg-white border border-slate-100 rounded-xl overflow-hidden transition-all duration-300">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left focus:outline-none">
+                        <span class="text-base md:text-lg font-bold text-slate-900">Qual o melhor horário para ir fazer compras e evitar filas?</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <p class="px-6 pb-6 text-sm md:text-base text-slate-600">
+                            Nossos horários de menor fluxo são nos dias de semana (segunda a sexta-feira) no início da manhã, das 08h às 10h, ou no início da tarde, entre 13h e 14h30. Sábados costumam ser bem movimentados ao longo de todo o dia.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER COMPLETO -->
+    <footer class="bg-slate-950 text-slate-400 pt-16 pb-8 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-slate-900">
+                
+                <!-- Coluna 1: Identidade -->
+                <div class="space-y-6">
+                    <a href="#" class="flex items-center space-x-3">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1781389402767_logo_agrojecas.jpg" 
+                             alt="Agro Jeca's Logo" 
+                             class="h-12 w-auto rounded-full border border-white/10">
+                        <span class="text-lg font-bold text-white font-title">Agro Jeca's</span>
+                    </a>
+                    <p class="text-sm leading-relaxed text-slate-400">
+                        Sua melhor opção em suprimentos de pet shop, rações de qualidade e artigos agropecuários na região de Juquitiba.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://www.instagram.com/agrojecas/" target="_blank" class="w-10 h-10 rounded-full bg-slate-900 hover:bg-primary hover:text-white flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-instagram text-lg"></i>
+                        </a>
+                        <a href="https://www.facebook.com/agropecuariajuquitiba" target="_blank" class="w-10 h-10 rounded-full bg-slate-900 hover:bg-primary hover:text-white flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-facebook-f text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Links Rápidos -->
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-6">Navegação</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#diferenciais" class="hover:text-primary transition-colors">Diferenciais</a></li>
+                        <li><a href="#servicos" class="hover:text-primary transition-colors">Produtos & Serviços</a></li>
+                        <li><a href="#depoimentos" class="hover:text-primary transition-colors">Avaliações</a></li>
+                        <li><a href="#sobre" class="hover:text-primary transition-colors">Sobre Nós</a></li>
+                        <li><a href="#faq" class="hover:text-primary transition-colors">Perguntas Frequentes</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 3: Contatos e Horário -->
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-6">Fale Conosco</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-phone text-primary"></i>
+                            <span>(11) 94181-4145</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-brands fa-whatsapp text-emerald-500"></i>
+                            <a href="https://wa.me/5511941814145" target="_blank" class="hover:underline">Whatsapp Direto</a>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fa-solid fa-location-dot text-primary mt-1"></i>
+                            <span class="leading-relaxed">R. José Antonio Nunes, 254 - Centro, Juquitiba - SP, 06950-000</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 4: Legal / Termos -->
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-6">Políticas</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="hover:text-primary transition-colors">Política de Privacidade</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Termos de Uso</a></li>
+                        <li class="text-xs text-slate-500 pt-2 border-t border-slate-900">
+                            Agro Jecas Comercio de Racoes Ltda<br>
+                            CNPJ: 28.301.005/0001-73
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Assinatura / Direitos Autorais -->
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 space-y-4 sm:space-y-0">
+                <p>&copy; 2024 Agro Jeca's. Todos os direitos reservados.</p>
+                <p class="font-semibold tracking-wider">Site criado e mantido por <span class="text-white hover:text-primary transition-colors">STUDIOTESTA.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WHATSAPP FLOATING BUTTON WITH PULSE EFFECT -->
+    <a href="https://wa.me/5511941814145" target="_blank" 
+       class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-emerald-500 text-white rounded-full shadow-2xl hover:bg-emerald-400 transition-all duration-300 hover:scale-110 active:scale-95 group"
+       aria-label="Falar pelo WhatsApp">
+        <span class="absolute inset-0 rounded-full bg-emerald-500/30 animate-ping group-hover:hidden"></span>
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // FAQ Accordion Toggle
+        const faqToggles = document.querySelectorAll('.faq-toggle');
+
+        faqToggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const content = toggle.nextElementSibling;
+                const icon = toggle.querySelector('i');
+                const parent = toggle.parentElement;
+
+                // Close other open FAQ items
+                document.querySelectorAll('.faq-content').forEach(item => {
+                    if (item !== content) {
+                        item.style.maxHeight = null;
+                        item.parentElement.querySelector('i').classList.remove('rotate-180');
+                        item.parentElement.classList.remove('border-primary/30');
+                    }
+                });
+
+                // Toggle Active State
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    icon.classList.remove('rotate-180');
+                    parent.classList.remove('border-primary/30');
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.classList.add('rotate-180');
+                    parent.classList.add('border-primary/30');
+                }
+            });
+        });
+
+        // Sticky Header scroll styling effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-lg', 'bg-white/95');
+                header.classList.remove('bg-white/85');
+            } else {
+                header.classList.remove('shadow-lg', 'bg-white/95');
+                header.classList.add('bg-white/85');
+            }
+        });
+    </script>
+</body>
+</html>
