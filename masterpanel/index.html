@@ -746,7 +746,7 @@
             <div class="bg-slate-950/80 rounded-2xl p-4 border border-slate-800/80 space-y-3 font-mono text-xs max-h-[220px] overflow-y-auto custom-scrollbar mb-6" id="stepsConsole">
                 <div class="flex items-start gap-2.5 text-slate-400">
                     <i class="fa-solid fa-spinner animate-spin text-brand-500 mt-0.5"></i>
-                    <span>Iniciando disparador local...</span>
+                    <span>Iniciando pipeline de geração...</span>
                 </div>
             </div>
 
@@ -1007,10 +1007,9 @@
                 }
             } catch (err) {
                 console.error("Erro na validação remota:", err);
-                document.getElementById("errorMessageText").textContent = "Sem conexão com o n8n. Rodando autenticação mock local de segurança...";
+                document.getElementById("errorMessageText").textContent = "Sem conexão com o n8n. Rodando autenticação de contingência...";
                 errorBox.classList.remove("hidden");
                 
-                // Hack de backup do hacker da automação
                 if (user === "sidnei" && pass === "testa") {
                     sessionStorage.setItem("isAuth", "true");
                     showFormScreen();
@@ -2047,11 +2046,14 @@
         }
 
         async function saveSourceViaN8N() {
-            if (!activeSiteSlug) return;
+            if (!activeSiteSlug) {
+                showToast("Nenhum site ativo selecionado para salvar.", "warn");
+                return;
+            }
             const isTestMode = document.getElementById("testModeToggle").checked;
             const url = isTestMode 
-                ? "https://n8n.studiotesta.com.br/webhook-test/salvar-codigo-fonte" 
-                : "https://n8n.studiotesta.com.br/webhook/salvar-codigo-fonte";
+                ? "https://n8n.studiotesta.com.br/webhook-test/edit-sites-prontos" 
+                : "https://n8n.studiotesta.com.br/webhook/edit-sites-prontos";
 
             updateVisualEditorStatus(`<i class="fa-solid fa-spinner animate-spin mr-1.5 text-amber-500"></i> Sincronizando com o GitHub...`, "text-amber-400");
 
@@ -2061,8 +2063,9 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         site_slug: activeSiteSlug,
-                        html: currentEditingHtml,
-                        sha: activeGitFileSha
+                        "index.html": currentEditingHtml,
+                        acao: "salvar_edicao_visual",
+                        dados_originais: currentSiteFullData || { "slug_site": activeSiteSlug }
                     })
                 });
 
