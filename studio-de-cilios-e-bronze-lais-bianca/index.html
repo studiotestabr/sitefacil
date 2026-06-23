@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Lais Bianca | Extensão de Cílios e Bronzeamento em Mongaguá</title>
-    <meta name="description" content="Realce sua beleza no Studio de Cílios e Bronze Lais Bianca. Especialistas em extensão de cílios, bronzeamento e estética em Mongaguá. Agende sua experiência premium.">
+    <meta name="description" content="Realce sua beleza natural no Studio Lais Bianca. Especialistas em extensão de cílios, bronzeamento e estética em Mongaguá. Agende sua transformação hoje.">
     
-    <!-- Fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script>
         tailwind.config = {
             theme: {
@@ -25,7 +26,7 @@
                             primary: '#787878',
                             secondary: '#969696',
                             accent: '#1a1a1a',
-                            light: '#F5F5F5'
+                            light: '#f8f8f8'
                         }
                     },
                     fontFamily: {
@@ -38,470 +39,385 @@
     </script>
 
     <style>
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .hero-gradient {
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1583001809072-7003347da83c?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-        }
-        .text-reveal {
-            animation: reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        @keyframes reveal {
-            0% { transform: translateY(30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .accordion-active .accordion-content {
-            max-height: 200px;
-        }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .hero-gradient { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1583001931096-959e9a1a6223?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .btn-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(0,0,0,0.3); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
     </style>
 </head>
-<body class="bg-brand-light text-brand-accent font-sans">
+<body class="font-sans text-brand-accent bg-[#fafafa]">
 
     <!-- HEADER -->
-    <header class="fixed w-full z-50 transition-all duration-300 glass-effect">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <header class="fixed w-full z-50 px-6 py-4">
+        <nav class="max-w-7xl mx-auto glass rounded-2xl px-6 py-3 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
-                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782228875121_logo_lais_bianca.jpg" alt="Logo Lais Bianca" class="h-12 w-12 rounded-full object-cover border-2 border-brand-primary">
-                <span class="font-serif font-bold text-lg tracking-tighter leading-tight hidden sm:block">LAIS BIANCA<br><span class="text-xs font-sans font-light tracking-widest text-brand-primary uppercase">Cílios & Bronze</span></span>
+                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782228875121_logo_lais_bianca.jpg" alt="Logo Lais Bianca" class="h-12 w-12 rounded-full object-cover border border-brand-primary/20">
+                <span class="font-serif font-bold text-lg leading-tight hidden md:block">LAIS BIANCA<br><span class="text-[10px] font-sans tracking-widest text-brand-primary uppercase">Cílios & Bronze</span></span>
             </div>
             
-            <nav class="hidden md:flex gap-8 font-medium text-sm uppercase tracking-widest">
+            <div class="hidden md:flex items-center gap-8 font-medium text-sm uppercase tracking-wider">
                 <a href="#inicio" class="hover:text-brand-primary transition-colors">Início</a>
                 <a href="#servicos" class="hover:text-brand-primary transition-colors">Serviços</a>
                 <a href="#sobre" class="hover:text-brand-primary transition-colors">O Studio</a>
-                <a href="#contato" class="hover:text-brand-primary transition-colors">Contato</a>
-            </nav>
+                <a href="#avaliacoes" class="hover:text-brand-primary transition-colors">Depoimentos</a>
+            </div>
 
-            <a href="https://wa.me/5513997923043" target="_blank" class="bg-brand-primary text-white px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-brand-accent transition-all transform hover:scale-105 shadow-lg">
-                Agendar Agora
+            <a href="https://wa.me/5513997923043" target="_blank" class="bg-brand-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold btn-hover uppercase tracking-tighter">
+                Agendar Horário
             </a>
-        </div>
+        </nav>
     </header>
 
     <!-- HERO SECTION -->
-    <section id="inicio" class="relative h-screen flex items-center justify-center hero-gradient pt-20">
-        <div class="container mx-auto px-6 text-center text-white">
-            <h1 class="text-reveal font-serif text-5xl md:text-7xl lg:text-8xl mb-6">A Arte de Revelar <br><span class="italic text-brand-secondary">sua Essência.</span></h1>
-            <p class="text-reveal opacity-90 text-lg md:text-xl max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-                Especialistas em Extensão de Cílios e Bronzeamento em Mongaguá. Transformamos seu olhar com precisão e cuidado premium.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="https://wa.me/5513997923043" class="w-full sm:w-auto bg-white text-brand-accent px-10 py-5 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-brand-primary hover:text-white transition-all">
-                    Ver Disponibilidade
+    <section id="inicio" class="relative h-screen flex items-center justify-center hero-gradient text-white overflow-hidden">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative z-10 max-w-4xl px-6 text-center">
+            <span class="inline-block px-4 py-1 mb-6 border border-white/30 rounded-full text-xs uppercase tracking-[0.3em] backdrop-blur-sm">Exclusividade em Mongaguá</span>
+            <h1 class="font-serif text-5xl md:text-8xl mb-6 leading-tight">Seu olhar merece o toque da <span class="italic text-brand-secondary">perfeição.</span></h1>
+            <p class="text-lg md:text-xl mb-10 font-light opacity-90 max-w-2xl mx-auto">Especialistas em Extensão de Cílios e Bronzeamento que elevam sua autoestima e realçam sua beleza única.</p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="https://wa.me/5513997923043" class="bg-white text-brand-accent px-10 py-4 rounded-full font-bold uppercase text-sm btn-hover tracking-widest">
+                    Quero meu horário
                 </a>
-                <a href="#servicos" class="w-full sm:w-auto border border-white/30 backdrop-blur-sm px-10 py-5 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-white/10 transition-all">
-                    Conhecer Serviços
+                <a href="#servicos" class="border border-white/50 text-white px-10 py-4 rounded-full font-bold uppercase text-sm btn-hover tracking-widest backdrop-blur-sm">
+                    Ver Procedimentos
                 </a>
             </div>
         </div>
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
-            <i class="fa-solid fa-chevron-down text-white text-2xl"></i>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+            <i class="fa-solid fa-chevron-down opacity-50"></i>
         </div>
     </section>
 
-    <!-- PROPOSTA DE VALOR (USP) -->
-    <section class="py-24 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
-                <div class="text-center group">
-                    <div class="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-primary transition-colors duration-500">
-                        <i class="fa-solid fa-eye text-2xl text-brand-primary group-hover:text-white transition-colors"></i>
-                    </div>
-                    <h3 class="font-serif text-2xl mb-4">Cílios Personalizados</h3>
-                    <p class="text-gray-500 leading-relaxed">Design exclusivo para cada formato de rosto, garantindo naturalidade e durabilidade.</p>
+    <!-- USP SECTION (DIFERENCIAIS) -->
+    <section class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="reveal text-center group">
+                <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
+                    <i class="fa-solid fa-crown text-2xl"></i>
                 </div>
-                <div class="text-center group">
-                    <div class="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-primary transition-colors duration-500">
-                        <i class="fa-solid fa-mug-hot text-2xl text-brand-primary group-hover:text-white transition-colors"></i>
-                    </div>
-                    <h3 class="font-serif text-2xl mb-4">Experiência VIP</h3>
-                    <p class="text-gray-500 leading-relaxed">Ambiente acolhedor com direito ao melhor cappuccino do litoral e atendimento humanizado.</p>
+                <h3 class="font-serif text-xl mb-3 font-bold uppercase tracking-tight">Atendimento Premium</h3>
+                <p class="text-gray-500 leading-relaxed">Fomos eleitos por nossas clientes como o melhor atendimento e o cappuccino mais amado do litoral.</p>
+            </div>
+            <div class="reveal text-center group" style="transition-delay: 0.2s;">
+                <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
+                    <i class="fa-solid fa-gem text-2xl"></i>
                 </div>
-                <div class="text-center group">
-                    <div class="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-primary transition-colors duration-500">
-                        <i class="fa-solid fa-sun text-2xl text-brand-primary group-hover:text-white transition-colors"></i>
-                    </div>
-                    <h3 class="font-serif text-2xl mb-4">Bronze Perfeito</h3>
-                    <p class="text-gray-500 leading-relaxed">Técnicas modernas para um bronzeado saudável e uniforme durante todo o ano.</p>
+                <h3 class="font-serif text-xl mb-3 font-bold uppercase tracking-tight">Materiais de Elite</h3>
+                <p class="text-gray-500 leading-relaxed">Utilizamos produtos de altíssima qualidade para garantir durabilidade, conforto e saúde dos seus fios.</p>
+            </div>
+            <div class="reveal text-center group" style="transition-delay: 0.4s;">
+                <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
+                    <i class="fa-solid fa-venus text-2xl"></i>
+                </div>
+                <h3 class="font-serif text-xl mb-3 font-bold uppercase tracking-tight">Espaço Mulher</h3>
+                <p class="text-gray-500 leading-relaxed">Ambiente acolhedor, moderno e 100% pensado para o conforto e segurança feminina.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="servicos" class="py-24 px-6 bg-brand-light">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-serif text-4xl md:text-5xl mb-4">Nossos Procedimentos</h2>
+                <div class="w-20 h-1 bg-brand-primary mx-auto mb-6"></div>
+                <p class="text-gray-600 uppercase tracking-[0.2em] text-xs">A arte de transformar olhares</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Lash Extension -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm reveal group hover:shadow-xl transition-all duration-500">
+                    <img src="https://images.unsplash.com/photo-1512496011951-a6994413c2ae?q=80&w=600&auto=format&fit=crop" alt="Extensão de Cílios" class="w-full h-48 object-cover rounded-2xl mb-6">
+                    <h3 class="font-serif text-xl mb-4 font-bold">Cílios de Luxo</h3>
+                    <ul class="text-gray-500 space-y-2 text-sm mb-6">
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Fio a Fio Clássico</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Volume Russo</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Volume Brasileiro</li>
+                    </ul>
+                    <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest border-b border-brand-primary/30 pb-1">Saiba Mais</a>
+                </div>
+
+                <!-- Bronze -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm reveal group hover:shadow-xl transition-all duration-500" style="transition-delay: 0.1s;">
+                    <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=600&auto=format&fit=crop" alt="Bronzeamento" class="w-full h-48 object-cover rounded-2xl mb-6">
+                    <h3 class="font-serif text-xl mb-4 font-bold">Bronzeamento</h3>
+                    <ul class="text-gray-500 space-y-2 text-sm mb-6">
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Bronze de Fita</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Marcação Perfeita</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Hidratação Pós-Sol</li>
+                    </ul>
+                    <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest border-b border-brand-primary/30 pb-1">Saiba Mais</a>
+                </div>
+
+                <!-- Nails -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm reveal group hover:shadow-xl transition-all duration-500" style="transition-delay: 0.2s;">
+                    <img src="https://images.unsplash.com/photo-1604654894610-df490c8121aa?q=80&w=600&auto=format&fit=crop" alt="Manicure" class="w-full h-48 object-cover rounded-2xl mb-6">
+                    <h3 class="font-serif text-xl mb-4 font-bold">Nails Design</h3>
+                    <ul class="text-gray-500 space-y-2 text-sm mb-6">
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Blindagem</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Alongamento em Gel</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Esmaltação Premium</li>
+                    </ul>
+                    <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest border-b border-brand-primary/30 pb-1">Saiba Mais</a>
+                </div>
+
+                <!-- Hair -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm reveal group hover:shadow-xl transition-all duration-500" style="transition-delay: 0.3s;">
+                    <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=600&auto=format&fit=crop" alt="Cabelos" class="w-full h-48 object-cover rounded-2xl mb-6">
+                    <h3 class="font-serif text-xl mb-4 font-bold">Hair Styling</h3>
+                    <ul class="text-gray-500 space-y-2 text-sm mb-6">
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Corte Feminino</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Escova & Penteados</li>
+                        <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Tratamentos de Brilho</li>
+                    </ul>
+                    <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest border-b border-brand-primary/30 pb-1">Saiba Mais</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SERVIÇOS -->
-    <section id="servicos" class="py-24 bg-brand-light overflow-hidden">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-                <div class="max-w-2xl">
-                    <h2 class="font-serif text-4xl md:text-5xl mb-6">Nossos Procedimentos <span class="italic font-light">de Elite</span></h2>
-                    <p class="text-gray-600">Combine beleza e bem-estar com nossos serviços especializados realizados por profissionais dedicadas.</p>
+    <!-- PROVA SOCIAL -->
+    <section id="avaliacoes" class="py-24 px-6 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+                <div class="reveal">
+                    <h2 class="font-serif text-4xl md:text-5xl mb-4">Aprovado por quem <br><span class="italic text-brand-primary">mais importa.</span></h2>
+                    <p class="text-gray-500 uppercase tracking-[0.2em] text-xs">Depoimentos reais no Google</p>
                 </div>
-                <div class="flex gap-2">
-                    <div class="w-12 h-12 border border-brand-primary rounded-full flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white cursor-pointer transition-all">
-                        <i class="fa-solid fa-arrow-left"></i>
+                <div class="reveal text-center p-6 bg-brand-light rounded-2xl border border-brand-primary/10">
+                    <span class="text-4xl font-bold block">5.0</span>
+                    <div class="text-yellow-400 text-sm mb-1">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                     </div>
-                    <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-brand-accent transition-all">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
+                    <p class="text-[10px] uppercase font-bold tracking-widest">103 Avaliações</p>
                 </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Card 1 -->
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                    <div class="h-64 overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=1000&auto=format&fit=crop" alt="Extensão de Cílios" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
-                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter">Mais Procurado</div>
-                    </div>
-                    <div class="p-8">
-                        <h4 class="font-serif text-xl mb-4">Extensão de Cílios</h4>
-                        <ul class="space-y-2 mb-6 text-sm text-gray-500">
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Técnica Fio a Fio</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Volume Brasileiro</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Isolamento Perfeito</li>
-                        </ul>
-                        <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest hover:underline">Solicitar Orçamento</a>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                    <div class="h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1471466054146-e71bcc0d2bb2?q=80&w=1000&auto=format&fit=crop" alt="Bronzeamento" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
-                    </div>
-                    <div class="p-8">
-                        <h4 class="font-serif text-xl mb-4">Bronzeamento</h4>
-                        <ul class="space-y-2 mb-6 text-sm text-gray-500">
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Bronze Natural</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Marquinha Perfeita</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Hidratação Pós-Sol</li>
-                        </ul>
-                        <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest hover:underline">Saber Mais</a>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                    <div class="h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1000&auto=format&fit=crop" alt="Design de Unhas" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
-                    </div>
-                    <div class="p-8">
-                        <h4 class="font-serif text-xl mb-4">Nails Design</h4>
-                        <ul class="space-y-2 mb-6 text-sm text-gray-500">
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Alongamentos</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Esmaltação em Gel</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Cuidado Delicado</li>
-                        </ul>
-                        <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest hover:underline">Ver Agenda</a>
-                    </div>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                    <div class="h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?q=80&w=1000&auto=format&fit=crop" alt="Hair Care" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
-                    </div>
-                    <div class="p-8">
-                        <h4 class="font-serif text-xl mb-4">Cabelos</h4>
-                        <ul class="space-y-2 mb-6 text-sm text-gray-500">
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Cronograma Capilar</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Cortes Modernos</li>
-                            <li><i class="fa-solid fa-check text-brand-primary mr-2"></i>Resultados de Milhões</li>
-                        </ul>
-                        <a href="https://wa.me/5513997923043" class="text-brand-primary font-bold text-xs uppercase tracking-widest hover:underline">Agendar Agora</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- PROVA SOCIAL (AVALIAÇÕES) -->
-    <section class="py-24 bg-brand-accent text-white overflow-hidden">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-16">
-                <div class="flex justify-center items-center gap-1 mb-4">
-                    <i class="fa-solid fa-star text-yellow-400"></i>
-                    <i class="fa-solid fa-star text-yellow-400"></i>
-                    <i class="fa-solid fa-star text-yellow-400"></i>
-                    <i class="fa-solid fa-star text-yellow-400"></i>
-                    <i class="fa-solid fa-star text-yellow-400"></i>
-                    <span class="ml-2 font-bold">5.0</span>
-                </div>
-                <h2 class="font-serif text-4xl mb-4">O que dizem nossas clientes</h2>
-                <p class="opacity-60 uppercase tracking-widest text-xs">Mais de 103 avaliações cinco estrelas no Google</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Avaliação 1 -->
-                <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center font-bold">V</div>
-                        <div>
-                            <p class="font-bold">Vitória Carolina</p>
-                            <p class="text-xs opacity-50">Cliente Recorrente</p>
-                        </div>
+                <!-- Review 1 -->
+                <div class="bg-brand-light p-8 rounded-3xl reveal border border-transparent hover:border-brand-primary/20 transition-all">
+                    <div class="flex gap-1 text-yellow-400 mb-4 text-xs">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                     </div>
-                    <p class="italic opacity-80 leading-relaxed italic">"O atendimento maravilhoso, sempre faço minhas unhas com a Vitória, sempre com delicadeza. Sem falar das outras meninas, o cappuccino é uma delícia!"</p>
-                </div>
-                <!-- Avaliação 2 -->
-                <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm transform md:translate-y-12">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-brand-secondary rounded-full flex items-center justify-center font-bold">O</div>
-                        <div>
-                            <p class="font-bold">Ogih Uchicha</p>
-                            <p class="text-xs opacity-50">Local Guide</p>
-                        </div>
-                    </div>
-                    <p class="italic opacity-80 leading-relaxed">"O Studio Lais Bianca é maravilhoso! Trabalho impecável com cílios, que ficaram deslumbrantes e naturais. Recomendo de coração!"</p>
-                </div>
-                <!-- Avaliação 3 -->
-                <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center font-bold">A</div>
-                        <div>
-                            <p class="font-bold">Andressa Cruz Costa</p>
-                            <p class="text-xs opacity-50">Mãe e Cliente</p>
-                        </div>
-                    </div>
-                    <p class="italic opacity-80 leading-relaxed">"Espaço lindo! Atendimento maravilhoso. Eu e minha filha desfrutamos dos serviços dessas profissionais maravilhosas."</p>
-                </div>
-            </div>
-            
-            <div class="mt-24 text-center">
-                <a href="https://www.google.com/maps/place/STUDIO+DE+CILIOS+E+BRONZE+LAIS+BIANCA/..." target="_blank" class="inline-flex items-center gap-3 border-b border-white/30 pb-2 hover:border-white transition-all text-sm uppercase tracking-widest font-bold">
-                    Ver todas as avaliações no Google <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- SOBRE NÓS -->
-    <section id="sobre" class="py-24 bg-white overflow-hidden">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col lg:flex-row items-center gap-20">
-                <div class="lg:w-1/2 relative">
-                    <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEGCDfSHzHc9cHI7WX7VzR6XYZGnQIkQiWSE6joHTbQJV_4vKfwjl7K_DYdzT-dYKv-MoZbWAuRi8icWaw0bHVYzH5OQ0Syf9giFP6SKvFDB3ULu6slnDJYOtoMTbsdr0M877De=w408-h544-k-no" alt="Lais Bianca Studio" class="w-full h-auto">
-                    </div>
-                    <div class="absolute -bottom-10 -right-10 w-64 h-64 bg-brand-light -z-0 rounded-2xl hidden md:block"></div>
-                    <div class="absolute -top-10 -left-10 w-20 h-20 bg-brand-primary/10 rounded-full animate-pulse"></div>
-                </div>
-                <div class="lg:w-1/2">
-                    <span class="text-brand-primary font-bold uppercase tracking-[0.3em] text-xs mb-6 block">Nossa História</span>
-                    <h2 class="font-serif text-4xl md:text-5xl mb-8 leading-tight">Onde a Paixão Encontra <br><span class="italic">a Excelência</span>.</h2>
-                    <p class="text-gray-600 mb-8 leading-relaxed">
-                        No Studio de Cílios e Bronze Lais Bianca, nos identificamos como uma empresa de empreendedoras apaixonadas por transformar a autoestima feminina. Nosso espaço foi projetado para ser mais que um salão: é um refúgio de autocuidado.
-                    </p>
-                    <p class="text-gray-600 mb-10 leading-relaxed">
-                        Localizados no coração da Vila Atlântica em Mongaguá, oferecemos total acessibilidade e comodidade, garantindo que cada cliente se sinta única e deslumbrante. Da recepção ao cafezinho, cada detalhe é pensado em você.
-                    </p>
-                    <div class="grid grid-cols-2 gap-8 mb-10">
-                        <div>
-                            <p class="text-3xl font-serif text-brand-primary">100%</p>
-                            <p class="text-xs uppercase tracking-widest text-gray-400">Mulheres Empreendedoras</p>
-                        </div>
-                        <div>
-                            <p class="text-3xl font-serif text-brand-primary">+100</p>
-                            <p class="text-xs uppercase tracking-widest text-gray-400">Avaliações 5 Estrelas</p>
-                        </div>
-                    </div>
+                    <p class="italic text-gray-600 mb-6 font-light">"O Studio Lais Bianca é simplesmente maravilhoso! Profissionais extremamente competentes. O trabalho com cílios ficou deslumbrante e natural."</p>
                     <div class="flex items-center gap-4">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782228875121_logo_lais_bianca.jpg" alt="Assinatura" class="h-10 w-10 rounded-full grayscale">
-                        <div>
-                            <p class="font-bold text-sm">Equipe Lais Bianca Beauty</p>
-                            <p class="text-xs text-gray-400">Beleza com Propósito</p>
-                        </div>
+                        <div class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-bold">O</div>
+                        <span class="font-bold text-sm">Ogih Uchicha</span>
+                    </div>
+                </div>
+                <!-- Review 2 -->
+                <div class="bg-brand-light p-8 rounded-3xl reveal border border-transparent hover:border-brand-primary/20 transition-all" style="transition-delay: 0.1s;">
+                    <div class="flex gap-1 text-yellow-400 mb-4 text-xs">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="italic text-gray-600 mb-6 font-light">"O atendimento é maravilhoso, ambiente aconchegante, o melhor cappuccino do litoral! Faço Unha e Cílios com essas maravilhosas!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-bold">N</div>
+                        <span class="font-bold text-sm">Natasha Gonçalves</span>
+                    </div>
+                </div>
+                <!-- Review 3 -->
+                <div class="bg-brand-light p-8 rounded-3xl reveal border border-transparent hover:border-brand-primary/20 transition-all" style="transition-delay: 0.2s;">
+                    <div class="flex gap-1 text-yellow-400 mb-4 text-xs">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="italic text-gray-600 mb-6 font-light">"Lugar maravilhoso, primeira vez fazendo o cabelo lá e um resultado de milhões. Recepção maravilhosa, nota mil!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-bold">E</div>
+                        <span class="font-bold text-sm">Eduarda Cabral</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ SECTION -->
-    <section class="py-24 bg-brand-light">
-        <div class="container mx-auto px-6 max-w-3xl">
-            <div class="text-center mb-16">
-                <h2 class="font-serif text-4xl mb-4">Dúvidas Frequentes</h2>
-                <p class="text-gray-500">Esclarecemos os principais pontos para sua primeira visita.</p>
+    <!-- SOBRE NOS -->
+    <section id="sobre" class="py-24 px-6 bg-brand-accent text-white">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
+            <div class="w-full md:w-1/2 reveal">
+                <div class="relative">
+                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEGCDfSHzHc9cHI7WX7VzR6XYZGnQIkQiWSE6joHTbQJV_4vKfwjl7K_DYdzT-dYKv-MoZbWAuRi8icWaw0bHVYzH5OQ0Syf9giFP6SKvFDB3ULu6slnDJYOtoMTbsdr0M877De=w408-h544-k-no" alt="Studio Lais Bianca" class="w-full rounded-[40px] shadow-2xl relative z-10">
+                    <div class="absolute -top-6 -left-6 w-full h-full border-2 border-brand-primary rounded-[40px]"></div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 reveal">
+                <span class="text-brand-primary uppercase tracking-[0.3em] text-xs font-bold mb-4 block">Nossa História</span>
+                <h2 class="font-serif text-4xl md:text-6xl mb-8 leading-tight">Onde a Paixão encontra a <span class="italic">Beleza.</span></h2>
+                <div class="space-y-6 text-gray-300 font-light leading-relaxed">
+                    <p>O Studio Lais Bianca nasceu do desejo de empreendedoras apaixonadas em criar um refúgio de autocuidado para mulheres em Mongaguá. Mais do que um salão, somos um espaço de acolhimento.</p>
+                    <p>Cada detalhe, desde a entrada com acessibilidade total até o nosso icônico cappuccino, foi planejado para que sua experiência seja revigorante. Aqui, realçamos sua beleza respeitando sua individualidade.</p>
+                </div>
+                <div class="mt-12 grid grid-cols-2 gap-8 border-t border-white/10 pt-8">
+                    <div>
+                        <span class="block text-2xl font-bold mb-1">100%</span>
+                        <span class="text-xs uppercase text-gray-400">Empreendedorismo Feminino</span>
+                    </div>
+                    <div>
+                        <span class="block text-2xl font-bold mb-1">Acessível</span>
+                        <span class="text-xs uppercase text-gray-400">Total Adaptado PNE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-24 px-6 bg-white">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-serif text-4xl mb-4 text-brand-accent">Dúvidas Frequentes</h2>
+                <div class="w-16 h-1 bg-brand-primary mx-auto"></div>
             </div>
 
             <div class="space-y-4">
                 <!-- FAQ Item 1 -->
-                <div class="accordion-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <button class="w-full flex items-center justify-between p-6 text-left focus:outline-none" onclick="toggleAccordion(this)">
-                        <span class="font-bold text-gray-700">Preciso agendar horário com antecedência?</span>
-                        <i class="fa-solid fa-plus text-brand-primary transition-transform duration-300"></i>
+                <div class="border border-gray-100 rounded-2xl overflow-hidden">
+                    <button class="w-full px-8 py-6 text-left flex justify-between items-center bg-brand-light/30 hover:bg-brand-light transition-colors" onclick="toggleAccordion(this)">
+                        <span class="font-bold text-brand-accent">Quanto tempo dura a extensão de cílios?</span>
+                        <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
                     </button>
-                    <div class="accordion-content px-6 pb-6 text-gray-500 text-sm">
-                        Sim, para garantirmos um atendimento personalizado e sem pressa, recomendamos que você agende seu horário via WhatsApp com pelo menos 48h de antecedência.
+                    <div class="accordion-content bg-white">
+                        <div class="px-8 py-6 text-gray-500 leading-relaxed">
+                            Em média, a durabilidade é de 3 a 4 semanas. Recomendamos a manutenção entre 15 a 21 dias para manter o olhar sempre preenchido e impecável.
+                        </div>
                     </div>
                 </div>
-
                 <!-- FAQ Item 2 -->
-                <div class="accordion-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <button class="w-full flex items-center justify-between p-6 text-left focus:outline-none" onclick="toggleAccordion(this)">
-                        <span class="font-bold text-gray-700">Quais as formas de pagamento aceitas?</span>
-                        <i class="fa-solid fa-plus text-brand-primary transition-transform duration-300"></i>
+                <div class="border border-gray-100 rounded-2xl overflow-hidden">
+                    <button class="w-full px-8 py-6 text-left flex justify-between items-center bg-brand-light/30 hover:bg-brand-light transition-colors" onclick="toggleAccordion(this)">
+                        <span class="font-bold text-brand-accent">O procedimento de bronzeamento é seguro?</span>
+                        <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
                     </button>
-                    <div class="accordion-content px-6 pb-6 text-gray-500 text-sm">
-                        Aceitamos cartões de crédito, débito e pagamentos por dispositivo móvel via NFC. Facilitamos sua experiência de beleza em todos os detalhes.
+                    <div class="accordion-content bg-white">
+                        <div class="px-8 py-6 text-gray-500 leading-relaxed">
+                            Sim! Trabalhamos com produtos certificados e técnicas que garantem uma marcação perfeita sem danos à saúde da sua pele, sempre com hidratação pós-procedimento.
+                        </div>
                     </div>
                 </div>
-
                 <!-- FAQ Item 3 -->
-                <div class="accordion-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <button class="w-full flex items-center justify-between p-6 text-left focus:outline-none" onclick="toggleAccordion(this)">
-                        <span class="font-bold text-gray-700">O Studio possui acessibilidade?</span>
-                        <i class="fa-solid fa-plus text-brand-primary transition-transform duration-300"></i>
+                <div class="border border-gray-100 rounded-2xl overflow-hidden">
+                    <button class="w-full px-8 py-6 text-left flex justify-between items-center bg-brand-light/30 hover:bg-brand-light transition-colors" onclick="toggleAccordion(this)">
+                        <span class="font-bold text-brand-accent">Preciso marcar horário com antecedência?</span>
+                        <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
                     </button>
-                    <div class="accordion-content px-6 pb-6 text-gray-500 text-sm">
-                        Sim! Nosso espaço conta com entrada e estacionamento com total acessibilidade para pessoas em cadeira de rodas, garantindo conforto para todas as nossas clientes.
+                    <div class="accordion-content bg-white">
+                        <div class="px-8 py-6 text-gray-500 leading-relaxed">
+                            Sim, recomendamos o agendamento prévio para garantirmos total dedicação ao seu atendimento e para que possamos preparar o seu cappuccino especial!
+                        </div>
                     </div>
                 </div>
-
                 <!-- FAQ Item 4 -->
-                <div class="accordion-item bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <button class="w-full flex items-center justify-between p-6 text-left focus:outline-none" onclick="toggleAccordion(this)">
-                        <span class="font-bold text-gray-700">Quanto tempo dura a extensão de cílios?</span>
-                        <i class="fa-solid fa-plus text-brand-primary transition-transform duration-300"></i>
+                <div class="border border-gray-100 rounded-2xl overflow-hidden">
+                    <button class="w-full px-8 py-6 text-left flex justify-between items-center bg-brand-light/30 hover:bg-brand-light transition-colors" onclick="toggleAccordion(this)">
+                        <span class="font-bold text-brand-accent">Quais as formas de pagamento aceitas?</span>
+                        <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
                     </button>
-                    <div class="accordion-content px-6 pb-6 text-gray-500 text-sm">
-                        A durabilidade depende do ciclo natural dos seus fios e dos cuidados pós-procedimento. Recomendamos a manutenção entre 15 a 21 dias para manter o olhar sempre impecável.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- LOCALIZAÇÃO & CONTATO -->
-    <section id="contato" class="py-24 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                <div>
-                    <h2 class="font-serif text-4xl mb-8">Onde Estamos</h2>
-                    <div class="space-y-6 mb-10">
-                        <div class="flex gap-4">
-                            <div class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center flex-shrink-0 text-brand-primary">
-                                <i class="fa-solid fa-location-dot"></i>
-                            </div>
-                            <p class="text-gray-600">Av. Monteiro Lobato, 4670 - Vila Atlântica, Mongaguá - SP, 11730-000</p>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center flex-shrink-0 text-brand-primary">
-                                <i class="fa-solid fa-clock"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-600">Segunda a Sábado: 09:00 – 19:00</p>
-                                <p class="text-gray-400 text-sm italic">Domingo: Fechado</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center flex-shrink-0 text-brand-primary">
-                                <i class="fa-solid fa-phone"></i>
-                            </div>
-                            <p class="text-gray-600">(13) 99792-3043</p>
+                    <div class="accordion-content bg-white">
+                        <div class="px-8 py-6 text-gray-500 leading-relaxed">
+                            Aceitamos cartões de crédito, débito, PIX e pagamentos por aproximação via celular (NFC).
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <a href="https://www.instagram.com/lais_bbeauty" class="w-12 h-12 border border-gray-100 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
-                            <i class="fa-brands fa-instagram"></i>
-                        </a>
-                        <a href="https://wa.me/5513997923043" class="w-12 h-12 border border-gray-100 rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
-                            <i class="fa-brands fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="rounded-3xl overflow-hidden h-96 lg:h-auto shadow-2xl relative group">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.098485741753!2d-46.6472176!3d-24.1058773!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce273febf03eeb%3A0xed363ea871ee0880!2sSTUDIO%20DE%20CILIOS%20E%20BRONZE%20LAIS%20BIANCA!5e0!3m2!1spt-BR!2sbr!4v1715000000000!5m2!1spt-BR!2sbr" 
-                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=-24.105877,-46.647218" class="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur py-4 text-center rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl transform translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
-                        Traçar Rota no Waze / Maps
-                    </a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-brand-light pt-24 pb-12 border-t border-gray-200">
-        <div class="container mx-auto px-6 text-center">
-            <div class="flex flex-col items-center mb-12">
-                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782228875121_logo_lais_bianca.jpg" alt="Logo Lais Bianca" class="h-16 w-16 rounded-full mb-4">
-                <h2 class="font-serif text-2xl">STUDIO DE CILIOS E BRONZE LAIS BIANCA</h2>
-                <p class="text-xs text-gray-400 mt-2 tracking-widest uppercase">CNPJ: 00.000.000/0001-00</p>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 text-sm text-gray-500 font-medium">
-                <a href="#inicio" class="hover:text-brand-primary">Início</a>
-                <a href="#servicos" class="hover:text-brand-primary">Serviços</a>
-                <a href="#sobre" class="hover:text-brand-primary">O Studio</a>
-                <a href="https://wa.me/5513997923043" class="hover:text-brand-primary">Agendamentos</a>
+    <footer class="bg-[#121212] text-white pt-24 pb-12 px-6 border-t border-white/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+                <div class="col-span-1 lg:col-span-1">
+                    <div class="flex items-center gap-3 mb-8">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782228875121_logo_lais_bianca.jpg" alt="Logo Lais Bianca" class="h-14 w-14 rounded-full border border-white/10">
+                        <span class="font-serif font-bold text-xl leading-tight tracking-tighter uppercase">Lais Bianca</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-8">Especialistas em realçar a sua beleza natural através de técnicas modernas e atendimento humanizado.</p>
+                    <div class="flex gap-4">
+                        <a href="https://www.instagram.com/lais_bbeauty" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-primary transition-all"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://wa.me/5513997923043" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-primary transition-all"><i class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-serif text-lg mb-8">Horário de Atendimento</h4>
+                    <ul class="text-gray-400 text-sm space-y-3">
+                        <li class="flex justify-between"><span>Segunda - Sexta:</span> <span>09:00 – 19:00</span></li>
+                        <li class="flex justify-between"><span>Sábado:</span> <span>09:00 – 19:00</span></li>
+                        <li class="flex justify-between text-brand-primary"><span>Domingo:</span> <span>Fechado</span></li>
+                    </ul>
+                </div>
+
+                <div class="col-span-1 lg:col-span-2">
+                    <h4 class="font-serif text-lg mb-8">Onde Estamos</h4>
+                    <a href="https://www.google.com/maps/place/STUDIO+DE+CILIOS+E+BRONZE+LAIS+BIANCA/data=!4m7!3m6!1s0x94ce273febf03eeb:0xed363ea871ee0880!8m2!3d-24.1058773!4d-46.6472176!16s%2Fg%2F11tk3d1j1d!19sChIJ6z7w6z8nzpQRgAjucag-Nu0?authuser=0&hl=pt-BR&rclk=1" target="_blank" class="block group">
+                        <p class="text-gray-400 text-sm mb-4 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-location-dot mr-2"></i> Av. Monteiro Lobato, 4670 - Vila Atlântica<br>Mongaguá - SP, 11730-000
+                        </p>
+                        <div class="w-full h-40 bg-gray-800 rounded-2xl overflow-hidden grayscale contrast-125 opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700">
+                             <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Mapa">
+                        </div>
+                    </a>
+                </div>
             </div>
 
-            <div class="border-t border-gray-200 pt-12 flex flex-col md:flex-row justify-between items-center gap-6">
-                <p class="text-xs text-gray-400 uppercase tracking-widest">© 2024 Lais Bianca Beauty. Todos os direitos reservados.</p>
-                <div class="flex gap-8 text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                    <a href="#" class="hover:text-brand-primary">Política de Privacidade</a>
-                    <a href="#" class="hover:text-brand-primary">Termos de Uso</a>
+            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+                <div class="text-center md:text-left">
+                    <p>STUDIO DE CILIOS E BRONZE LAIS BIANCA | 00.000.000/0001-00</p>
+                    <p class="mt-2">© 2024 Todos os direitos reservados. <a href="#" class="hover:text-white underline">Políticas</a> & <a href="#" class="hover:text-white underline">Termos</a></p>
                 </div>
-                <p class="text-xs text-gray-400 font-medium">
-                    Site criado e mantido por <a href="https://studiotesta.com.br/" class="text-brand-primary hover:underline font-bold">STUDIOTESTA</a>
-                </p>
+                <div class="flex items-center gap-2">
+                    <span>Site criado por</span>
+                    <a href="https://studiotesta.com.br/" target="_blank" class="hover:text-white transition-colors">
+                        <span class="text-brand-primary">STUDIOTESTA</span>
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- FLOAT WHATSAPP -->
-    <a href="https://wa.me/5513997923043" target="_blank" class="fixed bottom-6 right-6 z-[60] bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-2xl hover:bg-green-600 transition-all transform hover:scale-110">
+    <!-- Botão WhatsApp Flutuante -->
+    <a href="https://wa.me/5513997923043" class="fixed bottom-8 right-8 z-[100] w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform text-2xl">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
     <script>
-        // Header transparency on scroll
-        window.addEventListener('scroll', function() {
-            const header = document.querySelector('header');
-            if (window.scrollY > 50) {
-                header.classList.add('shadow-xl', 'py-2');
-                header.classList.remove('py-4');
-            } else {
-                header.classList.remove('shadow-xl', 'py-2');
-                header.classList.add('py-4');
-            }
-        });
+        // Animação de Surgimento (Reveal)
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
 
-        // FAQ Toggle
-        function toggleAccordion(element) {
-            const parent = element.parentElement;
-            const icon = element.querySelector('i');
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Accordion FAQ
+        function toggleAccordion(btn) {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('i');
             
-            // Close other items
-            document.querySelectorAll('.accordion-item').forEach(item => {
-                if (item !== parent) {
-                    item.classList.remove('accordion-active');
-                    item.querySelector('i').className = 'fa-solid fa-plus text-brand-primary transition-transform duration-300';
+            // Fecha outros
+            document.querySelectorAll('.accordion-content').forEach(el => {
+                if(el !== content) {
+                    el.style.maxHeight = null;
+                    el.previousElementSibling.querySelector('i').classList.replace('fa-minus', 'fa-plus');
                 }
             });
 
-            // Toggle current
-            parent.classList.toggle('accordion-active');
-            if (parent.classList.contains('accordion-active')) {
-                icon.className = 'fa-solid fa-minus text-brand-primary transition-transform duration-300 rotate-180';
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                icon.classList.replace('fa-minus', 'fa-plus');
             } else {
-                icon.className = 'fa-solid fa-plus text-brand-primary transition-transform duration-300';
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.classList.replace('fa-plus', 'fa-minus');
             }
         }
     </script>
 </body>
-</html>
+</html></html>
