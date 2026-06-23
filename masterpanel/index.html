@@ -1053,7 +1053,7 @@
             const badge = document.getElementById("dockerLiveStatusBadge");
             badge.className = "flex items-center gap-1.5";
             badge.innerHTML = `
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                 <span class="text-amber-400 font-extrabold uppercase tracking-wider text-[9px]">Sincronizando...</span>`;
             
             // Automatically refresh jobs
@@ -1272,7 +1272,7 @@
                     formBox.classList.remove("scale-95", "opacity-0");
                     formBox.classList.add("scale-100", "opacity-100");
                     
-                    // CRITICAL FIX FOR BLANK SCREEN: Force active tab initialization
+                    // Force active tab initialization
                     switchSidebarTab('scraper');
                 }, 50);
             }, 300);
@@ -1307,11 +1307,11 @@
                 fetchScraperJobs();
                 switchToScraperView();
             } else if (tab === "leads") {
-                tabLeadsBtn.className = "flex-1 pb-2 text-[11px] font-extrabold uppercase tracking-wider border-b-2 border-emerald-500 text-white transition-all";
+                tabLeadsBtn.className = "flex-1 pb-2 text-[11px] font-extrabold uppercase tracking-wider border-b-2 border-brand-500 text-white transition-all";
                 contentLeads.classList.remove("hidden");
                 switchToCurationView();
             } else if (tab === "sites") {
-                tabSitesBtn.className = "flex-1 pb-2 text-[11px] font-extrabold uppercase tracking-wider border-b-2 border-emerald-500 text-white transition-all";
+                tabSitesBtn.className = "flex-1 pb-2 text-[11px] font-extrabold uppercase tracking-wider border-b-2 border-brand-500 text-white transition-all";
                 contentSites.classList.remove("hidden");
                 if (createdSites.length === 0) fetchCreatedSites();
                 switchToCurationView();
@@ -1894,7 +1894,7 @@
                 ? "https://n8n.studiotesta.com.br/webhook-test/obter-codigo-fonte" 
                 : "https://n8n.studiotesta.com.br/webhook/obter-codigo-fonte";
 
-            updateVisualEditorStatus(`<i class="fa-solid fa-spinner animate-spin mr-1.5 font-bold text-amber-500"></i> Obtendo código-fonte de "${siteSlug}" via n8n...`, "text-amber-400");
+            updateVisualEditorStatus(`<i class="fa-solid fa-spinner animate-spin mr-1.5"></i> Obtendo código-fonte de "${siteSlug}" via n8n...`, "text-amber-400");
 
             try {
                 const response = await fetch(url, {
@@ -2320,7 +2320,7 @@
                 ? "https://n8n.studiotesta.com.br/webhook-test/edit-sites-prontos" 
                 : "https://n8n.studiotesta.com.br/webhook/edit-sites-prontos";
 
-            updateVisualEditorStatus(`<i class="fa-solid fa-spinner animate-spin mr-1.5 text-amber-500 font-bold"></i> Sincronizando com o GitHub...`, "text-amber-400");
+            updateVisualEditorStatus(`<i class="fa-solid fa-spinner animate-spin mr-1.5 text-amber-500"></i> Sincronizando com o GitHub...`, "text-amber-400");
 
             try {
                 const response = await fetch(url, {
@@ -2826,7 +2826,7 @@
         }
 
         // ==========================================
-        //  SISTEMA DE INTEGRAÇÃO DOCKER SCRAPER (V2)
+        //  SISTEMA DE INTEGRAÇÃO DOCKER SCRAPER
         // ==========================================
 
         // Conversor robusto de tempo amigável (3m, 60s, 1h) para Segundos inteiros
@@ -2876,10 +2876,15 @@
                 if (!response.ok) throw new Error();
 
                 const jobs = await response.json();
-                scraperJobsList = Array.isArray(jobs) ? jobs : (jobs.jobs || []);
                 
+                // MÁGICA DE MESTRE: Validação Real de Array e Erro
+                if (jobs.error || jobs.message || !Array.isArray(jobs)) {
+                    throw new Error(jobs.error || jobs.message || "Retorno inválido do n8n");
+                }
+                
+                scraperJobsList = jobs;
                 renderScraperJobs(scraperJobsList);
-                showToast("Console de monitoramento de Jobs atualizado via n8n!", "success");
+                showToast("Console de monitoramento de Jobs atualizado!", "success");
 
                 // Update live status to ONLINE
                 badge.className = "flex items-center gap-1.5 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/30";
@@ -2889,20 +2894,21 @@
 
             } catch (e) {
                 console.error("Erro ao obter Jobs do Scraper:", e);
-                showToast("Falha de conexão com o Docker via n8n.", "error");
+                showToast("Falha de rede ao buscar Jobs. Verifique o contêiner!", "error");
                 renderErrorInJobsList();
 
-                // Update live status to ERROR
+                // Update live status to ERROR - sem falsos-positivos!
                 badge.className = "flex items-center gap-1.5 bg-red-500/10 px-2 py-0.5 rounded-lg border border-red-500/30";
                 badge.innerHTML = `
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                    <span class="text-red-400 font-extrabold uppercase tracking-wider text-[9px]">ERRO REDE</span>`;
+                    <span class="text-red-400 font-extrabold uppercase tracking-wider text-[9px]">ERRO CONEXÃO</span>`;
             } finally {
                 syncBtn.disabled = false;
                 syncIcon.classList.remove("fa-spin");
             }
         }
 
+        // Renderização realista de erro sem poluir o painel com mockup falso
         function renderErrorInJobsList() {
             const sidebarContainer = document.getElementById("scraperJobsSidebarContainer");
             const dashboardContainer = document.getElementById("scraperDashboardJobsList");
@@ -2912,33 +2918,12 @@
             counter.textContent = `Erro`;
 
             const errorHtml = `
-                <div class="flex flex-col items-start text-left bg-red-950/35 border border-red-900/40 rounded-2xl p-5 space-y-4 h-full overflow-y-auto custom-scrollbar">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-red-950 rounded-xl flex items-center justify-center text-red-400 border border-red-900/30">
-                            <i class="fa-solid fa-triangle-exclamation text-xl animate-bounce"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-black text-white uppercase tracking-wider">Falha de Conexão com o Docker</h4>
-                            <p class="text-[9px] text-red-300 mt-0.5">Diagnóstico Técnico (Carlos Front-end & n8n Arquiteto)</p>
-                        </div>
-                    </div>
-                    
-                    <p class="text-[11px] text-slate-300 leading-relaxed">
-                        Não conseguimos ler seu Docker. Isso acontece porque o navegador **bloqueia conexões diretas de páginas HTTPS (do painel) para endereços locais HTTP (seu Docker)** por medidas rígidas de segurança (Mixed Content).
+                <div class="flex flex-col items-center justify-center h-full text-red-400 text-center py-12 bg-red-950/20 border border-red-900/30 rounded-xl p-4">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 animate-bounce"></i>
+                    <p class="text-xs font-bold">Falha de Conexão com o Docker Scraper</p>
+                    <p class="text-[10px] text-slate-400 mt-1.5 max-w-xs leading-relaxed">
+                        Não foi possível obter dados através do n8n. Verifique se o fluxo n8n está rodando e se o seu contêiner Docker está respondendo no endereço: <span class="font-mono text-white break-all">${dockerUrl}</span>.
                     </p>
-
-                    <div class="w-full bg-slate-950 p-3 rounded-xl border border-slate-900 font-mono text-[10px] text-slate-400 space-y-2">
-                        <p class="text-white font-bold"><i class="fa-solid fa-list-check text-amber-500 mr-1.5"></i>COMO CONFIGURAR SEU N8N PASSO A PASSO:</p>
-                        <p>1. Crie um nó <span class="text-amber-400">Webhook (POST)</span> com o path <span class="text-emerald-400">/obter-leads</span> no n8n.</p>
-                        <p>2. Adicione um <span class="text-amber-400">Switch / IF</span> lendo a chave <span class="font-bold text-white">"acao"</span> recebida do painel.</p>
-                        <p>3. Se a ação for <span class="text-emerald-400">"listar_jobs"</span>, faça um <span class="text-amber-400">HTTP Request (GET)</span> seguro para o endpoint:</p>
-                        <p class="pl-3 text-white font-bold bg-slate-900 p-1.5 rounded border border-slate-850 truncate">${dockerUrl}/api/v1/jobs</p>
-                        <p>4. Responda ao Webhook devolvendo a lista de objetos Jobs retornada pelo Docker!</p>
-                    </div>
-
-                    <div class="text-[9px] text-slate-500">
-                        <span>Configuração ativa: <strong>${dockerUrl}</strong></span>
-                    </div>
                 </div>`;
 
             sidebarContainer.innerHTML = `
@@ -2973,15 +2958,8 @@
                 const sidebarCard = document.createElement("div");
                 sidebarCard.className = "p-2.5 bg-slate-950 hover:bg-slate-850/80 border border-slate-800 rounded-xl cursor-pointer transition-all flex flex-col gap-1 shadow-md";
                 sidebarCard.onclick = () => {
-                    document.getElementById("scrapeJobName").value = job.name || "";
+                    document.getElementById("scrapeJobName").value = job.name;
                     document.getElementById("scrapeKeywords").value = job.data?.keywords?.join(", ") || "";
-                    if(job.data?.lang) document.getElementById("scrapeLang").value = job.data.lang;
-                    if(job.data?.zoom) document.getElementById("scrapeZoom").value = job.data.zoom;
-                    if(job.data?.lat) document.getElementById("scrapeLat").value = job.data.lat;
-                    if(job.data?.lon) document.getElementById("scrapeLon").value = job.data.lon;
-                    if(job.data?.radius) document.getElementById("scrapeRadius").value = job.data.radius;
-                    if(job.data?.depth) document.getElementById("scrapeDepth").value = job.data.depth;
-                    if(job.data?.max_time) document.getElementById("scrapeMaxTime").value = job.data.max_time;
                     showToast(`Configurações de "${job.name}" prontas para clonar!`, "info");
                 };
                 sidebarCard.innerHTML = `
@@ -3001,12 +2979,11 @@
             jobs.forEach(job => {
                 const statusBadge = getStatusBadge(job.status);
                 const keywordsText = job.data?.keywords?.join(", ") || "Nenhuma";
-                
                 const dockerUrl = document.getElementById("dockerApiUrl").value.trim() || "http://192.168.1.199:8081";
                 const isTestMode = document.getElementById("testModeToggle").checked;
                 const baseN8nUrl = isTestMode ? "https://n8n.studiotesta.com.br/webhook-test" : "https://n8n.studiotesta.com.br/webhook";
                 
-                // Proxy download endpoint designed to avoid mixed content in CSV retrieval
+                // Proxy download endpoint de mixed-content
                 const proxyDownloadUrl = `${baseN8nUrl}/obter-leads?acao=download_csv&id=${job.id}&docker_api_url=${encodeURIComponent(dockerUrl)}`;
 
                 const dashboardCard = document.createElement("div");
@@ -3031,7 +3008,7 @@
                         ` : ''}
                         
                         <a href="${proxyDownloadUrl}" target="_blank" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-200 text-[10px] font-extrabold uppercase rounded-lg transition-all flex items-center gap-1 border border-slate-700">
-                            <i class="fa-solid fa-download"></i> Baixar CSV (Via n8n)
+                            <i class="fa-solid fa-download"></i> CSV (Via n8n)
                         </a>
 
                         <button onclick="deleteScraperJob('${job.id}', this)" class="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-950/20 rounded-lg transition-all" title="Excluir Job">
@@ -3059,7 +3036,7 @@
             radarIcon.className = "fa-solid fa-compass animate-spin text-slate-950";
             startBtn.querySelector("span").textContent = "Disparando varredura no Docker...";
 
-            // Conversor robusto de minutos para segundos
+            // Tratamento de max_time contendo minutos ("3m" -> 180)
             const rawMaxTime = document.getElementById("scrapeMaxTime").value;
             const computedMaxTimeSeconds = rawMaxTime ? convertMaxTimeToSeconds(rawMaxTime) : 180;
 
@@ -3089,7 +3066,14 @@
 
                 if (!response.ok) throw new Error();
 
-                showToast("Varredura de Google Maps iniciada com sucesso!", "success");
+                const responseData = await response.json();
+                
+                // MÁGICA DE MESTRE: Tratando a resposta real da API
+                if (responseData.error || responseData.message || !responseData.id) {
+                    throw new Error(responseData.error || responseData.message || "Falha ao registrar job");
+                }
+
+                showToast("Varredura iniciada com sucesso! ID: " + responseData.id, "success");
                 document.getElementById("scraperJobForm").reset();
                 setTimeout(() => {
                     fetchScraperJobs();
@@ -3128,7 +3112,7 @@
 
                 if (!response.ok) throw new Error();
 
-                showToast("Leads importados! Planilha Google alimentada com sucesso.", "success");
+                showToast("Leads importados com sucesso para a planilha!", "success");
                 btnElement.className = btnElement.className.replace("bg-emerald-600", "bg-sky-600").replace("hover:bg-emerald-700", "hover:bg-sky-700");
                 btnElement.innerHTML = `<i class="fa-solid fa-circle-check"></i> Importado!`;
                 
@@ -3146,7 +3130,7 @@
         }
 
         async function deleteScraperJob(jobId, btnElement) {
-            if (!confirm("Confirmar a remoção do registro deste Job do container Docker?")) return;
+            showToast("Iniciando exclusão do Job no contêiner Docker...", "warn");
 
             const isTestMode = document.getElementById("testModeToggle").checked;
             const url = isTestMode 
@@ -3167,7 +3151,7 @@
 
                 if (!response.ok) throw new Error();
 
-                showToast("Registro do Job deletado!", "success");
+                showToast("Registro do Job deletado com sucesso!", "success");
                 fetchScraperJobs();
             } catch (e) {
                 showToast("Falha de rede ao tentar remover Job.", "error");
