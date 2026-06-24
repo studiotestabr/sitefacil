@@ -1,18 +1,23 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth"><head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AgroSítio em Mongaguá: Tudo para jardinagem, plantas, pet shop e aquarismo. O melhor atendimento da região com acessibilidade e variedade.">
+    <meta name="robots" content="index, follow">
+    <title>AgroSítio | Tudo para sua Natureza e seu Pet em Mongaguá</title>
     <meta name="description" content="AgroSítio em Mongaguá: Especialista em jardinagem, pet shop, aquarismo e medicamentos veterinários. O melhor atendimento da região com acessibilidade total.">
     <title>AgroSítio | Seu Jardim e seu Pet em Boas Mãos em Mongaguá</title>
 
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <!-- Fonts: Outfit (Modern) & Playfair Display (Luxury) -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&amp;family=Playfair+Display:wght@700;900&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,6 +25,8 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Tailwind Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -27,11 +34,15 @@
                     colors: {
                         primary: '#d2e187',
                         secondary: '#a5b469',
+                        dark: '#1c2112',
                         dark: '#1a2e05',
                     },
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
@@ -39,6 +50,11 @@
     </script>
 
     <style>
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        .hero-gradient { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .faq-active .faq-answer { max-height: 200px; }
+        .faq-active i { transform: rotate(180deg); }
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
         .hero-gradient { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://lh3.googleusercontent.com/gps-cs-s/APNQkAHdEaJtWIc6qe4P6M4AQFNsolFIuuUlP3iHNFzoTsNNvoN2ukC0fAATVIa_tKX6COWUz0cBpVa0N5pmTRiitZaZWHCHbSDf02SHBwNbPeNr8IGzscjrAqwHi--rrq5mdq8dJMQo=w1920-h1080-k-no'); background-size: cover; background-position: center; }
         .shadow-premium { box-shadow: 0 25px 50px -12px rgba(165, 180, 105, 0.25); }
@@ -57,8 +73,15 @@
         }
     </style>
 </head>
+<body class="bg-gray-50 text-dark overflow-x-hidden">
 <body class="bg-slate-50 text-slate-800 font-sans leading-relaxed overflow-x-hidden">
 
+    <!-- Header / Nav -->
+    <header class="fixed w-full z-50 transition-all duration-300 glass border-b border-gray-200">
+        <nav class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2">
+                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782256393388_images.jpg" alt="AgroSítio Logo" width="50" height="50" class="rounded-full shadow-sm">
+                <span class="font-serif text-2xl font-bold text-secondary">AgroSítio</span>
     <!-- HEADER -->
     <header class="fixed w-full z-50 transition-all duration-300 glass border-b border-white/20">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -66,23 +89,34 @@
                 <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782259907882_images.jpg" alt="Logo AgroSítio" width="50" height="50" class="rounded-full shadow-md">
                 <span class="text-2xl font-bold tracking-tighter text-dark">Agro<span class="text-secondary">Sítio</span></span>
             </a>
-            
+
+            <div class="hidden md:flex gap-8 font-semibold">
+                <a href="#inicio" class="hover:text-secondary transition">Início</a>
+                <a href="#diferenciais" class="hover:text-secondary transition">Diferenciais</a>
+                <a href="#produtos" class="hover:text-secondary transition">Produtos</a>
+                <a href="#depoimentos" class="hover:text-secondary transition">Avaliações</a>
             <div class="hidden md:flex items-center gap-8 font-medium">
                 <a href="#servicos" class="hover:text-secondary transition-colors">Serviços</a>
                 <a href="#sobre" class="hover:text-secondary transition-colors">Sobre</a>
                 <a href="#avaliacoes" class="hover:text-secondary transition-colors">Avaliações</a>
-                <a href="https://wa.me/5513991644364?text=Olá! Gostaria de fazer um pedido ou tirar uma dúvida." class="bg-secondary text-white px-6 py-3 rounded-full hover:bg-dark transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                <a href="https://wa.me/5513991644364?text=Olá! Gostaria de fazer um pedido ou tirar uma dúvida." 
+                   class="bg-secondary text-white px-6 py-3 rounded-full hover:bg-dark transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
                     <i class="fab fa-whatsapp"></i> Falar com Especialista
                 </a>
             </div>
 
+            <a href="https://wa.me/5513991644364?text=Olá,%20gostaria%20de%20fazer%20um%20pedido!" aria-label="Falar no WhatsApp" class="bg-secondary text-white px-6 py-2 rounded-full font-bold hover:bg-dark transition-all transform hover:scale-105 hidden sm:block">
+                Falar no WhatsApp
+            </a>
+
+            <button class="md:hidden text-2xl" id="menuBtn" aria-label="Menu Mobile">
             <button class="md:hidden text-2xl" aria-label="Menu" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
                 <i class="fas fa-bars"></i>
             </button>
         </nav>
         
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t p-6 space-y-4" style="">
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t p-6 space-y-4">
             <a href="#servicos" class="block text-lg font-medium">Serviços</a>
             <a href="#sobre" class="block text-lg font-medium">Sobre</a>
             <a href="#avaliacoes" class="block text-lg font-medium">Avaliações</a>
@@ -90,7 +124,51 @@
         </div>
     </header>
 
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenu" class="fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center gap-8 text-2xl font-bold transform translate-x-full transition-transform duration-300 md:hidden">
+        <button class="absolute top-6 right-6" id="closeMenu"><i class="fas fa-times text-3xl"></i></button>
+        <a href="#inicio" class="mobile-link">Início</a>
+        <a href="#diferenciais" class="mobile-link">Diferenciais</a>
+        <a href="#produtos" class="mobile-link">Produtos</a>
+        <a href="#depoimentos" class="mobile-link">Avaliações</a>
+        <a href="https://wa.me/5513991644364" class="bg-secondary text-white px-8 py-3 rounded-full">WhatsApp</a>
+    </div>
+
     <main>
+        <!-- Section 1: HERO -->
+        <section id="inicio" class="relative h-[90vh] flex items-center justify-center text-center px-4 overflow-hidden pt-16">
+            <div class="absolute inset-0 z-0">
+                <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAHdEaJtWIc6qe4P6M4AQFNsolFIuuUlP3iHNFzoTsNNvoN2ukC0fAATVIa_tKX6COWUz0cBpVa0N5pmTRiitZaZWHCHbSDf02SHBwNbPeNr8IGzscjrAqwHi--rrq5mdq8dJMQo=w1920-h1080-k-no" alt="AgroSítio Fachada" class="w-full h-full object-cover">
+                <div class="absolute inset-0 hero-gradient"></div>
+            </div>
+            
+            <div class="relative z-10 max-w-4xl">
+                <h1 class="font-serif text-4xl md:text-7xl text-white mb-6 leading-tight">Dê Vida ao seu Jardim com quem entende de <span class="text-primary italic">Natureza.</span></h1>
+                <p class="text-gray-200 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+                    A maior variedade de Mongaguá em plantas, ferramentas de jardinagem, acessórios para pet e aquarismo. Atendimento de excelência há mais de 20 anos.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://wa.me/5513991644364?text=Olá,%20vi%20o%20site%20e%20quero%20mais%20informações" class="bg-primary text-dark font-bold text-xl px-10 py-5 rounded-xl shadow-2xl animate-pulse-slow hover:bg-white transition-all transform hover:scale-105">
+                        <i class="fab fa-whatsapp mr-2"></i> PEÇA PELO WHATSAPP
+                    </a>
+                    <a href="#produtos" class="border-2 border-white text-white font-bold text-xl px-10 py-5 rounded-xl hover:bg-white hover:text-dark transition-all">
+                        VER PRODUTOS
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: DOR E EMPATIA -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-secondary mb-4 underline decoration-primary underline-offset-8">Frustrado com seu jardim ou pet?</h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="p-8 rounded-2xl bg-gray-50 border-l-4 border-red-400 shadow-sm">
+                        <i class="fas fa-skull-crossbones text-3xl text-red-400 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Plantas que não vingam?</h3>
+                        <p class="text-gray-600">Chega de gastar com mudas fracas. Nossas mudas são selecionadas e climatizadas para durarem.</p>
         <!-- HERO SECTION -->
         <section class="relative min-h-screen flex items-center hero-gradient pt-20">
             <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
@@ -98,6 +176,10 @@
                     <div class="inline-block px-4 py-1 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-full text-primary font-semibold tracking-wide uppercase text-sm">
                         🌿 A Melhor Agropecuária de Mongaguá
                     </div>
+                    <div class="p-8 rounded-2xl bg-gray-50 border-l-4 border-red-400 shadow-sm">
+                        <i class="fas fa-shopping-basket text-3xl text-red-400 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Difícil achar tudo em um só lugar?</h3>
+                        <p class="text-gray-600">Perdendo tempo em várias lojas? No AgroSítio você encontra da terra ao medicamento veterinário.</p>
                     <h1 class="text-5xl md:text-7xl font-serif font-black leading-tight">
                         Transforme seu Jardim, Cuide do seu <span class="text-primary italic text-6xl md:text-8xl">Amigo.</span>
                     </h1>
@@ -105,16 +187,24 @@
                         Mudas selecionadas, medicamentos veterinários e tudo para aquarismo em um só lugar. Atendimento humanizado e acessível para você e sua família.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="https://wa.me/5513991644364?text=Olá, vi o site e quero saber mais sobre os produtos!" class="bg-primary text-dark font-bold px-10 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-transform flex items-center justify-center gap-3 text-lg">
+                        <a href="https://wa.me/5513991644364?text=Olá, vi o site e quero saber mais sobre os produtos!" 
+                           class="bg-primary text-dark font-bold px-10 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-transform flex items-center justify-center gap-3 text-lg">
                             <i class="fab fa-whatsapp text-2xl"></i> Peça pelo WhatsApp
                         </a>
                         <a href="#mapa" class="bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold px-10 py-5 rounded-2xl hover:bg-white/20 transition-all flex items-center justify-center gap-3">
                             <i class="fas fa-map-marker-alt"></i> Ver Localização
                         </a>
                     </div>
+                    <div class="p-8 rounded-2xl bg-gray-50 border-l-4 border-red-400 shadow-sm">
+                        <i class="fas fa-clock text-3xl text-red-400 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Atendimento demorado?</h3>
+                        <p class="text-gray-600">No litoral o serviço é lento? Aqui prezamos pela agilidade e atenção que você e seus animais merecem.</p>
                 </div>
                 <div class="hidden md:block relative">
-                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/agrositio/1782260390788_723111005_18098261519520095_1553395479330654191_n.jpg?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1000&amp;q=80&amp;fm=webp" alt="Jardim Vibrante" width="600" height="800" class="rounded-3xl shadow-2xl border-4 border-white/10 shadow-premium" style="width: 400px; height: 264px; object-fit: cover;">
+                    <img src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80&fm=webp" 
+                         alt="Jardim Vibrante" 
+                         width="600" height="800"
+                         class="rounded-3xl shadow-2xl border-4 border-white/10 shadow-premium">
                     <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl flex items-center gap-4">
                         <div class="bg-secondary p-3 rounded-xl text-white">
                             <i class="fas fa-star text-2xl"></i>
@@ -128,6 +218,36 @@
             </div>
         </section>
 
+        <!-- Section 3: A SOLUÇÃO -->
+        <section id="diferenciais" class="py-20 bg-dark text-white overflow-hidden relative">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-wrap items-center">
+                    <div class="w-full lg:w-1/2 mb-12 lg:mb-0">
+                        <span class="text-primary font-bold tracking-widest uppercase">Por que o AgroSítio?</span>
+                        <h2 class="text-4xl md:text-5xl font-serif font-bold mt-4 mb-8">Mais que uma loja, um refúgio para quem ama a vida.</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="bg-secondary p-4 rounded-lg h-fit"><i class="fas fa-wheelchair text-white text-xl"></i></div>
+                                <div>
+                                    <h4 class="text-xl font-bold">Acessibilidade Total</h4>
+                                    <p class="text-gray-400">Entrada facilitada para cadeirantes. Todos são bem-vindos em nosso espaço.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="bg-secondary p-4 rounded-lg h-fit"><i class="fas fa-paw text-white text-xl"></i></div>
+                                <div>
+                                    <h4 class="text-xl font-bold">Amor Animal Real</h4>
+                                    <p class="text-gray-400">Cuidamos e abrigamos animais de rua da nossa região. Sua compra apoia essa causa.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="bg-secondary p-4 rounded-lg h-fit"><i class="fas fa-truck text-white text-xl"></i></div>
+                                <div>
+                                    <h4 class="text-xl font-bold">Entrega Ágil em Mongaguá</h4>
+                                    <p class="text-gray-400">Precisou de ração ou adubo? Entregamos rápido para você não pausar seus cuidados.</p>
+                                </div>
+                            </div>
         <!-- PROBLEMAS -->
         <section class="py-24 bg-white">
             <div class="container mx-auto px-6">
@@ -152,6 +272,9 @@
                         <h3 class="text-xl font-bold mb-4">Dificuldade em Remédios?</h3>
                         <p class="text-gray-600">Encontre linha completa de medicamentos veterinários com orientação técnica e preço justo.</p>
                     </div>
+                    <div class="w-full lg:w-1/2 relative">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEZhPQ1590NQHE2Qv-3XZaNiaAirntHRduRGDYdAjoqk38gJNtL6V5OvfmoUyMqf7PA5nKHKZXxQ8P9FYgJgIMDqbsS6vIs3gBRHgKlshTdxabNZiLXS3cLsnHDBtgNQJpdvrM=w600-h800-k-no" alt="Nossas Plantas" class="rounded-3xl shadow-2xl relative z-10 mx-auto" width="400" height="600" loading="lazy">
+                        <div class="absolute -bottom-10 -right-10 w-64 h-64 bg-primary rounded-full blur-3xl opacity-20"></div>
                     <div class="p-10 rounded-3xl bg-slate-50 border border-slate-100 hover:border-primary transition-all">
                         <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
                             <i class="fas fa-wheelchair"></i>
@@ -163,6 +286,12 @@
             </div>
         </section>
 
+        <!-- Section 4: PRODUTOS / SERVIÇOS -->
+        <section id="produtos" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-serif font-bold text-dark mb-4">Nossa Seleção Especial</h2>
+                    <p class="text-gray-600">Qualidade garantida em cada item da nossa prateleira</p>
         <!-- SERVIÇOS / CATÁLOGO -->
         <section id="servicos" class="py-24 bg-slate-900 text-white">
             <div class="container mx-auto px-6">
@@ -173,11 +302,22 @@
                     </div>
                     <a href="https://wa.me/5513991644364" class="text-primary border-b-2 border-primary pb-1 font-bold hover:text-white hover:border-white transition-all uppercase text-sm tracking-widest">Ver Catálogo Completo</a>
                 </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Produto 1 -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden group hover:-translate-y-2 transition-all duration-300">
+                        <div class="h-56 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=800&fm=webp" alt="Plantas e Mudas" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" width="400" height="300">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Mudas e Flores</h3>
+                            <p class="text-gray-600 text-sm mb-4">Hortaliças, ornamentais e frutíferas sempre saudáveis para seu plantio.</p>
+                            <a href="https://wa.me/5513991644364?text=Olá,%20tenho%20interesse%20em%20mudas%20e%20plantas" class="block text-center bg-gray-100 py-2 rounded-lg font-bold hover:bg-secondary hover:text-white transition">Consultar Preço</a>
                 
                 <div class="grid md:grid-cols-4 gap-6">
                     <!-- Serviço 1 -->
                     <div class="group relative overflow-hidden rounded-3xl aspect-[3/4]">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/agrositio/1782257404415_486680618_1210003577584194_4950797829490220050_n.jpg?q=80&amp;w=600&amp;fm=webp" alt="Jardinagem" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1592150621344-824545026a24?q=80&w=600&fm=webp" alt="Jardinagem" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent opacity-80"></div>
                         <div class="absolute bottom-0 p-8">
                             <h4 class="text-2xl font-bold mb-2">Jardinagem</h4>
@@ -185,9 +325,18 @@
                             <span class="bg-primary/20 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold uppercase tracking-tighter">A partir de R$ 5,00</span>
                         </div>
                     </div>
+                    <!-- Produto 2 -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden group hover:-translate-y-2 transition-all duration-300">
+                        <div class="h-56 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=800&fm=webp" alt="Pet Shop" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" width="400" height="300">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Pet Shop Completo</h3>
+                            <p class="text-gray-600 text-sm mb-4">Rações premium, brinquedos e medicamentos para cães e gatos.</p>
+                            <a href="https://wa.me/5513991644364?text=Olá,%20tenho%20interesse%20em%20produtos%20pet" class="block text-center bg-gray-100 py-2 rounded-lg font-bold hover:bg-secondary hover:text-white transition">Consultar Preço</a>
                     <!-- Serviço 2 -->
                     <div class="group relative overflow-hidden rounded-3xl aspect-[3/4]">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/agrositio/1782257354352_467312134_18034546835520095_2706749286107347823_n.jpg?q=80&amp;w=600&amp;fm=webp" alt="Pet Shop" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=600&fm=webp" alt="Pet Shop" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent opacity-80"></div>
                         <div class="absolute bottom-0 p-8">
                             <h4 class="text-2xl font-bold mb-2">Pet Shop</h4>
@@ -195,9 +344,18 @@
                             <span class="bg-primary/20 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold uppercase tracking-tighter">Variedade Premium</span>
                         </div>
                     </div>
+                    <!-- Produto 3 -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden group hover:-translate-y-2 transition-all duration-300">
+                        <div class="h-56 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1520333789090-1afc82db536a?auto=format&fit=crop&q=80&w=800&fm=webp" alt="Ferramentas" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" width="400" height="300">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Jardinagem Profissional</h3>
+                            <p class="text-gray-600 text-sm mb-4">Ferramentas, vasos, terras e adubos de alta performance.</p>
+                            <a href="https://wa.me/5513991644364?text=Olá,%20tenho%20interesse%20em%20ferramentas" class="block text-center bg-gray-100 py-2 rounded-lg font-bold hover:bg-secondary hover:text-white transition">Consultar Preço</a>
                     <!-- Serviço 3 -->
                     <div class="group relative overflow-hidden rounded-3xl aspect-[3/4]">
-                        <img src="https://images.unsplash.com/photo-1706114350113-3063f27619c7?q=80&amp;w=600&amp;fm=webp" alt="Aquarismo" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=600&fm=webp" alt="Aquarismo" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent opacity-80"></div>
                         <div class="absolute bottom-0 p-8">
                             <h4 class="text-2xl font-bold mb-2">Aquarismo</h4>
@@ -205,9 +363,18 @@
                             <span class="bg-primary/20 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold uppercase tracking-tighter">Peixes Ornamentais</span>
                         </div>
                     </div>
+                    <!-- Produto 4 -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden group hover:-translate-y-2 transition-all duration-300">
+                        <div class="h-56 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&q=80&w=800&fm=webp" alt="Aquarismo" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" width="400" height="300">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Aquarismo e Peixes</h3>
+                            <p class="text-gray-600 text-sm mb-4">Peixes ornamentais, aquários e acessórios para seu hobby.</p>
+                            <a href="https://wa.me/5513991644364?text=Olá,%20tenho%20interesse%20em%20aquarismo" class="block text-center bg-gray-100 py-2 rounded-lg font-bold hover:bg-secondary hover:text-white transition">Consultar Preço</a>
                     <!-- Serviço 4 -->
                     <div class="group relative overflow-hidden rounded-3xl aspect-[3/4]">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/agrositio/74407608_1087986588236463_5266482709307326464_n.jpg?q=80&amp;w=600&amp;fm=webp" alt="Veterinária" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=600&fm=webp" alt="Veterinária" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent opacity-80"></div>
                         <div class="absolute bottom-0 p-8">
                             <h4 class="text-2xl font-bold mb-2">Medicamentos</h4>
@@ -219,6 +386,21 @@
             </div>
         </section>
 
+        <!-- Section 5: PROVA SOCIAL -->
+        <section id="depoimentos" class="py-20 bg-secondary/10">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <div class="flex justify-center gap-1 text-yellow-500 mb-4 text-2xl">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <h2 class="text-4xl font-serif font-bold text-dark">4.6 Estrelas no Google</h2>
+                    <p class="text-gray-600 mt-2">Baseado em +206 avaliações reais de clientes satisfeitos</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Depoimento 1 -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                        <p class="italic text-gray-700 mb-6 text-lg">"Lugar fantástico, tem tudo para plantas e animais, são muito atenciosos, fui muito bem atendida. Os produtos são de qualidade e o preço é justo. Eles tratam muito bem os animais de rua do entorno..."</p>
         <!-- PROVA SOCIAL / AVALIAÇÕES -->
         <section id="avaliacoes" class="py-24 bg-slate-50 overflow-hidden">
             <div class="container mx-auto px-6 text-center">
@@ -237,11 +419,16 @@
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center font-bold">LM</div>
                             <div>
+                                <h4 class="font-bold">Lu Moura</h4>
+                                <span class="text-yellow-500 text-xs"><i class="fas fa-star"></i> 5 Estrelas</span>
                                 <h4 class="font-bold text-dark leading-none">Lu Moura</h4>
                                 <span class="text-xs text-gray-400 uppercase tracking-tighter font-bold">Cliente Satisfeita</span>
                             </div>
                         </div>
                     </div>
+                    <!-- Depoimento 2 -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                        <p class="italic text-gray-700 mb-6 text-lg">"A melhor loja da região! Muito cuidadosos com seus produtos e extremamente atenciosos. Não existe nenhuma agro melhor!"</p>
                     <!-- Testemunho 2 -->
                     <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 flex flex-col justify-between">
                         <div>
@@ -251,13 +438,19 @@
                             <p class="text-gray-700 italic mb-6">"A melhor loja da região! Muito cuidadosos com seus produtos e extremamente atenciosos. Não existe nenhuma agro melhor!"</p>
                         </div>
                         <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center font-bold text-dark">B</div>
                             <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center font-bold">B</div>
                             <div>
+                                <h4 class="font-bold">Bahamutis</h4>
+                                <span class="text-yellow-500 text-xs"><i class="fas fa-star"></i> 5 Estrelas</span>
                                 <h4 class="font-bold text-dark leading-none">Bahamutis</h4>
                                 <span class="text-xs text-gray-400 uppercase tracking-tighter font-bold">Guia Local</span>
                             </div>
                         </div>
                     </div>
+                    <!-- Depoimento 3 -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                        <p class="italic text-gray-700 mb-6 text-lg">"Excelente atendimento, preços bons ,os atendentes são maravilhosos, entrega rápida recomendo!!!"</p>
                     <!-- Testemunho 3 -->
                     <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 flex flex-col justify-between">
                         <div>
@@ -267,8 +460,11 @@
                             <p class="text-gray-700 italic mb-6">"Sou cliente deles la tem mudas de plantas hortaliças peixinhos de aquário ração para caes e gatos, medicamentos veterinários etc"</p>
                         </div>
                         <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center font-bold">ME</div>
                             <div class="w-12 h-12 bg-dark text-white rounded-full flex items-center justify-center font-bold">EP</div>
                             <div>
+                                <h4 class="font-bold">MelEvelyn</h4>
+                                <span class="text-yellow-500 text-xs"><i class="fas fa-star"></i> 5 Estrelas</span>
                                 <h4 class="font-bold text-dark leading-none">Edvaldo Przybysz</h4>
                                 <span class="text-xs text-gray-400 uppercase tracking-tighter font-bold">Cliente Fiel</span>
                             </div>
@@ -278,13 +474,30 @@
             </div>
         </section>
 
+        <!-- Section 6: FAQ -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4 max-w-3xl">
+                <h2 class="text-3xl font-serif font-bold text-center mb-12">Dúvidas Frequentes</h2>
+                
+                <div class="space-y-4">
+                    <div class="faq-item border border-gray-200 rounded-xl">
+                        <button class="w-full flex justify-between items-center p-5 font-bold text-left" onclick="toggleFaq(this)">
+                            Vocês fazem entregas em Mongaguá?
+                            <i class="fas fa-chevron-down transition-transform"></i>
+                        </button>
+                        <div class="faq-answer px-5 pb-5 text-gray-600">
+                            Sim! Realizamos entregas em toda Mongaguá e cidades vizinhas. Consulte a taxa e o prazo para seu bairro pelo WhatsApp.
         <!-- SOBRE NÓS -->
         <section id="sobre" class="py-24 bg-white relative">
             <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
                 <div class="relative">
-                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGVI180Fhcov2rh6-1XKaUhmZEfZVAu5iVf8R1O18XYX7nh7qYDVNZxLEd1dZZ0Rg1XYc-6KuJ_BZyv0X6wI5AaB9T9vWD0D8UkPLvo0BUrmfZJ5HM9nzrp3ySSoyJqRme4FluX=w400-h600-k-no" alt="AgroSítio Fachada" width="400" height="600" class="rounded-3xl shadow-premium w-full object-cover">
+                    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAGVI180Fhcov2rh6-1XKaUhmZEfZVAu5iVf8R1O18XYX7nh7qYDVNZxLEd1dZZ0Rg1XYc-6KuJ_BZyv0X6wI5AaB9T9vWD0D8UkPLvo0BUrmfZJ5HM9nzrp3ySSoyJqRme4FluX=w400-h600-k-no" 
+                         alt="AgroSítio Fachada" width="400" height="600"
+                         class="rounded-3xl shadow-premium w-full object-cover">
                     <div class="absolute -top-10 -right-10 hidden lg:block">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/agrositio/1782257035984_627933930_18083588084520095_3700144896526577898_n.jpg" alt="AgroSítio Detalhe" width="300" height="400" class="rounded-2xl shadow-2xl border-8 border-white w-64 h-80 object-cover" style="height: 420px; width: 320px;">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEZhPQ1590NQHE2Qv-3XZaNiaAirntHRduRGDYdAjoqk38gJNtL6V5OvfmoUyMqf7PA5nKHKZXxQ8P9FYgJgIMDqbsS6vIs3gBRHgKlshTdxabNZiLXS3cLsnHDBtgNQJpdvrM=w300-h400-k-no" 
+                             alt="AgroSítio Detalhe" width="300" height="400"
+                             class="rounded-2xl shadow-2xl border-8 border-white w-64 h-80 object-cover">
                     </div>
                 </div>
                 <div class="space-y-8">
@@ -323,6 +536,10 @@
                             <p class="text-gray-500 font-bold uppercase text-xs tracking-widest">Dedicado a você</p>
                         </div>
                     </div>
+                    <div class="faq-item border border-gray-200 rounded-xl">
+                        <button class="w-full flex justify-between items-center p-5 font-bold text-left" onclick="toggleFaq(this)">
+                            A loja possui acessibilidade para cadeirantes?
+                            <i class="fas fa-chevron-down transition-transform"></i>
                 </div>
             </div>
         </section>
@@ -333,8 +550,8 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEz-NYfi-TUlT4DHg0SwTTxYrrQv5shoq9WrqHfK23fONONCLa-wXu3QgCZHuFxR0NKzJQyDoP5vP1z6Sg68_K-BGHvkEMJgKnLZfy0URv5e6cJ9myPetpkT8_Gneh1aXxGqj9x=w400-h300-k-no" alt="AgroSitio" class="rounded-2xl h-64 w-full object-cover hover:opacity-90 transition shadow-lg" loading="lazy">
                     <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFsSFPH4GyVA4l-hsIrMEyXCKM-3GEZPVGyec8q8WILdbeINZ79IP4KxvbmMANm_zBWRP4_VNkOhusdMRi2vtuSQjzIZnFvSybh_Eb9MbZjGRjTAAf-t7JuGekf-cOvXtUSQlk2=w400-h300-k-no" alt="AgroSitio" class="rounded-2xl h-64 w-full object-cover hover:opacity-90 transition shadow-lg" loading="lazy">
-                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/agrositio/1782256172772_476834228_2476350789400029_1221936514472389648_n.jpg" alt="Pet Shop" class="rounded-2xl h-64 w-full object-cover hover:opacity-90 transition shadow-lg" loading="lazy">
-                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/agrositio/1782256181007_167598038_1487949291573522_1790624080384325314_n.jpg" alt="Aquario" class="rounded-2xl h-64 w-full object-cover hover:opacity-90 transition shadow-lg" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1599423300746-b62533397394?q=80&w=400&fm=webp" alt="Pet Shop" class="rounded-2xl h-64 w-full object-cover hover:opacity-90 transition shadow-lg" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1531026383433-6ed5a112afbc?q=80&w=400&fm=webp" alt="Aquario" class="rounded-2xl h-64 w-full object-cover hover:opacity-90 transition shadow-lg" loading="lazy">
                 </div>
             </div>
         </section>
@@ -350,26 +567,40 @@
                             Vocês fazem entrega em Mongaguá?
                             <i class="fas fa-chevron-down text-secondary"></i>
                         </button>
+                        <div class="faq-answer px-5 pb-5 text-gray-600">
+                            Sim, nossa entrada e o layout da loja foram pensados para garantir total acessibilidade a pessoas com mobilidade reduzida.
                         <div class="hidden text-gray-600 pb-4">
                             Sim! Realizamos entregas em toda a região de Mongaguá com rapidez e segurança. Consulte taxas via WhatsApp.
                         </div>
                     </div>
+                    <div class="faq-item border border-gray-200 rounded-xl">
+                        <button class="w-full flex justify-between items-center p-5 font-bold text-left" onclick="toggleFaq(this)">
+                            Trabalham com medicamentos veterinários?
+                            <i class="fas fa-chevron-down transition-transform"></i>
                     <!-- Q2 -->
                     <div class="border-b border-slate-200 pb-4">
                         <button class="flex justify-between items-center w-full text-left font-bold text-lg text-dark py-4 focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
                             A loja possui acessibilidade?
                             <i class="fas fa-chevron-down text-secondary"></i>
                         </button>
+                        <div class="faq-answer px-5 pb-5 text-gray-600">
+                            Sim, dispomos de uma linha completa de medicamentos veterinários básicos, vermífugos, antipulgas e suplementos.
                         <div class="hidden text-gray-600 pb-4">
                             Sim, nossa loja é totalmente acessível para cadeirantes e pessoas com mobilidade reduzida.
                         </div>
                     </div>
+                    <div class="faq-item border border-gray-200 rounded-xl">
+                        <button class="w-full flex justify-between items-center p-5 font-bold text-left" onclick="toggleFaq(this)">
+                            Quais as formas de pagamento aceitas?
+                            <i class="fas fa-chevron-down transition-transform"></i>
                     <!-- Q3 -->
                     <div class="border-b border-slate-200 pb-4">
                         <button class="flex justify-between items-center w-full text-left font-bold text-lg text-dark py-4 focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
                             Trabalham com aquarismo?
                             <i class="fas fa-chevron-down text-secondary"></i>
                         </button>
+                        <div class="faq-answer px-5 pb-5 text-gray-600">
+                            Aceitamos Dinheiro, Pix, Cartões de Débito e Crédito (com parcelamento sob consulta).
                         <div class="hidden text-gray-600 pb-4">
                             Sim! Temos peixes ornamentais, rações, filtros e acessórios para seu aquário estar sempre impecável.
                         </div>
@@ -377,7 +608,18 @@
                 </div>
             </div>
         </section>
+    </main>
 
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-20 pb-10">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-12 mb-16 border-b border-gray-800 pb-16">
+                <div class="col-span-1 lg:col-span-1">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/logos/1782256393388_images.jpg" alt="Logo AgroSítio" class="rounded-full mb-6 w-20 h-20" loading="lazy">
+                    <p class="text-gray-400 leading-relaxed">Referência em jardinagem e pet shop em Mongaguá. Qualidade, preço justo e amor pela vida.</p>
+                    <div class="flex gap-4 mt-6">
+                        <a href="https://www.instagram.com/agrositio_mongagua/" class="text-2xl hover:text-primary transition" aria-label="Siga-nos no Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://wa.me/5513991644364" class="text-2xl hover:text-primary transition" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
         <!-- ONDE ESTAMOS -->
         <section id="mapa" class="py-24 bg-slate-50">
             <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12">
@@ -408,13 +650,16 @@
                         </div>
                     </div>
 
-                    <a href="https://www.google.com/maps/dir//AgroS%C3%ADtio/@-24.105077,-46.645449" class="inline-flex items-center gap-3 bg-secondary text-white px-8 py-4 rounded-2xl shadow-xl hover:bg-dark transition-all font-bold">
+                    <a href="https://www.google.com/maps/dir//AgroS%C3%ADtio/@-24.105077,-46.645449" 
+                       class="inline-flex items-center gap-3 bg-secondary text-white px-8 py-4 rounded-2xl shadow-xl hover:bg-dark transition-all font-bold">
                         <i class="fas fa-directions"></i> Traçar Rota no Google Maps
                     </a>
                 </div>
                 
                 <div class="rounded-3xl overflow-hidden shadow-2xl h-[450px] border-4 border-white">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.407738222625!2d-46.645449!3d-24.105077!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce27961ec92cd5%3A0x545cc99d7df08bd6!2sAgroS%C3%ADtio!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.407738222625!2d-46.645449!3d-24.105077!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce27961ec92cd5%3A0x545cc99d7df08bd6!2sAgroS%C3%ADtio!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr" 
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
         </section>
@@ -425,6 +670,12 @@
         <div class="container mx-auto px-6">
             <div class="grid md:grid-cols-3 gap-16 mb-16">
                 <div>
+                    <h4 class="font-bold text-xl mb-6">Funcionamento</h4>
+                    <ul class="text-gray-400 space-y-2 text-sm">
+                        <li class="flex justify-between"><span>Seg - Sex:</span> <span>08h às 18h</span></li>
+                        <li class="flex justify-between"><span>Sábado:</span> <span>08h às 18h</span></li>
+                        <li class="flex justify-between font-bold text-primary"><span>Domingo:</span> <span>08h às 13h</span></li>
+                    </ul>
                     <h3 class="text-3xl font-bold mb-8">Agro<span class="text-primary">Sítio</span></h3>
                     <p class="text-gray-400 mb-8 max-w-xs">Qualidade, carinho e acessibilidade para o seu lar em Mongaguá desde 2002.</p>
                     <div class="flex gap-4">
@@ -436,7 +687,15 @@
                         </a>
                     </div>
                 </div>
+
                 <div>
+                    <h4 class="font-bold text-xl mb-6">Localização</h4>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Av. Monteiro Lobato, 4444<br>
+                        Vila Atlântica, Mongaguá - SP<br>
+                        CEP: 11730-000
+                    </p>
+                    <a href="https://www.google.com/maps/place/AgroS%C3%ADtio/@-24.105077,-46.645449,15z" class="text-primary hover:underline text-sm font-bold"><i class="fas fa-map-marker-alt mr-2"></i> Abrir no Google Maps</a>
                     <h4 class="font-bold text-xl mb-8">Links Rápidos</h4>
                     <ul class="space-y-4 text-gray-400">
                         <li><a href="#servicos" class="hover:text-primary transition-colors">Serviços</a></li>
@@ -445,7 +704,14 @@
                         <li><a href="https://wa.me/5513991644364" class="hover:text-primary transition-colors">Atendimento VIP</a></li>
                     </ul>
                 </div>
+
                 <div>
+                    <h4 class="font-bold text-xl mb-6">Institucional</h4>
+                    <p class="text-gray-400 text-xs leading-loose">
+                        Agro Sitio-Mongagua-Ltda<br>
+                        CNPJ: 05.235.562/0001-38<br>
+                        Fundada em 2002.
+                    </p>
                     <h4 class="font-bold text-xl mb-8">Informações Legais</h4>
                     <ul class="space-y-2 text-gray-400 text-sm">
                         <li>Razão Social: Agro Sitio-Mongagua-Ltda</li>
@@ -455,26 +721,62 @@
                     </ul>
                 </div>
             </div>
+            
+            <div class="text-center text-gray-500 text-sm">
+                <p class="mb-2">&copy; 2024 AgroSítio. Todos os direitos reservados.</p>
+                <a href="https://studiotesta.com.br/" class="opacity-50 hover:opacity-100 transition">Site criado e mantido por STUDIOTESTA</a>
             <div class="border-t border-white/10 pt-8 text-center text-gray-500 text-sm">
                 <p>Site criado e mantido por <a href="https://studiotesta.com.br/" class="font-bold hover:text-white transition-colors">STUDIOTESTA</a></p>
             </div>
         </div>
     </footer>
 
+    <!-- Floating WhatsApp -->
+    <a href="https://wa.me/5513991644364?text=Olá,%20gostaria%20de%20fazer%20um%20pedido!" class="fixed bottom-6 right-6 z-50 bg-[#25d366] text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-2xl transition hover:scale-110 animate-bounce" aria-label="Chamar no WhatsApp">
     <!-- FLOAT BUTTON WHATSAPP -->
-    <a href="https://wa.me/5513991644364?text=Olá, gostaria de tirar uma dúvida!" class="fixed bottom-8 right-8 z-[99] bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:scale-110 transition-transform whatsapp-pulse" aria-label="Falar no WhatsApp">
+    <a href="https://wa.me/5513991644364?text=Olá, gostaria de tirar uma dúvida!" 
+       class="fixed bottom-8 right-8 z-[99] bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:scale-110 transition-transform whatsapp-pulse"
+       aria-label="Falar no WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
 
+    <!-- Scripts -->
     <!-- PERFORMANCE SCRIPTS -->
     <script>
+        // FAQ Accordion
+        function toggleFaq(button) {
+            const item = button.parentElement;
+            const wasActive = item.classList.contains('faq-active');
+            
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('faq-active'));
+            if (!wasActive) item.classList.add('faq-active');
+        }
+
+        // Mobile Menu
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenu = document.getElementById('closeMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        menuBtn.addEventListener('click', () => mobileMenu.classList.remove('translate-x-full'));
+        closeMenu.addEventListener('click', () => mobileMenu.classList.add('translate-x-full'));
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('translate-x-full'));
+        });
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
         // Smooth header shadow change on scroll
         window.onscroll = function() {
             const header = document.querySelector('header');
             if (window.scrollY > 50) {
+                header.classList.add('py-1', 'shadow-md');
+                header.classList.remove('py-3');
                 header.classList.add('shadow-xl', 'py-2');
                 header.classList.remove('py-4');
             } else {
+                header.classList.remove('py-1', 'shadow-md');
+                header.classList.add('py-3');
                 header.classList.remove('shadow-xl', 'py-2');
                 header.classList.add('py-4');
             }
@@ -490,5 +792,6 @@
             });
         });
     </script>
-
-</body></html>
+</body>
+</html></html>
+</html>
