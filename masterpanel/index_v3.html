@@ -129,13 +129,6 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                <!-- Botão de Acesso ao Raspador (Link Externo de alta conversão) -->
-                <a href="https://busca.studiotesta.com.br/studiotesta/index.html" target="_blank"
-                    class="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-200 hover:scale-[1.03] active:scale-95 flex items-center gap-2 border border-blue-400/30">
-                    <i class="fa-solid fa-spider text-xs animate-pulse"></i>
-                    <span>Abrir Raspador</span>
-                </a>
-
                 <div class="flex items-center gap-3 bg-slate-900 px-3 py-2 rounded-xl border border-slate-800">
                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5" id="modeLabel">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Produção
@@ -565,39 +558,6 @@
                             </div>
                         </div>
 
-                        <!-- Grupo 8: Instalação de Tags & Pixels (Pós-Contrato / Oferecido nos Planos) -->
-                        <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800/80 space-y-4">
-                            <h2 class="text-xs font-extrabold uppercase tracking-widest text-emerald-400 flex items-center gap-2">
-                                <i class="fa-solid fa-code-branch text-emerald-500"></i> Grupo 8: Instalação de Tags & Pixels (Pós-Venda)
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">ID do Pixel do Facebook (Meta Pixel)</label>
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-                                            <i class="fa-brands fa-facebook-f text-xs"></i>
-                                        </span>
-                                        <input type="text" id="pixelFacebook" class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none text-white font-medium placeholder-slate-700" placeholder="Apenas o ID numérico do Pixel, ex: 1234567890">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">ID do Google Analytics / GTM</label>
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-                                            <i class="fa-solid fa-chart-line text-xs"></i>
-                                        </span>
-                                        <input type="text" id="googleAnalytics" class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none text-white font-medium placeholder-slate-700" placeholder="ID de medição ex: G-XXXXXXXXXX ou GTM-XXXX">
-                                    </div>
-                                </div>
-
-                                <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Scripts Personalizados Adicionais (Head/Body)</label>
-                                    <textarea id="customScripts" rows="3" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none text-white font-medium placeholder-slate-800" placeholder="Cole aqui outros códigos de tags, pixels adicionais (ex: Google Ads, Hotmart, TikTok Pixel, etc.)"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Diagnosticador de Chaves JSON -->
                         <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800/80 space-y-3">
                             <button type="button" onclick="toggleDebugPanel()" class="w-full flex items-center justify-between text-[11px] font-extrabold uppercase tracking-widest text-slate-400 hover:text-brand-400 transition-all">
@@ -662,16 +622,13 @@
                         <!-- Left Pane: Dynamic Properties Panel (3 cols) - Wix layered Outliner & Inspector -->
                         <div class="xl:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-[750px] space-y-4 glass">
                             
-                            <!-- Abas de Navegação das Propriedades e Camadas (Agora com aba Pixels) -->
+                            <!-- Abas de Navegação das Propriedades e Camadas -->
                             <div class="flex border-b border-slate-800 gap-2">
-                                <button onclick="switchPropertiesTab('editor')" id="tabPropEditorBtn" class="flex-1 pb-2 text-[10px] font-extrabold uppercase tracking-wider border-b-2 border-amber-500 text-white transition-all">
+                                <button onclick="switchPropertiesTab('editor')" id="tabPropEditorBtn" class="flex-1 pb-2 text-xs font-extrabold uppercase tracking-wider border-b-2 border-amber-500 text-white transition-all">
                                     <i class="fa-solid fa-sliders mr-1 text-amber-500"></i> Estilo
                                 </button>
-                                <button onclick="switchPropertiesTab('layers')" id="tabPropLayersBtn" class="flex-1 pb-2 text-[10px] font-extrabold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-white transition-all">
+                                <button onclick="switchPropertiesTab('layers')" id="tabPropLayersBtn" class="flex-1 pb-2 text-xs font-extrabold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-white transition-all">
                                     <i class="fa-solid fa-layer-group mr-1 text-sky-400"></i> Camadas
-                                </button>
-                                <button onclick="switchPropertiesTab('pixels')" id="tabPropPixelsBtn" class="flex-1 pb-2 text-[10px] font-extrabold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-white transition-all">
-                                    <i class="fa-solid fa-tags mr-1 text-emerald-400"></i> Pixels
                                 </button>
                             </div>
 
@@ -697,42 +654,6 @@
                                     <p class="text-[9px] max-w-[200px] mt-1">Abra um site pronto da sua lista lateral para gerenciar as camadas.</p>
                                 </div>
                             </div>
-
-                            <!-- TAB 3: Painel Exclusivo de Pixels & Tags de Rastreamento (WIX-Style Pixels Panel) -->
-                            <div class="hidden flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1" id="wixPixelsPanel">
-                                <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                                    <h5 class="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                                        <i class="fa-solid fa-code-branch"></i> Implantador de Scripts
-                                    </h5>
-                                    <p class="text-[9px] text-slate-400 mt-0.5">Insira tags e pixels neste site ativo. Eles são mantidos integrados no GitHub ao salvar.</p>
-                                </div>
-
-                                <div class="space-y-3.5 text-slate-300">
-                                    <div class="space-y-1">
-                                        <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">ID do Facebook Pixel</label>
-                                        <input type="text" id="propPixelFacebook" oninput="updateActiveSitePixelData('pixel_facebook', this.value)"
-                                            placeholder="Ex: 1234567890" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white">
-                                    </div>
-
-                                    <div class="space-y-1">
-                                        <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">ID do Google Analytics / GTM</label>
-                                        <input type="text" id="propGoogleAnalytics" oninput="updateActiveSitePixelData('google_analytics', this.value)"
-                                            placeholder="Ex: G-XXXXXXXXXX" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white">
-                                    </div>
-
-                                    <div class="space-y-1">
-                                        <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Scripts Adicionais (Header/Body)</label>
-                                        <textarea id="propCustomScripts" rows="8" oninput="updateActiveSitePixelData('custom_scripts', this.value)"
-                                            placeholder="Cole aqui tags <script> adicionais..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono custom-scrollbar"></textarea>
-                                    </div>
-                                    
-                                    <div class="p-2.5 bg-slate-950/40 rounded-xl border border-slate-850 text-[9px] text-slate-500 leading-normal">
-                                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>
-                                        Lembre-se de clicar no botão "Salvar & Publicar" no topo do painel para commitar e salvar essas novas chaves de pixels no repositório!
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
 
                         <!-- Right Pane: Interactive Live Visual Sandbox (9 cols para esticar e evitar bugs de menu comprimido) -->
@@ -1063,57 +984,22 @@
         function switchPropertiesTab(tab) {
             const tabEditorBtn = document.getElementById("tabPropEditorBtn");
             const tabLayersBtn = document.getElementById("tabPropLayersBtn");
-            const tabPixelsBtn = document.getElementById("tabPropPixelsBtn");
-            
             const panelProperties = document.getElementById("wixPropertiesPanel");
             const panelLayers = document.getElementById("wixLayersPanel");
-            const panelPixels = document.getElementById("wixPixelsPanel");
-
-            // Reseta estilos das abas
-            [tabEditorBtn, tabLayersBtn, tabPixelsBtn].forEach(btn => {
-                if (btn) btn.className = "flex-1 pb-2 text-[10px] font-extrabold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-white transition-all";
-            });
-            // Oculta painéis
-            [panelProperties, panelLayers, panelPixels].forEach(p => {
-                if (p) p.classList.add("hidden");
-            });
 
             if (tab === "editor") {
-                tabEditorBtn.className = "flex-1 pb-2 text-[10px] font-extrabold uppercase tracking-wider border-b-2 border-amber-500 text-white transition-all";
+                tabEditorBtn.className = "flex-1 pb-2 text-xs font-extrabold uppercase tracking-wider border-b-2 border-amber-500 text-white transition-all";
+                tabLayersBtn.className = "flex-1 pb-2 text-xs font-extrabold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-white transition-all";
                 panelProperties.classList.remove("hidden");
-            } else if (tab === "layers") {
-                tabLayersBtn.className = "flex-1 pb-2 text-[10px] font-extrabold uppercase tracking-wider border-b-2 border-sky-500 text-white transition-all";
+                panelLayers.classList.add("hidden");
+            } else {
+                tabLayersBtn.className = "flex-1 pb-2 text-xs font-extrabold uppercase tracking-wider border-b-2 border-sky-500 text-white transition-all";
+                tabEditorBtn.className = "flex-1 pb-2 text-xs font-extrabold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-white transition-all";
                 panelLayers.classList.remove("hidden");
-                generateLayersTree();
-            } else if (tab === "pixels") {
-                tabPixelsBtn.className = "flex-1 pb-2 text-[10px] font-extrabold uppercase tracking-wider border-b-2 border-emerald-500 text-white transition-all";
-                panelPixels.classList.remove("hidden");
+                panelProperties.classList.add("hidden");
                 
-                // Carrega os dados de pixels atuais no painel de edição esquerdo
-                if (currentSiteFullData) {
-                    document.getElementById("propPixelFacebook").value = currentSiteFullData.pixel_facebook || currentSiteFullData.pixelFacebook || "";
-                    document.getElementById("propGoogleAnalytics").value = currentSiteFullData.google_analytics || currentSiteFullData.googleAnalytics || "";
-                    document.getElementById("propCustomScripts").value = currentSiteFullData.custom_scripts || currentSiteFullData.customScripts || "";
-                }
+                generateLayersTree();
             }
-        }
-
-        function updateActiveSitePixelData(field, val) {
-            if (!currentSiteFullData) return;
-            
-            // Atualiza o objeto de dados em tempo de execução
-            currentSiteFullData[field] = val;
-            
-            // Sincroniza também com os inputs ocultos/visíveis do form de curadoria por segurança
-            if (field === 'pixel_facebook') {
-                document.getElementById("pixelFacebook").value = val;
-            } else if (field === 'google_analytics') {
-                document.getElementById("googleAnalytics").value = val;
-            } else if (field === 'custom_scripts') {
-                document.getElementById("customScripts").value = val;
-            }
-            
-            updateVisualEditorStatus("<i class='fa-solid fa-code text-emerald-400 mr-1'></i> Pixel atualizado localmente! Clique em 'Salvar & Publicar' para subir.", "text-amber-400 font-bold");
         }
 
         function toggleModeLabel() {
@@ -1613,11 +1499,6 @@
             document.getElementById("websiteAntigo").value = getField(lead, ['website', 'site', 'Website', 'old_site', 'Website Antigo']);
             document.getElementById("siteGerado").value = "";
 
-            // Reseta e limpa os campos do novo Grupo 8 de pixels
-            document.getElementById("pixelFacebook").value = getField(lead, ['pixel_facebook', 'pixelFacebook', 'pixel']) || "";
-            document.getElementById("googleAnalytics").value = getField(lead, ['google_analytics', 'googleAnalytics', 'analytics']) || "";
-            document.getElementById("customScripts").value = getField(lead, ['custom_scripts', 'customScripts', 'scripts']) || "";
-
             clearLogoUpload();
             document.getElementById("webhookForm").scrollIntoView({ behavior: 'smooth' });
         }
@@ -1696,11 +1577,6 @@
             document.getElementById("workspaceIndicatorColor").className = "w-3 h-3 rounded-full bg-amber-500 animate-pulse";
             document.getElementById("workspaceIndicatorDesc").textContent = `Editando ao vivo: ${title}`;
             document.getElementById("sandboxAddressBar").textContent = `https://studiotesta.com.br/${activeSiteSlug}/index.html`;
-
-            // Configura os campos do painel de Pixels com as informações do site atual selecionado
-            document.getElementById("propPixelFacebook").value = site.pixel_facebook || site.pixelFacebook || "";
-            document.getElementById("propGoogleAnalytics").value = site.google_analytics || site.googleAnalytics || "";
-            document.getElementById("propCustomScripts").value = site.custom_scripts || site.customScripts || "";
 
             const isTestMode = document.getElementById("testModeToggle").checked;
             if (isTestMode) {
@@ -2334,7 +2210,7 @@
                     </div>
 
                     <!-- 1. CONTEÚDO & HIGHLIGHT DE TEXTO -->
-                    \${data.tag !== 'img' ? \`
+                    ${data.tag !== 'img' ? `
                         <div class="wix-accordion-item border border-slate-800 bg-slate-950/40 rounded-xl overflow-hidden accordion-active">
                             <button onclick="toggleWixAccordion(this)" class="w-full flex items-center justify-between p-3 text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-300 hover:bg-slate-900/40 border-b border-slate-800/60 transition-all">
                                 <span class="flex items-center gap-2"><i class="fa-solid fa-pen-nib text-amber-500"></i> Texto & Duas Cores</span>
@@ -2343,7 +2219,7 @@
                             <div class="accordion-content space-y-3.5 p-3">
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Texto Completo</label>
-                                    <textarea id="propRawText" oninput="updateTextWithHighlight()" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500 custom-scrollbar leading-relaxed" rows="3">\${rawUnformattedText}</textarea>
+                                    <textarea id="propRawText" oninput="updateTextWithHighlight()" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500 custom-scrollbar leading-relaxed" rows="3">${rawUnformattedText}</textarea>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-900/60">
@@ -2352,18 +2228,18 @@
                                             <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Palavra para destacar (Segunda Cor)</label>
                                             <span class="text-[7px] text-slate-500">Gera Título em duas cores</span>
                                         </div>
-                                        <input type="text" id="propHighlightedWord" oninput="updateTextWithHighlight()" value="\${highlightedWord}" placeholder="Ex: agropecuária" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white">
+                                        <input type="text" id="propHighlightedWord" oninput="updateTextWithHighlight()" value="${highlightedWord}" placeholder="Ex: agropecuária" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white">
                                     </div>
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Cor do Destaque</label>
                                         <div class="flex items-center gap-1.5">
-                                            <input type="color" id="propHighlightColor" oninput="updateTextWithHighlight()" value="\${highlightColor}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
-                                            <input type="text" id="propHighlightColorHex" oninput="document.getElementById('propHighlightColor').value=this.value; updateTextWithHighlight()" value="\${highlightColor.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-[8px] text-white font-mono text-center">
+                                            <input type="color" id="propHighlightColor" oninput="updateTextWithHighlight()" value="${highlightColor}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
+                                            <input type="text" id="propHighlightColorHex" oninput="document.getElementById('propHighlightColor').value=this.value; updateTextWithHighlight()" value="${highlightColor.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-[8px] text-white font-mono text-center">
                                         </div>
                                     </div>
                                     <div class="space-y-1 flex flex-col justify-end pb-1.5">
                                         <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" id="propTextGradientToggle" onchange="updateTextWithHighlight()" class="sr-only peer" \${hasTextGradient ? 'checked' : ''}>
+                                            <input type="checkbox" id="propTextGradientToggle" onchange="updateTextWithHighlight()" class="sr-only peer" ${hasTextGradient ? 'checked' : ''}>
                                             <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
                                             <span class="ml-1.5 text-[8px] font-bold text-slate-400 uppercase">Degradê</span>
                                         </label>
@@ -2371,10 +2247,10 @@
                                 </div>
                             </div>
                         </div>
-                    \` : ''}
+                    ` : ''}
 
                     <!-- 2. TIPOGRAFIA AVANÇADA -->
-                    \u0024{data.tag !== 'img' ? \`
+                    ${data.tag !== 'img' ? `
                         <div class="wix-accordion-item border border-slate-800 bg-slate-950/40 rounded-xl overflow-hidden">
                             <button onclick="toggleWixAccordion(this)" class="w-full flex items-center justify-between p-3 text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-300 hover:bg-slate-900/40 border-b border-slate-800/60 transition-all">
                                 <span class="flex items-center gap-2"><i class="fa-solid fa-font text-amber-500"></i> Tipografia Avançada</span>
@@ -2387,7 +2263,7 @@
                                         <select id="propFontFamily" onchange="updateElementStyleInSandbox('fontFamily', this.value)" 
                                             class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
                                             <option value="sans-serif">Padrão do Sistema</option>
-                                            \${fontOptions}
+                                            ${fontOptions}
                                         </select>
                                     </div>
 
@@ -2395,20 +2271,20 @@
                                     <div class="space-y-1 col-span-2">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Estilos Básicos</label>
                                         <div class="grid grid-cols-4 gap-1">
-                                            <button onclick="toggleTextStyle('fontWeight', '700', '400')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${parseInt(data.styles.fontWeight) >= 700 ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Negrito (Bold)"><i class="fa-solid fa-bold"></i></button>
-                                            <button onclick="toggleTextStyle('fontStyle', 'italic', 'normal')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${data.styles.fontStyle === 'italic' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Itálico (Italic)"><i class="fa-solid fa-italic"></i></button>
-                                            <button onclick="toggleTextStyle('textDecoration', 'underline', 'none')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${data.styles.textDecoration.includes('underline') ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Sublinhado"><i class="fa-solid fa-underline"></i></button>
-                                            <button onclick="toggleTextStyle('textDecoration', 'line-through', 'none')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${data.styles.textDecoration.includes('line-through') ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Riscado"><i class="fa-solid fa-strikethrough"></i></button>
+                                            <button onclick="toggleTextStyle('fontWeight', '700', '400')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${parseInt(data.styles.fontWeight) >= 700 ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Negrito (Bold)"><i class="fa-solid fa-bold"></i></button>
+                                            <button onclick="toggleTextStyle('fontStyle', 'italic', 'normal')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${data.styles.fontStyle === 'italic' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Itálico (Italic)"><i class="fa-solid fa-italic"></i></button>
+                                            <button onclick="toggleTextStyle('textDecoration', 'underline', 'none')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${data.styles.textDecoration.includes('underline') ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Sublinhado"><i class="fa-solid fa-underline"></i></button>
+                                            <button onclick="toggleTextStyle('textDecoration', 'line-through', 'none')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${data.styles.textDecoration.includes('line-through') ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Riscado"><i class="fa-solid fa-strikethrough"></i></button>
                                         </div>
                                     </div>
 
                                     <div class="space-y-1 col-span-2">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Alinhamento</label>
                                         <div class="grid grid-cols-4 gap-1">
-                                            <button onclick="updateElementStyleInSandbox('textAlign', 'left')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${data.styles.textAlign === 'left' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Esquerda"><i class="fa-solid fa-align-left"></i></button>
-                                            <button onclick="updateElementStyleInSandbox('textAlign', 'center')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${data.styles.textAlign === 'center' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-                                            <button onclick="updateElementStyleInSandbox('textAlign', 'right')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${data.styles.textAlign === 'right' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Direita"><i class="fa-solid fa-align-right"></i></button>
-                                            <button onclick="updateElementStyleInSandbox('textAlign', 'justify')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center \${data.styles.textAlign === 'justify' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Justificado"><i class="fa-solid fa-align-justify"></i></button>
+                                            <button onclick="updateElementStyleInSandbox('textAlign', 'left')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${data.styles.textAlign === 'left' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Esquerda"><i class="fa-solid fa-align-left"></i></button>
+                                            <button onclick="updateElementStyleInSandbox('textAlign', 'center')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${data.styles.textAlign === 'center' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+                                            <button onclick="updateElementStyleInSandbox('textAlign', 'right')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${data.styles.textAlign === 'right' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Direita"><i class="fa-solid fa-align-right"></i></button>
+                                            <button onclick="updateElementStyleInSandbox('textAlign', 'justify')" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg border border-slate-800 text-xs flex items-center justify-center ${data.styles.textAlign === 'justify' ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'text-slate-400'}" title="Justificado"><i class="fa-solid fa-align-justify"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -2416,13 +2292,13 @@
                                 <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-900/60">
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Tamanho Fonte</label>
-                                        <input type="text" id="propFontSize" oninput="updateElementStyleInSandbox('fontSize', this.value)" value="\${data.styles.fontSize}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white font-mono text-center">
+                                        <input type="text" id="propFontSize" oninput="updateElementStyleInSandbox('fontSize', this.value)" value="${data.styles.fontSize}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white font-mono text-center">
                                     </div>
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Cor do Texto</label>
                                         <div class="flex items-center gap-1.5">
-                                            <input type="color" oninput="updateElementStyleInSandbox('color', this.value)" value="\${currentHexColor}" class="w-7 h-7 bg-transparent border-0 rounded cursor-pointer">
-                                            <input type="text" oninput="updateElementStyleInSandbox('color', this.value)" value="\${currentHexColor.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[9px] text-white font-mono text-center">
+                                            <input type="color" oninput="updateElementStyleInSandbox('color', this.value)" value="${currentHexColor}" class="w-7 h-7 bg-transparent border-0 rounded cursor-pointer">
+                                            <input type="text" oninput="updateElementStyleInSandbox('color', this.value)" value="${currentHexColor.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[9px] text-white font-mono text-center">
                                         </div>
                                     </div>
                                 </div>
@@ -2430,21 +2306,21 @@
                                 <div class="grid grid-cols-2 gap-3 pt-1">
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Entre-Letra</label>
-                                        <input type="range" min="-2" max="10" step="0.5" value="\${currentSpacing}" oninput="updateElementStyleInSandbox('letterSpacing', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                        <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentSpacing}px</span>
+                                        <input type="range" min="-2" max="10" step="0.5" value="${currentSpacing}" oninput="updateElementStyleInSandbox('letterSpacing', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                        <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentSpacing}px</span>
                                     </div>
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Entre-Linha</label>
-                                        <input type="range" min="0.8" max="3" step="0.1" value="\${currentLineHeight}" oninput="updateElementStyleInSandbox('lineHeight', this.value)" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                        <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentLineHeight}</span>
+                                        <input type="range" min="0.8" max="3" step="0.1" value="${currentLineHeight}" oninput="updateElementStyleInSandbox('lineHeight', this.value)" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                        <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentLineHeight}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    \` : ''}
+                    ` : ''}
 
                     <!-- 3. IMAGEM CONFIGS -->
-                    \u0024{data.tag === 'img' ? \`
+                    ${data.tag === 'img' ? `
                         <div class="wix-accordion-item border border-slate-800 bg-slate-950/40 rounded-xl overflow-hidden accordion-active">
                             <button onclick="toggleWixAccordion(this)" class="w-full flex items-center justify-between p-3 text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-300 hover:bg-slate-900/40 border-b border-slate-800/60 transition-all">
                                 <span class="flex items-center gap-2"><i class="fa-solid fa-image text-amber-500"></i> Wix Imagem Avançada</span>
@@ -2453,7 +2329,7 @@
                             <div class="accordion-content space-y-3.5 p-3">
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">URL da Imagem (src)</label>
-                                    <textarea id="propImgSrc" oninput="updateElementInSandbox('src', this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500 custom-scrollbar font-mono leading-relaxed" rows="2">\${data.src}</textarea>
+                                    <textarea id="propImgSrc" oninput="updateElementInSandbox('src', this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500 custom-scrollbar font-mono leading-relaxed" rows="2">${data.src}</textarea>
                                 </div>
 
                                 <div class="space-y-1.5">
@@ -2472,27 +2348,27 @@
                                     <div class="grid grid-cols-2 gap-2">
                                         <div class="space-y-1">
                                             <label class="block text-[7px] font-bold text-slate-500">Largura (Width)</label>
-                                            <input type="text" oninput="updateElementStyleInSandbox('width', this.value)" value="\${data.styles.width}" placeholder="auto" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-white font-mono text-center">
+                                            <input type="text" oninput="updateElementStyleInSandbox('width', this.value)" value="${data.styles.width}" placeholder="auto" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-white font-mono text-center">
                                         </div>
                                         <div class="space-y-1">
                                             <label class="block text-[7px] font-bold text-slate-500">Altura (Height)</label>
-                                            <input type="text" oninput="updateElementStyleInSandbox('height', this.value)" value="\${data.styles.height}" placeholder="auto" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-white font-mono text-center">
+                                            <input type="text" oninput="updateElementStyleInSandbox('height', this.value)" value="${data.styles.height}" placeholder="auto" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-white font-mono text-center">
                                         </div>
                                     </div>
 
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Enquadramento (Object Fit)</label>
                                         <select onchange="updateElementStyleInSandbox('objectFit', this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-100">
-                                            <option value="fill" \${data.styles.objectFit === 'fill' ? 'selected' : ''}>Preencher (Esticar)</option>
-                                            <option value="cover" \${data.styles.objectFit === 'cover' ? 'selected' : ''}>Capa (Cortar / Ajustar proporção)</option>
-                                            <option value="contain" \${data.styles.objectFit === 'contain' ? 'selected' : ''}>Conter (Sem cortar)</option>
-                                            <option value="scale-down" \${data.styles.objectFit === 'scale-down' ? 'selected' : ''}>Escalar Menor</option>
+                                            <option value="fill" ${data.styles.objectFit === 'fill' ? 'selected' : ''}>Preencher (Esticar)</option>
+                                            <option value="cover" ${data.styles.objectFit === 'cover' ? 'selected' : ''}>Capa (Cortar / Ajustar proporção)</option>
+                                            <option value="contain" ${data.styles.objectFit === 'contain' ? 'selected' : ''}>Conter (Sem cortar)</option>
+                                            <option value="scale-down" ${data.styles.objectFit === 'scale-down' ? 'selected' : ''}>Escalar Menor</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    \` : ''}
+                    ` : ''}
 
                     <!-- 4. FUNDO & GRADIETES AVANÇADO (TARJAS E BLOCOS) -->
                     <div class="wix-accordion-item border border-slate-800 bg-slate-950/40 rounded-xl overflow-hidden">
@@ -2504,53 +2380,53 @@
                             <div class="space-y-1.5">
                                 <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Tipo de Fundo</label>
                                 <div class="grid grid-cols-3 gap-1">
-                                    <button onclick="changeBackgroundType('solid')" id="bgTypeSolid" class="p-1.5 bg-slate-900 hover:bg-slate-850 rounded border border-slate-800 text-[9px] font-extrabold uppercase text-center \${bgType==='solid'?'border-amber-500 text-amber-500 bg-amber-500/10':''}">Sólido</button>
-                                    <button onclick="changeBackgroundType('gradient')" id="bgTypeGradient" class="p-1.5 bg-slate-900 hover:bg-slate-850 rounded border border-slate-800 text-[9px] font-extrabold uppercase text-center \${bgType==='gradient'?'border-amber-500 text-amber-500 bg-amber-500/10':''}">Degradê</button>
-                                    <button onclick="changeBackgroundType('image')" id="bgTypeImage" class="p-1.5 bg-slate-900 hover:bg-slate-850 rounded border border-slate-800 text-[9px] font-extrabold uppercase text-center \${bgType==='image'?'border-amber-500 text-amber-500 bg-amber-500/10':''}">Imagem</button>
+                                    <button onclick="changeBackgroundType('solid')" id="bgTypeSolid" class="p-1.5 bg-slate-900 hover:bg-slate-850 rounded border border-slate-800 text-[9px] font-extrabold uppercase text-center ${bgType==='solid'?'border-amber-500 text-amber-500 bg-amber-500/10':''}">Sólido</button>
+                                    <button onclick="changeBackgroundType('gradient')" id="bgTypeGradient" class="p-1.5 bg-slate-900 hover:bg-slate-850 rounded border border-slate-800 text-[9px] font-extrabold uppercase text-center ${bgType==='gradient'?'border-amber-500 text-amber-500 bg-amber-500/10':''}">Degradê</button>
+                                    <button onclick="changeBackgroundType('image')" id="bgTypeImage" class="p-1.5 bg-slate-900 hover:bg-slate-850 rounded border border-slate-800 text-[9px] font-extrabold uppercase text-center ${bgType==='image'?'border-amber-500 text-amber-500 bg-amber-500/10':''}">Imagem</button>
                                 </div>
                             </div>
 
                             <!-- Solid Background Color -->
-                            <div id="wixBgSolidSection" class="\${bgType !== 'solid' ? 'hidden' : ''} space-y-2">
+                            <div id="wixBgSolidSection" class="${bgType !== 'solid' ? 'hidden' : ''} space-y-2">
                                 <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Cor de Fundo Sólido</label>
                                 <div class="flex items-center gap-2">
-                                    <input type="color" id="propBgSolidColor" oninput="updateWixBackgroundSolid(this.value)" value="\${currentHexBg || '#1e293b'}" class="w-7 h-7 bg-transparent border-0 rounded cursor-pointer">
-                                    <input type="text" oninput="updateWixBackgroundSolid(this.value)" value="\${(currentHexBg || '#Transparent').toUpperCase()}" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-[10px] text-white font-mono text-center">
+                                    <input type="color" id="propBgSolidColor" oninput="updateWixBackgroundSolid(this.value)" value="${currentHexBg || '#1e293b'}" class="w-7 h-7 bg-transparent border-0 rounded cursor-pointer">
+                                    <input type="text" oninput="updateWixBackgroundSolid(this.value)" value="${(currentHexBg || '#Transparent').toUpperCase()}" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-[10px] text-white font-mono text-center">
                                 </div>
                             </div>
 
                             <!-- Gradient Design Tools -->
-                            <div id="wixBgGradientSection" class="\${bgType !== 'gradient' ? 'hidden' : ''} space-y-3 pt-1 border-t border-slate-900/60">
+                            <div id="wixBgGradientSection" class="${bgType !== 'gradient' ? 'hidden' : ''} space-y-3 pt-1 border-t border-slate-900/60">
                                 <div class="grid grid-cols-2 gap-2">
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Cor Inicial</label>
                                         <div class="flex items-center gap-1.5">
-                                            <input type="color" id="propGradColor1" oninput="updateWixBackgroundGradient()" value="\${gradColor1}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
-                                            <input type="text" id="propGradColor1Hex" oninput="document.getElementById('propGradColor1').value=this.value; updateWixBackgroundGradient()" value="\${gradColor1.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[8px] text-white font-mono text-center">
+                                            <input type="color" id="propGradColor1" oninput="updateWixBackgroundGradient()" value="${gradColor1}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
+                                            <input type="text" id="propGradColor1Hex" oninput="document.getElementById('propGradColor1').value=this.value; updateWixBackgroundGradient()" value="${gradColor1.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[8px] text-white font-mono text-center">
                                         </div>
                                     </div>
                                     <div class="space-y-1">
                                         <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Cor Final</label>
                                         <div class="flex items-center gap-1.5">
-                                            <input type="color" id="propGradColor2" oninput="updateWixBackgroundGradient()" value="\${gradColor2}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
-                                            <input type="text" id="propGradColor2Hex" oninput="document.getElementById('propGradColor2').value=this.value; updateWixBackgroundGradient()" value="\${gradColor2.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[8px] text-white font-mono text-center">
+                                            <input type="color" id="propGradColor2" oninput="updateWixBackgroundGradient()" value="${gradColor2}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
+                                            <input type="text" id="propGradColor2Hex" oninput="document.getElementById('propGradColor2').value=this.value; updateWixBackgroundGradient()" value="${gradColor2.toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[8px] text-white font-mono text-center">
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Ângulo do Degradê</label>
-                                    <input type="range" id="propGradAngle" min="0" max="360" step="5" value="\${gradAngle}" oninput="updateWixBackgroundGradient()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5" id="propGradAngleLabel">\${gradAngle}° Graus</span>
+                                    <input type="range" id="propGradAngle" min="0" max="360" step="5" value="${gradAngle}" oninput="updateWixBackgroundGradient()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5" id="propGradAngleLabel">${gradAngle}° Graus</span>
                                 </div>
                             </div>
 
                             <!-- Background Image -->
-                            <div id="wixBgImageSection" class="\${bgType !== 'image' ? 'hidden' : ''} space-y-2">
+                            <div id="wixBgImageSection" class="${bgType !== 'image' ? 'hidden' : ''} space-y-2">
                                 <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">URL da Imagem de Fundo</label>
                                 <input type="text" id="propBgImageUrl" placeholder="https://exemplo.com/imagem.jpg" 
                                     oninput="updateElementStyleInSandbox('backgroundImage', this.value ? 'url(' + this.value + ')' : 'none')" 
-                                    value="\${currentBgImgUrl}" 
+                                    value="${currentBgImgUrl}" 
                                     class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
                             </div>
                         </div>
@@ -2566,13 +2442,13 @@
                             <div class="grid grid-cols-2 gap-3">
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Espessura Borda</label>
-                                    <input type="range" min="0" max="10" value="\${currentBorderWidth}" oninput="updateElementStyleInSandbox('borderWidth', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentBorderWidth}px</span>
+                                    <input type="range" min="0" max="10" value="${currentBorderWidth}" oninput="updateElementStyleInSandbox('borderWidth', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentBorderWidth}px</span>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Arredondamento</label>
-                                    <input type="range" min="0" max="100" value="\${currentRadius}" oninput="updateElementStyleInSandbox('borderRadius', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentRadius}px</span>
+                                    <input type="range" min="0" max="100" value="${currentRadius}" oninput="updateElementStyleInSandbox('borderRadius', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentRadius}px</span>
                                 </div>
                             </div>
 
@@ -2580,17 +2456,17 @@
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Cor da Borda</label>
                                     <div class="flex items-center gap-1.5">
-                                        <input type="color" oninput="updateElementStyleInSandbox('borderColor', this.value)" value="\${currentHexBorder || '#ffffff'}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
-                                        <input type="text" oninput="updateElementStyleInSandbox('borderColor', this.value)" value="\${(currentHexBorder || '#FFFFFF').toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-[8px] text-white font-mono text-center">
+                                        <input type="color" oninput="updateElementStyleInSandbox('borderColor', this.value)" value="${currentHexBorder || '#ffffff'}" class="w-6 h-6 bg-transparent border-0 rounded cursor-pointer">
+                                        <input type="text" oninput="updateElementStyleInSandbox('borderColor', this.value)" value="${(currentHexBorder || '#FFFFFF').toUpperCase()}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-[8px] text-white font-mono text-center">
                                     </div>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Estilo da Borda</label>
                                     <select onchange="updateElementStyleInSandbox('borderStyle', this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-slate-100 focus:outline-none">
-                                        <option value="solid" \${data.styles.borderStyle === 'solid' ? 'selected' : ''}>Sólida</option>
-                                        <option value="dashed" \${data.styles.borderStyle === 'dashed' ? 'selected' : ''}>Tracejada</option>
-                                        <option value="dotted" \${data.styles.borderStyle === 'dotted' ? 'selected' : ''}>Pontilhada</option>
-                                        <option value="none" \${data.styles.borderStyle === 'none' ? 'selected' : ''}>Sem Borda</option>
+                                        <option value="solid" ${data.styles.borderStyle === 'solid' ? 'selected' : ''}>Sólida</option>
+                                        <option value="dashed" ${data.styles.borderStyle === 'dashed' ? 'selected' : ''}>Tracejada</option>
+                                        <option value="dotted" ${data.styles.borderStyle === 'dotted' ? 'selected' : ''}>Pontilhada</option>
+                                        <option value="none" ${data.styles.borderStyle === 'none' ? 'selected' : ''}>Sem Borda</option>
                                     </select>
                                 </div>
                             </div>
@@ -2598,13 +2474,13 @@
                             <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-900/60">
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Padding (Interno)</label>
-                                    <input type="range" min="0" max="100" value="\${currentPadding}" oninput="updateElementStyleInSandbox('padding', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentPadding}px</span>
+                                    <input type="range" min="0" max="100" value="${currentPadding}" oninput="updateElementStyleInSandbox('padding', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentPadding}px</span>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Margin (Externo)</label>
-                                    <input type="range" min="0" max="100" value="\${currentMargin}" oninput="updateElementStyleInSandbox('margin', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentMargin}px</span>
+                                    <input type="range" min="0" max="100" value="${currentMargin}" oninput="updateElementStyleInSandbox('margin', this.value + 'px')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentMargin}px</span>
                                 </div>
                             </div>
                         </div>
@@ -2631,36 +2507,36 @@
                             <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-900/60">
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Opacidade Camada</label>
-                                    <input type="range" min="0" max="1" step="0.05" value="\${currentOpacity}" oninput="updateElementStyleInSandbox('opacity', this.value)" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${Math.round(currentOpacity * 100)}%</span>
+                                    <input type="range" min="0" max="1" step="0.05" value="${currentOpacity}" oninput="updateElementStyleInSandbox('opacity', this.value)" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${Math.round(currentOpacity * 100)}%</span>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Ordem de Empilhamento (Z-Index)</label>
-                                    <input type="text" oninput="updateElementStyleInSandbox('zIndex', this.value)" value="\${currentZIndex}" placeholder="auto" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-white font-mono text-center">
+                                    <input type="text" oninput="updateElementStyleInSandbox('zIndex', this.value)" value="${currentZIndex}" placeholder="auto" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-white font-mono text-center">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-900/60">
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Blur Geral (Desfocar)</label>
-                                    <input type="range" min="0" max="40" step="1" value="\${currentBlur}" oninput="updateElementStyleInSandbox('filter', this.value > 0 ? 'blur(' + this.value + 'px)' : 'none')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentBlur}px</span>
+                                    <input type="range" min="0" max="40" step="1" value="${currentBlur}" oninput="updateElementStyleInSandbox('filter', this.value > 0 ? 'blur(' + this.value + 'px)' : 'none')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentBlur}px</span>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Filtro Atrás (Backdrop Blur)</label>
-                                    <input type="range" min="0" max="40" step="1" value="\${currentBackdropBlur}" oninput="updateElementStyleInSandbox('backdropFilter', this.value > 0 ? 'blur(' + this.value + 'px)' : 'none')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">\${currentBackdropBlur}px</span>
+                                    <input type="range" min="0" max="40" step="1" value="${currentBackdropBlur}" oninput="updateElementStyleInSandbox('backdropFilter', this.value > 0 ? 'blur(' + this.value + 'px)' : 'none')" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <span class="text-[8px] font-mono text-slate-500 text-right block mt-0.5">${currentBackdropBlur}px</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    \u0024{data.tag === 'a' ? \`
+                    ${data.tag === 'a' ? `
                         <div class="space-y-1.5 pt-1.5 border-t border-slate-800/60">
                             <label class="block text-[8px] font-bold uppercase tracking-wider text-slate-400">Link de Destino do Botão (href)</label>
-                            <input type="text" id="propHref" oninput="updateElementInSandbox('href', this.value)" value="\${data.href}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono">
+                            <input type="text" id="propHref" oninput="updateElementInSandbox('href', this.value)" value="${data.href}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono">
                         </div>
-                    \` : ''}
+                    ` : ''}
                 </div>
             `;
 
@@ -2816,7 +2692,7 @@
             const el = iframe.contentWindow.document.getElementById(selectedElementId);
             if (!el) return;
 
-            // Salva alteração no histórico (com de-bounce de digitação)
+            // Salva alteração no histórico (com debounce de digitação)
             saveToHistory(false);
 
             if (property === 'text') {
@@ -2861,7 +2737,7 @@
             const el = iframe.contentWindow.document.getElementById(selectedElementId);
             if (!el) return;
 
-            // Salva alteração de estilo no histórico (ex: sliders de blur/radius/padding usam de-bounce)
+            // Salva alteração de estilo no histórico (ex: sliders de blur/radius/padding usam debounce)
             saveToHistory(false);
 
             if (property === 'fontFamily' && GOOGLE_FONTS_LIST.includes(value)) {
@@ -3003,15 +2879,11 @@
                     throw new Error("Slug do site ausente. Carregue um site antes de salvar!");
                 }
 
-                // Payload inclui agora as novas propriedades de pixels & tags de rastreamento
                 const payload = {
                     site_slug: activeSiteSlug,
                     "index.html": cleanHtml,
                     html_limpo: cleanHtml,
-                    dados_originais: currentSiteFullData,
-                    pixel_facebook: document.getElementById("pixelFacebook").value.trim(),
-                    google_analytics: document.getElementById("googleAnalytics").value.trim(),
-                    custom_scripts: document.getElementById("customScripts").value.trim()
+                    dados_originais: currentSiteFullData
                 };
 
                 const response = await fetch(editWebhookUrl, {
@@ -3484,7 +3356,6 @@
 
             openStatusModal(empresaNome);
 
-            // Payload agora engloba as propriedades do Grupo 8 (Instalação de Tags & Pixels)
             const payload = {
                 id_projeto: activeProjectId,
                 title: empresaNome,
@@ -3515,10 +3386,6 @@
                 
                 logo_url: uploadedLogoUrl || null,
                 logo_file: uploadedLogoUrl ? null : logoFileData,
-                
-                pixel_facebook: document.getElementById("pixelFacebook").value.trim(),
-                google_analytics: document.getElementById("googleAnalytics").value.trim(),
-                custom_scripts: document.getElementById("customScripts").value.trim(),
                 
                 mode: "curated_panel"
             };
