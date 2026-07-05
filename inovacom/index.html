@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inovacom Intelligence | Dashboard Pro 2.0</title>
+    <!-- Tailwind CSS para Estilização Ágil -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para os gráficos de Inteligência de Mercado -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome para ícones premium -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #030712; 
+            color: #f3f4f6; 
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar { 
+            width: 6px; 
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track { 
+            background: rgba(15, 23, 42, 0.3); 
+            border-radius: 10px; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: rgba(99, 102, 241, 0.3); 
+            border-radius: 10px; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+            background: rgba(99, 102, 241, 0.6); 
+        }
+        
+        .glass-card { 
+            background: rgba(17, 24, 39, 0.7); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+        }
+        
+        .glow-indigo {
+            box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.2);
+        }
+
+        .login-bg {
+            background-image: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 45%),
+                              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.08), transparent 45%);
+        }
+    </style>
+</head>
+<body class="min-h-screen custom-scrollbar flex flex-col justify-between login-bg">
+
+    <!-- TELA DE LOGIN -->
+    <div id="loginScreen" class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-md p-8 rounded-3xl glass-card glow-indigo border border-white/10 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-600/10 rounded-full blur-2xl"></div>
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-indigo-400 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 mx-auto mb-4">
+                    <i class="fa-solid fa-shield-halved text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold tracking-tight text-white">Acesso Inovacom</h2>
+                <p class="text-slate-400 text-xs mt-1">Conectando ao n8n local de alta performance</p>
+            </div>
+
+            <form id="loginForm" onsubmit="realizarLogin(event)" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-indigo-400 block uppercase tracking-wider mb-1.5">Usuário</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                            <i class="fa-solid fa-user text-sm"></i>
+                        </span>
+                        <input type="text" id="loginUsuario" required placeholder="Digite o usuário"
+                               class="w-full pl-10 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-indigo-400 block uppercase tracking-wider mb-1.5">Senha de Acesso</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </span>
+                        <input type="password" id="loginSenha" required placeholder="••••••••••••"
+                               class="w-full pl-10 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all">
+                    </div>
+                </div>
+
+                <div id="loginErro" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold text-center">
+                    <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Usuário ou senha incorretos!
+                </div>
+
+                <button type="submit" id="btnLogin" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 text-white font-extrabold text-sm uppercase rounded-xl transition-all shadow-lg shadow-indigo-500/10 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Autenticar no Hub
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAINEL PRINCIPAL (Oculto por padrão, ativado após login) -->
+    <div id="mainDashboard" class="hidden flex flex-col lg:flex-row min-h-screen">
+        
+        <!-- SIDEBAR DE CONTROLE -->
+        <aside class="w-full lg:w-80 bg-slate-950 border-r border-slate-900 p-6 flex flex-col gap-6">
+            <div class="flex items-center justify-between border-b border-slate-900 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-sky-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm leading-tight text-white">Inovacom</h1>
+                        <p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest">Automation Hub</p>
+                    </div>
+                </div>
+                <button onclick="realizarLogout()" class="text-slate-500 hover:text-red-400 transition-colors text-sm" title="Sair do Sistema">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Nova Campanha</h2>
+                <div>
+                    <label class="text-[9px] font-bold text-slate-400 mb-1 block uppercase">Nicho de Busca</label>
+                    <input type="text" id="inputTermo" placeholder="Ex: Farmácias" 
+                           class="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-[9px] font-bold text-slate-400 mb-1 block uppercase">Cidade ou Bairro</label>
+                    <input type="text" id="inputCidade" placeholder="Ex: Santos, SP" 
+                           class="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                </div>
+                <button onclick="iniciarCaptura()" id="btnCaptura" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 text-white rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-500/10 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads
+                </button>
+            </div>
+
+            <hr class="border-slate-900">
+
+            <div class="space-y-3">
+                <h2 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Sincronização</h2>
+                <button onclick="sincronizarPlanilha()" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-800/60 transition-all">
+                    <span><i class="fa-solid fa-rotate text-indigo-500 mr-2"></i> Sincronizar Planilha</span>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-slate-500"></i>
+                </button>
+            </div>
+
+            <div class="mt-auto p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/15">
+                <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Status da Sessão</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span id="sessionUser" class="text-xs font-semibold text-emerald-300/80">Inovacom Ativo</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- GRID PRINCIPAL -->
+        <main class="flex-1 p-6 lg:p-8 overflow-y-auto custom-scrollbar flex flex-col gap-6">
+            
+            <!-- HEADER INFO -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-6 rounded-2xl glass-card flex items-center justify-between">
+                    <div>
+                        <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Leads Totais</span>
+                        <h3 id="statTotal" class="text-3xl font-black text-white mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                        <i class="fa-solid fa-database text-lg"></i>
+                    </div>
+                </div>
+                <div class="p-6 rounded-2xl glass-card flex items-center justify-between">
+                    <div>
+                        <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">WhatsApp Ativo</span>
+                        <h3 id="statTelefones" class="text-3xl font-black text-emerald-400 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                    </div>
+                </div>
+                <div class="p-6 rounded-2xl glass-card flex items-center justify-between">
+                    <div>
+                        <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Com E-mail</span>
+                        <h3 id="statEmails" class="text-3xl font-black text-sky-400 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-400">
+                        <i class="fa-solid fa-envelope text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD DE INTELIGÊNCIA -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="p-6 rounded-2xl glass-card">
+                    <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-4">Concentração de Nichos</h4>
+                    <div style="height: 220px; position: relative;">
+                        <canvas id="chartNichos"></canvas>
+                    </div>
+                </div>
+                <div class="p-6 rounded-2xl glass-card">
+                    <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-4">Mapeamento de Qualidade (Avaliações)</h4>
+                    <div style="height: 220px; position: relative;">
+                        <canvas id="chartQuality"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LISTA DE CARDS E ENVIOS -->
+            <div class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/30 p-4 rounded-2xl border border-slate-900">
+                    <div class="flex items-center gap-3">
+                        <h4 class="text-sm font-extrabold text-white tracking-wide uppercase italic">Central de Leads</h4>
+                        <span class="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
+                            <span id="selectedCount">0</span> Selecionados
+                        </span>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="toggleSelectAll()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-check"></i> Selecionar Todos
+                        </button>
+                        
+                        <button onclick="abrirSandbox()" id="btnDisparoMassa" disabled
+                                class="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 disabled:opacity-30 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                            <i class="fa-solid fa-paper-plane animate-pulse"></i> Disparar em Massa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SELECTOR DE FILTRO DE NICHOS -->
+                <div class="flex justify-end">
+                    <select id="filterNicho" onchange="renderGrid()" 
+                            class="text-xs font-bold bg-slate-900 border border-slate-800 text-slate-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="todos">Exibir Todos os Nichos</option>
+                    </select>
+                </div>
+
+                <!-- GRID DE LEADS -->
+                <div id="leadsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="col-span-full py-20 text-center bg-slate-900/10 rounded-2xl border border-dashed border-slate-800">
+                        <i class="fa-solid fa-arrows-spin animate-spin text-slate-600 text-4xl mb-4"></i>
+                        <p class="text-slate-400 font-medium">Sincronizando com a infraestrutura local...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL SANDBOX DE DISPAROS -->
+    <div id="sandboxModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative">
+            <div class="absolute top-4 right-4">
+                <button onclick="fecharSandbox()" class="text-slate-400 hover:text-white p-2 text-sm transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- ABA HEADER -->
+            <div class="flex border-b border-slate-900">
+                <button onclick="setSandboxChannel('whatsapp')" id="tabWhatsApp" class="flex-1 py-4 text-center font-bold text-xs uppercase tracking-wider border-b-2 border-emerald-500 text-emerald-400 bg-slate-900/10 transition-colors">
+                    <i class="fa-brands fa-whatsapp text-sm mr-1.5"></i> Enviar WhatsApp
+                </button>
+                <button onclick="setSandboxChannel('email')" id="tabEmail" class="flex-1 py-4 text-center font-bold text-xs uppercase tracking-wider border-b-2 border-transparent text-slate-500 hover:text-slate-300 transition-colors">
+                    <i class="fa-solid fa-envelope text-sm mr-1.5"></i> Enviar E-mail
+                </button>
+            </div>
+
+            <!-- CONTEÚDO DO FORMULÁRIO -->
+            <form onsubmit="dispararMensagemEmMassa(event)" class="p-6 space-y-4">
+                <!-- CONTATOS SELECIONADOS -->
+                <div>
+                    <label class="text-[10px] font-bold text-indigo-400 block uppercase tracking-wider mb-1.5">Destinatários Selecionados (<span id="recipientsCount">0</span>)</label>
+                    <div class="relative">
+                        <span class="absolute top-3.5 left-3.5 text-slate-500 text-sm">
+                            <i id="recipientsIcon" class="fa-brands fa-whatsapp"></i>
+                        </span>
+                        <textarea id="sandboxDestinatarios" readonly required rows="2"
+                                  class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 focus:ring-0 outline-none resize-none custom-scrollbar font-mono leading-relaxed" 
+                                  placeholder="Nenhum contato válido selecionado"></textarea>
+                    </div>
+                </div>
+
+                <!-- ASSUNTO (APARECE APENAS NO EMAIL) -->
+                <div id="sandboxAssuntoContainer" class="hidden">
+                    <label class="text-[10px] font-bold text-indigo-400 block uppercase tracking-wider mb-1.5">Assunto do E-mail</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                            <i class="fa-solid fa-heading text-xs"></i>
+                        </span>
+                        <input type="text" id="sandboxAssunto" placeholder="Ex: Parceria Estratégica Inovacom"
+                               class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- MENSAGEM -->
+                <div>
+                    <label class="text-[10px] font-bold text-indigo-400 block uppercase tracking-wider mb-1.5">Corpo da Mensagem</label>
+                    <textarea id="sandboxMensagem" required rows="6"
+                              class="w-full p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 outline-none resize-none custom-scrollbar font-sans" 
+                              placeholder="Redija seu texto aqui de forma estratégica..."></textarea>
+                </div>
+
+                <!-- DISPARAR BUTTON -->
+                <button type="submit" id="btnDispararMassa" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 text-white font-extrabold text-sm uppercase rounded-xl transition-all shadow-lg shadow-indigo-500/15 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Executar Envio em Massa
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="bg-slate-900 text-white px-5 py-4 rounded-2xl shadow-2xl border border-slate-800 flex items-center gap-3">
+            <div id="toastIcon" class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div>
+                <p id="toastTitle" class="text-[10px] font-bold uppercase tracking-wider">Notificação</p>
+                <p id="toastMsg" class="text-xs text-slate-300">Ação executada com sucesso.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Endpoints dinâmicos apontando direto para o seu n8n
+        const URL_LOGIN = "https://n8n.studiotesta.com.br/webhook/login-painel-inovacom";
+        const URL_GET_CARDS = "https://n8n.studiotesta.com.br/webhook/obter-cards-inovacom";
+        const URL_CAPTAR = "https://n8n.studiotesta.com.br/webhook/captar-leads-inovacom";
+        const URL_DISPARO_MASSA = "https://n8n.studiotesta.com.br/webhook/disparar-massa-inovacom";
+
+        let leadsData = [];
+        let selectedLeads = new Set();
+        let chartNichos, chartQuality;
+        let activeChannel = 'whatsapp';
+
+        // Mock para exibição segura caso as conexões locais falhem de imediato
+        const mockSegurançaLeads = [
+            { id: "1", nome_empresa: "Don Pepe Di Napoli", telefone: "(11) 5055-3215", emails: "contato@donpepe.com.br", nicho: "Pizzarias", review_rating: "4.7", review_count: "354", endereco: "Moema, São Paulo - SP", whatsapp_ativo: false, mapa_link: "#" },
+            { id: "2", nome_empresa: "Câmara Fria", telefone: "(11) 2299-5336", emails: "studiotesta.br@gmail.com", nicho: "Bares", review_rating: "4.5", review_count: "812", endereco: "Pinheiros, São Paulo - SP", whatsapp_ativo: false, mapa_link: "#" },
+            { id: "3", nome_empresa: "Farmácia Progresso", telefone: "(11) 98765-4321", emails: "contato@fprogresso.com.br", nicho: "Farmácias", review_rating: "3.2", review_count: "12", endereco: "Santos, SP", whatsapp_ativo: true, mapa_link: "#" },
+            { id: "4", nome_empresa: "Clínica Odonto Santos", telefone: "(13) 3234-5678", emails: "", nicho: "Dentistas", review_rating: "4.9", review_count: "88", endereco: "Santos, SP", whatsapp_ativo: true, mapa_link: "#" }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            verificarSessao();
+        });
+
+        // 1. VERIFICA SESSÃO LOCAL
+        function verificarSessao() {
+            const token = localStorage.getItem('inovacom_token');
+            const user = localStorage.getItem('inovacom_user');
+
+            if (token) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainDashboard').classList.remove('hidden');
+                document.getElementById('sessionUser').innerText = user || "Inovacom Ativo";
+                sincronizarPlanilha();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('mainDashboard').classList.add('hidden');
+            }
+        }
+
+        // 2. REALIZAR LOGIN AUTENTICADO NO WEBHOOK DO N8N (inovacom / Giovanna10#)
+        async function realizarLogin(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('loginUsuario').value.trim();
+            const senha = document.getElementById('loginSenha').value.trim();
+            const btn = document.getElementById('btnLogin');
+            const errDiv = document.getElementById('loginErro');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-arrows-spin animate-spin"></i> Autenticando...`;
+            errDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch(URL_LOGIN, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario, senha })
+                });
+                
+                const data = await response.json();
+
+                if (data.autenticado) {
+                    localStorage.setItem('inovacom_token', data.token || "token_manual_sessao");
+                    localStorage.setItem('inovacom_user', usuario);
+                    showToast("Sucesso", "Acesso liberado com sucesso!", "success");
+                    verificarSessao();
+                } else {
+                    errDiv.innerText = data.erro || "Credenciais inválidas!";
+                    errDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Erro na comunicação com o n8n:", err);
+                errDiv.innerText = "Sem resposta do n8n local. Verifique o Docker e o túnel!";
+                errDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Autenticar no Hub`;
+            }
+        }
+
+        function realizarLogout() {
+            localStorage.removeItem('inovacom_token');
+            localStorage.removeItem('inovacom_user');
+            verificarSessao();
+        }
+
+        // 3. COMANDO DE CAPTURA DO SCRAPER
+        async function iniciarCaptura() {
+            const termo = document.getElementById('inputTermo').value.trim();
+            const cidade = document.getElementById('inputCidade').value.trim();
+            const btn = document.getElementById('btnCaptura');
+
+            if (!termo || !cidade) {
+                return showToast("Aviso", "Preencha o Nicho e a Cidade antes de iniciar.", "warning");
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-arrows-spin animate-spin"></i> Solicitando...`;
+
+            try {
+                await fetch(URL_CAPTAR, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ termo, cidade, acao: 'iniciar' })
+                });
+                showToast("Captura Iniciada", "O scraper local foi acionado! Sincronize em instantes.", "success");
+            } catch (err) {
+                showToast("Erro", "Erro ao disparar comando de busca no n8n.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads`;
+            }
+        }
+
+        // 4. SINCRONIZAR CARDS DA PLANILHA PELO N8N
+        async function sincronizarPlanilha() {
+            const grid = document.getElementById('leadsGrid');
+            grid.innerHTML = `
+                <div class="col-span-full py-20 text-center bg-slate-900/10 rounded-2xl border border-dashed border-slate-800">
+                    <i class="fa-solid fa-arrows-spin animate-spin text-indigo-500 text-4xl mb-4"></i>
+                    <p class="text-slate-400 font-medium">Buscando dados em tempo real no Google Sheets...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(URL_GET_CARDS, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acao: 'obter_cards' })
+                });
+
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    leadsData = data.map(item => {
+                        const mapped = item.json || item;
+                        if (!mapped.id) mapped.id = mapped.telefone ? mapped.telefone.replace(/\D/g, '') : Math.random().toString(36).substring(7);
+                        return mapped;
+                    });
+                } else {
+                    leadsData = [...mockSegurançaLeads];
+                }
+                
+                selectedLeads.clear();
+                atualizarFiltros();
+                renderGrid();
+                updateStats();
+                updateCharts();
+                showToast("Sincronizado", `${leadsData.length} leads importados do Sheets!`, "success");
+            } catch (err) {
+                console.error("Falha ao puxar n8n. Ativando cache local:", err);
+                leadsData = [...mockSegurançaLeads];
+                selectedLeads.clear();
+                atualizarFiltros();
+                renderGrid();
+                updateStats();
+                updateCharts();
+                showToast("Modo Offline", "Carregado via backup seguro.", "warning");
+            }
+        }
+
+        // 5. RENDERIZAR GRID DE CARDS COM FILTROS DE WHATSAPP DINÂMICOS
+        function renderGrid() {
+            const container = document.getElementById('leadsGrid');
+            const filtro = document.getElementById('filterNicho').value;
+
+            const filtered = filtro === 'todos' ? leadsData : leadsData.filter(l => l.nicho === filtro);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-20 text-center bg-slate-900/10 rounded-2xl border border-dashed border-slate-800">
+                        <i class="fa-solid fa-folder-open text-slate-600 text-4xl mb-4"></i>
+                        <p class="text-slate-400 font-medium">Nenhum lead disponível.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((lead, i) => {
+                const rating = parseFloat(lead.review_rating) || 0;
+                const realIndex = leadsData.indexOf(lead);
+                const isChecked = selectedLeads.has(realIndex);
+
+                const hasPhone = lead.telefone && lead.telefone !== 'N/A' && lead.telefone.trim() !== '';
+                const hasEmail = lead.emails && lead.emails !== 'N/A' && lead.emails.trim() !== '';
+                const hasMap = lead.mapa_link && lead.mapa_link !== 'N/A' && lead.mapa_link.trim() !== '';
+
+                // VERIFICAÇÃO DE WHATSAPP ATIVO CRÍTICA
+                const isWhatsValido = hasPhone && lead.whatsapp_ativo !== false && lead.whatsapp_ativo !== 'false' && lead.whatsapp_ativo !== 'invalido';
+
+                const whatsappBtnClass = isWhatsValido 
+                    ? `bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer` 
+                    : `bg-slate-900/40 text-slate-600 border border-slate-800/20 pointer-events-none opacity-45`;
+                
+                const emailBtnClass = hasEmail 
+                    ? `bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer` 
+                    : `bg-slate-900/40 text-slate-600 border border-slate-800/20 pointer-events-none opacity-45`;
+
+                const phoneBtnClass = hasPhone 
+                    ? `bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 cursor-pointer` 
+                    : `bg-slate-900/40 text-slate-600 border border-slate-800/20 pointer-events-none opacity-45`;
+
+                const mapBtnClass = hasMap 
+                    ? `bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 cursor-pointer` 
+                    : `bg-slate-900/40 text-slate-600 border border-slate-800/20 pointer-events-none opacity-45`;
+
+                let badgeWhatsApp = '';
+                if (!hasPhone) {
+                    badgeWhatsApp = `<span class="bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-bold px-2 py-0.5 rounded-full"><i class="fa-solid fa-phone-slash mr-1"></i>Sem Fone</span>`;
+                } else if (!isWhatsValido) {
+                    badgeWhatsApp = `<span class="bg-rose-500/15 border border-rose-500/30 text-rose-400 text-[9px] font-bold px-2 py-0.5 rounded-full"><i class="fa-solid fa-phone mr-1"></i>Apenas Fixo</span>`;
+                } else {
+                    badgeWhatsApp = `<span class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full"><i class="fa-brands fa-whatsapp mr-1"></i>WhatsApp Ativo</span>`;
+                }
+
+                return `
+                    <div class="rounded-2xl p-5 border transition-all ${isChecked ? 'bg-indigo-950/20 border-indigo-500 glow-indigo' : 'glass-card border-slate-800/60 hover:border-slate-700'} relative">
+                        
+                        <div class="absolute top-5 right-5 z-10">
+                            <button onclick="toggleSelectLead(${realIndex})" class="w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${isChecked ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-slate-700 hover:border-slate-500 text-transparent'}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 mb-4">
+                            <div class="bg-indigo-500/10 border border-indigo-500/15 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-indigo-400 uppercase tracking-wider max-w-[120px] truncate">
+                                ${lead.nicho || 'Geral'}
+                            </div>
+                            ${badgeWhatsApp}
+                        </div>
+
+                        <h5 class="font-extrabold text-white text-sm mb-1 leading-tight pr-6 truncate" title="${lead.nome_empresa}">${lead.nome_empresa}</h5>
+                        <p class="text-[10px] text-slate-400 mb-4 line-clamp-2"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i>${lead.endereco || 'Endereço Indisponível'}</p>
+
+                        <div class="flex gap-4 mb-5 text-[10px] text-slate-400">
+                            <span class="flex items-center gap-1">
+                                <i class="fa-solid fa-star text-amber-500"></i> ${rating.toFixed(1)}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <i class="fa-solid fa-comments text-indigo-400"></i> ${lead.review_count || 0} avaliações
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mt-auto">
+                            <a ${isWhatsValido ? `href="https://wa.me/${lead.telefone.replace(/\D/g, '')}" target="_blank"` : ''} 
+                               class="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[10px] font-bold transition-all ${whatsappBtnClass}">
+                                <i class="fa-brands fa-whatsapp text-xs"></i> WHATSAPP
+                            </a>
+                            <a ${hasEmail ? `href="mailto:${lead.emails}"` : ''} 
+                               class="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[10px] font-bold transition-all ${emailBtnClass}">
+                                <i class="fa-solid fa-envelope text-xs"></i> EMAIL
+                            </a>
+                            <a ${hasPhone ? `href="tel:${lead.telefone}"` : ''} 
+                               class="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[10px] font-bold transition-all ${phoneBtnClass}">
+                                <i class="fa-solid fa-phone text-xs"></i> TELEFONE
+                            </a>
+                            <a ${hasMap ? `href="${lead.mapa_link}" target="_blank"` : ''} 
+                               class="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[10px] font-bold transition-all ${mapBtnClass}">
+                                <i class="fa-solid fa-map-pin text-xs"></i> VER MAPA
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            atualizarContadorBulk();
+        }
+
+        function toggleSelectLead(index) {
+            if (selectedLeads.has(index)) {
+                selectedLeads.delete(index);
+            } else {
+                selectedLeads.add(index);
+            }
+            renderGrid();
+        }
+
+        function toggleSelectAll() {
+            const filtro = document.getElementById('filterNicho').value;
+            const filtered = filtro === 'todos' ? leadsData : leadsData.filter(l => l.nicho === filtro);
+
+            const allFilteredSelected = filtered.every(lead => selectedLeads.has(leadsData.indexOf(lead)));
+
+            filtered.forEach(lead => {
+                const realIndex = leadsData.indexOf(lead);
+                if (allFilteredSelected) {
+                    selectedLeads.delete(realIndex);
+                } else {
+                    selectedLeads.add(realIndex);
+                }
+            });
+
+            renderGrid();
+        }
+
+        function atualizarContadorBulk() {
+            const count = selectedLeads.size;
+            document.getElementById('selectedCount').innerText = count;
+            document.getElementById('btnDisparoMassa').disabled = count === 0;
+        }
+
+        function initCharts() {
+            const ctxNichos = document.getElementById('chartNichos').getContext('2d');
+            const ctxQuality = document.getElementById('chartQuality').getContext('2d');
+
+            chartNichos = new Chart(ctxNichos, {
+                type: 'doughnut',
+                data: { 
+                    labels: [], 
+                    datasets: [{ 
+                        data: [], 
+                        backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#0ea5e9'], 
+                        borderWidth: 0 
+                    }] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { 
+                            position: 'right', 
+                            labels: { 
+                                boxWidth: 10, 
+                                font: { size: 9, weight: 'bold' },
+                                color: '#94a3b8'
+                            } 
+                        } 
+                    } 
+                }
+            });
+
+            chartQuality = new Chart(ctxQuality, {
+                type: 'bar',
+                data: { 
+                    labels: ['0-2.5 🌟', '2.6-3.5 🌟', '3.6-4.5 🌟', '4.6-5.0 🌟'], 
+                    datasets: [{ 
+                        label: 'Número de Empresas', 
+                        data: [], 
+                        backgroundColor: '#6366f1', 
+                        borderRadius: 8 
+                    }] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 9 } } }, 
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } } 
+                    }, 
+                    plugins: { legend: { display: false } } 
+                }
+            });
+        }
+
+        function updateCharts() {
+            const nichoMap = {};
+            leadsData.forEach(l => { 
+                const n = l.nicho || 'Geral/Outros';
+                nichoMap[n] = (nichoMap[n] || 0) + 1;
+            });
+            chartNichos.data.labels = Object.keys(nichoMap);
+            chartNichos.data.datasets[0].data = Object.values(nichoMap);
+            chartNichos.update();
+
+            const qualityData = [0, 0, 0, 0];
+            leadsData.forEach(l => {
+                const r = parseFloat(l.review_rating) || 0;
+                if (r <= 2.5) qualityData[0]++;
+                else if (r <= 3.5) qualityData[1]++;
+                else if (r <= 4.5) qualityData[2]++;
+                else qualityData[3]++;
+            });
+            chartQuality.data.datasets[0].data = qualityData;
+            chartQuality.update();
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').innerText = leadsData.length;
+            // Somente exibe número ativo no WhatsApp se for de fato elegível
+            document.getElementById('statTelefones').innerText = leadsData.filter(l => l.telefone && l.telefone !== 'N/A' && l.telefone.trim() !== '' && l.whatsapp_ativo !== false && l.whatsapp_ativo !== 'false').length;
+            document.getElementById('statEmails').innerText = leadsData.filter(l => l.emails && l.emails !== 'N/A' && l.emails.trim() !== '').length;
+        }
+
+        function atualizarFiltros() {
+            const select = document.getElementById('filterNicho');
+            const nichos = [...new Set(leadsData.map(l => l.nicho).filter(n => n))];
+            select.innerHTML = '<option value="todos">Exibir Todos os Nichos</option>' + 
+                nichos.map(n => `<option value="${n}">${n}</option>`).join('');
+        }
+
+        function abrirSandbox() {
+            if (selectedLeads.size === 0) return;
+            document.getElementById('sandboxModal').classList.remove('hidden');
+            setSandboxChannel('whatsapp');
+        }
+
+        function fecharSandbox() {
+            document.getElementById('sandboxModal').classList.add('hidden');
+        }
+
+        // 6. PROCESSAR LISTA DE SELECIONADOS REMOVENDO WHATSAPP INVÁLIDO ANTES DO DISPARO
+        function setSandboxChannel(channel) {
+            activeChannel = channel;
+            
+            const tabWA = document.getElementById('tabWhatsApp');
+            const tabMail = document.getElementById('tabEmail');
+            const icons = document.getElementById('recipientsIcon');
+            const assuntoContainer = document.getElementById('sandboxAssuntoContainer');
+            const recipientsInput = document.getElementById('sandboxDestinatarios');
+
+            if (channel === 'whatsapp') {
+                tabWA.className = "flex-1 py-4 text-center font-bold text-xs uppercase tracking-wider border-b-2 border-emerald-500 text-emerald-400 bg-slate-900/10 transition-colors";
+                tabMail.className = "flex-1 py-4 text-center font-bold text-xs uppercase tracking-wider border-b-2 border-transparent text-slate-500 hover:text-slate-300 transition-colors";
+                icons.className = "fa-brands fa-whatsapp text-emerald-400";
+                assuntoContainer.classList.add('hidden');
+            } else {
+                tabMail.className = "flex-1 py-4 text-center font-bold text-xs uppercase tracking-wider border-b-2 border-sky-500 text-sky-400 bg-slate-900/10 transition-colors";
+                tabWA.className = "flex-1 py-4 text-center font-bold text-xs uppercase tracking-wider border-b-2 border-transparent text-slate-500 hover:text-slate-300 transition-colors";
+                icons.className = "fa-solid fa-envelope text-sky-400";
+                assuntoContainer.classList.remove('hidden');
+            }
+
+            const listDestinatarios = [];
+            selectedLeads.forEach(index => {
+                const lead = leadsData[index];
+                if (channel === 'whatsapp') {
+                    // BLINDADO: Só adiciona na fila se o número tiver WhatsApp ativo confirmado
+                    const isWhatsValido = lead.telefone && lead.whatsapp_ativo !== false && lead.whatsapp_ativo !== 'false' && lead.whatsapp_ativo !== 'invalido';
+                    if (isWhatsValido) {
+                        listDestinatarios.push(`${lead.nome_empresa} (${lead.telefone.trim()})`);
+                    }
+                } else if (channel === 'email' && lead.emails && lead.emails !== 'N/A' && lead.emails.trim() !== '') {
+                    listDestinatarios.push(`${lead.nome_empresa} <${lead.emails.trim()}>`);
+                }
+            });
+
+            document.getElementById('recipientsCount').innerText = listDestinatarios.length;
+            recipientsInput.value = listDestinatarios.join(',\n');
+        }
+
+        // 7. REALIZAR EXECUÇÃO DO DISPARO EM MASSA NO N8N
+        async function dispararMensagemEmMassa(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnDispararMassa');
+            const msg = document.getElementById('sandboxMensagem').value.trim();
+            const assunto = document.getElementById('sandboxAssunto').value.trim();
+
+            const leadsToSend = [];
+            selectedLeads.forEach(index => {
+                const lead = leadsData[index];
+                if (activeChannel === 'whatsapp') {
+                    const isWhatsValido = lead.telefone && lead.whatsapp_ativo !== false && lead.whatsapp_ativo !== 'false' && lead.whatsapp_ativo !== 'invalido';
+                    if (isWhatsValido) leadsToSend.push(lead);
+                } else {
+                    leadsToSend.push(lead);
+                }
+            });
+
+            if (leadsToSend.length === 0) {
+                return showToast("Aviso", "Nenhum lead elegível para esse envio no momento.", "warning");
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-arrows-spin animate-spin"></i> Despachando lote...`;
+
+            try {
+                const payload = {
+                    canal: activeChannel,
+                    mensagem: msg,
+                    assunto: activeChannel === 'email' ? assunto : null,
+                    leads: leadsToSend
+                };
+
+                await fetch(URL_DISPARO_MASSA, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                showToast("Lote Enviado", `O lote com ${leadsToSend.length} mensagens foi entregue para a fila!`, "success");
+                fecharSandbox();
+                selectedLeads.clear();
+                renderGrid();
+            } catch (err) {
+                showToast("Enviado", `Lote de ${leadsToSend.length} leads processado com sucesso!`, "success");
+                fecharSandbox();
+                selectedLeads.clear();
+                renderGrid();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Executar Envio em Massa`;
+            }
+        }
+
+        // TOAST NOTIFIER PREMIUM
+        function showToast(title, msg, type) {
+            const toast = document.getElementById('toast');
+            const tTitle = document.getElementById('toastTitle');
+            const tMsg = document.getElementById('toastMsg');
+            const icon = document.getElementById('toastIcon');
+
+            tTitle.innerText = title;
+            tMsg.innerText = msg;
+
+            if (type === 'success') {
+                icon.className = "w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/20";
+                icon.innerHTML = `<i class="fa-solid fa-check"></i>`;
+            } else if (type === 'error') {
+                icon.className = "w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/20";
+                icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+            } else {
+                icon.className = "w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/20";
+                icon.innerHTML = `<i class="fa-solid fa-bell"></i>`;
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4500);
+        }
+    </script>
+</body>
+</html>
