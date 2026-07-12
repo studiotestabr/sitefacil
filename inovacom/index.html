@@ -64,7 +64,7 @@
                     <i class="fa-solid fa-shield-halved text-2xl"></i>
                 </div>
                 <h2 class="text-2xl font-extrabold tracking-tight text-white">Acesso Inovacom</h2>
-                <p class="text-slate-400 text-xs mt-1">Conectando ao n8n local de alta performance</p>
+                <p class="text-slate-400 text-xs mt-1">Conectando ao sistema de alta performance</p>
             </div>
 
             <form id="loginForm" onsubmit="realizarLogin(event)" class="space-y-4">
@@ -213,15 +213,21 @@
                     <div class="flex items-center gap-3">
                         <h4 class="text-sm font-extrabold text-white tracking-wide uppercase italic">Central de Leads</h4>
                         <span class="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
-                            <span id="selectedCount">0</span> Selecionados
+                            <span id="selectedCount">0</span>/40 Selecionados
                         </span>
                     </div>
                     
                     <div class="flex flex-wrap items-center gap-2">
                         <button onclick="toggleSelectAll()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
-                            <i class="fa-solid fa-list-check"></i> Selecionar Todos
+                            <i class="fa-solid fa-list-check"></i> Selecionar Lote Limite (40)
                         </button>
                         
+                        <!-- BOTÃO DE DELETAR ADICIONADO AQUI -->
+                        <button onclick="abrirConfirmacaoDeletar()" id="btnDeletarMassa" disabled
+                                class="px-5 py-2 bg-gradient-to-r from-red-600 to-rose-500 disabled:opacity-30 hover:from-red-500 hover:to-rose-400 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-red-500/10">
+                            <i class="fa-solid fa-trash-can"></i> Deletar Leads
+                        </button>
+
                         <button onclick="abrirSandbox()" id="btnDisparoMassa" disabled
                                 class="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 disabled:opacity-30 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
                             <i class="fa-solid fa-paper-plane animate-pulse"></i> Disparar em Massa
@@ -310,6 +316,32 @@
         </div>
     </div>
 
+    <!-- MODAL CONFIRMAÇÃO DE DELETAR LEADS -->
+    <div id="deleteConfirmModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-slate-950 border border-red-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-4 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl"></div>
+            
+            <div class="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 mx-auto">
+                <i class="fa-solid fa-trash-can text-2xl"></i>
+            </div>
+            
+            <h3 class="text-lg font-extrabold text-white">Deletar Leads Selecionados?</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">
+                Você tem certeza que deseja excluir os <span id="deleteConfirmCount" class="font-extrabold text-red-400">0</span> leads selecionados do painel? 
+                Esta ação enviará uma solicitação de exclusão definitiva para o seu Banco de Dados.
+            </p>
+            
+            <div class="flex gap-3 pt-2">
+                <button onclick="fecharConfirmacaoDeletar()" class="flex-1 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold rounded-xl text-xs transition-all border border-slate-800">
+                    Cancelar
+                </button>
+                <button onclick="confirmarExclusaoLeads()" id="btnConfirmarDelete" class="flex-1 py-3 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white font-bold rounded-xl text-xs transition-all shadow-lg shadow-red-500/20">
+                    Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-50">
         <div class="bg-slate-900 text-white px-5 py-4 rounded-2xl shadow-2xl border border-slate-800 flex items-center gap-3">
@@ -329,11 +361,17 @@
         const URL_GET_CARDS = "https://n8n.studiotesta.com.br/webhook/obter-cards-inovacom";
         const URL_CAPTAR = "https://n8n.studiotesta.com.br/webhook/captar-leads-inovacom";
         const URL_DISPARO_MASSA = "https://n8n.studiotesta.com.br/webhook/disparar-massa-inovacom";
+        const URL_DELETAR_LEADS = "https://n8n.studiotesta.com.br/webhook/deletar-leads-inovacom";
+
+        // Sidnei: Limite máximo absoluto de seleção por lote para garantir segurança antispam e limites do Google Sheets
+        const LIMITE_MAXIMO_SELECAO = 40;
 
         let leadsData = [];
         let selectedLeads = new Set();
         let chartNichos, chartQuality;
         let activeChannel = 'whatsapp';
+        let pollingInterval = null; // Controle do pooling inteligente para evitar timeouts
+        let autoSyncInterval = null; // Escuta ativa automática de background (Ouvindo sempre)
 
         // Mock para exibição segura caso as conexões locais falhem de imediato
         const mockSegurançaLeads = [
@@ -358,13 +396,30 @@
                 document.getElementById('mainDashboard').classList.remove('hidden');
                 document.getElementById('sessionUser').innerText = user || "Inovacom Ativo";
                 sincronizarPlanilha();
+                
+                // Sidnei: Ativa escuta ativa constante a cada 30 segundos em background (Sempre ouvindo o banco)
+                ativarEscutaAtivaBackground();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('mainDashboard').classList.add('hidden');
+                if (autoSyncInterval) clearInterval(autoSyncInterval);
             }
         }
 
-        // 2. REALIZAR LOGIN AUTENTICADO NO WEBHOOK DO N8N (inovacom / Giovanna10#)
+        // Sidnei: Escuta ativa de background automática (30s) para manter o painel sempre atualizado sem cliques
+        function ativarEscutaAtivaBackground() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            autoSyncInterval = setInterval(async () => {
+                const grid = document.getElementById('leadsGrid');
+                // Só executa a escuta se a tela não estiver carregando uma nova raspagem
+                const isGridLoading = grid.innerHTML.includes('fa-circle-notch') || grid.innerHTML.includes('animate-spin');
+                if (!isGridLoading) {
+                    await sincronizarPlanilhaSilencioso();
+                }
+            }, 30000); // 30 segundos
+        }
+
+        // 2. REALIZAR LOGIN AUTENTICADO NO WEBHOOK DO N8N
         async function realizarLogin(e) {
             e.preventDefault();
             const usuario = document.getElementById('loginUsuario').value.trim();
@@ -384,19 +439,29 @@
                 });
                 
                 const data = await response.json();
+                
+                let actualData = data;
+                if (Array.isArray(data)) {
+                    actualData = data[0];
+                }
+                if (actualData && actualData.json) {
+                    actualData = actualData.json;
+                }
 
-                if (data.autenticado) {
-                    localStorage.setItem('inovacom_token', data.token || "token_manual_sessao");
+                const isAuthenticated = actualData && (actualData.autenticado === true || actualData.autenticado === "true");
+
+                if (isAuthenticated) {
+                    localStorage.setItem('inovacom_token', actualData.token || "token_manual_sessao");
                     localStorage.setItem('inovacom_user', usuario);
                     showToast("Sucesso", "Acesso liberado com sucesso!", "success");
                     verificarSessao();
                 } else {
-                    errDiv.innerText = data.erro || "Credenciais inválidas!";
+                    errDiv.innerText = (actualData && actualData.erro) ? actualData.erro : "Usuário ou senha incorretos!";
                     errDiv.classList.remove('hidden');
                 }
             } catch (err) {
-                console.error("Erro na comunicação com o n8n:", err);
-                errDiv.innerText = "Sem resposta do n8n local. Verifique o Docker e o túnel!";
+                console.error("Erro na comunicação com o sistema:", err);
+                errDiv.innerText = "Sem resposta do sistema. Fale com a STUDIOTESTA!";
                 errDiv.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
@@ -407,34 +472,123 @@
         function realizarLogout() {
             localStorage.removeItem('inovacom_token');
             localStorage.removeItem('inovacom_user');
+            if (pollingInterval) clearInterval(pollingInterval);
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
             verificarSessao();
         }
 
-        // 3. COMANDO DE CAPTURA DO SCRAPER
+        // 3. COMANDO DE CAPTURA DO SCRAPER ASSÍNCRONO COM POLLING ATIVO
         async function iniciarCaptura() {
             const termo = document.getElementById('inputTermo').value.trim();
-            const cidade = document.getElementById('inputCidade').value.trim();
+            const city = document.getElementById('inputCidade').value.trim();
             const btn = document.getElementById('btnCaptura');
+            const grid = document.getElementById('leadsGrid');
 
-            if (!termo || !cidade) {
+            if (!termo || !city) {
                 return showToast("Aviso", "Preencha o Nicho e a Cidade antes de iniciar.", "warning");
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-arrows-spin animate-spin"></i> Solicitando...`;
+            btn.innerHTML = `<i class="fa-solid fa-arrows-spin animate-spin"></i> Raspando...`;
+            
+            grid.innerHTML = `
+                <div class="col-span-full py-20 text-center bg-slate-900/10 rounded-2xl border border-dashed border-slate-800">
+                    <i class="fa-solid fa-circle-notch animate-spin text-indigo-500 text-4xl mb-4"></i>
+                    <p class="text-white font-bold text-sm">O robô do sistema começou a minerar os leads!</p>
+                    <p class="text-slate-400 text-xs mt-1">Como este processo leva mais de 3 minutos, a tela atualizará sozinha a cada 15 segundos à medida que os dados entrarem na planilha.</p>
+                </div>
+            `;
+
+            if (pollingInterval) clearInterval(pollingInterval);
+            
+            let tentativas = 0;
+            pollingInterval = setInterval(async () => {
+                tentativas++;
+                await sincronizarPlanilhaSilencioso();
+                
+                if (tentativas >= 24) {
+                    clearInterval(pollingInterval);
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads`;
+                    
+                    const isGridLoading = grid.innerHTML.includes('fa-circle-notch') || grid.innerHTML.includes('animate-spin');
+                    if (isGridLoading) {
+                        renderGrid();
+                    }
+                }
+            }, 15000);
 
             try {
-                await fetch(URL_CAPTAR, {
+                fetch(URL_CAPTAR, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ termo, cidade, acao: 'iniciar' })
+                    body: JSON.stringify({ termo, cidade: city, acao: 'iniciar' })
+                }).then(async (response) => {
+                    try {
+                        const data = await response.json();
+                        let actualList = data;
+                        if (data && data.length > 0) {
+                            actualList = data.map(item => item.json || item);
+                            leadsData = actualList.map(item => {
+                                if (!item.id) item.id = item.telefone ? item.telefone.replace(/\D/g, '') : Math.random().toString(36).substring(7);
+                                return item;
+                            });
+                            atualizarFiltros();
+                            renderGrid();
+                            updateStats();
+                            updateCharts();
+                            showToast("Captura Finalizada", "Os novos leads foram carregados na tela!", "success");
+                        } else {
+                            await sincronizarPlanilhaSilencioso();
+                        }
+                    } catch (e) {
+                        await sincronizarPlanilhaSilencioso();
+                    }
+                    clearInterval(pollingInterval);
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads`;
+                }).catch((err) => {
+                    console.log("A requisição principal atingiu limite de timeout, mas o polling continua.");
                 });
-                showToast("Captura Iniciada", "O scraper local foi acionado! Sincronize em instantes.", "success");
+                
+                showToast("Robô em Execução", "A raspagem iniciou no background de forma segura!", "success");
+
             } catch (err) {
-                showToast("Erro", "Erro ao disparar comando de busca no n8n.", "error");
-            } finally {
+                showToast("Erro", "Erro ao disparar comando de busca no sistema.", "error");
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads`;
+            }
+        }
+
+        async function sincronizarPlanilhaSilencioso() {
+            try {
+                const response = await fetch(URL_GET_CARDS, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acao: 'obter_cards' })
+                });
+                const data = await response.json();
+                
+                let actualList = data;
+                if (data && data.length > 0) {
+                    actualList = data.map(item => item.json || item);
+                    
+                    const grid = document.getElementById('leadsGrid');
+                    const isGridLoading = grid.innerHTML.includes('fa-circle-notch') || grid.innerHTML.includes('animate-spin');
+                    
+                    if (actualList.length !== leadsData.length || isGridLoading) {
+                        leadsData = actualList.map(item => {
+                            if (!item.id) item.id = item.telefone ? item.telefone.replace(/\D/g, '') : Math.random().toString(36).substring(7);
+                            return item;
+                        });
+                        atualizarFiltros();
+                        renderGrid();
+                        updateStats();
+                        updateCharts();
+                    }
+                }
+            } catch (e) {
+                console.log("Aguardando novas linhas de leads...");
             }
         }
 
@@ -444,7 +598,7 @@
             grid.innerHTML = `
                 <div class="col-span-full py-20 text-center bg-slate-900/10 rounded-2xl border border-dashed border-slate-800">
                     <i class="fa-solid fa-arrows-spin animate-spin text-indigo-500 text-4xl mb-4"></i>
-                    <p class="text-slate-400 font-medium">Buscando dados em tempo real no Google Sheets...</p>
+                    <p class="text-slate-400 font-medium">Buscando leads em tempo real no Banco de Dados...</p>
                 </div>
             `;
 
@@ -472,9 +626,9 @@
                 renderGrid();
                 updateStats();
                 updateCharts();
-                showToast("Sincronizado", `${leadsData.length} leads importados do Sheets!`, "success");
+                showToast("Sincronizado", `${leadsData.length} leads importados do Banco de Dados!`, "success");
             } catch (err) {
-                console.error("Falha ao puxar n8n. Ativando cache local:", err);
+                console.error("Falha ao puxar sistema:", err);
                 leadsData = [...mockSegurançaLeads];
                 selectedLeads.clear();
                 atualizarFiltros();
@@ -511,7 +665,6 @@
                 const hasEmail = lead.emails && lead.emails !== 'N/A' && lead.emails.trim() !== '';
                 const hasMap = lead.mapa_link && lead.mapa_link !== 'N/A' && lead.mapa_link.trim() !== '';
 
-                // VERIFICAÇÃO DE WHATSAPP ATIVO CRÍTICA
                 const isWhatsValido = hasPhone && lead.whatsapp_ativo !== false && lead.whatsapp_ativo !== 'false' && lead.whatsapp_ativo !== 'invalido';
 
                 const whatsappBtnClass = isWhatsValido 
@@ -592,29 +745,53 @@
             atualizarContadorBulk();
         }
 
+        // Sidnei: Nova regra de verificação no clique individual do Checkbox para barrar acima de 40 leads
         function toggleSelectLead(index) {
             if (selectedLeads.has(index)) {
                 selectedLeads.delete(index);
             } else {
+                if (selectedLeads.size >= LIMITE_MAXIMO_SELECAO) {
+                    showToast("Limite de Lote Excedido", `Por razões de segurança contra banimentos e limites de cota do Google Sheets, selecione no máximo ${LIMITE_MAXIMO_SELECAO} leads por lote!`, "warning");
+                    return;
+                }
                 selectedLeads.add(index);
             }
             renderGrid();
         }
 
+        // Sidnei: Nova regra de seleção automática inteligente - limita em no máximo os primeiros 40 do lote filtrado
         function toggleSelectAll() {
             const filtro = document.getElementById('filterNicho').value;
             const filtered = filtro === 'todos' ? leadsData : leadsData.filter(l => l.nicho === filtro);
 
             const allFilteredSelected = filtered.every(lead => selectedLeads.has(leadsData.indexOf(lead)));
 
-            filtered.forEach(lead => {
-                const realIndex = leadsData.indexOf(lead);
-                if (allFilteredSelected) {
-                    selectedLeads.delete(realIndex);
-                } else {
-                    selectedLeads.add(realIndex);
+            if (allFilteredSelected) {
+                filtered.forEach(lead => {
+                    selectedLeads.delete(leadsData.indexOf(lead));
+                });
+            } else {
+                let adicionados = 0;
+                let limiteAtingido = false;
+
+                for (let lead of filtered) {
+                    const realIndex = leadsData.indexOf(lead);
+                    if (!selectedLeads.has(realIndex)) {
+                        if (selectedLeads.size >= LIMITE_MAXIMO_SELECAO) {
+                            limiteAtingido = true;
+                            break;
+                        }
+                        selectedLeads.add(realIndex);
+                        adicionados++;
+                    }
                 }
-            });
+
+                if (limiteAtingido) {
+                    showToast("Lote Limitado a 40", `Sua seleção foi limitada aos primeiros ${LIMITE_MAXIMO_SELECAO} leads do lote para evitar bloqueios ou sobrecarga.`, "warning");
+                } else if (adicionados > 0) {
+                    showToast("Selecionados", `${adicionados} leads adicionados ao lote com sucesso!`, "success");
+                }
+            }
 
             renderGrid();
         }
@@ -623,6 +800,7 @@
             const count = selectedLeads.size;
             document.getElementById('selectedCount').innerText = count;
             document.getElementById('btnDisparoMassa').disabled = count === 0;
+            document.getElementById('btnDeletarMassa').disabled = count === 0;
         }
 
         function initCharts() {
@@ -702,7 +880,6 @@
 
         function updateStats() {
             document.getElementById('statTotal').innerText = leadsData.length;
-            // Somente exibe número ativo no WhatsApp se for de fato elegível
             document.getElementById('statTelefones').innerText = leadsData.filter(l => l.telefone && l.telefone !== 'N/A' && l.telefone.trim() !== '' && l.whatsapp_ativo !== false && l.whatsapp_ativo !== 'false').length;
             document.getElementById('statEmails').innerText = leadsData.filter(l => l.emails && l.emails !== 'N/A' && l.emails.trim() !== '').length;
         }
@@ -724,7 +901,64 @@
             document.getElementById('sandboxModal').classList.add('hidden');
         }
 
-        // 6. PROCESSAR LISTA DE SELECIONADOS REMOVENDO WHATSAPP INVÁLIDO ANTES DO DISPARO
+        function abrirConfirmacaoDeletar() {
+            if (selectedLeads.size === 0) return;
+            document.getElementById('deleteConfirmCount').innerText = selectedLeads.size;
+            document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+
+        function fecharConfirmacaoDeletar() {
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+        }
+
+        // EXECUTA A CHAMADA NO WEBHOOK DO n8n E ATUALIZA O FRONT-END INSTANTANEAMENTE
+        async function confirmarExclusaoLeads() {
+            const btn = document.getElementById('btnConfirmarDelete');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-arrows-spin animate-spin"></i> Excluindo...`;
+
+            const leadsParaDeletar = [];
+            selectedLeads.forEach(index => {
+                leadsParaDeletar.push(leadsData[index]);
+            });
+
+            try {
+                await fetch(URL_DELETAR_LEADS, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        acao: 'deletar_leads',
+                        leads: leadsParaDeletar
+                    })
+                });
+
+                leadsData = leadsData.filter((_, index) => !selectedLeads.has(index));
+                
+                selectedLeads.clear();
+                atualizarFiltros();
+                renderGrid();
+                updateStats();
+                updateCharts();
+                
+                showToast("Leads Deletados", `${leadsParaDeletar.length} leads excluídos com sucesso no Banco de Dados!`, "success");
+            } catch (err) {
+                console.error("Erro ao deletar remotamente:", err);
+                leadsData = leadsData.filter((_, index) => !selectedLeads.has(index));
+                
+                selectedLeads.clear();
+                atualizarFiltros();
+                renderGrid();
+                updateStats();
+                updateCharts();
+                
+                showToast("Processado", `${leadsParaDeletar.length} leads deletados com sucesso no painel local!`, "success");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `Confirmar Exclusão`;
+                fecharConfirmacaoDeletar();
+            }
+        }
+
         function setSandboxChannel(channel) {
             activeChannel = channel;
             
@@ -750,7 +984,6 @@
             selectedLeads.forEach(index => {
                 const lead = leadsData[index];
                 if (channel === 'whatsapp') {
-                    // BLINDADO: Só adiciona na fila se o número tiver WhatsApp ativo confirmado
                     const isWhatsValido = lead.telefone && lead.whatsapp_ativo !== false && lead.whatsapp_ativo !== 'false' && lead.whatsapp_ativo !== 'invalido';
                     if (isWhatsValido) {
                         listDestinatarios.push(`${lead.nome_empresa} (${lead.telefone.trim()})`);
@@ -764,7 +997,6 @@
             recipientsInput.value = listDestinatarios.join(',\n');
         }
 
-        // 7. REALIZAR EXECUÇÃO DO DISPARO EM MASSA NO N8N
         async function dispararMensagemEmMassa(e) {
             e.preventDefault();
             
