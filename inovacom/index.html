@@ -222,7 +222,7 @@
                             <i class="fa-solid fa-list-check"></i> Selecionar Lote Limite (40)
                         </button>
                         
-                        <!-- BOTÃO DE DELETAR ADICIONADO AQUI -->
+                        <!-- BOTÃO DE DELETAR -->
                         <button onclick="abrirConfirmacaoDeletar()" id="btnDeletarMassa" disabled
                                 class="px-5 py-2 bg-gradient-to-r from-red-600 to-rose-500 disabled:opacity-30 hover:from-red-500 hover:to-rose-400 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-red-500/10">
                             <i class="fa-solid fa-trash-can"></i> Deletar Leads
@@ -371,14 +371,13 @@
         let chartNichos, chartQuality;
         let activeChannel = 'whatsapp';
         let pollingInterval = null; // Controle do pooling inteligente para evitar timeouts
-        let autoSyncInterval = null; // Escuta ativa automática de background (Ouvindo sempre)
 
         // Mock para exibição segura caso as conexões locais falhem de imediato
         const mockSegurançaLeads = [
-            { id: "1", nome_empresa: "Don Pepe Di Napoli", telefone: "(11) 5055-3215", emails: "contato@donpepe.com.br", nicho: "Pizzarias", review_rating: "4.7", review_count: "354", endereco: "Moema, São Paulo - SP", whatsapp_ativo: false, mapa_link: "#" },
+            { id: "1", nome_empresa: "Don Pepe Di Napoli", telefone: "(11) 5055-3215", emails: "contato@donpepe.com.br", nicho: "Pizzarias", review_rating: "4.7", review_count: "354", endereco: "Moema, São Paulo - SP", whatsapp_ativo: false, mapa_link: "#", "Status Envio": "Proposta enviada Por Whatsapp" },
             { id: "2", nome_empresa: "Câmara Fria", telefone: "(11) 2299-5336", emails: "studiotesta.br@gmail.com", nicho: "Bares", review_rating: "4.5", review_count: "812", endereco: "Pinheiros, São Paulo - SP", whatsapp_ativo: false, mapa_link: "#" },
             { id: "3", nome_empresa: "Farmácia Progresso", telefone: "(11) 98765-4321", emails: "contato@fprogresso.com.br", nicho: "Farmácias", review_rating: "3.2", review_count: "12", endereco: "Santos, SP", whatsapp_ativo: true, mapa_link: "#" },
-            { id: "4", nome_empresa: "Clínica Odonto Santos", telefone: "(13) 3234-5678", emails: "", nicho: "Dentistas", review_rating: "4.9", review_count: "88", endereco: "Santos, SP", whatsapp_ativo: true, mapa_link: "#" }
+            { id: "4", nome_empresa: "Clínica Odonto Santos", telefone: "(13) 3234-5678", emails: "", nicho: "Dentistas", review_rating: "4.9", review_count: "88", endereco: "Santos, SP", whatsapp_ativo: true, mapa_link: "#", "Status Envio": "Proposta enviada por email" }
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -396,27 +395,10 @@
                 document.getElementById('mainDashboard').classList.remove('hidden');
                 document.getElementById('sessionUser').innerText = user || "Inovacom Ativo";
                 sincronizarPlanilha();
-                
-                // Sidnei: Ativa escuta ativa constante a cada 30 segundos em background (Sempre ouvindo o banco)
-                ativarEscutaAtivaBackground();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('mainDashboard').classList.add('hidden');
-                if (autoSyncInterval) clearInterval(autoSyncInterval);
             }
-        }
-
-        // Sidnei: Escuta ativa de background automática (30s) para manter o painel sempre atualizado sem cliques
-        function ativarEscutaAtivaBackground() {
-            if (autoSyncInterval) clearInterval(autoSyncInterval);
-            autoSyncInterval = setInterval(async () => {
-                const grid = document.getElementById('leadsGrid');
-                // Só executa a escuta se a tela não estiver carregando uma nova raspagem
-                const isGridLoading = grid.innerHTML.includes('fa-circle-notch') || grid.innerHTML.includes('animate-spin');
-                if (!isGridLoading) {
-                    await sincronizarPlanilhaSilencioso();
-                }
-            }, 30000); // 30 segundos
         }
 
         // 2. REALIZAR LOGIN AUTENTICADO NO WEBHOOK DO N8N
@@ -473,11 +455,10 @@
             localStorage.removeItem('inovacom_token');
             localStorage.removeItem('inovacom_user');
             if (pollingInterval) clearInterval(pollingInterval);
-            if (autoSyncInterval) clearInterval(autoSyncInterval);
             verificarSessao();
         }
 
-        // 3. COMANDO DE CAPTURA DO SCRAPER ASSÍNCRONO COM POLLING ATIVO
+        // 3. COMANDO DE CAPTURA DO SCRAPER INTELIGENTE (SEM FLOODAR O N8N)
         async function iniciarCaptura() {
             const termo = document.getElementById('inputTermo').value.trim();
             const city = document.getElementById('inputCidade').value.trim();
@@ -495,71 +476,67 @@
                 <div class="col-span-full py-20 text-center bg-slate-900/10 rounded-2xl border border-dashed border-slate-800">
                     <i class="fa-solid fa-circle-notch animate-spin text-indigo-500 text-4xl mb-4"></i>
                     <p class="text-white font-bold text-sm">O robô do sistema começou a minerar os leads!</p>
-                    <p class="text-slate-400 text-xs mt-1">Como este processo leva mais de 3 minutos, a tela atualizará sozinha a cada 15 segundos à medida que os dados entrarem na planilha.</p>
+                    <p class="text-slate-400 text-xs mt-1">Como este processo leva tempo, o painel atualizará inteligentemente de 30 em 30 segundos até o fim da raspagem.</p>
                 </div>
             `;
 
+            // Limpa qualquer polling pendente
             if (pollingInterval) clearInterval(pollingInterval);
             
-            let tentativas = 0;
+            // Sidnei: Iniciamos a busca e configuramos um Polling Otimizado (30 segundos) que é destruído no final
             pollingInterval = setInterval(async () => {
-                tentativas++;
                 await sincronizarPlanilhaSilencioso();
-                
-                if (tentativas >= 24) {
-                    clearInterval(pollingInterval);
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads`;
-                    
-                    const isGridLoading = grid.innerHTML.includes('fa-circle-notch') || grid.innerHTML.includes('animate-spin');
-                    if (isGridLoading) {
-                        renderGrid();
-                    }
-                }
-            }, 15000);
+            }, 30000); 
 
             try {
-                fetch(URL_CAPTAR, {
+                // Dispara a chamada principal de raspagem
+                const response = await fetch(URL_CAPTAR, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ termo, cidade: city, acao: 'iniciar' })
-                }).then(async (response) => {
-                    try {
-                        const data = await response.json();
-                        let actualList = data;
-                        if (data && data.length > 0) {
-                            actualList = data.map(item => item.json || item);
-                            leadsData = actualList.map(item => {
-                                if (!item.id) item.id = item.telefone ? item.telefone.replace(/\D/g, '') : Math.random().toString(36).substring(7);
-                                return item;
-                            });
-                            atualizarFiltros();
-                            renderGrid();
-                            updateStats();
-                            updateCharts();
-                            showToast("Captura Finalizada", "Os novos leads foram carregados na tela!", "success");
-                        } else {
-                            await sincronizarPlanilhaSilencioso();
-                        }
-                    } catch (e) {
-                        await sincronizarPlanilhaSilencioso();
-                    }
-                    clearInterval(pollingInterval);
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads`;
-                }).catch((err) => {
-                    console.log("A requisição principal atingiu limite de timeout, mas o polling continua.");
                 });
                 
-                showToast("Robô em Execução", "A raspagem iniciou no background de forma segura!", "success");
+                const data = await response.json();
+                
+                // Sidnei: A raspagem finalizou no n8n! Destruímos o Polling IMEDIATAMENTE
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+
+                let actualList = data;
+                if (data && data.length > 0) {
+                    actualList = data.map(item => item.json || item);
+                    leadsData = actualList.map(item => {
+                        if (!item.id) item.id = item.telefone ? item.telefone.replace(/\D/g, '') : Math.random().toString(36).substring(7);
+                        return item;
+                    });
+                    atualizarFiltros();
+                    renderGrid();
+                    updateStats();
+                    updateCharts();
+                    showToast("Captura Finalizada", "Todos os leads foram minerados e organizados com sucesso!", "success");
+                } else {
+                    // Força uma sincronização final limpa para fechar o processo
+                    await sincronizarPlanilhaSilencioso();
+                    showToast("Sucesso", "Painel atualizado com os novos dados!", "success");
+                }
 
             } catch (err) {
-                showToast("Erro", "Erro ao disparar comando de busca no sistema.", "error");
+                console.log("Erro na resposta direta ou timeout, garantindo sincronização final...");
+                await sincronizarPlanilhaSilencioso();
+            } finally {
+                // Sidnei: Garante que limpamos o loop e reativamos o botão de busca
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Leads`;
             }
         }
 
+        // Sidnei: Sincronização silenciosa e polida de segurança
         async function sincronizarPlanilhaSilencioso() {
             try {
                 const response = await fetch(URL_GET_CARDS, {
@@ -588,11 +565,11 @@
                     }
                 }
             } catch (e) {
-                console.log("Aguardando novas linhas de leads...");
+                console.log("Aguardando carregamento da planilha...");
             }
         }
 
-        // 4. SINCRONIZAR CARDS DA PLANILHA PELO N8N
+        // 4. SINCRONIZAR CARDS DA PLANILHA PELO N8N (Disparado Manualmente ou no Login)
         async function sincronizarPlanilha() {
             const grid = document.getElementById('leadsGrid');
             grid.innerHTML = `
@@ -626,7 +603,7 @@
                 renderGrid();
                 updateStats();
                 updateCharts();
-                showToast("Sincronizado", `${leadsData.length} leads importados do Banco de Dados!`, "success");
+                showToast("Sincronizado", `${leadsData.length} leads importados com sucesso!`, "success");
             } catch (err) {
                 console.error("Falha ao puxar sistema:", err);
                 leadsData = [...mockSegurançaLeads];
@@ -692,32 +669,56 @@
                     badgeWhatsApp = `<span class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full"><i class="fa-brands fa-whatsapp mr-1"></i>WhatsApp Ativo</span>`;
                 }
 
+                // Sidnei: Tratando a marcação visual do "Status Envio" que o n8n cospe direto da planilha de forma ultra premium!
+                const statusEnvio = lead['Status Envio'] || lead['status_envio'] || '';
+                let badgeStatusEnvio = '';
+                
+                if (statusEnvio) {
+                    const sLower = statusEnvio.toLowerCase();
+                    if (sLower.includes('whatsapp') || sLower.includes('whats')) {
+                        badgeStatusEnvio = `<span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0"><i class="fa-brands fa-whatsapp"></i> Prop. Enviada</span>`;
+                    } else if (sLower.includes('email') || sLower.includes('e-mail')) {
+                        badgeStatusEnvio = `<span class="bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0"><i class="fa-solid fa-envelope"></i> Prop. Enviada</span>`;
+                    } else {
+                        badgeStatusEnvio = `<span class="bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0"><i class="fa-solid fa-paper-plane"></i> ${statusEnvio}</span>`;
+                    }
+                }
+
+                // Sidnei: Define a classe do Card destacando suavemente os que já foram disparados com uma borda verde
+                const cardBorderClass = isChecked 
+                    ? 'bg-indigo-950/20 border-indigo-500 glow-indigo' 
+                    : (statusEnvio 
+                        ? 'glass-card border-emerald-500/20 hover:border-emerald-500/40 bg-emerald-950/10' 
+                        : 'glass-card border-slate-800/60 hover:border-slate-700');
+
                 return `
-                    <div class="rounded-2xl p-5 border transition-all ${isChecked ? 'bg-indigo-950/20 border-indigo-500 glow-indigo' : 'glass-card border-slate-800/60 hover:border-slate-700'} relative">
-                        
-                        <div class="absolute top-5 right-5 z-10">
-                            <button onclick="toggleSelectLead(${realIndex})" class="w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${isChecked ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-slate-700 hover:border-slate-500 text-transparent'}">
-                                <i class="fa-solid fa-check text-xs"></i>
-                            </button>
-                        </div>
-
-                        <div class="flex flex-wrap items-center gap-2 mb-4">
-                            <div class="bg-indigo-500/10 border border-indigo-500/15 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-indigo-400 uppercase tracking-wider max-w-[120px] truncate">
-                                ${lead.nicho || 'Geral'}
+                    <div class="rounded-2xl p-5 border transition-all ${cardBorderClass} relative flex flex-col justify-between">
+                        <div>
+                            <div class="absolute top-5 right-5 z-10">
+                                <button onclick="toggleSelectLead(${realIndex})" class="w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${isChecked ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-slate-700 hover:border-slate-500 text-transparent'}">
+                                    <i class="fa-solid fa-check text-xs"></i>
+                                </button>
                             </div>
-                            ${badgeWhatsApp}
-                        </div>
 
-                        <h5 class="font-extrabold text-white text-sm mb-1 leading-tight pr-6 truncate" title="${lead.nome_empresa}">${lead.nome_empresa}</h5>
-                        <p class="text-[10px] text-slate-400 mb-4 line-clamp-2"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i>${lead.endereco || 'Endereço Indisponível'}</p>
+                            <div class="flex flex-wrap items-center gap-1.5 mb-4">
+                                <div class="bg-indigo-500/10 border border-indigo-500/15 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-indigo-400 uppercase tracking-wider max-w-[120px] truncate">
+                                    ${lead.nicho || 'Geral'}
+                                </div>
+                                ${badgeWhatsApp}
+                                ${badgeStatusEnvio}
+                            </div>
 
-                        <div class="flex gap-4 mb-5 text-[10px] text-slate-400">
-                            <span class="flex items-center gap-1">
-                                <i class="fa-solid fa-star text-amber-500"></i> ${rating.toFixed(1)}
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fa-solid fa-comments text-indigo-400"></i> ${lead.review_count || 0} avaliações
-                            </span>
+                            <h5 class="font-extrabold text-white text-sm mb-1 leading-tight pr-6 truncate" title="${lead.nome_empresa}">${lead.nome_empresa}</h5>
+                            <p class="text-[10px] text-slate-400 mb-4 line-clamp-2"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i>${lead.endereco || 'Endereço Indisponível'}</p>
+
+                            <div class="flex gap-4 mb-5 text-[10px] text-slate-400">
+                                <span class="flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-amber-500"></i> ${rating.toFixed(1)}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <i class="fa-solid fa-comments text-indigo-400"></i> ${lead.review_count || 0} avaliações
+                                </span>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 mt-auto">
@@ -751,7 +752,7 @@
                 selectedLeads.delete(index);
             } else {
                 if (selectedLeads.size >= LIMITE_MAXIMO_SELECAO) {
-                    showToast("Limite de Lote Excedido", `Por razões de segurança contra banimentos e limites de cota do Google Sheets, selecione no máximo ${LIMITE_MAXIMO_SELECAO} leads por lote!`, "warning");
+                    showToast("Limite de Lote Excedido", `Por razões de segurança contra banimentos, selecione no máximo ${LIMITE_MAXIMO_SELECAO} leads por lote!`, "warning");
                     return;
                 }
                 selectedLeads.add(index);
@@ -759,7 +760,7 @@
             renderGrid();
         }
 
-        // Sidnei: Nova regra de seleção automática inteligente - limita em no máximo os primeiros 40 do lote filtrado
+        // Sidnei: Seleção em lote inteligente limitada a 40 leads
         function toggleSelectAll() {
             const filtro = document.getElementById('filterNicho').value;
             const filtered = filtro === 'todos' ? leadsData : leadsData.filter(l => l.nicho === filtro);
@@ -787,9 +788,9 @@
                 }
 
                 if (limiteAtingido) {
-                    showToast("Lote Limitado a 40", `Sua seleção foi limitada aos primeiros ${LIMITE_MAXIMO_SELECAO} leads do lote para evitar bloqueios ou sobrecarga.`, "warning");
+                    showToast("Lote Limitado a 40", `Sua seleção foi limitada aos primeiros ${LIMITE_MAXIMO_SELECAO} para a segurança do envio.`, "warning");
                 } else if (adicionados > 0) {
-                    showToast("Selecionados", `${adicionados} leads adicionados ao lote com sucesso!`, "success");
+                    showToast("Selecionados", `${adicionados} leads adicionados ao lote!`, "success");
                 }
             }
 
@@ -911,7 +912,7 @@
             document.getElementById('deleteConfirmModal').classList.add('hidden');
         }
 
-        // EXECUTA A CHAMADA NO WEBHOOK DO n8n E ATUALIZA O FRONT-END INSTANTANEAMENTE
+        // EXECUTA A EXCLUSÃO DE LEADS NO BANCO DE DADOS
         async function confirmarExclusaoLeads() {
             const btn = document.getElementById('btnConfirmarDelete');
             btn.disabled = true;
@@ -951,7 +952,7 @@
                 updateStats();
                 updateCharts();
                 
-                showToast("Processado", `${leadsParaDeletar.length} leads deletados com sucesso no painel local!`, "success");
+                showToast("Processado", `${leadsParaDeletar.length} leads deletados no painel local!`, "success");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `Confirmar Exclusão`;
