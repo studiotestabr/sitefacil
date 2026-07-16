@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Fenix | Seu Pet Shop Completo em Mongaguá - Rações, Acessórios e Saúde Animal</title>
+    <meta name="description" content="Agro Fenix é o seu destino completo para tudo o que seu pet precisa em Mongaguá. Rações premium, acessórios modernos, medicamentos e um atendimento excepcional. Entrega e retirada disponíveis. Cuidado e paixão em cada produto!">
+    <meta name="robots" content="index, follow">
+
+    <!-- Preconnect & DNS-Prefetch for essential resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <!-- Google Fonts: Playfair Display for titles, Outfit for body text -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Tailwind Colors and Base Styles -->
+    <style>
+        :root {
+            --color-primary: #1e1e4b;
+            --color-secondary: #d2a54b;
+            --color-text-body: #4a5568; /* Dark gray for readability */
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            color: var(--color-text-body);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-primary);
+        }
+        .bg-primary { background-color: var(--color-primary); }
+        .text-primary { color: var(--color-primary); }
+        .border-primary { border-color: var(--color-primary); }
+        .bg-secondary { background-color: var(--color-secondary); }
+        .text-secondary { color: var(--color-secondary); }
+        .border-secondary { border-color: var(--color-secondary); }
+
+        /* Custom utility for dynamic Tailwind colors */
+        .bg-\[var\(--color-primary\)\] { background-color: var(--color-primary); }
+        .text-\[var\(--color-primary\)\] { color: var(--color-primary); }
+        .bg-\[var\(--color-secondary\)\] { background-color: var(--color-secondary); }
+        .text-\[var\(--color-secondary\)\] { color: var(--color-secondary); }
+        .border-\[var\(--color-secondary\)\] { border-color: var(--color-secondary); }
+        .hover\:bg-\[var\(--color-secondary\)\]:hover { background-color: var(--color-secondary); }
+        .hover\:text-\[var\(--color-primary\)\]:hover { color: var(--color-primary); }
+
+        /* Preload for the Hero image */
+        <link rel="preload" as="image" href="https://images.unsplash.com/photo-1548247016-1681f26a636a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80&fm=webp">
+
+        /* Smooth scroll for anchor links */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-700">
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20e%20servi%C3%A7os%20da%20Agro%20Fenix!"
+       class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg z-50 hover:scale-110 transition-transform duration-300 ease-in-out animate-bounce"
+       target="_blank" rel="noopener noreferrer" aria-label="Fale conosco pelo WhatsApp">
+        <i class="fab fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/90 backdrop-blur-sm shadow-md fixed top-0 left-0 w-full z-40 transition-all duration-300 ease-in-out">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#hero" class="flex items-center space-x-2 text-2xl font-bold text-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Página inicial Agro Fenix">
+                <!-- No logo provided, using text logo -->
+                <i class="fas fa-paw text-[var(--color-secondary)]"></i>
+                <span>Agro Fenix</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#solucao" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Nossos Diferenciais">Diferenciais</a>
+                <a href="#servicos" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Nossos Produtos e Serviços">Serviços</a>
+                <a href="#depoimentos" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Depoimentos de Clientes">Depoimentos</a>
+                <a href="#sobre" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Sobre a Agro Fenix">Sobre Nós</a>
+                <a href="#contato" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Localização e Contato">Contato</a>
+                <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20e%20servi%C3%A7os%20da%20Agro%20Fenix!"
+                   class="ml-4 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105 transition-all duration-300 ease-in-out font-semibold flex items-center gap-2"
+                   target="_blank" rel="noopener noreferrer" aria-label="Entrar em contato via WhatsApp">
+                    <i class="fab fa-whatsapp"></i> Fale Conosco
+                </a>
+            </div>
+            <button class="md:hidden text-[var(--color-primary)] text-2xl focus:outline-none" aria-label="Abrir menu de navegação">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SEÇÃO HERO (O Topo, Impacto e Promessa) -->
+        <section id="hero" class="relative h-screen bg-cover bg-center flex items-center" style="background-image: url('https://images.unsplash.com/photo-1548247016-1681f26a636a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80&fm=webp');">
+            <div class="absolute inset-0 bg-black/60"></div>
+            <div class="container mx-auto px-6 text-center text-white relative z-10">
+                <h1 class="text-5xl md:text-7xl font-bold leading-tight drop-shadow-lg animate-fade-in-up">
+                    O Paraíso do Seu Pet em Mongaguá!
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl max-w-3xl mx-auto drop-shadow-md animate-fade-in-up animation-delay-300">
+                    Encontre tudo que seu animal merece: das melhores rações e acessórios aos cuidados essenciais de saúde.
+                    <br>Cuidado, variedade e paixão em cada detalhe.
+                </p>
+                <a href="https://wa.me/551334482068?text=Quero%20o%20Melhor%20para%20Meu%20Pet%20na%20Agro%20Fenix!"
+                   class="mt-8 inline-block px-10 py-5 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] text-xl font-extrabold rounded-full shadow-2xl hover:scale-105 hover:from-yellow-500 hover:to-[var(--color-secondary)] transition-all duration-300 ease-in-out transform animate-pulse"
+                   target="_blank" rel="noopener noreferrer" aria-label="Fale conosco para cuidar do seu pet">
+                    Quero o Melhor para Meu Pet! <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DE DOR E EMPATIA (O Problema) -->
+        <section id="problemas" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]">
+                    Você e Seu Pet Merecem Mais.
+                </h2>
+                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
+                    Sabemos que encontrar o local ideal para o seu companheiro pode ser um desafio.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Problema 1 -->
+                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <i class="fas fa-magnifying-glass text-5xl text-[var(--color-secondary)] mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-4 text-[var(--color-primary)]">Dificuldade em Encontrar Variedade?</h3>
+                        <p class="text-lg text-gray-700">
+                            Cansado de visitar várias lojas para achar o que seu pet precisa? A falta de opções frustra quem busca o melhor.
+                        </p>
+                    </div>
+                    <!-- Problema 2 -->
+                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <i class="fas fa-truck-fast text-5xl text-[var(--color-secondary)] mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-4 text-[var(--color-primary)]">Falta de Conveniência e Tempo?</h3>
+                        <p class="text-lg text-gray-700">
+                            Com a correria do dia a dia, ir às compras para o pet pode ser um luxo. Você precisa de soluções práticas.
+                        </p>
+                    </div>
+                    <!-- Problema 3 -->
+                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <i class="fas fa-question-circle text-5xl text-[var(--color-secondary)] mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-4 text-[var(--color-primary)]">Dúvidas sobre o Melhor para Ele?</h3>
+                        <p class="text-lg text-gray-700">
+                            Com tantas opções no mercado, é difícil saber qual a melhor ração, brinquedo ou tratamento. Você busca orientação.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROPOSTA ÚNICA DE VALOR (SOLUÇÃO / DIFERENCIAIS) -->
+        <section id="solucao" class="py-16 md:py-24 bg-[var(--color-primary)] text-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+                    Agro Fenix: A Solução Completa Para O Bem-Estar Do Seu Pet!
+                </h2>
+                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-300">
+                    Transformamos sua experiência com seu animal de estimação, oferecendo conforto e qualidade incomparáveis.
+                </p>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Diferencial 1: Entrega -->
+                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <i class="fas fa-truck text-5xl text-[var(--color-secondary)] mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-3">Entrega Confortável</h3>
+                        <p class="text-lg text-gray-700">Receba os produtos do seu pet no conforto da sua casa, sem preocupações.</p>
+                    </div>
+                    <!-- Diferencial 2: Retirada na loja -->
+                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <i class="fas fa-store text-5xl text-[var(--color-secondary)] mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-3">Retirada Facilitada</h3>
+                        <p class="text-lg text-gray-700">Prefere buscar? Seu pedido estará pronto em nossa loja para retirada rápida.</p>
+                    </div>
+                    <!-- Diferencial 3: Acessibilidade -->
+                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <i class="fas fa-wheelchair text-5xl text-[var(--color-secondary)] mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-3">Acessibilidade Total</h3>
+                        <p class="text-lg text-gray-700">Nossa loja é projetada para receber a todos com entrada acessível.</p>
+                    </div>
+                    <!-- Diferencial 4: Pagamentos flexíveis -->
+                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <i class="fas fa-credit-card text-5xl text-[var(--color-secondary)] mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-3">Pagamentos Modernos</h3>
+                        <p class="text-lg text-gray-700">Aceitamos crédito, débito e pagamentos por NFC para sua comodidade.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- APRESENTAÇÃO DE SERVIÇOS / PRODUTOS -->
+        <section id="servicos" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]">
+                    Tudo Que Seu Pet Precisa, Em Um Só Lugar
+                </h2>
+                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
+                    Explore nossa vasta seleção de produtos e serviços pensados para cada fase da vida do seu companheiro.
+                </p>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Serviço 1: Rações Premium -->
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1579208076043-34e2c88d8b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80&fm=webp"
+                             alt="Variedade de Rações Premium para Cães e Gatos"
+                             width="800" height="533" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary)]">Rações Premium</h3>
+                            <p class="text-lg text-gray-700 mb-4">
+                                As melhores marcas e formulações para garantir nutrição completa e sabor irresistível.
+                            </p>
+                            <ul class="list-disc list-inside text-left text-gray-600 mb-6 space-y-2">
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Opções para todas as idades</li>
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Dietas especiais e terapêuticas</li>
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Alimentos úmidos e secos</li>
+                            </ul>
+                            <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20as%20ra%C3%A7%C3%B5es%20dispon%C3%ADveis!"
+                               class="block w-full text-center py-3 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] font-bold rounded-full hover:scale-105 transition-all duration-300 ease-in-out"
+                               target="_blank" rel="noopener noreferrer" aria-label="Comprar Rações Premium">
+                                Ver Rações
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Serviço 2: Acessórios Divertidos -->
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1544974950-89196238b939?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80&fm=webp"
+                             alt="Variedade de Acessórios e Brinquedos para Pets"
+                             width="800" height="533" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary)]">Acessórios Incríveis</h3>
+                            <p class="text-lg text-gray-700 mb-4">
+                                De brinquedos interativos a coleiras estilosas, tudo para o conforto e alegria do seu amigo.
+                            </p>
+                            <ul class="list-disc list-inside text-left text-gray-600 mb-6 space-y-2">
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Brinquedos e arranhadores</li>
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Camas e cobertores aconchegantes</li>
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Guias, coleiras e caixas de transporte</li>
+                            </ul>
+                            <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20conhecer%20os%20acess%C3%B3rios%20para%20pets!"
+                               class="block w-full text-center py-3 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] font-bold rounded-full hover:scale-105 transition-all duration-300 ease-in-out"
+                               target="_blank" rel="noopener noreferrer" aria-label="Ver Acessórios para Pets">
+                                Ver Acessórios
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Serviço 3: Saúde e Bem-Estar -->
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1536852443493-2776c5b96910?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80&fm=webp"
+                             alt="Medicamentos e Produtos de Saúde Animal"
+                             width="800" height="533" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary)]">Saúde e Higiene</h3>
+                            <p class="text-lg text-gray-700 mb-4">
+                                Produtos essenciais para a saúde e higiene, garantindo uma vida longa e feliz para seu pet.
+                            </p>
+                            <ul class="list-disc list-inside text-left text-gray-600 mb-6 space-y-2">
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Vermífugos e antipulgas</li>
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Shampoos e condicionadores</li>
+                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Suplementos e vitaminas</li>
+                            </ul>
+                            <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20produtos%20de%20sa%C3%BAde%20e%20higiene%20pet!"
+                               class="block w-full text-center py-3 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] font-bold rounded-full hover:scale-105 transition-all duration-300 ease-in-out"
+                               target="_blank" rel="noopener noreferrer" aria-label="Comprar Produtos de Saúde Animal">
+                                Ver Produtos de Saúde
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROVA SOCIAL (Autoridade, Gatilho da Manada) -->
+        <section id="depoimentos" class="py-16 md:py-24 bg-[var(--color-primary)] text-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+                    O Que Nossos Clientes Dizem
+                </h2>
+                <div class="flex items-center justify-center mb-8">
+                    <div class="flex text-yellow-400 text-3xl">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="ml-4 text-2xl font-semibold text-white">4.7 de 5 estrelas</p>
+                    <p class="ml-2 text-xl text-gray-300">(618 avaliações)</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Testimonial 1 -->
+                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <div class="flex text-yellow-400 text-xl mb-4">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-lg text-gray-200 italic mb-6">
+                            "Lugar perfeito para comprar tudo para o pet. Sou cliente fiel. Adoro o atendimento. Preço e variedade de produtos. Recomendo."
+                        </p>
+                        <p class="font-bold text-secondary text-xl">- Andreia Capellari</p>
+                    </div>
+                    <!-- Testimonial 2 -->
+                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <div class="flex text-yellow-400 text-xl mb-4">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-lg text-gray-200 italic mb-6">
+                            "Esse lugar eu recomendo tem tudo que você em matéria de agro e cuidados animais desde rações ao medicamentos."
+                        </p>
+                        <p class="font-bold text-secondary text-xl">- José Constantino</p>
+                    </div>
+                    <!-- Testimonial 3 -->
+                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <div class="flex text-yellow-400 text-xl mb-4">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-lg text-gray-200 italic mb-6">
+                            "Ótimo atendimento. Bons preços."
+                        </p>
+                        <p class="font-bold text-secondary text-xl">- Fernando Antonio Guedes Molina</p>
+                    </div>
+                    <!-- Testimonial 4 -->
+                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <div class="flex text-yellow-400 text-xl mb-4">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-lg text-gray-200 italic mb-6">
+                            "Pense em lugar que tem tudo para animais, o atendimento é muito bom, atencioso e sempre tem desconto. Super recomendo!!!"
+                        </p>
+                        <p class="font-bold text-secondary text-xl">- Claudia Leite</p>
+                    </div>
+                    <!-- Testimonial 5 -->
+                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <div class="flex text-yellow-400 text-xl mb-4">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-lg text-gray-200 italic mb-6">
+                            "Literalmente lembrança da infância. Sempre fui ao local com meus pais dês de pequeno. Qualidade e atendimento nos mínimos detalhes."
+                        </p>
+                        <p class="font-bold text-secondary text-xl">- Bruno Sorru</p>
+                    </div>
+                    <!-- Testimonial 6 -->
+                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
+                        <div class="flex text-yellow-400 text-xl mb-4">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-lg text-gray-200 italic mb-6">
+                            "Super recomendo! Mega atenciosos, pronto atendimento, variedades, jardinagem, medicamentos e acima de tudo paixão no que faz. Dedicação e carinho aos animais."
+                        </p>
+                        <p class="font-bold text-secondary text-xl">- Marcia Regina Luzzi</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO SOBRE NÓS HUMANIZADA -->
+        <section id="sobre" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <!-- Lado Imagem -->
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1517423738870-4824584c4785?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80&fm=webp"
+                             alt="Equipe da Agro Fenix interagindo com um cachorro"
+                             width="800" height="533" loading="lazy" decoding="async"
+                             class="rounded-2xl shadow-2xl w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500 ease-in-out">
+                    </div>
+                    <!-- Lado Texto -->
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-6 text-[var(--color-primary)]">
+                            Agro Fenix: Paixão e Cuidado Que Transformam
+                        </h2>
+                        <p class="text-lg leading-relaxed mb-6 text-gray-700">
+                            Na Agro Fenix, nossa história é escrita com amor e dedicação aos animais. Desde o início, nosso compromisso é oferecer não apenas produtos, mas soluções completas que promovam o bem-estar e a felicidade dos pets e seus tutores. Entendemos que cada animal é único e merece o melhor.
+                        </p>
+                        <p class="text-lg leading-relaxed mb-8 text-gray-700">
+                            Com opções de entrega e retirada na loja, e uma equipe sempre pronta para auxiliar, garantimos uma experiência de compra conveniente e personalizada. Nossa loja é acessível a todos e pensada para você fazer suas compras de forma rápida e eficiente, sempre com a garantia de qualidade e variedade.
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-8 mt-8">
+                            <div class="text-center bg-gray-100 p-6 rounded-lg shadow-md">
+                                <p class="text-5xl font-bold text-[var(--color-secondary)]">20+</p>
+                                <p class="text-xl font-medium text-[var(--color-primary)]">Anos de Experiência</p>
+                            </div>
+                            <div class="text-center bg-gray-100 p-6 rounded-lg shadow-md">
+                                <p class="text-5xl font-bold text-[var(--color-secondary)]">1000+</p>
+                                <p class="text-xl font-medium text-[var(--color-primary)]">Clientes Satisfeitos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ESTRUTURA DA LOJA (Galeria Imersiva) -->
+        <section id="galeria" class="py-16 md:py-24 bg-gray-100">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]">
+                    Nosso Espaço: Conforto e Variedade Para Seu Pet
+                </h2>
+                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
+                    Explore nossa loja e veja a qualidade e o carinho que preparamos para receber você e seu companheiro.
+                </p>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    <div class="overflow-hidden rounded-xl shadow-xl">
+                        <img src="https://images.unsplash.com/photo-1596707242858-6923b72b64d0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80&fm=webp"
+                             alt="Interior da Agro Fenix com produtos para animais de estimação"
+                             width="800" height="533" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEugbk8Jkp4bGRgpzm3uYu1CA-1E6cq55HgtkzxHi1QrP1eQH88bRllHUY6u3LsAvKePfzR_O5ArfM9CQcNn6QYBBB9xQ5ilFbkgCk_hYtTmezE1SJvTyaYxX5cY-DCZULHoxhmoA=w224-h472-k-no"
+                             alt="Fachada da Agro Fenix Pet Shop em Mongaguá"
+                             width="224" height="472" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl">
+                        <img src="https://images.unsplash.com/photo-1583337130225-b4618a804473?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80&fm=webp"
+                             alt="Corredor de rações e alimentos para pets na Agro Fenix"
+                             width="800" height="533" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAHI7JgYqvWh3iUIr9WLfpmuNdhe9fogLBYsoUvt6p8MwdbSkJ57CZHW_VhPcfYQX4cw40k9SN7Q6DySDoev0OJIGd6GFzJC0G3Enyd3n57QdUBXguH5aZPS8pbaeIRy6phL2aUIcw=w397-h298-k-no"
+                             alt="Detalhes da loja Agro Fenix com produtos organizados"
+                             width="397" height="298" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAH6gUv9wAQn4dmUYSeoVQtdQEzJMTuUOCBgXUjvQeb0aPvORiOeNzhUvGoBilQpWlYNDN3pI50IZ1asqyz7IQTfwXRGlKiXzO2czjsUD38lmTEa32VNbblPQwZH6eCdd4UX3w=w224-h398-k-no"
+                             alt="Prateleiras com produtos de higiene e saúde para pets"
+                             width="224" height="398" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEUfu8OuPbuFLy4Niaetq-7gcDheOpDpsLM0Q7fxn2ou8VbO1Z9WMeom41-D-pJ_gKPgm0OfS848c6QkgpSXI1kZI9mbfhUm_sT25rWv43gD9Lv-YX6xJCFOayp_FNHNmk5dYxj-A=w224-h298-k-no"
+                             alt="Seção de medicamentos e suplementos na Agro Fenix"
+                             width="224" height="298" loading="lazy" decoding="async"
+                             class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO FAQ (Sanfona/Accordion) -->
+        <section id="faq" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6 text-center max-w-4xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]">
+                    Dúvidas Frequentes
+                </h2>
+                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
+                    Respostas rápidas para as perguntas mais comuns sobre nossos produtos e serviços.
+                </p>
+
+                <div class="space-y-4 text-left">
+                    <!-- FAQ Item 1 -->
+                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
+                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out"
+                                aria-expanded="false" aria-controls="faq-content-1" aria-label="Abrir ou fechar resposta para Quais formas de pagamento são aceitas?">
+                            <span>Quais formas de pagamento são aceitas?</span>
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-1" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
+                            Aceitamos diversas formas de pagamento para sua comodidade, incluindo cartões de crédito e débito, e pagamentos por dispositivo móvel via NFC.
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 2 -->
+                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
+                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out"
+                                aria-expanded="false" aria-controls="faq-content-2" aria-label="Abrir ou fechar resposta para Vocês fazem entrega de produtos?">
+                            <span>Vocês fazem entrega de produtos?</span>
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-2" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
+                            Sim, oferecemos serviço de entrega para que você receba todos os produtos do seu pet no conforto da sua casa. Entre em contato para verificar a disponibilidade na sua região!
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 3 -->
+                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
+                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out"
+                                aria-expanded="false" aria-controls="faq-content-3" aria-label="Abrir ou fechar resposta para Posso retirar meu pedido diretamente na loja?">
+                            <span>Posso retirar meu pedido diretamente na loja?</span>
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-3" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
+                            Claro! Você pode fazer seu pedido e optar pela retirada na loja. Basta aguardar a confirmação de que seu pedido está pronto para ser retirado.
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 4 -->
+                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
+                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out"
+                                aria-expanded="false" aria-controls="faq-content-4" aria-label="Abrir ou fechar resposta para A loja possui acessibilidade para cadeirantes?">
+                            <span>A loja possui acessibilidade para cadeirantes?</span>
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-4" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
+                            Sim, nossa loja conta com entrada acessível para pessoas em cadeira de rodas, garantindo conforto e segurança para todos os nossos clientes.
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 5 -->
+                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
+                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out"
+                                aria-expanded="false" aria-controls="faq-content-5" aria-label="Abrir ou fechar resposta para Vocês oferecem algum tipo de consultoria sobre produtos?">
+                            <span>Vocês oferecem algum tipo de consultoria sobre produtos?</span>
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-5" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
+                            Nossa equipe está sempre pronta para ajudar! Se você tem dúvidas sobre qual produto é o ideal para o seu pet, venha nos visitar ou entre em contato. Teremos prazer em oferecer a melhor orientação.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ONDE ESTAMOS (Facilidade de Acesso) -->
+        <section id="contato" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-center text-[var(--color-primary)]">
+                    Localização e Contato
+                </h2>
+                <p class="text-xl max-w-3xl mx-auto mb-12 text-center text-gray-600">
+                    Visite-nos e encontre tudo que seu pet precisa. Estamos esperando por você!
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                    <!-- Lado esquerdo: Endereço e Horários -->
+                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-3xl font-bold mb-4 text-[var(--color-primary)]">Venha nos Visitar!</h3>
+                            <p class="text-lg mb-6 flex items-start">
+                                <i class="fas fa-map-marker-alt text-[var(--color-secondary)] mr-3 mt-1 text-xl"></i>
+                                Agro Fenix - Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000
+                            </p>
+
+                            <h4 class="text-2xl font-bold mb-3 text-[var(--color-primary)]">Horário de Atendimento:</h4>
+                            <ul class="text-lg mb-8 space-y-2">
+                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Segunda-feira:</span> 08:00–19:00</li>
+                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Terça-feira:</span> 08:00–19:00</li>
+                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Quarta-feira:</span> 08:00–19:00</li>
+                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Quinta-feira:</span> 08:00–19:00</li>
+                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Sexta-feira:</span> 08:00–19:00</li>
+                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Sábado:</span> 08:00–19:00</li>
+                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Domingo:</span> 08:00–13:00</li>
+                            </ul>
+                        </div>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=-24.122787,-46.679817"
+                           class="w-full text-center py-4 bg-gradient-to-r from-green-500 to-green-600 text-white text-xl font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center gap-3"
+                           target="_blank" rel="noopener noreferrer" aria-label="Obter direções para Agro Fenix no Google Maps">
+                            <i class="fas fa-route"></i> Como Chegar (Google Maps)
+                        </a>
+                    </div>
+                    <!-- Lado direito: Google Maps Iframe -->
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 ease-in-out">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.457816047716!2d-46.68239168498777!3d-24.12278708436587!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce280e18ba1d71%3A0x2cf41e45a8465f8a!2sAgro%20Fenix!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr"
+                            width="100%" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            title="Localização da Agro Fenix no Google Maps">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER COMPLETO -->
+    <footer class="bg-[var(--color-primary)] text-gray-300 py-12">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+            <!-- Coluna 1: Informações da Empresa -->
+            <div>
+                <h4 class="text-2xl font-bold mb-4 text-white">Agro Fenix</h4>
+                <p class="mb-2">Razão Social: Agro Fenixx Comercio de Racoes LTDA</p>
+                <p class="mb-2">CNPJ: 49.390.182/0001-43</p>
+                <p class="mb-2">Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000</p>
+                <p class="mb-2">Horário: Seg-Sáb: 08:00–19:00 | Dom: 08:00–13:00</p>
+                <p class="mt-4"><a href="https://wa.me/551334482068" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Agro Fenix" class="text-white hover:text-[var(--color-secondary)] transition-colors duration-300"><i class="fab fa-whatsapp mr-2"></i>(13) 3448-2068</a></p>
+            </div>
+
+            <!-- Coluna 2: Links Rápidos -->
+            <div>
+                <h4 class="text-2xl font-bold mb-4 text-white">Links Rápidos</h4>
+                <ul class="space-y-2">
+                    <li><a href="#hero" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Ir para a seção Hero">Início</a></li>
+                    <li><a href="#servicos" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Nossos Produtos e Serviços">Serviços</a></li>
+                    <li><a href="#depoimentos" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Depoimentos de Clientes">Depoimentos</a></li>
+                    <li><a href="#sobre" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Sobre a Agro Fenix">Sobre Nós</a></li>
+                    <li><a href="#contato" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Localização e Contato">Contato</a></li>
+                </ul>
+            </div>
+
+            <!-- Coluna 3: Redes Sociais e Legal -->
+            <div>
+                <h4 class="text-2xl font-bold mb-4 text-white">Conecte-se</h4>
+                <div class="flex justify-center md:justify-start space-x-4 mb-6">
+                    <a href="https://www.facebook.com/diskagrofenix" target="_blank" rel="noopener noreferrer" aria-label="Visite nosso Facebook" class="text-white hover:text-[var(--color-secondary)] text-3xl transition-colors duration-300">
+                        <i class="fab fa-facebook-square"></i>
+                    </a>
+                    <!-- Assuming an Instagram presence despite Facebook link in data -->
+                    <a href="https://www.instagram.com/agrofeniix/" target="_blank" rel="noopener noreferrer" aria-label="Visite nosso Instagram" class="text-white hover:text-[var(--color-secondary)] text-3xl transition-colors duration-300">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Política de Privacidade">Política de Privacidade</a></li>
+                    <li><a href="#" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Termos de Uso">Termos de Uso</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-700 mt-10 pt-8 text-center text-gray-400 text-sm">
+            <p>&copy; 2024 Agro Fenix. Todos os direitos reservados.</p>
+            <p class="mt-2">Site criado e mantido por <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="text-[var(--color-secondary)] hover:text-white transition-colors duration-300">STUDIOTESTA</a></p>
+        </div>
+    </footer>
+
+    <!-- Vanilla JavaScript for FAQ Accordion -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqButtons = document.querySelectorAll('#faq button');
+
+            faqButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('i');
+
+                    // Close all other open accordions
+                    faqButtons.forEach(otherButton => {
+                        if (otherButton !== button) {
+                            const otherContent = otherButton.nextElementSibling;
+                            const otherIcon = otherButton.querySelector('i');
+                            if (!otherContent.classList.contains('hidden')) {
+                                otherContent.classList.add('hidden');
+                                otherButton.setAttribute('aria-expanded', 'false');
+                                otherIcon.classList.remove('rotate-180');
+                            }
+                        }
+                    });
+
+                    // Toggle current accordion
+                    content.classList.toggle('hidden');
+                    const isExpanded = content.classList.contains('hidden') ? 'false' : 'true';
+                    button.setAttribute('aria-expanded', isExpanded);
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
