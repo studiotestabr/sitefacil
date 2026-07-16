@@ -1,112 +1,153 @@
-<html lang="pt-BR" class="scroll-smooth"><head>
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agro Fenix | Seu Pet Shop Completo em Mongaguá - Rações, Acessórios e Saúde Animal</title>
-    <meta name="description" content="Agro Fenix é o seu destino completo para tudo o que seu pet precisa em Mongaguá. Rações premium, acessórios modernos, medicamentos e um atendimento excepcional. Entrega e retirada disponíveis. Cuidado e paixão em cada produto!">
-    <meta name="robots" content="index, follow">
+    <meta name="description" content="Agro Fenix - Seu Pet Shop completo em Mongaguá, SP. Rações premium, acessórios, medicamentos e cuidados especializados para a saúde e felicidade do seu pet. Entrega e retirada na loja.">
+    <title>Agro Fenix | Seu Pet Shop Completo em Mongaguá, SP</title>
 
-    <!-- Preconnect & DNS-Prefetch for essential resources -->
+    <!-- Preload Hero Image for instant loading - High Resolution Unsplash Image -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1596499335607-b087093557e0?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=1920" fetchpriority="high">
+
+    <!-- Preconnect & DNS-Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
-    <!-- Google Fonts: Playfair Display for titles, Outfit for body text -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Google Fonts: Outfit (modern and clean) -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Custom Tailwind Colors and Base Styles -->
-    <style>
-        :root {
-            --color-primary: #1e1e4b;
-            --color-secondary: #d2a54b;
-            --color-text-body: #4a5568; /* Dark gray for readability */
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom Tailwind Configuration (Colors & Fonts) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#1e1e4b',    // Main Dark Blue/Purple
+                        'secondary': '#d2a54b',  // Golden Yellow Accent
+                        'accent': '#c3964b',     // Slightly darker Gold Accent
+                        'dark-alt': '#4b3c4b',   // Dark Brown/Purple for text/elements
+                        'dark-lighter': '#2d2d4b', // Lighter Dark Blue/Purple for section backgrounds
+                        'whatsapp': '#25D366',   // WhatsApp Green
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'], 
+                    },
+                }
+            }
         }
+    </script>
+
+    <style>
+        /* General body styling for background and font */
         body {
             font-family: 'Outfit', sans-serif;
-            color: var(--color-text-body);
+            background-color: #f8f8f8;
+            color: #333;
         }
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-            color: var(--color-primary);
+
+        /* Custom scrollbar for better aesthetics, optional but nice for premium feel */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .bg-primary { background-color: var(--color-primary); }
-        .text-primary { color: var(--color-primary); }
-        .border-primary { border-color: var(--color-primary); }
-        .bg-secondary { background-color: var(--color-secondary); }
-        .text-secondary { color: var(--color-secondary); }
-        .border-secondary { border-color: var(--color-secondary); }
-
-        /* Custom utility for dynamic Tailwind colors */
-        .bg-\[var\(--color-primary\)\] { background-color: var(--color-primary); }
-        .text-\[var\(--color-primary\)\] { color: var(--color-primary); }
-        .bg-\[var\(--color-secondary\)\] { background-color: var(--color-secondary); }
-        .text-\[var\(--color-secondary\)\] { color: var(--color-secondary); }
-        .border-\[var\(--color-secondary\)\] { border-color: var(--color-secondary); }
-        .hover\:bg-\[var\(--color-secondary\)\]:hover { background-color: var(--color-secondary); }
-        .hover\:text-\[var\(--color-primary\)\]:hover { color: var(--color-primary); }
-
-        /* Preload for the Hero image */
-        <link rel="preload" as="image" href="https://images.unsplash.com/photo-1548247016-1681f26a636a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80&fm=webp">
-
-        /* Smooth scroll for anchor links */
-        html {
-            scroll-behavior: smooth;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.bottom-6{bottom:1.5rem}.left-0{left:0px}.right-6{right:1.5rem}.top-0{top:0px}.z-10{z-index:10}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-12{margin-bottom:3rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-2{margin-left:0.5rem}.ml-4{margin-left:1rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-1{margin-top:0.25rem}.mt-10{margin-top:2.5rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-64{height:16rem}.h-auto{height:auto}.h-screen{height:100vh}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes bounce{0%, 100%{transform:translateY(-25%);animation-timing-function:cubic-bezier(0.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,0.2,1)}}.animate-bounce{animation:bounce 1s infinite}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-12{gap:3rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-8 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(2rem * var(--tw-space-x-reverse));margin-left:calc(2rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.scroll-smooth{scroll-behavior:smooth}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-t{border-top-width:1px}.border-t-4{border-top-width:4px}.border-\[var\(--color-secondary\)\]{border-color:var(--color-secondary)}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-700{--tw-border-opacity:1;border-color:rgb(55 65 81 / var(--tw-border-opacity, 1))}.bg-\[var\(--color-primary\)\]{background-color:var(--color-primary)}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/10{background-color:rgb(255 255 255 / 0.1)}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-\[var\(--color-secondary\)\]{--tw-gradient-from:var(--color-secondary) var(--tw-gradient-from-position);--tw-gradient-to:rgb(255 255 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-green-500{--tw-gradient-from:#22c55e var(--tw-gradient-from-position);--tw-gradient-to:rgb(34 197 94 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-green-600{--tw-gradient-to:#16a34a var(--tw-gradient-to-position)}.to-yellow-500{--tw-gradient-to:#eab308 var(--tw-gradient-to-position)}.bg-cover{background-size:cover}.bg-center{background-position:center}.object-cover{object-fit:cover}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-10{padding-left:2.5rem;padding-right:2.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pt-8{padding-top:2rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.text-\[var\(--color-primary\)\]{color:var(--color-primary)}.text-\[var\(--color-secondary\)\]{color:var(--color-secondary)}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-400{--tw-text-opacity:1;color:rgb(250 204 21 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.drop-shadow-lg{--tw-drop-shadow:drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.drop-shadow-md{--tw-drop-shadow:drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-500{transition-duration:500ms}.ease-in-out{transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1)}.hover\:-translate-y-1:hover{--tw-translate-y:-0.25rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-110:hover{--tw-scale-x:1.1;--tw-scale-y:1.1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-gray-100:hover{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.hover\:from-green-600:hover{--tw-gradient-from:#16a34a var(--tw-gradient-from-position);--tw-gradient-to:rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-yellow-500:hover{--tw-gradient-from:#eab308 var(--tw-gradient-from-position);--tw-gradient-to:rgb(234 179 8 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-\[var\(--color-secondary\)\]:hover{--tw-gradient-to:var(--color-secondary) var(--tw-gradient-to-position)}.hover\:to-green-700:hover{--tw-gradient-to:#15803d var(--tw-gradient-to-position)}.hover\:text-\[var\(--color-secondary\)\]:hover{color:var(--color-secondary)}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:shadow-2xl:hover{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 768px){.md\:flex{display:flex}.md\:hidden{display:none}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:justify-start{justify-content:flex-start}.md\:py-24{padding-top:6rem;padding-bottom:6rem}.md\:text-left{text-align:left}.md\:text-2xl{font-size:1.5rem;line-height:2rem}.md\:text-5xl{font-size:3rem;line-height:1}.md\:text-7xl{font-size:4.5rem;line-height:1}}@media (min-width: 1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}</style><style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.bottom-6{bottom:1.5rem}.left-0{left:0px}.right-6{right:1.5rem}.top-0{top:0px}.z-10{z-index:10}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-12{margin-bottom:3rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-2{margin-left:0.5rem}.ml-4{margin-left:1rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-1{margin-top:0.25rem}.mt-10{margin-top:2.5rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-64{height:16rem}.h-auto{height:auto}.h-screen{height:100vh}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes bounce{0%, 100%{transform:translateY(-25%);animation-timing-function:cubic-bezier(0.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,0.2,1)}}.animate-bounce{animation:bounce 1s infinite}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-12{gap:3rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-8 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(2rem * var(--tw-space-x-reverse));margin-left:calc(2rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.scroll-smooth{scroll-behavior:smooth}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-t{border-top-width:1px}.border-t-4{border-top-width:4px}.border-\[var\(--color-secondary\)\]{border-color:var(--color-secondary)}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-700{--tw-border-opacity:1;border-color:rgb(55 65 81 / var(--tw-border-opacity, 1))}.bg-\[var\(--color-primary\)\]{background-color:var(--color-primary)}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/10{background-color:rgb(255 255 255 / 0.1)}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-\[var\(--color-secondary\)\]{--tw-gradient-from:var(--color-secondary) var(--tw-gradient-from-position);--tw-gradient-to:rgb(255 255 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-green-500{--tw-gradient-from:#22c55e var(--tw-gradient-from-position);--tw-gradient-to:rgb(34 197 94 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-green-600{--tw-gradient-to:#16a34a var(--tw-gradient-to-position)}.to-yellow-500{--tw-gradient-to:#eab308 var(--tw-gradient-to-position)}.bg-cover{background-size:cover}.bg-center{background-position:center}.object-cover{object-fit:cover}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-10{padding-left:2.5rem;padding-right:2.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pt-8{padding-top:2rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.text-\[var\(--color-primary\)\]{color:var(--color-primary)}.text-\[var\(--color-secondary\)\]{color:var(--color-secondary)}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-400{--tw-text-opacity:1;color:rgb(250 204 21 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.drop-shadow-lg{--tw-drop-shadow:drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.drop-shadow-md{--tw-drop-shadow:drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-500{transition-duration:500ms}.ease-in-out{transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1)}.hover\:-translate-y-1:hover{--tw-translate-y:-0.25rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-110:hover{--tw-scale-x:1.1;--tw-scale-y:1.1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-gray-100:hover{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.hover\:from-green-600:hover{--tw-gradient-from:#16a34a var(--tw-gradient-from-position);--tw-gradient-to:rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-yellow-500:hover{--tw-gradient-from:#eab308 var(--tw-gradient-from-position);--tw-gradient-to:rgb(234 179 8 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-\[var\(--color-secondary\)\]:hover{--tw-gradient-to:var(--color-secondary) var(--tw-gradient-to-position)}.hover\:to-green-700:hover{--tw-gradient-to:#15803d var(--tw-gradient-to-position)}.hover\:text-\[var\(--color-secondary\)\]:hover{color:var(--color-secondary)}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:shadow-2xl:hover{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 768px){.md\:flex{display:flex}.md\:hidden{display:none}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:justify-start{justify-content:flex-start}.md\:py-24{padding-top:6rem;padding-bottom:6rem}.md\:text-left{text-align:left}.md\:text-2xl{font-size:1.5rem;line-height:2rem}.md\:text-5xl{font-size:3rem;line-height:1}.md\:text-7xl{font-size:4.5rem;line-height:1}}@media (min-width: 1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}</style></head>
-<body class="antialiased text-gray-700">
+</head>
+<body class="overflow-x-hidden">
 
-    <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20e%20servi%C3%A7os%20da%20Agro%20Fenix!" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg z-50 hover:scale-110 transition-transform duration-300 ease-in-out animate-bounce" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco pelo WhatsApp" id="st-el-2zrhpfxzw">
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/551334482068?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20Agro%20Fenix%21" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco pelo WhatsApp" class="fixed bottom-6 right-6 z-50 bg-whatsapp text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all duration-300 ease-in-out animate-bounce">
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
-    <!-- Header & Navigation -->
-    <header class="bg-white/90 backdrop-blur-sm shadow-md fixed top-0 left-0 w-full z-40 transition-all duration-300 ease-in-out" id="st-el-zswp5dvsn">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center" id="st-el-1ct54dht0" style="">
-            <a href="#hero" class="flex items-center space-x-2 text-2xl font-bold text-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Página inicial Agro Fenix" id="st-el-9niv51kmp">
-                <!-- No logo provided, using text logo -->
-                <i class="fas fa-paw text-[var(--color-secondary)]"></i>
-                <span>Agro Fenix</span>
-            </a>
-            <div class="hidden md:flex items-center space-x-8" style="">
-                <a href="#solucao" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Nossos Diferenciais" id="st-el-ihzor6m8n">Diferenciais</a>
-                <a href="#servicos" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Nossos Produtos e Serviços" id="st-el-aidbuxbkb" style="">Serviços</a>
-                <a href="#depoimentos" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Depoimentos de Clientes" id="st-el-fi20uehlu" style="">Depoimentos</a>
-                <a href="#sobre" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Sobre a Agro Fenix" id="st-el-i6r4sqp1s">Sobre Nós</a>
-                <a href="#contato" class="text-lg font-medium text-gray-700 hover:text-[var(--color-secondary)] transition-colors duration-300 ease-in-out" aria-label="Localização e Contato" id="st-el-qs13m6kfi">Contato</a>
-                <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20e%20servi%C3%A7os%20da%20Agro%20Fenix!" class="ml-4 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105 transition-all duration-300 ease-in-out font-semibold flex items-center gap-2" target="_blank" rel="noopener noreferrer" aria-label="Entrar em contato via WhatsApp" id="st-el-26x5wfhqq" style="">
-                    <i class="fab fa-whatsapp" style=""></i> Fale Conosco
-                </a>
+    <!-- HEADER & NAVIGATION -->
+    <header class="bg-primary text-white p-4 shadow-lg fixed w-full z-40">
+        <nav class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/agrofenix/logo_1784245460440.png" alt="Logo Agro Fenix" class="h-10 w-10 object-contain rounded-full border-2 border-secondary" width="40" height="40" decoding="async" loading="eager">
+                <a href="#hero" class="text-2xl font-bold text-secondary font-heading" aria-label="Agro Fenix - Ir para o topo">Agro Fenix</a>
             </div>
-            <button class="md:hidden text-[var(--color-primary)] text-2xl focus:outline-none" aria-label="Abrir menu de navegação" id="st-el-lx9engu3h">
-                <i class="fas fa-bars"></i>
+            <ul class="hidden md:flex space-x-8 text-lg font-medium">
+                <li><a href="#hero" class="hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Ir para a seção Início">Início</a></li>
+                <li><a href="#solucao" class="hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Conheça nossas soluções">Nossas Soluções</a></li>
+                <li><a href="#servicos" class="hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Veja nossos produtos e serviços">Produtos</a></li>
+                <li><a href="#depoimentos" class="hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Leia o que nossos clientes dizem">Depoimentos</a></li>
+                <li><a href="#sobre" class="hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Saiba mais sobre a Agro Fenix">Sobre Nós</a></li>
+                <li><a href="#contato" class="hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Encontre nossa localização">Contato</a></li>
+            </ul>
+            <a href="https://wa.me/551334482068?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20Agro%20Fenix%21" target="_blank" rel="noopener noreferrer" aria-label="Fale Conosco pelo WhatsApp" class="hidden md:block bg-gradient-to-r from-secondary to-accent text-primary px-6 py-2 rounded-full font-bold shadow-md hover:scale-105 transition-all duration-300 ease-in-out">
+                Fale Conosco
+            </a>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none" aria-label="Abrir menu mobile">
+                <i class="fas fa-bars text-2xl"></i>
             </button>
         </nav>
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-primary/90 backdrop-blur-md z-50 hidden md:hidden">
+            <div class="flex justify-end p-4">
+                <button id="close-mobile-menu-button" class="text-white focus:outline-none" aria-label="Fechar menu mobile">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <ul class="flex flex-col items-center justify-center h-full space-y-8 text-2xl font-bold">
+                <li><a href="#hero" class="text-white hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Ir para a seção Início">Início</a></li>
+                <li><a href="#solucao" class="text-white hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Conheça nossas soluções">Nossas Soluções</a></li>
+                <li><a href="#servicos" class="text-white hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Veja nossos produtos e serviços">Produtos</a></li>
+                <li><a href="#depoimentos" class="text-white hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Leia o que nossos clientes dizem">Depoimentos</a></li>
+                <li><a href="#sobre" class="text-white hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Saiba mais sobre a Agro Fenix">Sobre Nós</a></li>
+                <li><a href="#contato" class="text-white hover:text-secondary transition-colors duration-300 ease-in-out" aria-label="Encontre nossa localização">Contato</a></li>
+                <li><a href="https://wa.me/551334482068?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20Agro%20Fenix%21" target="_blank" rel="noopener noreferrer" aria-label="Fale Conosco pelo WhatsApp" class="bg-gradient-to-r from-secondary to-accent text-primary px-8 py-3 rounded-full shadow-md hover:scale-105 transition-all duration-300 ease-in-out">
+                    Fale Conosco
+                </a></li>
+            </ul>
+        </div>
     </header>
 
     <main>
         <!-- SEÇÃO HERO (O Topo, Impacto e Promessa) -->
-        <section id="hero" class="relative h-screen bg-cover bg-center flex items-center" style="background-image: url('https://images.unsplash.com/photo-1548247016-1681f26a636a?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1920&amp;q=80&amp;fm=webp');">
-            <div class="absolute inset-0 bg-black/60" style=""></div>
-            <div class="container mx-auto px-6 text-center text-white relative z-10" style="">
-                <h1 class="text-5xl md:text-7xl font-bold leading-tight drop-shadow-lg animate-fade-in-up" id="st-el-pi9n36pbe" style="">O Paraíso do Seu Pet em Mongaguá!</h1>
-                <p class="mt-4 text-xl md:text-2xl max-w-3xl mx-auto drop-shadow-md animate-fade-in-up animation-delay-300" style="">
-                    Encontre tudo que seu animal merece: das melhores rações e acessórios aos cuidados essenciais de saúde.
-                    <br>Cuidado, variedade e paixão em cada detalhe.
+        <section id="hero" class="relative bg-primary min-h-screen flex items-center justify-center text-white py-24 md:py-32 overflow-hidden">
+            <img 
+                src="https://images.unsplash.com/photo-1596499335607-b087093557e0?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=1920" 
+                alt="Interior de um pet shop moderno e completo com prateleiras de produtos para animais, iluminado" 
+                class="absolute inset-0 w-full h-full object-cover z-0" 
+                width="1920" 
+                height="1080" 
+                decoding="async" 
+                loading="eager"
+            >
+            <div class="absolute inset-0 bg-primary/70 z-10"></div> <!-- Dark overlay -->
+            
+            <div class="container mx-auto px-6 text-center z-20">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 font-heading text-secondary drop-shadow-lg">
+                    Onde a Saúde e a Felicidade do Seu Pet Encontram Tudo o que Precisam em <span class="text-white">Mongaguá!</span>
+                </h1>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-gray-200">
+                    Da ração premium aos brinquedos mais divertidos, cuidamos do seu melhor amigo com carinho, conhecimento e a maior variedade da região.
                 </p>
-                <a href="https://wa.me/551334482068?text=Quero%20o%20Melhor%20para%20Meu%20Pet%20na%20Agro%20Fenix!" class="mt-8 inline-block px-10 py-5 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] text-xl font-extrabold rounded-full shadow-2xl hover:scale-105 hover:from-yellow-500 hover:to-[var(--color-secondary)] transition-all duration-300 ease-in-out transform animate-pulse" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco para cuidar do seu pet" id="st-el-mbyqhxscr">
-                    Quero o Melhor para Meu Pet! <i class="fas fa-arrow-right ml-2"></i>
+                <a href="https://wa.me/551334482068?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20Agro%20Fenix%21" target="_blank" rel="noopener noreferrer" aria-label="Fale Conosco Agora e Cuide do Seu Pet" class="inline-block bg-gradient-to-r from-secondary to-accent text-primary px-10 py-4 rounded-full text-xl font-bold shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out animate-pulse">
+                    Fale Conosco Agora! <i class="fab fa-whatsapp ml-2"></i>
                 </a>
             </div>
         </section>
@@ -114,145 +155,137 @@
         <!-- SEÇÃO DE DOR E EMPATIA (O Problema) -->
         <section id="problemas" class="py-16 md:py-24 bg-gray-50">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]" id="st-el-b70m9w7tv">
-                    Você e Seu Pet Merecem Mais.
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
-                    Sabemos que encontrar o local ideal para o seu companheiro pode ser um desafio.
-                </p>
-
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Problema 1 -->
-                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <i class="fas fa-magnifying-glass text-5xl text-[var(--color-secondary)] mb-6"></i>
-                        <h3 class="text-2xl font-semibold mb-4 text-[var(--color-primary)]" id="st-el-wey773pgo">Dificuldade em Encontrar Variedade?</h3>
-                        <p class="text-lg text-gray-700">
-                            Cansado de visitar várias lojas para achar o que seu pet precisa? A falta de opções frustra quem busca o melhor.
-                        </p>
+                <h2 class="text-3xl md:text-4xl font-bold text-primary mb-12 font-heading">Você se Identifica com Algum Desses Desafios?</h2>
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Problema 1: Dificuldade em encontrar produtos de qualidade e variedade -->
+                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200">
+                        <i class="fas fa-search-dollar text-5xl text-secondary mb-6"></i>
+                        <h3 class="text-xl font-semibold text-dark-alt mb-4 font-heading">Dificuldade em Encontrar o Produto Certo</h3>
+                        <p class="text-gray-700">Perde tempo procurando rações específicas, brinquedos duráveis ou medicamentos de qualidade sem sucesso?</p>
                     </div>
-                    <!-- Problema 2 -->
-                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <i class="fas fa-truck-fast text-5xl text-[var(--color-secondary)] mb-6"></i>
-                        <h3 class="text-2xl font-semibold mb-4 text-[var(--color-primary)]" id="st-el-06i50hmsl">Falta de Conveniência e Tempo?</h3>
-                        <p class="text-lg text-gray-700">
-                            Com a correria do dia a dia, ir às compras para o pet pode ser um luxo. Você precisa de soluções práticas.
-                        </p>
+                    <!-- Problema 2: Falta de orientação especializada -->
+                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200">
+                        <i class="fas fa-question-circle text-5xl text-secondary mb-6"></i>
+                        <h3 class="text-xl font-semibold text-dark-alt mb-4 font-heading">Falta de Orientação Especializada</h3>
+                        <p class="text-gray-700">Não sabe qual a melhor dieta, suplemento ou acessório para a necessidade particular do seu pet?</p>
                     </div>
-                    <!-- Problema 3 -->
-                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <i class="fas fa-question-circle text-5xl text-[var(--color-secondary)] mb-6"></i>
-                        <h3 class="text-2xl font-semibold mb-4 text-[var(--color-primary)]" id="st-el-yo3ymj219">Dúvidas sobre o Melhor para Ele?</h3>
-                        <p class="text-lg text-gray-700">
-                            Com tantas opções no mercado, é difícil saber qual a melhor ração, brinquedo ou tratamento. Você busca orientação.
-                        </p>
+                    <!-- Problema 3: Perda de tempo e conveniência -->
+                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-gray-200">
+                        <i class="fas fa-shipping-fast text-5xl text-secondary mb-6"></i>
+                        <h3 class="text-xl font-semibold text-dark-alt mb-4 font-heading">Perda de Tempo e Conveniência</h3>
+                        <p class="text-gray-700">Cansado de ter que se deslocar para diversas lojas para encontrar tudo que seu pet precisa?</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- PROPOSTA ÚNICA DE VALOR (SOLUÇÃO / DIFERENCIAIS) -->
-        <section id="solucao" class="py-16 md:py-24 bg-[var(--color-primary)] text-white">
+        <section id="solucao" class="py-16 md:py-24 bg-dark-lighter text-white">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white" id="st-el-93xtpu1hg">
-                    Agro Fenix: A Solução Completa Para O Bem-Estar Do Seu Pet!
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-300">
-                    Transformamos sua experiência com seu animal de estimação, oferecendo conforto e qualidade incomparáveis.
-                </p>
-
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Diferencial 1: Entrega -->
-                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
-                        <i class="fas fa-truck text-5xl text-[var(--color-secondary)] mb-6"></i>
-                        <h3 class="text-2xl font-semibold mb-3" id="st-el-gacq5o1j1">Entrega Confortável</h3>
-                        <p class="text-lg text-gray-700">Receba os produtos do seu pet no conforto da sua casa, sem preocupações.</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-secondary mb-12 font-heading">Agro Fenix: A Solução Completa para o Bem-Estar do Seu Pet!</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Diferencial 1: Qualidade e Variedade Incomparáveis -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <i class="fas fa-award text-5xl text-accent mb-6"></i>
+                        <h3 class="text-xl font-semibold text-white mb-4 font-heading">Qualidade e Variedade Incomparáveis</h3>
+                        <p class="text-gray-300">Oferecemos uma curadoria excepcional dos melhores produtos do mercado, das rações mais nobres aos acessórios inovadores.</p>
                     </div>
-                    <!-- Diferencial 2: Retirada na loja -->
-                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
-                        <i class="fas fa-store text-5xl text-[var(--color-secondary)] mb-6"></i>
-                        <h3 class="text-2xl font-semibold mb-3" id="st-el-fyjkz8cip">Retirada Facilitada</h3>
-                        <p class="text-lg text-gray-700">Prefere buscar? Seu pedido estará pronto em nossa loja para retirada rápida.</p>
+                    <!-- Diferencial 2: Atendimento Especializado -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <i class="fas fa-handshake text-5xl text-accent mb-6"></i>
+                        <h3 class="text-xl font-semibold text-white mb-4 font-heading">Atendimento Especializado</h3>
+                        <p class="text-gray-300">Nossa equipe é apaixonada por animais e pronta para oferecer a melhor orientação, garantindo escolhas inteligentes para seu pet.</p>
                     </div>
-                    <!-- Diferencial 3: Acessibilidade -->
-                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
-                        <i class="fas fa-wheelchair text-5xl text-[var(--color-secondary)] mb-6"></i>
-                        <h3 class="text-2xl font-semibold mb-3" id="st-el-y6gfdsp8u">Acessibilidade Total</h3>
-                        <p class="text-lg text-gray-700">Nossa loja é projetada para receber a todos com entrada acessível.</p>
+                    <!-- Diferencial 3: Conveniência Total: Entrega e Retirada -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <i class="fas fa-truck text-5xl text-accent mb-6"></i>
+                        <h3 class="text-xl font-semibold text-white mb-4 font-heading">Conveniência Total: Entrega e Retirada</h3>
+                        <p class="text-gray-300">Pensando na sua rotina, oferecemos opções flexíveis de entrega em domicílio e retirada rápida na loja.</p>
                     </div>
-                    <!-- Diferencial 4: Pagamentos flexíveis -->
-                    <div class="bg-white text-[var(--color-primary)] p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
-                        <i class="fas fa-credit-card text-5xl text-[var(--color-secondary)] mb-6"></i>
-                        <h3 class="text-2xl font-semibold mb-3" id="st-el-gnc728fhi">Pagamentos Modernos</h3>
-                        <p class="text-lg text-gray-700">Aceitamos crédito, débito e pagamentos por NFC para sua comodidade.</p>
+                    <!-- Diferencial 4: Espaço Acessível para Todos -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <i class="fas fa-wheelchair text-5xl text-accent mb-6"></i>
+                        <h3 class="text-xl font-semibold text-white mb-4 font-heading">Espaço Acessível para Todos</h3>
+                        <p class="text-gray-300">Nossa loja foi pensada para receber a todos com conforto e facilidade, incluindo entrada com acessibilidade.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- APRESENTAÇÃO DE SERVIÇOS / PRODUTOS -->
-        <section id="servicos" class="py-16 md:py-24 bg-gray-50">
+        <section id="servicos" class="py-16 md:py-24 bg-gray-100">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]" id="st-el-p9vcy23bt">
-                    Tudo Que Seu Pet Precisa, Em Um Só Lugar
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
-                    Explore nossa vasta seleção de produtos e serviços pensados para cada fase da vida do seu companheiro.
-                </p>
-
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Serviço 1: Rações Premium -->
-                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
-                        <img src="https://images.unsplash.com/photo-1579208076043-34e2c88d8b6e?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80&amp;fm=webp" alt="Variedade de Rações Premium para Cães e Gatos" width="800" height="533" loading="lazy" decoding="async" class="w-full h-64 object-cover" id="st-el-5hdlpeh2d">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary mb-12 font-heading">Nossa Seleção Premium para o Seu Melhor Amigo</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <!-- Produto/Serviço 1: Rações e Alimentos Premium -->
+                    <div class="bg-white rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out overflow-hidden border border-gray-200">
+                        <img 
+                            src="https://images.unsplash.com/photo-1583569806495-2dfb94d134d1?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=600" 
+                            alt="Diversas rações premium para cães e gatos em sacos coloridos de alta qualidade" 
+                            class="w-full h-56 object-cover" 
+                            width="600" 
+                            height="375" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                         <div class="p-6">
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary)]" id="st-el-hwigp6o2j">Rações Premium</h3>
-                            <p class="text-lg text-gray-700 mb-4">
-                                As melhores marcas e formulações para garantir nutrição completa e sabor irresistível.
-                            </p>
-                            <ul class="list-disc list-inside text-left text-gray-600 mb-6 space-y-2">
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Opções para todas as idades</li>
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Dietas especiais e terapêuticas</li>
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Alimentos úmidos e secos</li>
+                            <h3 class="text-2xl font-semibold text-dark-alt mb-3 font-heading">Rações e Alimentos Premium</h3>
+                            <p class="text-gray-700 mb-4">A melhor nutrição para todas as fases da vida do seu pet. Escolha entre as marcas mais renomadas:</p>
+                            <ul class="text-left text-gray-600 space-y-2 mb-6">
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Rações secas e úmidas</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Dietas específicas e terapêuticas</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Suplementos e petiscos saudáveis</li>
                             </ul>
-                            <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20as%20ra%C3%A7%C3%B5es%20dispon%C3%ADveis!" class="block w-full text-center py-3 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] font-bold rounded-full hover:scale-105 transition-all duration-300 ease-in-out" target="_blank" rel="noopener noreferrer" aria-label="Comprar Rações Premium" id="st-el-sqxiax0ys">
-                                Ver Rações
+                            <a href="https://wa.me/551334482068?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20as%20ra%C3%A7%C3%B5es%20da%20Agro%20Fenix%21" target="_blank" rel="noopener noreferrer" aria-label="Ver Rações e Alimentos Premium" class="inline-block bg-gradient-to-r from-secondary to-accent text-primary px-6 py-3 rounded-full font-bold hover:scale-105 transition-all duration-300 ease-in-out">
+                                Ver Produtos <i class="fas fa-arrow-right ml-2"></i>
                             </a>
                         </div>
                     </div>
-
-                    <!-- Serviço 2: Acessórios Divertidos -->
-                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
-                        <img src="https://images.unsplash.com/photo-1544974950-89196238b939?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80&amp;fm=webp" alt="Variedade de Acessórios e Brinquedos para Pets" width="800" height="533" loading="lazy" decoding="async" class="w-full h-64 object-cover" id="st-el-uvo4imdxx">
+                    <!-- Produto/Serviço 2: Acessórios e Brinquedos -->
+                    <div class="bg-white rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out overflow-hidden border border-gray-200">
+                        <img 
+                            src="https://images.unsplash.com/photo-1543466835-09a656627054?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=600" 
+                            alt="Diversos acessórios coloridos para pets, incluindo coleiras, brinquedos e caminhas em um pet shop" 
+                            class="w-full h-56 object-cover" 
+                            width="600" 
+                            height="375" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                         <div class="p-6">
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary)]" id="st-el-x3ys7afdr">Acessórios Incríveis</h3>
-                            <p class="text-lg text-gray-700 mb-4">
-                                De brinquedos interativos a coleiras estilosas, tudo para o conforto e alegria do seu amigo.
-                            </p>
-                            <ul class="list-disc list-inside text-left text-gray-600 mb-6 space-y-2">
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Brinquedos e arranhadores</li>
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Camas e cobertores aconchegantes</li>
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Guias, coleiras e caixas de transporte</li>
+                            <h3 class="text-2xl font-semibold text-dark-alt mb-3 font-heading">Acessórios e Brinquedos</h3>
+                            <p class="text-gray-700 mb-4">Tudo para o conforto, diversão e segurança do seu companheiro:</p>
+                            <ul class="text-left text-gray-600 space-y-2 mb-6">
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Coleiras, guias e peitorais</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Brinquedos interativos e educativos</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Caminhas, cobertores e arranhadores</li>
                             </ul>
-                            <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20conhecer%20os%20acess%C3%B3rios%20para%20pets!" class="block w-full text-center py-3 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] font-bold rounded-full hover:scale-105 transition-all duration-300 ease-in-out" target="_blank" rel="noopener noreferrer" aria-label="Ver Acessórios para Pets" id="st-el-a2ggcum1v">
-                                Ver Acessórios
+                            <a href="https://wa.me/551334482068?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20acess%C3%B3rios%20e%20brinquedos%20da%20Agro%20Fenix%21" target="_blank" rel="noopener noreferrer" aria-label="Ver Acessórios e Brinquedos" class="inline-block bg-gradient-to-r from-secondary to-accent text-primary px-6 py-3 rounded-full font-bold hover:scale-105 transition-all duration-300 ease-in-out">
+                                Ver Produtos <i class="fas fa-arrow-right ml-2"></i>
                             </a>
                         </div>
                     </div>
-
-                    <!-- Serviço 3: Saúde e Bem-Estar -->
-                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
-                        <img src="https://images.unsplash.com/photo-1536852443493-2776c5b96910?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80&amp;fm=webp" alt="Medicamentos e Produtos de Saúde Animal" width="800" height="533" loading="lazy" decoding="async" class="w-full h-64 object-cover" id="st-el-ja31dzqah">
+                    <!-- Produto/Serviço 3: Saúde e Bem-Estar -->
+                    <div class="bg-white rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out overflow-hidden border border-gray-200">
+                        <img 
+                            src="https://images.unsplash.com/photo-1616766488737-ea5c49b91361?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=600" 
+                            alt="Caixa de primeiros socorros para pets e diversos medicamentos essenciais para a saúde animal" 
+                            class="w-full h-56 object-cover" 
+                            width="600" 
+                            height="375" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                         <div class="p-6">
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary)]" id="st-el-353hs7fma">Saúde e Higiene</h3>
-                            <p class="text-lg text-gray-700 mb-4">
-                                Produtos essenciais para a saúde e higiene, garantindo uma vida longa e feliz para seu pet.
-                            </p>
-                            <ul class="list-disc list-inside text-left text-gray-600 mb-6 space-y-2">
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Vermífugos e antipulgas</li>
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Shampoos e condicionadores</li>
-                                <li><i class="fas fa-check-circle text-[var(--color-secondary)] mr-2"></i>Suplementos e vitaminas</li>
+                            <h3 class="text-2xl font-semibold text-dark-alt mb-3 font-heading">Saúde e Bem-Estar</h3>
+                            <p class="text-gray-700 mb-4">Cuidados essenciais para a saúde e higiene, garantindo mais qualidade de vida:</p>
+                            <ul class="text-left text-gray-600 space-y-2 mb-6">
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Medicamentos e vermífugos</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Shampoos, condicionadores e perfumes</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle text-secondary mr-2"></i> Produtos antipulgas e carrapatos</li>
                             </ul>
-                            <a href="https://wa.me/551334482068?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20produtos%20de%20sa%C3%BAde%20e%20higiene%20pet!" class="block w-full text-center py-3 bg-gradient-to-r from-[var(--color-secondary)] to-yellow-500 text-[var(--color-primary)] font-bold rounded-full hover:scale-105 transition-all duration-300 ease-in-out" target="_blank" rel="noopener noreferrer" aria-label="Comprar Produtos de Saúde Animal" id="st-el-h8zhbqhuf">
-                                Ver Produtos de Saúde
+                            <a href="https://wa.me/551334482068?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20de%20sa%C3%BAde%20e%20bem-estar%20da%20Agro%20Fenix%21" target="_blank" rel="noopener noreferrer" aria-label="Ver Produtos de Saúde e Bem-Estar" class="inline-block bg-gradient-to-r from-secondary to-accent text-primary px-6 py-3 rounded-full font-bold hover:scale-105 transition-all duration-300 ease-in-out">
+                                Ver Produtos <i class="fas fa-arrow-right ml-2"></i>
                             </a>
                         </div>
                     </div>
@@ -261,117 +294,137 @@
         </section>
 
         <!-- PROVA SOCIAL (Autoridade, Gatilho da Manada) -->
-        <section id="depoimentos" class="py-16 md:py-24 bg-[var(--color-primary)] text-white">
+        <section id="depoimentos" class="py-16 md:py-24 bg-dark-lighter text-white">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white" id="st-el-bezo6cxul">
-                    O Que Nossos Clientes Dizem
-                </h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-secondary mb-12 font-heading">O Que Nossos Clientes Dizem Sobre a Agro Fenix</h2>
                 <div class="flex items-center justify-center mb-8">
-                    <div class="flex text-yellow-400 text-3xl">
+                    <div class="flex text-amber-400 text-3xl mr-3">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star-half-alt"></i>
                     </div>
-                    <p class="ml-4 text-2xl font-semibold text-white">4.7 de 5 estrelas</p>
-                    <p class="ml-2 text-xl text-gray-300">(618 avaliações)</p>
+                    <p class="text-xl text-white font-semibold">4.7 de 5 estrelas baseadas em <span class="text-secondary">618 avaliações</span></p>
                 </div>
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Testimonial 1 -->
-                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <div class="flex text-yellow-400 text-xl mb-4">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <!-- Depoimento 1: Andreia Capellari -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <div class="flex items-center mb-4">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?crop=entropy&cs=tinysrgb&fit=facearea&fm=webp&h=80&q=80&w=80" alt="Foto de perfil de Andreia Capellari" class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-secondary" width="80" height="80" loading="lazy" decoding="async">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white font-heading">Andreia Capellari</h3>
+                                <div class="flex text-amber-400 text-lg">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-lg text-gray-200 italic mb-6">
-                            "Lugar perfeito para comprar tudo para o pet. Sou cliente fiel. Adoro o atendimento. Preço e variedade de produtos. Recomendo."
-                        </p>
-                        <p class="font-bold text-secondary text-xl">- Andreia Capellari</p>
+                        <p class="text-gray-300 italic">"Lugar perfeito para comprar tudo para o pet. Sou cliente fiel. Adoro o atendimento. Preço e variedade de produtos. Recomendo."</p>
                     </div>
-                    <!-- Testimonial 2 -->
-                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <div class="flex text-yellow-400 text-xl mb-4">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <!-- Depoimento 2: Edinilson Matheus -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <div class="flex items-center mb-4">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b73528c311a?crop=entropy&cs=tinysrgb&fit=facearea&fm=webp&h=80&q=80&w=80" alt="Foto de perfil de Edinilson Matheus" class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-secondary" width="80" height="80" loading="lazy" decoding="async">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white font-heading">Edinilson Matheus</h3>
+                                <div class="flex text-amber-400 text-lg">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-lg text-gray-200 italic mb-6">
-                            "Esse lugar eu recomendo tem tudo que você em matéria de agro e cuidados animais desde rações ao medicamentos."
-                        </p>
-                        <p class="font-bold text-secondary text-xl">- José Constantino</p>
+                        <p class="text-gray-300 italic">"Atendimento perfeito, funcionários atenciosos e conhecedores. Parabéns"</p>
                     </div>
-                    <!-- Testimonial 3 -->
-                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <div class="flex text-yellow-400 text-xl mb-4">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <!-- Depoimento 3: José Constantino -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <div class="flex items-center mb-4">
+                            <img src="https://images.unsplash.com/photo-1507003211169-e69fe254fe58?crop=entropy&cs=tinysrgb&fit=facearea&fm=webp&h=80&q=80&w=80" alt="Foto de perfil de José Constantino" class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-secondary" width="80" height="80" loading="lazy" decoding="async">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white font-heading">José Constantino</h3>
+                                <div class="flex text-amber-400 text-lg">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-lg text-gray-200 italic mb-6">
-                            "Ótimo atendimento. Bons preços."
-                        </p>
-                        <p class="font-bold text-secondary text-xl">- Fernando Antonio Guedes Molina</p>
+                        <p class="text-gray-300 italic">"Esse lugar eu recomendo tem tudo que você em matéria de agro e cuidados animais desde rações ao medicamentos."</p>
                     </div>
-                    <!-- Testimonial 4 -->
-                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <div class="flex text-yellow-400 text-xl mb-4">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <!-- Depoimento 4: Fernando Antonio Guedes Molina -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <div class="flex items-center mb-4">
+                            <img src="https://images.unsplash.com/photo-1542155829-7973bb907409?crop=entropy&cs=tinysrgb&fit=facearea&fm=webp&h=80&q=80&w=80" alt="Foto de perfil de Fernando Antonio Guedes Molina" class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-secondary" width="80" height="80" loading="lazy" decoding="async">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white font-heading">Fernando Antonio Guedes Molina</h3>
+                                <div class="flex text-amber-400 text-lg">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-lg text-gray-200 italic mb-6">
-                            "Pense em lugar que tem tudo para animais, o atendimento é muito bom, atencioso e sempre tem desconto. Super recomendo!!!"
-                        </p>
-                        <p class="font-bold text-secondary text-xl">- Claudia Leite</p>
+                        <p class="text-gray-300 italic">"Ótimo atendimento. Bons preços."</p>
                     </div>
-                    <!-- Testimonial 5 -->
-                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <div class="flex text-yellow-400 text-xl mb-4">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <!-- Depoimento 5: Claudia Leite -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <div class="flex items-center mb-4">
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=tinysrgb&fit=facearea&fm=webp&h=80&q=80&w=80" alt="Foto de perfil de Claudia Leite" class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-secondary" width="80" height="80" loading="lazy" decoding="async">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white font-heading">Claudia Leite</h3>
+                                <div class="flex text-amber-400 text-lg">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-lg text-gray-200 italic mb-6">
-                            "Literalmente lembrança da infância. Sempre fui ao local com meus pais dês de pequeno. Qualidade e atendimento nos mínimos detalhes."
-                        </p>
-                        <p class="font-bold text-secondary text-xl">- Bruno Sorru</p>
+                        <p class="text-gray-300 italic">"Pense em lugar que tem tudo para animais, o atendimento é muito bom, atencioso e sempre tem desconto. Super recomendo!!!"</p>
                     </div>
-                    <!-- Testimonial 6 -->
-                    <div class="bg-white/10 p-8 rounded-xl shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out border-t-4 border-[var(--color-secondary)]">
-                        <div class="flex text-yellow-400 text-xl mb-4">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <!-- Depoimento 6: Bruno Sorru -->
+                    <div class="bg-primary p-8 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-in-out border border-secondary/30">
+                        <div class="flex items-center mb-4">
+                            <img src="https://images.unsplash.com/photo-1519085360753-af0f3899cd46?crop=entropy&cs=tinysrgb&fit=facearea&fm=webp&h=80&q=80&w=80" alt="Foto de perfil de Bruno Sorru" class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-secondary" width="80" height="80" loading="lazy" decoding="async">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white font-heading">Bruno Sorru</h3>
+                                <div class="flex text-amber-400 text-lg">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-lg text-gray-200 italic mb-6">
-                            "Super recomendo! Mega atenciosos, pronto atendimento, variedades, jardinagem, medicamentos e acima de tudo paixão no que faz. Dedicação e carinho aos animais."
-                        </p>
-                        <p class="font-bold text-secondary text-xl">- Marcia Regina Luzzi</p>
+                        <p class="text-gray-300 italic">"Literalmente lembrança da infância. Sempre fui ao local com meus pais dês de pequeno. Qualidade e atendimento nos mínimos detalhes."</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- SEÇÃO SOBRE NÓS HUMANIZADA -->
-        <section id="sobre" class="py-16 md:py-24 bg-white">
-            <div class="container mx-auto px-6">
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <!-- Lado Imagem -->
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1517423738870-4824584c4785?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80&amp;fm=webp" alt="Equipe da Agro Fenix interagindo com um cachorro" width="800" height="533" loading="lazy" decoding="async" class="rounded-2xl shadow-2xl w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500 ease-in-out" id="st-el-t50jkq2wy">
-                    </div>
-                    <!-- Lado Texto -->
-                    <div>
-                        <h2 class="text-4xl md:text-5xl font-bold mb-6 text-[var(--color-primary)]" id="st-el-usc2k6wy0">
-                            Agro Fenix: Paixão e Cuidado Que Transformam
-                        </h2>
-                        <p class="text-lg leading-relaxed mb-6 text-gray-700">
-                            Na Agro Fenix, nossa história é escrita com amor e dedicação aos animais. Desde o início, nosso compromisso é oferecer não apenas produtos, mas soluções completas que promovam o bem-estar e a felicidade dos pets e seus tutores. Entendemos que cada animal é único e merece o melhor.
-                        </p>
-                        <p class="text-lg leading-relaxed mb-8 text-gray-700">
-                            Com opções de entrega e retirada na loja, e uma equipe sempre pronta para auxiliar, garantimos uma experiência de compra conveniente e personalizada. Nossa loja é acessível a todos e pensada para você fazer suas compras de forma rápida e eficiente, sempre com a garantia de qualidade e variedade.
-                        </p>
-
-                        <div class="grid grid-cols-2 gap-8 mt-8">
-                            <div class="text-center bg-gray-100 p-6 rounded-lg shadow-md">
-                                <p class="text-5xl font-bold text-[var(--color-secondary)]">20+</p>
-                                <p class="text-xl font-medium text-[var(--color-primary)]">Anos de Experiência</p>
-                            </div>
-                            <div class="text-center bg-gray-100 p-6 rounded-lg shadow-md">
-                                <p class="text-5xl font-bold text-[var(--color-secondary)]">1000+</p>
-                                <p class="text-xl font-medium text-[var(--color-primary)]">Clientes Satisfeitos</p>
-                            </div>
+        <section id="sobre" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+                <!-- Lado Imagem -->
+                <div class="order-2 md:order-1">
+                    <img 
+                        src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkGxEi8-fxpxgbc2HI2fSB2Zvv0czT3zpDq1iBeTwXXrsI2y9MVbwPBdxfNhqjRRUqo2tKE68uYg0Ehi2vMrG9Mky3I3v2Sxcc-Uv_El-JtbVWMY_AJaFpBMrhz0LM0Wb_oL3WF5Q=w408-h306-k-no" 
+                        alt="Cachorro feliz sendo abraçado por uma pessoa em um ambiente de loja de animais" 
+                        class="rounded-xl shadow-2xl w-full h-auto object-cover border-4 border-secondary/50" 
+                        width="408" 
+                        height="306" 
+                        loading="lazy" 
+                        decoding="async"
+                    >
+                </div>
+                <!-- Lado Texto -->
+                <div class="order-1 md:order-2 text-center md:text-left">
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary mb-6 font-heading">Agro Fenix: Paixão e Cuidado Pelos Seus Animais</h2>
+                    <p class="text-gray-700 leading-relaxed mb-6">
+                        Na Agro Fenix, nossa história é escrita com amor e dedicação aos animais. Desde o início, nosso compromisso é oferecer não apenas produtos, mas soluções completas que promovam a saúde, o bem-estar e a felicidade de seus pets. Acreditamos que cada animal merece o melhor, e é com essa missão que selecionamos cuidadosamente cada item do nosso catálogo e treinamos nossa equipe.
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-8">
+                        Mais do que um pet shop, somos um ponto de encontro para tutores que buscam excelência, variedade e um atendimento humanizado. Seja para uma ração especial, um novo brinquedo ou um conselho amigável, conte com a Agro Fenix para ser o parceiro ideal na jornada com seu melhor amigo.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6 mt-8">
+                        <div class="p-4 bg-primary text-white rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out">
+                            <i class="fas fa-users text-3xl text-secondary mb-2"></i>
+                            <p class="text-2xl font-bold font-heading">618+</p>
+                            <p class="text-sm">Clientes Satisfeitos</p>
+                        </div>
+                        <div class="p-4 bg-primary text-white rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out">
+                            <i class="fas fa-calendar-alt text-3xl text-secondary mb-2"></i>
+                            <p class="text-2xl font-bold font-heading">XX+</p> 
+                            <p class="text-sm">Anos de Tradição</p>
                         </div>
                     </div>
                 </div>
@@ -379,101 +432,139 @@
         </section>
 
         <!-- ESTRUTURA DA LOJA (Galeria Imersiva) -->
-        <section id="galeria" class="py-16 md:py-24 bg-gray-100">
+        <section id="galeria" class="py-16 md:py-24 bg-primary">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]" id="st-el-uj1xpn88r">
-                    Nosso Espaço: Conforto e Variedade Para Seu Pet
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
-                    Explore nossa loja e veja a qualidade e o carinho que preparamos para receber você e seu companheiro.
-                </p>
-
+                <h2 class="text-3xl md:text-4xl font-bold text-secondary mb-12 font-heading">Explore Nosso Espaço e Produtos!</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    <div class="overflow-hidden rounded-xl shadow-xl">
-                        <img src="https://images.unsplash.com/photo-1596707242858-6923b72b64d0?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80&amp;fm=webp" alt="Interior da Agro Fenix com produtos para animais de estimação" width="800" height="533" loading="lazy" decoding="async" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" id="st-el-u0rckia0i">
+                    <!-- Galeria Imagem 1 (from provided data) -->
+                    <div class="rounded-xl overflow-hidden shadow-xl border-2 border-secondary/30">
+                        <img 
+                            src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlboC9UMrbf5czcA5HgwBBnUudN3jvv5-xFfF8kiylPpVJX8_jfpfYUP8ywe2Me0ir7G7gf6aoReNuPVkO2Mlu5exPHWWzDk4uQiFoMbCHeWsv2nMSxe2Hv-6VMt2EQbO-G8Wc9lw=w224-h472-k-no" 
+                            alt="Interior da Agro Fenix, corredor com prateleiras repletas de produtos para animais de estimação" 
+                            class="w-full h-64 md:h-80 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" 
+                            width="224" 
+                            height="472" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                     </div>
-                    <div class="overflow-hidden rounded-xl shadow-xl">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEugbk8Jkp4bGRgpzm3uYu1CA-1E6cq55HgtkzxHi1QrP1eQH88bRllHUY6u3LsAvKePfzR_O5ArfM9CQcNn6QYBBB9xQ5ilFbkgCk_hYtTmezE1SJvTyaYxX5cY-DCZULHoxhmoA=w224-h472-k-no" alt="Fachada da Agro Fenix Pet Shop em Mongaguá" width="224" height="472" loading="lazy" decoding="async" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" id="st-el-wh5ydvjkx">
+                    <!-- Galeria Imagem 2 (from provided data) -->
+                    <div class="rounded-xl overflow-hidden shadow-xl border-2 border-secondary/30">
+                        <img 
+                            src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWn6_pJmtgW-qM0X58dJdVLsuWLEGTHs2llLJht_UmFdJT3tL-JozWh1mbOsjL8DUIJoFvfPBLiEgzX-0Nan29nNxAvEVehgDXJnL4TukH7vAmdW0jtOorLwqteP4dSVF3PaWuo=w224-h398-k-no" 
+                            alt="Setor da Agro Fenix com produtos para jardinagem e ferramentas diversas" 
+                            class="w-full h-64 md:h-80 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" 
+                            width="224" 
+                            height="398" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                     </div>
-                    <div class="overflow-hidden rounded-xl shadow-xl">
-                        <img src="https://images.unsplash.com/photo-1583337130225-b4618a804473?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80&amp;fm=webp" alt="Corredor de rações e alimentos para pets na Agro Fenix" width="800" height="533" loading="lazy" decoding="async" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" id="st-el-dhsns0jsf">
+                    <!-- Galeria Imagem 3 (from provided data) -->
+                    <div class="rounded-xl overflow-hidden shadow-xl border-2 border-secondary/30">
+                        <img 
+                            src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnu-rhpwgUfraimQBnLVAtgCHTzSQNjtgCtaupmxMvVYFtwLmxueYwLRNHGOSuawdldRh5etI7Zu1Og8OxZ2VCY7rwv1XQ2ThqoUTl4Bmgk3qaENHewDvtEx4vNEc70JxpjvXiHgw=w224-h298-k-no" 
+                            alt="Entrada da loja Agro Fenix com exposição de plantas e produtos ao ar livre" 
+                            class="w-full h-64 md:h-80 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" 
+                            width="224" 
+                            height="298" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                     </div>
-                    <div class="overflow-hidden rounded-xl shadow-xl">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAHI7JgYqvWh3iUIr9WLfpmuNdhe9fogLBYsoUvt6p8MwdbSkJ57CZHW_VhPcfYQX4cw40k9SN7Q6DySDoev0OJIGd6GFzJC0G3Enyd3n57QdUBXguH5aZPS8pbaeIRy6phL2aUIcw=w397-h298-k-no" alt="Detalhes da loja Agro Fenix com produtos organizados" width="397" height="298" loading="lazy" decoding="async" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" id="st-el-otbgcfavu">
+                    <!-- Galeria Imagem 4 (Unsplash fallback for more pet focus) -->
+                    <div class="rounded-xl overflow-hidden shadow-xl border-2 border-secondary/30">
+                        <img 
+                            src="https://images.unsplash.com/photo-1517743519890-a50e50f3cf1c?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=600" 
+                            alt="Prateleiras bem organizadas com uma variedade de brinquedos e acessórios para gatos" 
+                            class="w-full h-64 md:h-80 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" 
+                            width="600" 
+                            height="400" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                     </div>
-                    <div class="overflow-hidden rounded-xl shadow-xl">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAH6gUv9wAQn4dmUYSeoVQtdQEzJMTuUOCBgXUjvQeb0aPvORiOeNzhUvGoBilQpWlYNDN3pI50IZ1asqyz7IQTfwXRGlKiXzO2czjsUD38lmTEa32VNbblPQwZH6eCdd4UX3w=w224-h398-k-no" alt="Prateleiras com produtos de higiene e saúde para pets" width="224" height="398" loading="lazy" decoding="async" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" id="st-el-ghmes9wee">
+                    <!-- Galeria Imagem 5 (Unsplash fallback for more pet focus) -->
+                    <div class="rounded-xl overflow-hidden shadow-xl border-2 border-secondary/30">
+                        <img 
+                            src="https://images.unsplash.com/photo-1599424840484-90aa362534a6?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=600" 
+                            alt="Exposição de produtos para higiene e cuidado com pets, como shampoos e escovas" 
+                            class="w-full h-64 md:h-80 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" 
+                            width="600" 
+                            height="400" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                     </div>
-                    <div class="overflow-hidden rounded-xl shadow-xl">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEUfu8OuPbuFLy4Niaetq-7gcDheOpDpsLM0Q7fxn2ou8VbO1Z9WMeom41-D-pJ_gKPgm0OfS848c6QkgpSXI1kZI9mbfhUm_sT25rWv43gD9Lv-YX6xJCFOayp_FNHNmk5dYxj-A=w224-h298-k-no" alt="Seção de medicamentos e suplementos na Agro Fenix" width="224" height="298" loading="lazy" decoding="async" class="w-full h-64 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" id="st-el-0rmixicg8">
+                    <!-- Galeria Imagem 6 (Unsplash fallback for more pet focus) -->
+                    <div class="rounded-xl overflow-hidden shadow-xl border-2 border-secondary/30">
+                        <img 
+                            src="https://images.unsplash.com/photo-1629864222014-e5380590c910?crop=entropy&cs=tinysrgb&fit=max&fm=webp&q=80&w=600" 
+                            alt="Um lindo cachorro da raça Golden Retriever com expressão feliz" 
+                            class="w-full h-64 md:h-80 object-cover transform hover:scale-110 transition-transform duration-500 ease-in-out" 
+                            width="600" 
+                            height="400" 
+                            loading="lazy" 
+                            decoding="async"
+                        >
                     </div>
                 </div>
             </div>
         </section>
-
+        
         <!-- SEÇÃO FAQ (Sanfona/Accordion) -->
-        <section id="faq" class="py-16 md:py-24 bg-white">
-            <div class="container mx-auto px-6 text-center max-w-4xl">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]" id="st-el-6ozax6vbh">
-                    Dúvidas Frequentes
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto mb-12 text-gray-600">
-                    Respostas rápidas para as perguntas mais comuns sobre nossos produtos e serviços.
-                </p>
-
-                <div class="space-y-4 text-left">
+        <section id="faq" class="py-16 md:py-24 bg-gray-100">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary mb-12 font-heading">Dúvidas Frequentes</h2>
+                <div class="max-w-3xl mx-auto space-y-4">
                     <!-- FAQ Item 1 -->
-                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
-                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out" aria-expanded="false" aria-controls="faq-content-1" aria-label="Abrir ou fechar resposta para Quais formas de pagamento são aceitas?" id="st-el-ss07zahrx">
-                            <span>Quais formas de pagamento são aceitas?</span>
-                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-xl font-semibold text-dark-alt hover:bg-gray-50 transition-colors duration-300 ease-in-out focus:outline-none" aria-expanded="false" aria-controls="faq-content-1" aria-label="Expandir ou recolher a resposta para 'Quais marcas de ração vocês trabalham?'">
+                            Quais marcas de ração vocês trabalham?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300 ease-in-out"></i>
                         </button>
-                        <div id="faq-content-1" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
-                            Aceitamos diversas formas de pagamento para sua comodidade, incluindo cartões de crédito e débito, e pagamentos por dispositivo móvel via NFC.
+                        <div id="faq-content-1" class="faq-content px-6 pb-6 text-gray-700 hidden" aria-hidden="true">
+                            <p class="pt-4 border-t border-gray-200">Trabalhamos com uma vasta gama de marcas premium e super premium, como Royal Canin, Premier, Hill's, N&D, e muitas outras, para atender às necessidades nutricionais específicas de cada pet, seja ele um filhote, adulto, sênior ou com condições especiais. Venha nos visitar e confira nosso catálogo completo!</p>
                         </div>
                     </div>
-
                     <!-- FAQ Item 2 -->
-                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
-                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out" aria-expanded="false" aria-controls="faq-content-2" aria-label="Abrir ou fechar resposta para Vocês fazem entrega de produtos?" id="st-el-pyf9ufdsa">
-                            <span>Vocês fazem entrega de produtos?</span>
-                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-xl font-semibold text-dark-alt hover:bg-gray-50 transition-colors duration-300 ease-in-out focus:outline-none" aria-expanded="false" aria-controls="faq-content-2" aria-label="Expandir ou recolher a resposta para 'Vocês oferecem serviço de entrega?'">
+                            Vocês oferecem serviço de entrega?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300 ease-in-out"></i>
                         </button>
-                        <div id="faq-content-2" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
-                            Sim, oferecemos serviço de entrega para que você receba todos os produtos do seu pet no conforto da sua casa. Entre em contato para verificar a disponibilidade na sua região!
+                        <div id="faq-content-2" class="faq-content px-6 pb-6 text-gray-700 hidden" aria-hidden="true">
+                            <p class="pt-4 border-t border-gray-200">Sim! Para sua maior comodidade, a Agro Fenix oferece serviço de entrega em Mongaguá e região. Consulte-nos para saber mais sobre as condições e áreas atendidas. Você também pode optar pela retirada rápida na loja.</p>
                         </div>
                     </div>
-
                     <!-- FAQ Item 3 -->
-                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
-                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out" aria-expanded="false" aria-controls="faq-content-3" aria-label="Abrir ou fechar resposta para Posso retirar meu pedido diretamente na loja?" id="st-el-hc1lvbhon">
-                            <span>Posso retirar meu pedido diretamente na loja?</span>
-                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-xl font-semibold text-dark-alt hover:bg-gray-50 transition-colors duration-300 ease-in-out focus:outline-none" aria-expanded="false" aria-controls="faq-content-3" aria-label="Expandir ou recolher a resposta para 'Como posso saber qual o melhor produto para o meu pet?'">
+                            Como posso saber qual o melhor produto para o meu pet?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300 ease-in-out"></i>
                         </button>
-                        <div id="faq-content-3" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
-                            Claro! Você pode fazer seu pedido e optar pela retirada na loja. Basta aguardar a confirmação de que seu pedido está pronto para ser retirado.
+                        <div id="faq-content-3" class="faq-content px-6 pb-6 text-gray-700 hidden" aria-hidden="true">
+                            <p class="pt-4 border-t border-gray-200">Nossa equipe de especialistas está sempre pronta para ajudar! Com base nas características do seu pet (idade, raça, porte, nível de atividade e condições de saúde), podemos indicar as melhores opções de rações, suplementos, brinquedos e acessórios. Venha conversar conosco!</p>
                         </div>
                     </div>
-
                     <!-- FAQ Item 4 -->
-                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
-                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out" aria-expanded="false" aria-controls="faq-content-4" aria-label="Abrir ou fechar resposta para A loja possui acessibilidade para cadeirantes?" id="st-el-21rzsfl1b">
-                            <span>A loja possui acessibilidade para cadeirantes?</span>
-                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-xl font-semibold text-dark-alt hover:bg-gray-50 transition-colors duration-300 ease-in-out focus:outline-none" aria-expanded="false" aria-controls="faq-content-4" aria-label="Expandir ou recolher a resposta para 'Quais são as formas de pagamento aceitas?'">
+                            Quais são as formas de pagamento aceitas?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300 ease-in-out"></i>
                         </button>
-                        <div id="faq-content-4" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
-                            Sim, nossa loja conta com entrada acessível para pessoas em cadeira de rodas, garantindo conforto e segurança para todos os nossos clientes.
+                        <div id="faq-content-4" class="faq-content px-6 pb-6 text-gray-700 hidden" aria-hidden="true">
+                            <p class="pt-4 border-t border-gray-200">Aceitamos diversas formas de pagamento para sua conveniência: cartões de crédito, cartões de débito, e pagamentos por dispositivo móvel via NFC. Você escolhe a melhor opção para você!</p>
                         </div>
                     </div>
-
                     <!-- FAQ Item 5 -->
-                    <div class="border border-gray-200 rounded-xl shadow-md overflow-hidden bg-white">
-                        <button class="flex justify-between items-center w-full p-6 text-xl font-semibold text-[var(--color-primary)] bg-gray-50 hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out" aria-expanded="false" aria-controls="faq-content-5" aria-label="Abrir ou fechar resposta para Vocês oferecem algum tipo de consultoria sobre produtos?" id="st-el-y2vch7s0d">
-                            <span>Vocês oferecem algum tipo de consultoria sobre produtos?</span>
-                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-xl font-semibold text-dark-alt hover:bg-gray-50 transition-colors duration-300 ease-in-out focus:outline-none" aria-expanded="false" aria-controls="faq-content-5" aria-label="Expandir ou recolher a resposta para 'Vocês têm produtos para outros tipos de animais além de cães e gatos?'">
+                            Vocês têm produtos para outros tipos de animais além de cães e gatos?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300 ease-in-out"></i>
                         </button>
-                        <div id="faq-content-5" class="p-6 text-lg text-gray-700 border-t border-gray-200 hidden">
-                            Nossa equipe está sempre pronta para ajudar! Se você tem dúvidas sobre qual produto é o ideal para o seu pet, venha nos visitar ou entre em contato. Teremos prazer em oferecer a melhor orientação.
+                        <div id="faq-content-5" class="faq-content px-6 pb-6 text-gray-700 hidden" aria-hidden="true">
+                            <p class="pt-4 border-t border-gray-200">Sim! Embora tenhamos um foco em cães e gatos, a Agro Fenix também oferece uma seleção de produtos para aves, roedores, peixes e outros pequenos animais. Venha nos consultar sobre as opções disponíveis para o seu pet exótico!</p>
                         </div>
                     </div>
                 </div>
@@ -481,258 +572,152 @@
         </section>
 
         <!-- ONDE ESTAMOS (Facilidade de Acesso) -->
-        <section id="contato" class="py-16 md:py-24 bg-gray-50">
+        <section id="contato" class="py-16 md:py-24 bg-dark-lighter text-white">
             <div class="container mx-auto px-6">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-center text-[var(--color-primary)]" id="st-el-vnk44i7ec">
-                    Localização e Contato
-                </h2>
-                <p class="text-xl max-w-3xl mx-auto mb-12 text-center text-gray-600">
-                    Visite-nos e encontre tudo que seu pet precisa. Estamos esperando por você!
-                </p>
-
-                <div class="grid md:grid-cols-2 gap-8 items-stretch">
-                    <!-- Lado esquerdo: Endereço e Horários -->
-                    <div class="bg-white p-8 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-3xl font-bold mb-4 text-[var(--color-primary)]" id="st-el-7hrnkj75t">Venha nos Visitar!</h3>
-                            <p class="text-lg mb-6 flex items-start">
-                                <i class="fas fa-map-marker-alt text-[var(--color-secondary)] mr-3 mt-1 text-xl"></i>
-                                Agro Fenix - Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000
-                            </p>
-
-                            <h4 class="text-2xl font-bold mb-3 text-[var(--color-primary)]">Horário de Atendimento:</h4>
-                            <ul class="text-lg mb-8 space-y-2">
-                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Segunda-feira:</span> 08:00–19:00</li>
-                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Terça-feira:</span> 08:00–19:00</li>
-                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Quarta-feira:</span> 08:00–19:00</li>
-                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Quinta-feira:</span> 08:00–19:00</li>
-                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Sexta-feira:</span> 08:00–19:00</li>
-                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Sábado:</span> 08:00–19:00</li>
-                                <li class="flex items-center"><i class="far fa-clock text-[var(--color-secondary)] mr-3"></i><span class="font-semibold">Domingo:</span> 08:00–13:00</li>
-                            </ul>
+                <h2 class="text-3xl md:text-4xl font-bold text-secondary text-center mb-12 font-heading">Venha nos Visitar!</h2>
+                <div class="grid md:grid-cols-2 gap-12 items-start">
+                    <!-- Lado esquerdo: Informações de Contato -->
+                    <div class="text-center md:text-left">
+                        <p class="text-xl text-gray-200 mb-4 flex items-center justify-center md:justify-start"><i class="fas fa-map-marker-alt text-accent mr-3"></i> <strong>Endereço:</strong> Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000</p>
+                        <p class="text-xl text-gray-200 mb-6 flex items-center justify-center md:justify-start"><i class="fab fa-whatsapp text-accent mr-3"></i> <strong>WhatsApp:</strong> (13) 3448-2068</p>
+                        
+                        <h3 class="text-2xl font-bold text-white mb-4 font-heading">Horário de Atendimento:</h3>
+                        <div class="bg-primary p-6 rounded-lg shadow-xl inline-block max-w-full">
+                            <table class="w-full text-left text-gray-200">
+                                <tbody>
+                                    <tr><td class="pr-8 py-1 font-semibold">Segunda-feira:</td><td class="py-1">08:00–19:00</td></tr>
+                                    <tr><td class="pr-8 py-1 font-semibold">Terça-feira:</td><td class="py-1">08:00–19:00</td></tr>
+                                    <tr><td class="pr-8 py-1 font-semibold">Quarta-feira:</td><td class="py-1">08:00–19:00</td></tr>
+                                    <tr><td class="pr-8 py-1 font-semibold">Quinta-feira:</td><td class="py-1">08:00–19:00</td></tr>
+                                    <tr><td class="pr-8 py-1 font-semibold">Sexta-feira:</td><td class="py-1">08:00–19:00</td></tr>
+                                    <tr><td class="pr-8 py-1 font-semibold">Sábado:</td><td class="py-1">08:00–19:00</td></tr>
+                                    <tr><td class="pr-8 py-1 font-semibold">Domingo:</td><td class="py-1">08:00–13:00</td></tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <a href="https://www.google.com/maps/dir/?api=1&amp;destination=-24.122787,-46.679817" class="w-full text-center py-4 bg-gradient-to-r from-green-500 to-green-600 text-white text-xl font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center gap-3" target="_blank" rel="noopener noreferrer" aria-label="Obter direções para Agro Fenix no Google Maps" id="st-el-hyqe4jhjr">
-                            <i class="fas fa-route"></i> Como Chegar (Google Maps)
+                        <a href="https://www.google.com/maps/place/Agro+Fenix/data=!4m7!3m6!1s0x94ce280e18ba1d71:0x2cf41e45a8465f8a!8m2!3d-24.122787!4d-46.679817!16s%2Fg%2F11g6b10pyq!19sChIJcR26GA4ozpQRil9GqEUe9Cw?authuser=0&hl=pt-BR&rclk=1" target="_blank" rel="noopener noreferrer" aria-label="Obter Rotas para Agro Fenix no Google Maps" class="mt-8 inline-block bg-whatsapp text-white px-8 py-4 rounded-full text-xl font-bold shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out">
+                            Como Chegar (Google Maps) <i class="fas fa-map-marked-alt ml-2"></i>
                         </a>
                     </div>
-                    <!-- Lado direito: Google Maps Iframe -->
-                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 ease-in-out">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.457816047716!2d-46.68239168498777!3d-24.12278708436587!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce280e18ba1d71%3A0x2cf41e45a8465f8a!2sAgro%20Fenix!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" width="100%" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Localização da Agro Fenix no Google Maps">
-                        </iframe>
+                    <!-- Lado direito: Google Maps -->
+                    <div class="relative w-full h-80 md:h-full min-h-[300px] rounded-xl overflow-hidden shadow-2xl border-4 border-secondary/50">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.457801321901!2d-46.682391689252326!3d-24.122787077677848!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce280e18ba1d71%3A0x2cf41e45a8465f8a!2sAgro%20Fenix!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Localização da Agro Fenix no Google Maps"
+                            aria-label="Mapa interativo da localização da Agro Fenix em Mongaguá"
+                        ></iframe>
                     </div>
                 </div>
             </div>
         </section>
+
     </main>
 
-    <!-- FOOTER COMPLETO -->
-    <footer class="bg-[var(--color-primary)] text-gray-300 py-12" id="st-el-tm0cb59zj">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+    <!-- FOOTER COMPLETO (Segurança Jurídica) -->
+    <footer class="bg-primary text-gray-300 py-12 md:py-16">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
             <!-- Coluna 1: Informações da Empresa -->
             <div>
-                <h4 class="text-2xl font-bold mb-4 text-white">Agro Fenix</h4>
+                <h3 class="text-xl font-bold text-secondary mb-4 font-heading">Agro Fenix</h3>
                 <p class="mb-2">Razão Social: Agro Fenixx Comercio de Racoes LTDA</p>
                 <p class="mb-2">CNPJ: 49.390.182/0001-43</p>
-                <p class="mb-2">Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000</p>
-                <p class="mb-2">Horário: Seg-Sáb: 08:00–19:00 | Dom: 08:00–13:00</p>
-                <p class="mt-4"><a href="https://wa.me/551334482068" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Agro Fenix" class="text-white hover:text-[var(--color-secondary)] transition-colors duration-300" id="st-el-rml8ywek4"><i class="fab fa-whatsapp mr-2"></i>(13) 3448-2068</a></p>
+                <p class="mb-2">Endereço: Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP, 11730-000</p>
+                <p class="mb-2">WhatsApp: (13) 3448-2068</p>
             </div>
 
-            <!-- Coluna 2: Links Rápidos -->
+            <!-- Coluna 2: Horários e Links Úteis -->
             <div>
-                <h4 class="text-2xl font-bold mb-4 text-white">Links Rápidos</h4>
+                <h3 class="text-xl font-bold text-secondary mb-4 font-heading">Horário de Funcionamento</h3>
+                <p>Segunda a Sábado: 08:00–19:00</p>
+                <p>Domingo: 08:00–13:00</p>
+                
+                <h3 class="text-xl font-bold text-secondary mt-6 mb-4 font-heading">Links Úteis</h3>
                 <ul class="space-y-2">
-                    <li><a href="#hero" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Ir para a seção Hero" id="st-el-7l41sdk2d">Início</a></li>
-                    <li><a href="#servicos" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Nossos Produtos e Serviços" id="st-el-56z51nszt">Serviços</a></li>
-                    <li><a href="#depoimentos" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Depoimentos de Clientes" id="st-el-ikhcsw63y">Depoimentos</a></li>
-                    <li><a href="#sobre" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Sobre a Agro Fenix" id="st-el-e76mwwyoj">Sobre Nós</a></li>
-                    <li><a href="#contato" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Localização e Contato" id="st-el-e3bxtzsb7">Contato</a></li>
+                    <li><a href="#" class="hover:text-secondary transition-colors duration-300" aria-label="Política de Privacidade da Agro Fenix">Política de Privacidade</a></li>
+                    <li><a href="#" class="hover:text-secondary transition-colors duration-300" aria-label="Termos de Uso da Agro Fenix">Termos de Uso</a></li>
                 </ul>
             </div>
 
-            <!-- Coluna 3: Redes Sociais e Legal -->
+            <!-- Coluna 3: Redes Sociais -->
             <div>
-                <h4 class="text-2xl font-bold mb-4 text-white">Conecte-se</h4>
-                <div class="flex justify-center md:justify-start space-x-4 mb-6">
-                    <a href="https://www.facebook.com/diskagrofenix" target="_blank" rel="noopener noreferrer" aria-label="Visite nosso Facebook" class="text-white hover:text-[var(--color-secondary)] text-3xl transition-colors duration-300" id="st-el-q93o4n0wn">
-                        <i class="fab fa-facebook-square"></i>
-                    </a>
-                    <!-- Assuming an Instagram presence despite Facebook link in data -->
-                    <a href="https://www.instagram.com/agrofeniix/" target="_blank" rel="noopener noreferrer" aria-label="Visite nosso Instagram" class="text-white hover:text-[var(--color-secondary)] text-3xl transition-colors duration-300" id="st-el-0jrlnini4">
+                <h3 class="text-xl font-bold text-secondary mb-4 font-heading">Redes Sociais</h3>
+                <div class="flex justify-center md:justify-start space-x-4 text-2xl">
+                    <a href="https://www.instagram.com/agrofenix" target="_blank" rel="noopener noreferrer" aria-label="Instagram da Agro Fenix" class="hover:text-secondary transition-colors duration-300">
                         <i class="fab fa-instagram"></i>
                     </a>
+                    <a href="https://www.facebook.com/agrofenix" target="_blank" rel="noopener noreferrer" aria-label="Facebook da Agro Fenix" class="hover:text-secondary transition-colors duration-300">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
                 </div>
-                <ul class="space-y-2">
-                    <li><a href="#" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Política de Privacidade" id="st-el-ey8iq9sbd">Política de Privacidade</a></li>
-                    <li><a href="#" class="hover:text-[var(--color-secondary)] transition-colors duration-300" aria-label="Termos de Uso" id="st-el-d2omdm25x">Termos de Uso</a></li>
-                </ul>
             </div>
         </div>
 
-        <div class="border-t border-gray-700 mt-10 pt-8 text-center text-gray-400 text-sm">
-            <p>© 2024 Agro Fenix. Todos os direitos reservados.</p>
-            <p class="mt-2">Site criado e mantido por <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="text-[var(--color-secondary)] hover:text-white transition-colors duration-300" id="st-el-ua1son2v2">STUDIOTESTA</a></p>
+        <div class="mt-12 pt-8 border-t border-gray-700 text-center text-gray-500 text-sm">
+            &copy; 2024 Agro Fenix. Todos os direitos reservados.
+            <p class="mt-2">Site criado e mantido por <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="text-secondary hover:underline transition-colors duration-300">STUDIOTESTA</a></p>
         </div>
     </footer>
 
-    <!-- Vanilla JavaScript for FAQ Accordion -->
+    <!-- Vanilla JS for FAQ Accordion and Mobile Menu -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const faqButtons = document.querySelectorAll('#faq button');
+            // FAQ Accordion Functionality
+            const faqToggles = document.querySelectorAll('.faq-toggle');
 
-            faqButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const content = button.nextElementSibling;
-                    const icon = button.querySelector('i');
+            faqToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('i');
 
-                    // Close all other open accordions
-                    faqButtons.forEach(otherButton => {
-                        if (otherButton !== button) {
-                            const otherContent = otherButton.nextElementSibling;
-                            const otherIcon = otherButton.querySelector('i');
-                            if (!otherContent.classList.contains('hidden')) {
-                                otherContent.classList.add('hidden');
-                                otherButton.setAttribute('aria-expanded', 'false');
-                                otherIcon.classList.remove('rotate-180');
-                            }
+                    // Close other open FAQ items for cleaner UX
+                    faqToggles.forEach(otherToggle => {
+                        if (otherToggle !== this && otherToggle.getAttribute('aria-expanded') === 'true') {
+                            otherToggle.setAttribute('aria-expanded', 'false');
+                            otherToggle.nextElementSibling.classList.add('hidden');
+                            otherToggle.nextElementSibling.setAttribute('aria-hidden', 'true');
+                            otherToggle.querySelector('i').classList.remove('rotate-180');
                         }
                     });
 
-                    // Toggle current accordion
+                    // Toggle current FAQ item
+                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !isExpanded);
                     content.classList.toggle('hidden');
-                    const isExpanded = content.classList.contains('hidden') ? 'false' : 'true';
-                    button.setAttribute('aria-expanded', isExpanded);
+                    content.setAttribute('aria-hidden', isExpanded);
                     icon.classList.toggle('rotate-180');
+                });
+            });
+
+            // Mobile Menu Toggle Functionality
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const closeMobileMenuButton = document.getElementById('close-mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            });
+
+            closeMobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.add('hidden');
+                document.body.style.overflow = ''; // Restore scrolling
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                    document.body.style.overflow = ''; // Restore scrolling
                 });
             });
         });
     </script>
-
-            
-            
-            <script id="st-editor-helper-script">
-                let dragActive = false;
-                let selectedDragEl = null;
-                let isDragging = false;
-                let startX, startY;
-                let originalLeft, originalTop;
-
-                document.addEventListener('mouseover', (e) => {
-                    if (e.target === document.body || e.target === document.documentElement) return;
-                    e.target.style.outline = "2px dashed #f59e0b";
-                    e.stopPropagation();
-                });
-                document.addEventListener('mouseout', (e) => {
-                    if (e.target === document.body || e.target === document.documentElement) return;
-                    e.target.style.outline = "";
-                    e.stopPropagation();
-                });
-                document.addEventListener('dblclick', (e) => {
-                    if (e.target === document.body || e.target === document.documentElement) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    if (!e.target.id) {
-                        e.target.id = "st-el-" + Math.random().toString(36).substr(2, 9);
-                    }
-                    
-                    window.parent.postMessage({
-                        type: 'ELEMENT_SELECTED',
-                        id: e.target.id,
-                        tagName: e.target.tagName,
-                        outerHTML: e.target.outerHTML,
-                        textContent: e.target.textContent.trim(),
-                        classes: e.target.className,
-                        src: e.target.src || ""
-                    }, '*');
-                });
-
-                window.addEventListener('message', (event) => {
-                    if (event.data.type === 'TOGGLE_DRAG_MODE') {
-                        dragActive = event.data.active;
-                        const elId = event.data.targetId;
-                        selectedDragEl = document.getElementById(elId);
-                        if (selectedDragEl) {
-                            if (dragActive) {
-                                selectedDragEl.style.position = 'absolute';
-                                selectedDragEl.style.cursor = 'move';
-                                selectedDragEl.style.zIndex = '9999';
-                            } else {
-                                selectedDragEl.style.cursor = '';
-                            }
-                        }
-                    }
-                });
-
-                // Eventos de Arrastar com Mouse
-                document.addEventListener('mousedown', (e) => {
-                    if (!dragActive || !selectedDragEl) return;
-                    if (e.target !== selectedDragEl && !selectedDragEl.contains(e.target)) return;
-                    isDragging = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    
-                    const rect = selectedDragEl.getBoundingClientRect();
-                    const style = window.getComputedStyle(selectedDragEl);
-                    originalLeft = parseFloat(style.left) || rect.left;
-                    originalTop = parseFloat(style.top) || rect.top;
-                    
-                    e.preventDefault();
-                });
-
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging || !selectedDragEl) return;
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
-                    selectedDragEl.style.left = (originalLeft + dx) + 'px';
-                    selectedDragEl.style.top = (originalTop + dy) + 'px';
-                    
-                    window.parent.postMessage({
-                        type: 'ELEMENT_DRAG_UPDATE',
-                        id: selectedDragEl.id,
-                        left: selectedDragEl.style.left,
-                        top: selectedDragEl.style.top
-                    }, '*');
-                });
-
-                document.addEventListener('mouseup', () => {
-                    isDragging = false;
-                });
-
-                // Toques em Mobile
-                document.addEventListener('touchstart', (e) => {
-                    if (!dragActive || !selectedDragEl || e.touches.length === 0) return;
-                    const touch = e.touches[0];
-                    if (e.target !== selectedDragEl && !selectedDragEl.contains(e.target)) return;
-                    isDragging = true;
-                    startX = touch.clientX;
-                    startY = touch.clientY;
-                    
-                    const rect = selectedDragEl.getBoundingClientRect();
-                    const style = window.getComputedStyle(selectedDragEl);
-                    originalLeft = parseFloat(style.left) || rect.left;
-                    originalTop = parseFloat(style.top) || rect.top;
-                });
-
-                document.addEventListener('touchmove', (e) => {
-                    if (!isDragging || !selectedDragEl || e.touches.length === 0) return;
-                    const touch = e.touches[0];
-                    const dx = touch.clientX - startX;
-                    const dy = touch.clientY - startY;
-                    selectedDragEl.style.left = (originalLeft + dx) + 'px';
-                    selectedDragEl.style.top = (originalTop + dy) + 'px';
-                    
-                    window.parent.postMessage({
-                        type: 'ELEMENT_DRAG_UPDATE',
-                        id: selectedDragEl.id,
-                        left: selectedDragEl.style.left,
-                        top: selectedDragEl.style.top
-                    }, '*');
-                });
-
-                document.addEventListener('touchend', () => {
-                    isDragging = false;
-                });
-            </script>
-            <!-- studiotesta-editor-helper-end -->
-            </body></html>
+</body>
+</html>
