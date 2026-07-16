@@ -1062,6 +1062,16 @@
             "Dancing Script", "Cinzel", "Pacifico", "Quicksand", "Fira Sans", "Arvo"
         ];
 
+        function cleanIframeHtml(rawHtml) {
+            const index = rawHtml.indexOf('<!-- studiotesta-editor-helper -->');
+            if (index !== -1) {
+                return rawHtml.substring(0, index) + "</html>";
+            }
+            // Fallback robusto via Regex caso o navegador tenha limpado os comentários do DOM
+            return rawHtml.replace(/<!-- studiotesta-editor-helper -->[\s\S]*?<\/script>/gi, '')
+                           .replace(/<script[^>]*>[\s\S]*?TOGGLE_DRAG_MODE[\s\S]*?<\/script>/gi, '');
+        }
+
         window.onload = function() {
             if (sessionStorage.getItem("isAuth") === "true") {
                 showFormScreen();
@@ -1942,7 +1952,7 @@
                     } else if (event.data.type === 'ELEMENT_DRAG_UPDATE') {
                         const iframe = document.getElementById("visualHtmlPreviewFrame");
                         const cleanHtml = iframe.contentWindow.document.documentElement.outerHTML;
-                        currentEditingHtml = cleanHtml.substring(0, cleanHtml.indexOf('<!-- studiotesta-editor-helper -->')) + "</html>";
+                        currentEditingHtml = cleanIframeHtml(cleanHtml);
                         document.getElementById("visualRawHtmlCode").value = currentEditingHtml;
                         updateVisualEditorStatus("<i class='fa-solid fa-arrows-up-down-left-right text-amber-500 mr-1'></i> Elemento reposicionado livremente!", "text-amber-400 font-bold");
                     }
@@ -2193,7 +2203,7 @@
             }
             
             const rawIframeHtml = iframe.contentWindow.document.documentElement.outerHTML;
-            const cleanHtml = rawIframeHtml.substring(0, rawIframeHtml.indexOf('<!-- studiotesta-editor-helper -->')) + "</html>";
+            const cleanHtml = cleanIframeHtml(rawIframeHtml);
             
             currentEditingHtml = cleanHtml;
             document.getElementById("visualRawHtmlCode").value = cleanHtml;
@@ -2209,7 +2219,7 @@
             el.style[prop] = val;
             
             const rawIframeHtml = iframe.contentWindow.document.documentElement.outerHTML;
-            const cleanHtml = rawIframeHtml.substring(0, rawIframeHtml.indexOf('<!-- studiotesta-editor-helper -->')) + "</html>";
+            const cleanHtml = cleanIframeHtml(rawIframeHtml);
             
             currentEditingHtml = cleanHtml;
             document.getElementById("visualRawHtmlCode").value = cleanHtml;
