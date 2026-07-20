@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Raspagem - Duda Studio</title>
+    
+    <!-- Tailwind CSS CDN para estilização dinâmica ultra-veloz -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        duda: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            500: '#db2777', // Fuchsia Principal
+                            600: '#be185d', // Fuchsia Escuro
+                            700: '#9d174d',
+                            950: '#500724',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font-Awesome Icons para visual premium de botões e status -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(219, 39, 119, 0.3);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(219, 39, 119, 0.6);
+            border-radius: 10px;
+        }
+        /* Efeito de brilho neon para botões e caixas de status */
+        .neon-border {
+            box-shadow: 0 0 20px rgba(219, 39, 119, 0.3);
+            border-color: rgba(219, 39, 119, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen p-3 md:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black overflow-x-hidden flex items-start justify-center custom-scrollbar">
+
+    <div id="loginSection" class="w-full max-w-lg glass rounded-3xl p-10 shadow-2xl border border-white/10 transition-all duration-500 ease-in-out transform scale-100 my-16 self-center">
+        <div class="text-center mb-10">
+            <div class="w-20 h-20 bg-gradient-to-tr from-duda-600 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-duda-500/40">
+                <i class="fa-solid fa-wand-magic-sparkles text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight">Duda Studio</h1>
+            <p class="text-base text-pink-400 font-bold uppercase tracking-widest mt-2">Prospecção & Raspagem de Clientes</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
+            <div>
+                <label class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-2.5">Usuário de Acesso</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
+                        <i class="fa-solid fa-user-ninja text-base"></i>
+                    </span>
+                    <input type="text" id="username" required 
+                        class="w-full pl-11 pr-4 py-4 bg-slate-900/80 border border-slate-850 rounded-xl focus:outline-none focus:ring-2 focus:ring-duda-500 focus:border-transparent transition-all text-white text-base font-medium" 
+                        placeholder="Digite seu usuário">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-2.5">Senha Secreta</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
+                        <i class="fa-solid fa-lock-open text-base"></i>
+                    </span>
+                    <input type="password" id="password" required 
+                        class="w-full pl-11 pr-4 py-4 bg-slate-900/80 border border-slate-850 rounded-xl focus:outline-none focus:ring-2 focus:ring-duda-500 focus:border-transparent transition-all text-white text-base font-medium" 
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <div id="loginError" class="hidden text-base font-bold bg-red-950/50 p-4 rounded-xl flex items-center gap-3 border border-red-900/50 text-red-400">
+                <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                <span id="loginErrorText">Usuário ou senha incorretos!</span>
+            </div>
+
+            <button type="submit" 
+                class="w-full py-4.5 bg-gradient-to-r from-duda-600 to-pink-500 hover:from-duda-500 hover:to-pink-400 text-white text-base font-black rounded-xl shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2.5">
+                <span>Entrar no Workspace</span>
+                <i class="fa-solid fa-arrow-right-to-bracket text-lg"></i>
+            </button>
+        </form>
+    </div>
+
+    <div id="formSection" class="hidden w-full max-w-[1920px] px-3 lg:px-8 transition-all duration-500 ease-in-out transform scale-95 opacity-0 my-3 space-y-8">
+        
+        <!-- Header Flutuante Premium -->
+        <div class="w-full glass rounded-3xl p-6 border border-white/10 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-gradient-to-tr from-duda-600 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-duda-500/30">
+                    <i class="fa-solid fa-spider text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black text-white leading-none">Duda Studio Leads</h1>
+                    <p class="text-sm md:text-base text-pink-400 font-bold uppercase tracking-widest mt-2 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping"></span> Mapeador Google Maps & Evolution API
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-5 w-full md:w-auto justify-between md:justify-end">
+                <button onclick="handleLogout()" 
+                    class="px-5 py-3 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 font-bold rounded-xl text-sm md:text-base transition-all flex items-center gap-2">
+                    <span>Sair</span>
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Layout Principal: Lateral (Configuração/Status) + Centro (Visualização de Leads) -->
+        <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
+            
+            <!-- Left Column: Formulário & Progresso (Proporção: 40%) -->
+            <div class="lg:col-span-4 space-y-8">
+                
+                <!-- Aba de Raspagem -->
+                <div class="bg-slate-900/60 rounded-3xl border border-white/10 p-6 shadow-2xl glass space-y-6">
+                    <div class="border-b border-slate-800 pb-4">
+                        <h2 class="text-xl font-black uppercase tracking-wider text-white flex items-center gap-2.5">
+                            <i class="fa-solid fa-magnifying-glass-location text-pink-500"></i> Disparar Nova Varredura
+                        </h2>
+                        <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+                            O robô executará o Puppeteer Browserless local no seu servidor, extraindo dados completos do Google Maps e validando via Evolution API.
+                        </p>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-xs md:text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">Nicho / Termo de Busca</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                                    <i class="fa-solid fa-tags text-sm"></i>
+                                </span>
+                                <input type="text" id="inputTermo" placeholder="Ex: Farmácias, Oficinas, Pet Shops, Clínicas" 
+                                       class="w-full pl-10 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-xl text-sm md:text-base focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-700">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs md:text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">Cidade e Estado de Busca</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                                    <i class="fa-solid fa-location-dot text-sm"></i>
+                                </span>
+                                <input type="text" id="inputCidade" placeholder="Ex: Mongaguá - SP, Santos - SP" 
+                                       class="w-full pl-10 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-xl text-sm md:text-base focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-700">
+                            </div>
+                        </div>
+                        
+                        <button onclick="iniciarCaptura()" id="btnCaptura" 
+                                class="w-full py-4 bg-gradient-to-r from-duda-600 to-pink-500 hover:from-duda-500 hover:to-pink-400 text-white text-sm md:text-base font-extrabold uppercase rounded-xl tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-pink-500/20 hover:scale-[1.01] active:scale-95">
+                            <i class="fa-solid fa-play" id="scraperIcon"></i>
+                            <span>Iniciar Raspagem com Filtro Whats</span>
+                        </button>
+                    </div>
+
+                    <!-- Container de Progresso Embutido -->
+                    <div id="scrapingProgressContainer" class="hidden space-y-5 p-5 bg-slate-950 rounded-2xl border border-slate-800/80 neon-border transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-extrabold uppercase tracking-widest text-pink-400 flex items-center gap-2" id="scrapingStatusText">
+                                <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span> Inicializando Browserless...
+                            </span>
+                            <span class="text-sm font-bold text-slate-400 font-mono" id="scrapingPercentText">0%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div id="scrapingBarFill" class="h-full bg-gradient-to-r from-duda-600 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        
+                        <!-- Contador regressivo de 20 minutos -->
+                        <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-slate-800 text-sm">
+                            <span class="text-slate-400 font-bold uppercase tracking-wider"><i class="fa-solid fa-hourglass-half mr-2 text-pink-500"></i> Timeout de Segurança:</span>
+                            <span class="font-mono font-black text-pink-400 text-base" id="timeoutCountdown">20:00</span>
+                        </div>
+
+                        <!-- Console de Logs em tempo real -->
+                        <div class="bg-black/80 rounded-xl p-4 font-mono text-xs md:text-sm text-slate-400 h-52 overflow-y-auto custom-scrollbar space-y-1.5" id="scrapingConsole">
+                            <div class="text-pink-400 font-bold">&gt; Monitor local pronto.</div>
+                        </div>
+                        
+                        <!-- Alerta do limite de Gateway Timeout do Cloudflare Tunnel -->
+                        <div class="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs md:text-sm rounded-xl leading-relaxed">
+                            <i class="fa-solid fa-circle-exclamation mr-1.5"></i>
+                            <strong>Aviso de infra:</strong> Pelo limite do Cloudflare Tunnel, a conexão pode acusar Timeout após 100s. Se ocorrer, **não feche a aba**! O robô continuará rodando em segundo plano no seu i7-2600.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Visualizador de Leads -->
+            <div class="lg:col-span-6 space-y-8">
+                
+                <div class="bg-slate-900/60 p-6 rounded-3xl border border-white/10 shadow-2xl glass space-y-5">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                        <div>
+                            <h2 class="text-xl font-black uppercase tracking-wider text-white flex items-center gap-2.5">
+                                <i class="fa-solid fa-list-check text-pink-500"></i> Leads Higienizados
+                            </h2>
+                            <p class="text-sm text-slate-400 mt-2">Lista sincronizada diretamente da planilha com telefones validados pelo WhatsApp.</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <button onclick="fetchCreatedLeads()" id="syncBtn"
+                                class="flex-1 sm:flex-none py-3 px-5 bg-gradient-to-tr from-pink-600 to-duda-500 hover:from-pink-500 hover:to-duda-400 text-white text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-pink-500/15">
+                                <i class="fa-solid fa-rotate" id="syncIcon"></i>
+                                <span>Sincronizar Planilha</span>
+                            </button>
+                            <span class="text-sm bg-pink-500/20 text-pink-400 px-4 py-1.5 rounded-full font-black border border-pink-500/20" id="leadCounter">0 Carregados</span>
+                        </div>
+                    </div>
+
+                    <!-- Filtros, Seleção em Lote e Busca Rápida -->
+                    <div class="flex flex-col gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                            <div class="relative md:col-span-6">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                                </span>
+                                <input type="text" id="searchLead" oninput="filterLeads()"
+                                    class="w-full pl-10 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-xl text-sm md:text-base focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-500"
+                                    placeholder="Filtrar por nome, nicho ou endereço...">
+                            </div>
+                            <div class="flex gap-3 md:col-span-6">
+                                <button onclick="toggleSelectAll()" class="flex-1 py-3.5 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 hover:border-pink-500/20">
+                                    <i class="fa-solid fa-list-check text-pink-500"></i> <span id="btnSelectAllText">Selecionar Tudo (Máx 50)</span>
+                                </button>
+                                <button onclick="exportToCSV()" class="flex-1 py-3.5 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 hover:border-pink-500/20">
+                                    <i class="fa-solid fa-file-csv text-emerald-400"></i> Exportar (CSV)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Barra Ativa de Ações em Massa (Apenas visível se houver leads selecionados) -->
+                        <div id="bulkActionsBar" class="hidden flex items-center justify-between p-4 bg-pink-950/20 border border-pink-500/30 rounded-2xl transition-all duration-300">
+                            <span class="text-sm md:text-base text-pink-300 font-bold">
+                                <i class="fa-solid fa-circle-info mr-2"></i> <span id="selectedCountText">0</span>/50 itens selecionados
+                            </span>
+                            <div class="flex gap-3">
+                                <button onclick="abrirConfirmacaoDeletar()" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white rounded-xl text-xs md:text-sm font-bold shadow-lg transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-trash-can"></i> Deletar Selecionados
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Container Grid de Cards de Leads -->
+                    <div class="max-h-[650px] overflow-y-auto custom-scrollbar space-y-4 pr-1" id="leadsListContainer">
+                        <div class="flex flex-col items-center justify-center h-full text-center p-12 text-slate-500 py-24">
+                            <i class="fa-solid fa-cloud-arrow-down text-5xl mb-4 text-pink-500 animate-bounce"></i>
+                            <p class="text-sm md:text-base font-black text-slate-400">Nenhum lead importado do Sheets</p>
+                            <p class="text-xs md:text-sm text-slate-500 max-w-sm mt-2">Preencha o termo e a cidade ao lado e inicie o robô para capturar leads.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-slate-950 border border-red-500/20 rounded-3xl p-8 shadow-2xl text-center space-y-5 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl"></div>
+            
+            <div class="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 mx-auto">
+                <i class="fa-solid fa-trash-can text-3xl"></i>
+            </div>
+            
+            <h3 class="text-2xl font-extrabold text-white">Deletar Leads do Sheets?</h3>
+            <p class="text-slate-400 text-sm md:text-base leading-relaxed">
+                Você tem certeza que deseja excluir permanentemente os <span id="deleteConfirmCount" class="font-extrabold text-red-400">0</span> leads selecionados? 
+                Isso removerá as linhas correspondentes da planilha do Google Drive de forma sequencial do final para o início.
+            </p>
+            
+            <div class="flex gap-4 pt-3">
+                <button onclick="fecharConfirmacaoDeletar()" class="flex-1 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold rounded-xl text-sm md:text-base transition-all border border-slate-800">
+                    Cancelar
+                </button>
+                <button onclick="confirmarExclusaoLeads()" id="btnConfirmarDelete" class="flex-1 py-3.5 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white font-bold rounded-xl text-sm md:text-base transition-all shadow-lg shadow-red-500/20">
+                    Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast flutuante de Notificação Premium -->
+    <div id="toast" class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <div class="bg-slate-900 text-white px-6 py-5 rounded-2xl shadow-2xl border border-slate-800 flex items-center gap-4">
+            <div id="toastIcon" class="w-10 h-10 rounded-full bg-duda-500/20 text-pink-400 flex items-center justify-center text-base">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div>
+                <p id="toastTitle" class="text-xs md:text-sm font-bold uppercase tracking-wider text-pink-400">Notificação</p>
+                <p id="toastMsg" class="text-sm md:text-base text-slate-300">Ação executada com sucesso.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scrapedLeads = [];
+        let selectedLeads = new Set(); // Guarda os índices originais dos leads selecionados
+        let activeCountdown = null;
+        let controller = null; // AbortController global para timeouts estendidos
+        let autoSyncIntervalId = null; // Sincronização periódica a cada 60s dos cards
+        let statusPollingIntervalId = null; // Polling do status da raspagem ativa
+        let currentSessionId = null; // ID único da sessão de raspagem ativa
+
+        window.onload = function() {
+            if (sessionStorage.getItem("duda_auth") === "true") {
+                showWorkspaceScreen();
+            }
+        }
+
+        // Sistema de login integrado ao Webhook com Basic Auth do n8n
+        async function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById("username").value;
+            const pass = document.getElementById("password").value;
+            const errorBox = document.getElementById("loginError");
+            const errorText = document.getElementById("loginErrorText");
+            const submitBtn = e.target.querySelector("button[type='submit']");
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2 text-sm"></i> Autenticando...`;
+            errorBox.classList.add("hidden");
+
+            try {
+                // Passo Hacker: Codifica usuário e senha para o formato padrão do Basic Auth (Base64)
+                const credentials = btoa(`${user}:${pass}`);
+
+                // Dispara o POST direto para o endpoint seguro do n8n da StudioTesta
+                const response = await fetch("https://n8n.studiotesta.com.br/webhook/login-painel-duda", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Basic ${credentials}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        usuario: user,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    sessionStorage.setItem("duda_auth", "true");
+                    showWorkspaceScreen();
+                    showToast("Acesso Liberado!", "Bem-vinda de volta, Duda!", "success");
+                } else if (response.status === 401) {
+                    throw new Error("Usuário ou senha incorretos!");
+                } else {
+                    throw new Error(`Erro no servidor n8n (Status: ${response.status})`);
+                }
+            } catch (error) {
+                errorText.textContent = error.message || "Falha ao conectar com o n8n.";
+                errorBox.classList.remove("hidden");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `Entrar no Workspace <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>`;
+            }
+        }
+
+        function showWorkspaceScreen() {
+            document.getElementById("loginSection").classList.add("hidden");
+            const formBox = document.getElementById("formSection");
+            formBox.classList.remove("hidden");
+            setTimeout(() => {
+                formBox.classList.remove("scale-95", "opacity-0");
+                formBox.classList.add("scale-100", "opacity-100");
+                fetchCreatedLeads(true);
+                startAutoSync(); // Inicia o sincronizador de 60 segundos
+            }, 50);
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem("duda_auth");
+            if (autoSyncIntervalId) clearInterval(autoSyncIntervalId);
+            if (statusPollingIntervalId) clearInterval(statusPollingIntervalId);
+            window.location.reload();
+        }
+
+        function startAutoSync() {
+            if (autoSyncIntervalId) clearInterval(autoSyncIntervalId);
+            autoSyncIntervalId = setInterval(() => {
+                fetchCreatedLeads(true);
+            }, 60000); // Sincronização automática dos cards a cada 60 segundos
+        }
+
+        function startStatusPolling(sessionId) {
+            if (statusPollingIntervalId) clearInterval(statusPollingIntervalId);
+            
+            const consoleBox = document.getElementById("scrapingConsole");
+            const statusText = document.getElementById("scrapingStatusText");
+            const barFill = document.getElementById("scrapingBarFill");
+            const percentText = document.getElementById("scrapingPercentText");
+
+            if (consoleBox) {
+                consoleBox.innerHTML += `<div class="text-pink-400 mt-2 font-bold">&gt; [Status] Monitor de sessão ativa iniciado para ID: ${sessionId}</div>`;
+                consoleBox.scrollTop = consoleBox.scrollHeight;
+            }
+
+            // O seu webhook busca status do n8n é cadastrado para requisições POST no path status-raspagem
+            const urlStatus = `https://n8n.studiotesta.com.br/webhook/status-raspagem`;
+
+            let stableCycles = 0;
+
+            statusPollingIntervalId = setInterval(async () => {
+                try {
+                    // Executa o POST conforme desenhado na sua engenharia do n8n para consultar o status no Sheets
+                    const res = await fetch(urlStatus, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: sessionId })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        
+                        // Incrementa a barra progressivamente para dar feedback visual de processamento
+                        stableCycles++;
+                        let simulatedPercent = Math.min(84 + (stableCycles * 2), 98);
+                        if (barFill) barFill.style.width = `${simulatedPercent}%`;
+                        if (percentText) percentText.textContent = `${simulatedPercent}%`;
+
+                        if (consoleBox) {
+                            consoleBox.innerHTML += `<div class="text-slate-500 mt-1">&gt; [Status] Verificando progresso com o servidor auxiliar... (Sessão: ${sessionId})</div>`;
+                            consoleBox.scrollTop = consoleBox.scrollHeight;
+                        }
+
+                        // Algoritmo de Verificação Inteligente de Fim de Fluxo:
+                        // Se a resposta retornar dados da sessão concluída (seja um array contendo a linha concluída ou objeto direto)
+                        let isFinished = false;
+                        if (Array.isArray(data)) {
+                            isFinished = data.some(row => Object.values(row).some(val => String(val).includes(sessionId)));
+                        } else if (typeof data === 'object' && data !== null) {
+                            isFinished = Object.values(data).some(val => String(val).includes(sessionId)) || data.status === "concluido";
+                        }
+
+                        if (isFinished) {
+                            finishScrapingFlowSuccessfully();
+                        }
+                    }
+                } catch (err) {
+                    console.error("Erro ao ler status da raspagem:", err);
+                }
+            }, 60000); // Polling sincronizado a cada 60 segundos para evitar sobrecarga no i7-2600 e na API do Google Sheets
+        }
+
+        function finishScrapingFlowSuccessfully() {
+            if (statusPollingIntervalId) {
+                clearInterval(statusPollingIntervalId);
+                statusPollingIntervalId = null;
+            }
+            clearInterval(activeCountdown);
+
+            const btn = document.getElementById("btnCaptura");
+            const barFill = document.getElementById("scrapingBarFill");
+            const percentText = document.getElementById("scrapingPercentText");
+            const statusText = document.getElementById("scrapingStatusText");
+            const consoleBox = document.getElementById("scrapingConsole");
+
+            if (barFill) barFill.style.width = "100%";
+            if (percentText) percentText.textContent = "100%";
+            if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Varredura Concluída!`;
+            
+            if (consoleBox) {
+                consoleBox.innerHTML += `
+                    <div class="text-emerald-400 font-bold mt-3">&gt; [SUCESSO] O fluxo auxiliar do n8n confirmou a conclusão total do processo!</div>
+                    <div class="text-emerald-300 mt-1">&gt; Importando todos os leads gerados e salvos na planilha...</div>
+                `;
+                consoleBox.scrollTop = consoleBox.scrollHeight;
+            }
+
+            if (btn) {
+                btn.disabled = false;
+                btn.querySelector("span").textContent = "Iniciar Raspagem com Filtro Whats";
+            }
+
+            fetchCreatedLeads(false); // Força sincronização visual dos cards na tela de forma imediata
+            showToast("Varredura Finalizada!", "A raspagem foi concluída e integrada com sucesso!", "success");
+        }
+
+        async function iniciarCaptura() {
+            const nicho = document.getElementById("inputTermo").value;
+            const cidade = document.getElementById("inputCidade").value;
+
+            if (!nicho || !cidade) {
+                showToast("Atenção", "Preencha o termo de busca e a cidade antes de iniciar.", "error");
+                return;
+            }
+
+            if (statusPollingIntervalId) clearInterval(statusPollingIntervalId);
+            statusPollingIntervalId = null;
+
+            // Gera o ID único de sessão para o rastreio da raspagem ativa
+            currentSessionId = "duda_session_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+            const btn = document.getElementById("btnCaptura");
+            const icon = document.getElementById("scraperIcon");
+            const originalText = btn.querySelector("span").textContent;
+
+            btn.disabled = true;
+            icon.className = "fa-solid fa-circle-notch animate-spin mr-2.5 text-sm";
+            btn.querySelector("span").textContent = "Varrendo no Servidor...";
+
+            const progressContainer = document.getElementById("scrapingProgressContainer");
+            const barFill = document.getElementById("scrapingBarFill");
+            const percentText = document.getElementById("scrapingPercentText");
+            const statusText = document.getElementById("scrapingStatusText");
+            const consoleBox = document.getElementById("scrapingConsole");
+
+            if (progressContainer) progressContainer.classList.remove("hidden");
+            if (barFill) barFill.style.width = "5%";
+            if (percentText) percentText.textContent = "5%";
+            if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping"></span> Inicializando Browserless...`;
+            if (consoleBox) consoleBox.innerHTML = `<div class="text-pink-400 font-bold">&gt; Disparando Webhook no Servidor local com ID: ${currentSessionId}...</div>`;
+
+            // Configura cronômetro de 20 minutos
+            let secondsLeft = 1200;
+            const countdownEl = document.getElementById("timeoutCountdown");
+            if (activeCountdown) clearInterval(activeCountdown);
+            
+            activeCountdown = setInterval(() => {
+                secondsLeft--;
+                const min = Math.floor(secondsLeft / 60);
+                const sec = secondsLeft % 60;
+                countdownEl.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+                
+                if (secondsLeft <= 0) {
+                    clearInterval(activeCountdown);
+                    logConsoleError("A requisição excedeu o timeout de 20 minutos.");
+                }
+            }, 1000);
+
+            let percent = 5;
+            let consoleSteps = [
+                { t: 15, m: "Invocando o contêiner Docker do Browserless...", c: "text-slate-300" },
+                { t: 30, m: "Localizando coordenadas GPS para " + cidade + "...", c: "text-slate-300" },
+                { t: 45, m: "Scraper navegando em modo oculto no Google Maps...", c: "text-pink-400" },
+                { t: 60, m: "Iniciando raspagem e rolagem automática do feed...", c: "text-pink-400" },
+                { t: 75, m: "Processando lote de dados limpos do Maps...", c: "text-pink-400" },
+                { t: 83, m: "Filtro Ativo: Higienizando lote na Evolution API...", c: "text-emerald-400" }
+            ];
+            let loggedSteps = new Set();
+
+            const progressInterval = setInterval(() => {
+                if (percent < 84) {
+                    percent += (84 - percent) * 0.02 + 0.1;
+                }
+                const currentPercent = Math.floor(percent);
+                if (barFill) barFill.style.width = currentPercent + "%";
+                if (percentText) percentText.textContent = currentPercent + "%";
+
+                consoleSteps.forEach(step => {
+                    if (currentPercent >= step.t && !loggedSteps.has(step.t)) {
+                        loggedSteps.add(step.t);
+                        if (consoleBox) {
+                            consoleBox.innerHTML += `<div class="${step.c} mt-1.5">&gt; ${step.m}</div>`;
+                            consoleBox.scrollTop = consoleBox.scrollHeight;
+                        }
+                        if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse"></span> ${step.m}`;
+                    }
+                });
+            }, 1500);
+
+            // Iniciamos o Monitor de Status imediatamente, antes mesmo do timeout ocorrer!
+            startStatusPolling(currentSessionId);
+
+            controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 1200000); // 20 minutos
+
+            const endpoint = `https://n8n.studiotesta.com.br/webhook/duda-leads`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        termo: nicho,
+                        nicho: nicho,
+                        cidade: cidade,
+                        id_sessao: currentSessionId // Passa o ID único para o n8n
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+                clearInterval(progressInterval);
+
+                if (!response.ok) throw new Error("Status " + response.status);
+                
+                // Se o fluxo responder rápido (dentro dos 100s do Cloudflare), finalizamos imediatamente
+                finishScrapingFlowSuccessfully();
+
+            } catch (err) {
+                clearInterval(progressInterval);
+                clearTimeout(timeoutId);
+                
+                if (err.name === 'AbortError') {
+                    clearInterval(activeCountdown);
+                    logConsoleError("Erro de Timeout: A varredura demorou mais que 20 minutos.");
+                    showToast("Timeout Alcançado", "O robô ainda está processando os dados localmente no Docker.", "error");
+                    
+                    btn.disabled = false;
+                    icon.className = "fa-solid fa-play";
+                    btn.querySelector("span").textContent = originalText;
+                } else {
+                    logConsoleError("Conexão interrompida pelo Cloudflare Tunnel (Timeout HTTP)");
+                    if (consoleBox) {
+                        consoleBox.innerHTML += `
+                            <div class="text-amber-400 mt-2.5 font-bold">&gt; Não entre em pânico! O i7-2600 continua processando em segundo plano no Docker.</div>
+                            <div class="text-slate-400 mt-1.5">&gt; O n8n continuará salvando os leads e notificará o fluxo auxiliar quando terminar.</div>
+                            <div class="text-pink-400 mt-1.5 font-bold">&gt; Aguardando notificação de conclusão em segundo plano...</div>
+                        `;
+                        consoleBox.scrollTop = consoleBox.scrollHeight;
+                    }
+                    if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span> Rodando em background...`;
+                }
+            }
+        }
+
+        function logConsoleError(msg) {
+            const consoleBox = document.getElementById("scrapingConsole");
+            if (consoleBox) {
+                consoleBox.innerHTML += `<div class="text-red-400 mt-2 font-bold">&gt; Alerta: ${msg}</div>`;
+                consoleBox.scrollTop = consoleBox.scrollHeight;
+            }
+        }
+
+        async function fetchCreatedLeads(isSilent = false) {
+            const url = `https://n8n.studiotesta.com.br/webhook/obter-leads-Duda`;
+
+            const syncBtn = document.getElementById("syncBtn");
+            const syncIcon = document.getElementById("syncIcon");
+
+            if (!isSilent) {
+                if (syncBtn) {
+                    syncBtn.disabled = true;
+                    syncBtn.querySelector("span").textContent = "Sincronizando...";
+                }
+                if (syncIcon) syncIcon.classList.add("fa-spin");
+            }
+
+            try {
+                const response = await fetch(url, { 
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ acao: "disparar_importacao" })
+                });
+                
+                if (!response.ok) throw new Error("Erro na conexão");
+                const data = await response.json();
+                
+                let rawList = Array.isArray(data) ? data : (data.leads || data.data || []);
+                scrapedLeads = rawList.map(item => item.json ? item.json : item);
+                
+                // Mantém a consistência de seleções ao re-sincronizar
+                renderLeads(scrapedLeads);
+                
+                if (!isSilent) {
+                    showToast("Dados Sincronizados", "Os leads da planilha Google Sheets foram carregados!", "success");
+                }
+            } catch (error) {
+                console.error("Erro ao ler planilha:", error);
+                if (!isSilent) {
+                    showToast("Erro de Sincronização", "O n8n não retornou os dados da planilha.", "error");
+                }
+            } finally {
+                if (syncBtn) {
+                    syncBtn.disabled = false;
+                    syncBtn.querySelector("span").textContent = "Sincronizar Planilha";
+                }
+                if (syncIcon) syncIcon.classList.remove("fa-spin");
+            }
+        }
+
+        // Helper para resolver múltiplos nomes de campos que possam vir do n8n/Sheets
+        function getField(obj, paths) {
+            for (let path of paths) {
+                if (obj[path] !== undefined && obj[path] !== null && obj[path] !== '') {
+                    return obj[path];
+                }
+            }
+            return '';
+        }
+
+        function renderLeads(leads) {
+            const container = document.getElementById("leadsListContainer");
+            const counter = document.getElementById("leadCounter");
+            
+            if (counter) counter.textContent = `${leads.length} Carregados`;
+
+            if (leads.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center p-12 text-slate-500 py-24">
+                        <i class="fa-solid fa-cloud-arrow-down text-5xl mb-4 text-pink-500 opacity-40"></i>
+                        <p class="text-base font-black text-slate-400">Nenhum lead importado do Sheets</p>
+                        <p class="text-sm text-slate-500 max-w-sm mt-2">Preencha o termo e a cidade ao lado e inicie o robô para capturar leads.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            leads.forEach((lead, index) => {
+                const title = getField(lead, ['nome_empresa', 'nome', 'title']) || "Sem Nome";
+                const rating = getField(lead, ['review_rating', 'rating', 'reviewRating', 'nota']) || "";
+                const category = getField(lead, ['nicho', 'category', 'categoryHtml']) || "Geral";
+                const address = getField(lead, ['endereco', 'Endereço', 'address', 'local']) || "Endereço não disponível";
+                const isSelected = selectedLeads.has(index);
+                
+                const rawPhone = getField(lead, ['whatsapp', 'telefone', 'phone', 'number']);
+                let whatsappNumber = "";
+                if (rawPhone) {
+                    whatsappNumber = rawPhone.toString().replace(/\D/g, '');
+                    if (whatsappNumber.length > 0 && !whatsappNumber.startsWith('55')) {
+                        whatsappNumber = '55' + whatsappNumber;
+                    }
+                }
+
+                const instaUrl = getField(lead, ['instagram', 'instagram_url']) || "";
+                const faceUrl = getField(lead, ['facebook', 'facebook_url']) || "";
+
+                const hasInsta = instaUrl.length > 0;
+                const hasFace = faceUrl.length > 0;
+
+                const ratingBadge = rating ? `
+                    <span class="bg-amber-500/20 text-amber-400 text-xs font-black px-3 py-1 rounded-full border border-amber-500/20 flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-star text-[10px]"></i> ${rating}
+                    </span>
+                ` : '';
+
+                const card = document.createElement("div");
+                card.className = `p-5 rounded-2xl border transition-all duration-300 relative flex flex-col justify-between gap-4 ${isSelected ? 'bg-pink-950/20 border-pink-500/50 neon-border' : 'bg-slate-900/40 border-white/5 hover:border-white/15'}`;
+                
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between gap-3 flex-wrap">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="bg-pink-500/10 text-pink-400 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border border-pink-500/10">
+                                    ${category}
+                                </span>
+                                <span class="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/10 flex items-center gap-1.5">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i> Validado Whats
+                                </span>
+                                ${ratingBadge}
+                            </div>
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelectLead(${index})" 
+                                   class="w-5 h-5 rounded-md accent-pink-500 border-white/10 bg-slate-950 cursor-pointer focus:ring-0 focus:ring-offset-0">
+                        </div>
+
+                        <h3 class="text-lg md:text-xl font-black text-white hover:text-pink-400 transition-colors leading-tight pt-1">${title}</h3>
+                        <p class="text-xs md:text-sm text-slate-400 flex items-start gap-2 leading-relaxed">
+                            <i class="fa-solid fa-map-location-dot text-pink-500 text-base mt-0.5 shrink-0"></i>
+                            <span>${address}</span>
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2.5 pt-2">
+                        <a href="https://wa.me/${whatsappNumber}" target="_blank" 
+                           class="py-2.5 bg-slate-950 hover:bg-slate-900 text-slate-200 hover:text-white rounded-xl text-xs md:text-sm font-bold border border-white/5 hover:border-pink-500/20 flex items-center justify-center gap-1.5 transition-all">
+                            <i class="fa-brands fa-whatsapp text-sm text-emerald-400"></i>
+                            <span>Abrir Whats</span>
+                        </a>
+                        <a ${hasInsta ? `href="${instaUrl}" target="_blank"` : 'href="#" onclick="showNoSocialAlert(event)"'} 
+                           class="py-2.5 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs md:text-sm font-bold border border-white/5 hover:border-pink-500/20 flex items-center justify-center gap-1.5 transition-all ${hasInsta ? 'text-slate-200 hover:text-white' : 'text-slate-600 cursor-not-allowed'}">
+                            <i class="fa-brands fa-instagram text-sm text-pink-500"></i>
+                            <span>Instagram</span>
+                        </a>
+                        <a ${hasFace ? `href="${faceUrl}" target="_blank"` : 'href="#" onclick="showNoSocialAlert(event)"'} 
+                           class="py-2.5 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs md:text-sm font-bold border border-white/5 hover:border-pink-500/20 flex items-center justify-center gap-1.5 transition-all ${hasFace ? 'text-slate-200 hover:text-white' : 'text-slate-600 cursor-not-allowed'}">
+                            <i class="fa-brands fa-facebook text-sm text-blue-500"></i>
+                            <span>Facebook</span>
+                        </a>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+
+            updateBulkActionsBar();
+        }
+
+        function showNoSocialAlert(e) {
+            e.preventDefault();
+            showToast("Rede Social", "Essa empresa não possui link social cadastrado.", "error");
+        }
+
+        function toggleSelectLead(index) {
+            if (selectedLeads.has(index)) {
+                selectedLeads.delete(index);
+            } else {
+                if (selectedLeads.size >= 50) {
+                    showToast("Limite Atingido", "Você só pode selecionar até 50 leads por lote.", "error");
+                    renderLeads(scrapedLeads); // Redesenha para re-sincronizar o check do checkbox
+                    return;
+                }
+                selectedLeads.add(index);
+            }
+            renderLeads(scrapedLeads);
+        }
+
+        function toggleSelectAll() {
+            const inputPesquisa = document.getElementById("searchLead").value.toLowerCase();
+            const filtered = scrapedLeads.map((l, i) => ({ l, i })).filter(item => {
+                const title = (getField(item.l, ['nome_empresa', 'nome', 'title']) || "").toLowerCase();
+                const address = (getField(item.l, ['endereco', 'Endereço', 'address', 'local']) || "").toLowerCase();
+                const category = (getField(item.l, ['nicho', 'category', 'categoryHtml']) || "").toLowerCase();
+                return title.includes(inputPesquisa) || address.includes(inputPesquisa) || category.includes(inputPesquisa);
+            });
+
+            const allFilteredSelected = filtered.every(item => selectedLeads.has(item.i));
+
+            if (allFilteredSelected) {
+                // Remove todos do filtro ativo
+                filtered.forEach(item => selectedLeads.delete(item.i));
+                showToast("Seleção Removida", "Leads desmarcados com sucesso.", "success");
+            } else {
+                // Adiciona os primeiros até bater 50 seleções
+                let addedCount = 0;
+                let limitExceeded = false;
+
+                for (let item of filtered) {
+                    if (selectedLeads.has(item.i)) continue;
+                    if (selectedLeads.size >= 50) {
+                        limitExceeded = true;
+                        break;
+                    }
+                    selectedLeads.add(item.i);
+                    addedCount++;
+                }
+
+                if (limitExceeded) {
+                    showToast("Limite Ativado", "Selecionamos apenas os primeiros 50 itens permitidos.", "error");
+                } else if (addedCount > 0) {
+                    showToast("Lote Selecionado", `${addedCount} leads selecionados com sucesso!`, "success");
+                }
+            }
+
+            renderLeads(scrapedLeads);
+        }
+
+        function filterLeads() {
+            const query = document.getElementById("searchLead").value.toLowerCase();
+            const filtered = scrapedLeads.filter(lead => {
+                const title = (getField(lead, ['nome_empresa', 'nome', 'title']) || "").toLowerCase();
+                const address = (getField(lead, ['endereco', 'Endereço', 'address', 'local']) || "").toLowerCase();
+                const category = (getField(lead, ['nicho', 'category', 'categoryHtml']) || "").toLowerCase();
+                return title.includes(query) || address.includes(query) || category.includes(query);
+            });
+            renderLeads(filtered);
+        }
+
+        function updateBulkActionsBar() {
+            const bar = document.getElementById("bulkActionsBar");
+            const countText = document.getElementById("selectedCountText");
+            const btnText = document.getElementById("btnSelectAllText");
+
+            if (selectedLeads.size > 0) {
+                bar.classList.remove("hidden");
+                countText.textContent = selectedLeads.size;
+                btnText.textContent = "Desmarcar Tudo";
+            } else {
+                bar.classList.add("hidden");
+                btnText.textContent = "Selecionar Tudo (Máx 50)";
+            }
+        }
+
+        function abrirConfirmacaoDeletar() {
+            if (selectedLeads.size === 0) return;
+            document.getElementById("deleteConfirmCount").textContent = selectedLeads.size;
+            document.getElementById("deleteConfirmModal").classList.remove("hidden");
+        }
+
+        function fecharConfirmacaoDeletar() {
+            document.getElementById("deleteConfirmModal").classList.add("hidden");
+        }
+
+        async function confirmarExclusaoLeads() {
+            const modalBtn = document.getElementById("btnConfirmarDelete");
+            modalBtn.disabled = true;
+            modalBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Processando...`;
+
+            // Mapeia os leads selecionados trazendo o index dinâmico da planilha (+ 2 do cabeçalho)
+            const itensParaExcluir = Array.from(selectedLeads).map(originalIndex => {
+                const lead = scrapedLeads[originalIndex];
+                // Busca o número real da linha, se não encontrar, usa o index de fallback + 2 do Sheets
+                const rawRow = getField(lead, ['row_number', 'row', 'linha']);
+                const rowValue = rawRow ? parseInt(rawRow) : (originalIndex + 2);
+                
+                return {
+                    row_number: rowValue,
+                    nome_empresa: getField(lead, ['nome_empresa', 'nome', 'title']) || "Sem Nome"
+                };
+            });
+
+            const endpointDelete = `https://n8n.studiotesta.com.br/webhook/deletar-leads-duda`;
+
+            try {
+                const response = await fetch(endpointDelete, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        itensParaExcluir: itensParaExcluir
+                    })
+                });
+
+                if (response.ok) {
+                    showToast("Sucesso!", `${selectedLeads.size} leads excluídos de forma segura.`, "success");
+                    
+                    // Limpa seleção
+                    selectedLeads.clear();
+                    fecharConfirmacaoDeletar();
+                    
+                    // Sincroniza dados da planilha na mesma hora
+                    fetchCreatedLeads(false);
+                } else {
+                    throw new Error("Resposta negativa do servidor");
+                }
+            } catch (error) {
+                console.error("Erro na deleção em lote:", error);
+                showToast("Erro no n8n", "Não foi possível concluir a deleção.", "error");
+            } finally {
+                modalBtn.disabled = false;
+                modalBtn.textContent = "Confirmar Exclusão";
+            }
+        }
+
+        // Exportação clássica formatada para CSV
+        function exportToCSV() {
+            if (scrapedLeads.length === 0) {
+                showToast("Erro", "Não existem dados carregados para exportar.", "error");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Nome Empresa,Telefone/Whats,Nicho,Avaliacao,Endereco\n";
+
+            scrapedLeads.forEach(lead => {
+                const title = `"${(getField(lead, ['nome_empresa', 'nome', 'title']) || "").replace(/"/g, '""')}"`;
+                const phone = `"${(getField(lead, ['whatsapp', 'telefone', 'phone', 'number']) || "")}"`;
+                const category = `"${(getField(lead, ['nicho', 'category', 'categoryHtml']) || "Geral")}"`;
+                const rating = `"${getField(lead, ['review_rating', 'rating', 'reviewRating', 'nota'])}"`;
+                const address = `"${(getField(lead, ['endereco', 'Endereço', 'address', 'local']) || "").replace(/"/g, '""')}"`;
+
+                csvContent += `${title},${phone},${category},${rating},${address}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Leads_Duda_Studio_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast("Exportado!", "O arquivo CSV foi gerado com sucesso.", "success");
+        }
+
+        function showToast(title, msg, type = "success") {
+            const toast = document.getElementById("toast");
+            const tIcon = document.getElementById("toastIcon");
+            const tTitle = document.getElementById("toastTitle");
+            const tMsg = document.getElementById("toastMsg");
+
+            tTitle.textContent = title;
+            tMsg.textContent = msg;
+
+            if (type === "success") {
+                tIcon.className = "w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-base";
+                tIcon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+                tTitle.className = "text-sm font-bold uppercase tracking-wider text-emerald-400";
+            } else {
+                tIcon.className = "w-10 h-10 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-base";
+                tIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
+                tTitle.className = "text-sm font-bold uppercase tracking-wider text-rose-400";
+            }
+
+            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.add("translate-y-0", "opacity-100");
+
+            setTimeout(() => {
+                toast.classList.remove("translate-y-0", "opacity-100");
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
