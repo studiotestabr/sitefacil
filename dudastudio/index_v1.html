@@ -36,243 +36,236 @@
             -webkit-backdrop-filter: blur(16px);
         }
         .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
             border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(219, 39, 119, 0.3);
+            background: rgba(219, 39, 119, 0.25);
             border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(219, 39, 119, 0.6);
+            background: rgba(219, 39, 119, 0.5);
             border-radius: 10px;
         }
         /* Efeito de brilho neon para botões e caixas de status */
         .neon-border {
-            box-shadow: 0 0 20px rgba(219, 39, 119, 0.3);
-            border-color: rgba(219, 39, 119, 0.5);
+            box-shadow: 0 0 15px rgba(219, 39, 119, 0.25);
+            border-color: rgba(219, 39, 119, 0.4);
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen p-3 md:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black overflow-x-hidden flex items-start justify-center custom-scrollbar">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen p-2 md:p-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black overflow-x-hidden flex items-start justify-center custom-scrollbar">
 
-    <div id="loginSection" class="w-full max-w-lg glass rounded-3xl p-10 shadow-2xl border border-white/10 transition-all duration-500 ease-in-out transform scale-100 my-16 self-center">
-        <div class="text-center mb-10">
-            <div class="w-20 h-20 bg-gradient-to-tr from-duda-600 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-duda-500/40">
-                <i class="fa-solid fa-wand-magic-sparkles text-white text-3xl"></i>
+    <div id="loginSection" class="w-full max-w-md glass rounded-2xl p-8 shadow-2xl border border-white/10 transition-all duration-500 ease-in-out transform scale-100 my-12 self-center">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-tr from-duda-600 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-duda-500/30">
+                <i class="fa-solid fa-wand-magic-sparkles text-white text-2xl"></i>
             </div>
-            <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight">Duda Studio</h1>
-            <p class="text-base text-pink-400 font-bold uppercase tracking-widest mt-2">Prospecção & Raspagem de Clientes</p>
+            <h1 class="text-2xl md:text-3xl font-black text-white tracking-tight">Duda Studio</h1>
+            <p class="text-xs text-pink-400 font-bold uppercase tracking-widest mt-1.5">Prospecção & Raspagem de Clientes</p>
         </div>
 
-        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
             <div>
-                <label class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-2.5">Usuário de Acesso</label>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Usuário de Acesso</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
-                        <i class="fa-solid fa-user-ninja text-base"></i>
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                        <i class="fa-solid fa-user-ninja text-sm"></i>
                     </span>
                     <input type="text" id="username" required 
-                        class="w-full pl-11 pr-4 py-4 bg-slate-900/80 border border-slate-850 rounded-xl focus:outline-none focus:ring-2 focus:ring-duda-500 focus:border-transparent transition-all text-white text-base font-medium" 
+                        class="w-full pl-9 pr-4 py-3 bg-slate-900/80 border border-slate-850 rounded-xl focus:outline-none focus:ring-1 focus:ring-duda-500 focus:border-transparent transition-all text-white text-sm font-medium" 
                         placeholder="Digite seu usuário">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold uppercase tracking-wider text-slate-400 mb-2.5">Senha Secreta</label>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Senha Secreta</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
-                        <i class="fa-solid fa-lock-open text-base"></i>
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                        <i class="fa-solid fa-lock text-sm"></i>
                     </span>
                     <input type="password" id="password" required 
-                        class="w-full pl-11 pr-4 py-4 bg-slate-900/80 border border-slate-850 rounded-xl focus:outline-none focus:ring-2 focus:ring-duda-500 focus:border-transparent transition-all text-white text-base font-medium" 
+                        class="w-full pl-9 pr-4 py-3 bg-slate-900/80 border border-slate-850 rounded-xl focus:outline-none focus:ring-1 focus:ring-duda-500 focus:border-transparent transition-all text-white text-sm font-medium" 
                         placeholder="••••••••">
                 </div>
             </div>
 
-            <div id="loginError" class="hidden text-base font-bold bg-red-950/50 p-4 rounded-xl flex items-center gap-3 border border-red-900/50 text-red-400">
-                <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+            <div id="loginError" class="hidden text-xs font-bold bg-red-950/40 p-3 rounded-lg flex items-center gap-2.5 border border-red-900/40 text-red-400">
+                <i class="fa-solid fa-triangle-exclamation text-sm"></i>
                 <span id="loginErrorText">Usuário ou senha incorretos!</span>
             </div>
 
             <button type="submit" 
-                class="w-full py-4.5 bg-gradient-to-r from-duda-600 to-pink-500 hover:from-duda-500 hover:to-pink-400 text-white text-base font-black rounded-xl shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2.5">
+                class="w-full py-3.5 bg-gradient-to-r from-duda-600 to-pink-500 hover:from-duda-500 hover:to-pink-400 text-white text-sm font-extrabold rounded-xl shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
                 <span>Entrar no Workspace</span>
-                <i class="fa-solid fa-arrow-right-to-bracket text-lg"></i>
+                <i class="fa-solid fa-arrow-right-to-bracket text-base"></i>
             </button>
         </form>
     </div>
 
-    <div id="formSection" class="hidden w-full max-w-[1920px] px-3 lg:px-8 transition-all duration-500 ease-in-out transform scale-95 opacity-0 my-3 space-y-8">
+    <div id="formSection" class="hidden w-full max-w-[1600px] px-2 lg:px-6 transition-all duration-500 ease-in-out transform scale-95 opacity-0 my-2 space-y-6">
         
         <!-- Header Flutuante Premium -->
-        <div class="w-full glass rounded-3xl p-6 border border-white/10 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-gradient-to-tr from-duda-600 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-duda-500/30">
-                    <i class="fa-solid fa-spider text-2xl"></i>
+        <div class="w-full glass rounded-2xl p-5 border border-white/10 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-tr from-duda-600 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-duda-500/25">
+                    <i class="fa-solid fa-spider text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black text-white leading-none">Duda Studio Leads</h1>
-                    <p class="text-sm md:text-base text-pink-400 font-bold uppercase tracking-widest mt-2 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping"></span> Mapeador Google Maps & Evolution API
+                    <h1 class="text-2xl font-black text-white leading-none">Duda Studio Leads</h1>
+                    <p class="text-xs text-pink-400 font-bold uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span> Mapeador Google Maps & Evolution API
                     </p>
                 </div>
             </div>
             
-            <div class="flex flex-wrap items-center gap-5 w-full md:w-auto justify-between md:justify-end">
+            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-end">
                 <button onclick="handleLogout()" 
-                    class="px-5 py-3 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 font-bold rounded-xl text-sm md:text-base transition-all flex items-center gap-2">
+                    class="px-4 py-2.5 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5">
                     <span>Sair</span>
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Layout Principal: Lateral (Configuração/Status) + Centro (Visualização de Leads) -->
-        <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
+        <!-- Layout de Colunas: Lateral (Configuração) + Centro/Direita (Visualização de Leads) -->
+        <div class="grid grid-cols-1 lg:grid-cols-10 gap-6 items-start">
             
-            <!-- Left Column: Formulário & Progresso (Proporção: 40%) -->
-            <div class="lg:col-span-4 space-y-8">
+            <div class="lg:col-span-4 space-y-6">
                 
-                <!-- Aba de Raspagem -->
-                <div class="bg-slate-900/60 rounded-3xl border border-white/10 p-6 shadow-2xl glass space-y-6">
-                    <div class="border-b border-slate-800 pb-4">
-                        <h2 class="text-xl font-black uppercase tracking-wider text-white flex items-center gap-2.5">
+                <!-- Painel de Raspagem -->
+                <div class="bg-slate-900/60 rounded-2xl border border-white/10 p-5 shadow-2xl glass space-y-5">
+                    <div class="border-b border-slate-800 pb-3">
+                        <h2 class="text-lg font-black uppercase tracking-wider text-white flex items-center gap-2">
                             <i class="fa-solid fa-magnifying-glass-location text-pink-500"></i> Disparar Nova Varredura
                         </h2>
-                        <p class="text-sm text-slate-400 mt-2 leading-relaxed">
-                            O robô executará o Puppeteer Browserless local no seu servidor, extraindo dados completos do Google Maps e validando via Evolution API.
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                            O robô executará a captura local em segundo plano no servidor, extraindo dados completos e higienizando diretamente no WhatsApp.
                         </p>
                     </div>
 
-                    <div class="space-y-5">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-xs md:text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">Nicho / Termo de Busca</label>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nicho / Termo de Busca</label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                                    <i class="fa-solid fa-tags text-sm"></i>
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                                    <i class="fa-solid fa-tags text-xs"></i>
                                 </span>
                                 <input type="text" id="inputTermo" placeholder="Ex: Farmácias, Oficinas, Pet Shops, Clínicas" 
-                                       class="w-full pl-10 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-xl text-sm md:text-base focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-700">
+                                       class="w-full pl-9 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-700">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs md:text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">Cidade e Estado de Busca</label>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Cidade e Estado de Busca</label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                                    <i class="fa-solid fa-location-dot text-sm"></i>
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                                    <i class="fa-solid fa-location-dot text-xs"></i>
                                 </span>
                                 <input type="text" id="inputCidade" placeholder="Ex: Mongaguá - SP, Santos - SP" 
-                                       class="w-full pl-10 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-xl text-sm md:text-base focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-700">
+                                       class="w-full pl-9 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-700">
                             </div>
                         </div>
                         
                         <button onclick="iniciarCaptura()" id="btnCaptura" 
-                                class="w-full py-4 bg-gradient-to-r from-duda-600 to-pink-500 hover:from-duda-500 hover:to-pink-400 text-white text-sm md:text-base font-extrabold uppercase rounded-xl tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-pink-500/20 hover:scale-[1.01] active:scale-95">
+                                class="w-full py-3.5 bg-gradient-to-r from-duda-600 to-pink-500 hover:from-duda-500 hover:to-pink-400 text-white text-xs font-extrabold uppercase rounded-xl tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-pink-500/15 hover:scale-[1.01] active:scale-95">
                             <i class="fa-solid fa-play" id="scraperIcon"></i>
                             <span>Iniciar Raspagem com Filtro Whats</span>
                         </button>
                     </div>
 
-                    <!-- Container de Progresso Embutido -->
-                    <div id="scrapingProgressContainer" class="hidden space-y-5 p-5 bg-slate-950 rounded-2xl border border-slate-800/80 neon-border transition-all duration-300">
+                    <!-- Container de Progresso Embutido (Limpo de logs pretos) -->
+                    <div id="scrapingProgressContainer" class="hidden space-y-4 p-4.5 bg-slate-950 rounded-xl border border-slate-800/80 neon-border transition-all duration-300">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm font-extrabold uppercase tracking-widest text-pink-400 flex items-center gap-2" id="scrapingStatusText">
+                            <span class="text-xs font-extrabold uppercase tracking-widest text-pink-400 flex items-center gap-2" id="scrapingStatusText">
                                 <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span> Inicializando Browserless...
                             </span>
-                            <span class="text-sm font-bold text-slate-400 font-mono" id="scrapingPercentText">0%</span>
+                            <span class="text-xs font-bold text-slate-400 font-mono" id="scrapingPercentText">0%</span>
                         </div>
-                        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                        <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                             <div id="scrapingBarFill" class="h-full bg-gradient-to-r from-duda-600 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                         
                         <!-- Contador regressivo de 20 minutos -->
-                        <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-slate-800 text-sm">
-                            <span class="text-slate-400 font-bold uppercase tracking-wider"><i class="fa-solid fa-hourglass-half mr-2 text-pink-500"></i> Timeout de Segurança:</span>
-                            <span class="font-mono font-black text-pink-400 text-base" id="timeoutCountdown">20:00</span>
-                        </div>
-
-                        <!-- Console de Logs em tempo real -->
-                        <div class="bg-black/80 rounded-xl p-4 font-mono text-xs md:text-sm text-slate-400 h-52 overflow-y-auto custom-scrollbar space-y-1.5" id="scrapingConsole">
-                            <div class="text-pink-400 font-bold">&gt; Monitor local pronto.</div>
+                        <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-[11px]">
+                            <span class="text-slate-400 font-bold uppercase tracking-wider"><i class="fa-solid fa-hourglass-half mr-1.5 text-pink-500"></i> Timeout de Segurança:</span>
+                            <span class="font-mono font-black text-pink-400 text-xs" id="timeoutCountdown">20:00</span>
                         </div>
                         
                         <!-- Alerta do limite de Gateway Timeout do Cloudflare Tunnel -->
-                        <div class="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs md:text-sm rounded-xl leading-relaxed">
-                            <i class="fa-solid fa-circle-exclamation mr-1.5"></i>
-                            <strong>Aviso de infra:</strong> Pelo limite do Cloudflare Tunnel, a conexão pode acusar Timeout após 100s. Se ocorrer, **não feche a aba**! O robô continuará rodando em segundo plano no seu i7-2600.
+                        <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] rounded-lg leading-relaxed">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            <strong>Aviso de infra:</strong> A conexão do painel pode fechar após 100s, mas o robô continuará gerando os contatos em background normalmente.
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Right Column: Visualizador de Leads -->
-            <div class="lg:col-span-6 space-y-8">
+            <div class="lg:col-span-6 space-y-6">
                 
-                <div class="bg-slate-900/60 p-6 rounded-3xl border border-white/10 shadow-2xl glass space-y-5">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-white/10 shadow-2xl glass space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
                         <div>
-                            <h2 class="text-xl font-black uppercase tracking-wider text-white flex items-center gap-2.5">
+                            <h2 class="text-lg font-black uppercase tracking-wider text-white flex items-center gap-2">
                                 <i class="fa-solid fa-list-check text-pink-500"></i> Leads Higienizados
                             </h2>
-                            <p class="text-sm text-slate-400 mt-2">Lista sincronizada diretamente da planilha com telefones validados pelo WhatsApp.</p>
+                            <p class="text-xs text-slate-400 mt-1">Lista sincronizada diretamente da planilha com telefones validados pelo WhatsApp.</p>
                         </div>
                         
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <div class="flex items-center gap-2.5 w-full sm:w-auto">
                             <button onclick="fetchCreatedLeads()" id="syncBtn"
-                                class="flex-1 sm:flex-none py-3 px-5 bg-gradient-to-tr from-pink-600 to-duda-500 hover:from-pink-500 hover:to-duda-400 text-white text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-pink-500/15">
+                                class="flex-1 sm:flex-none py-2 px-4 bg-gradient-to-tr from-pink-600 to-duda-500 hover:from-pink-500 hover:to-duda-400 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-pink-500/10">
                                 <i class="fa-solid fa-rotate" id="syncIcon"></i>
                                 <span>Sincronizar Planilha</span>
                             </button>
-                            <span class="text-sm bg-pink-500/20 text-pink-400 px-4 py-1.5 rounded-full font-black border border-pink-500/20" id="leadCounter">0 Carregados</span>
+                            <span class="text-xs bg-pink-500/20 text-pink-400 px-3 py-1 rounded-full font-black border border-pink-500/20" id="leadCounter">0 Carregados</span>
                         </div>
                     </div>
 
                     <!-- Filtros, Seleção em Lote e Busca Rápida -->
-                    <div class="flex flex-col gap-4">
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="flex flex-col gap-3">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
                             <div class="relative md:col-span-6">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
                                 </span>
                                 <input type="text" id="searchLead" oninput="filterLeads()"
-                                    class="w-full pl-10 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-xl text-sm md:text-base focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-500"
+                                    class="w-full pl-9 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-1 focus:ring-duda-500 focus:outline-none text-white placeholder-slate-500"
                                     placeholder="Filtrar por nome, nicho ou endereço...">
                             </div>
-                            <div class="flex gap-3 md:col-span-6">
-                                <button onclick="toggleSelectAll()" class="flex-1 py-3.5 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 hover:border-pink-500/20">
+                            <div class="flex gap-2 md:col-span-6">
+                                <button onclick="toggleSelectAll()" class="flex-1 py-3 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 hover:border-pink-500/20">
                                     <i class="fa-solid fa-list-check text-pink-500"></i> <span id="btnSelectAllText">Selecionar Tudo (Máx 50)</span>
                                 </button>
-                                <button onclick="exportToCSV()" class="flex-1 py-3.5 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 hover:border-pink-500/20">
+                                <button onclick="exportToCSV()" class="flex-1 py-3 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 hover:border-pink-500/20">
                                     <i class="fa-solid fa-file-csv text-emerald-400"></i> Exportar (CSV)
                                 </button>
                             </div>
                         </div>
 
                         <!-- Barra Ativa de Ações em Massa (Apenas visível se houver leads selecionados) -->
-                        <div id="bulkActionsBar" class="hidden flex items-center justify-between p-4 bg-pink-950/20 border border-pink-500/30 rounded-2xl transition-all duration-300">
-                            <span class="text-sm md:text-base text-pink-300 font-bold">
-                                <i class="fa-solid fa-circle-info mr-2"></i> <span id="selectedCountText">0</span>/50 itens selecionados
+                        <div id="bulkActionsBar" class="hidden flex items-center justify-between p-3.5 bg-pink-950/20 border border-pink-500/30 rounded-xl transition-all duration-300">
+                            <span class="text-xs text-pink-300 font-bold">
+                                <i class="fa-solid fa-circle-info mr-1.5"></i> <span id="selectedCountText">0</span>/50 selecionados
                             </span>
-                            <div class="flex gap-3">
-                                <button onclick="abrirConfirmacaoDeletar()" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white rounded-xl text-xs md:text-sm font-bold shadow-lg transition-all flex items-center gap-2">
-                                    <i class="fa-solid fa-trash-can"></i> Deletar Selecionados
+                            <div class="flex gap-2">
+                                <button onclick="abrirConfirmacaoDeletar()" class="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white rounded-lg text-xs font-bold shadow-lg transition-all flex items-center gap-1.5">
+                                    <i class="fa-solid fa-trash-can"></i> Deletar
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Container Grid de Cards de Leads -->
-                    <div class="max-h-[650px] overflow-y-auto custom-scrollbar space-y-4 pr-1" id="leadsListContainer">
-                        <div class="flex flex-col items-center justify-center h-full text-center p-12 text-slate-500 py-24">
-                            <i class="fa-solid fa-cloud-arrow-down text-5xl mb-4 text-pink-500 animate-bounce"></i>
-                            <p class="text-sm md:text-base font-black text-slate-400">Nenhum lead importado do Sheets</p>
-                            <p class="text-xs md:text-sm text-slate-500 max-w-sm mt-2">Preencha o termo e a cidade ao lado e inicie o robô para capturar leads.</p>
+                    <div class="max-h-[600px] overflow-y-auto custom-scrollbar space-y-3.5 pr-1" id="leadsListContainer">
+                        <div class="flex flex-col items-center justify-center h-full text-center p-10 text-slate-500 py-20">
+                            <i class="fa-solid fa-cloud-arrow-down text-4xl mb-3 text-pink-500 animate-bounce"></i>
+                            <p class="text-xs font-black text-slate-400">Nenhum lead importado do Sheets</p>
+                            <p class="text-[11px] text-slate-500 max-w-sm mt-1.5">Preencha o termo e a cidade ao lado e inicie o robô para capturar leads.</p>
                         </div>
                     </div>
                 </div>
@@ -281,25 +274,25 @@
         </div>
     </div>
 
-    <div id="deleteConfirmModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-lg bg-slate-950 border border-red-500/20 rounded-3xl p-8 shadow-2xl text-center space-y-5 relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl"></div>
+    <div id="deleteConfirmModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-slate-950 border border-red-500/20 rounded-2xl p-6 shadow-2xl text-center space-y-4 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-28 h-28 bg-red-600/10 rounded-full blur-2xl"></div>
             
-            <div class="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 mx-auto">
-                <i class="fa-solid fa-trash-can text-3xl"></i>
+            <div class="w-16 h-16 bg-red-500/10 rounded-xl flex items-center justify-center text-red-500 mx-auto">
+                <i class="fa-solid fa-trash-can text-2xl"></i>
             </div>
             
-            <h3 class="text-2xl font-extrabold text-white">Deletar Leads do Sheets?</h3>
-            <p class="text-slate-400 text-sm md:text-base leading-relaxed">
+            <h3 class="text-xl font-extrabold text-white">Deletar do Sheets?</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">
                 Você tem certeza que deseja excluir permanentemente os <span id="deleteConfirmCount" class="font-extrabold text-red-400">0</span> leads selecionados? 
-                Isso removerá as linhas correspondentes da planilha do Google Drive de forma sequencial do final para o início.
+                Isso removerá as linhas correspondentes da planilha de forma segura de trás para frente.
             </p>
             
-            <div class="flex gap-4 pt-3">
-                <button onclick="fecharConfirmacaoDeletar()" class="flex-1 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold rounded-xl text-sm md:text-base transition-all border border-slate-800">
+            <div class="flex gap-3 pt-2">
+                <button onclick="fecharConfirmacaoDeletar()" class="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold rounded-lg text-xs transition-all border border-slate-800">
                     Cancelar
                 </button>
-                <button onclick="confirmarExclusaoLeads()" id="btnConfirmarDelete" class="flex-1 py-3.5 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white font-bold rounded-xl text-sm md:text-base transition-all shadow-lg shadow-red-500/20">
+                <button onclick="confirmarExclusaoLeads()" id="btnConfirmarDelete" class="flex-1 py-2.5 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white font-bold rounded-lg text-xs transition-all shadow-lg shadow-red-500/15">
                     Confirmar Exclusão
                 </button>
             </div>
@@ -307,14 +300,14 @@
     </div>
 
     <!-- Toast flutuante de Notificação Premium -->
-    <div id="toast" class="fixed bottom-6 right-6 translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
-        <div class="bg-slate-900 text-white px-6 py-5 rounded-2xl shadow-2xl border border-slate-800 flex items-center gap-4">
-            <div id="toastIcon" class="w-10 h-10 rounded-full bg-duda-500/20 text-pink-400 flex items-center justify-center text-base">
+    <div id="toast" class="fixed bottom-5 right-5 translate-y-10 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <div class="bg-slate-900 text-white px-5 py-4 rounded-xl shadow-2xl border border-slate-800 flex items-center gap-3.5">
+            <div id="toastIcon" class="w-8 h-8 rounded-full bg-duda-500/20 text-pink-400 flex items-center justify-center text-xs">
                 <i class="fa-solid fa-check"></i>
             </div>
             <div>
-                <p id="toastTitle" class="text-xs md:text-sm font-bold uppercase tracking-wider text-pink-400">Notificação</p>
-                <p id="toastMsg" class="text-sm md:text-base text-slate-300">Ação executada com sucesso.</p>
+                <p id="toastTitle" class="text-[11px] font-bold uppercase tracking-wider text-pink-400">Notificação</p>
+                <p id="toastMsg" class="text-xs text-slate-300">Ação executada com sucesso.</p>
             </div>
         </div>
     </div>
@@ -325,7 +318,7 @@
         let activeCountdown = null;
         let controller = null; // AbortController global para timeouts estendidos
         let autoSyncIntervalId = null; // Sincronização periódica a cada 60s dos cards
-        let statusPollingIntervalId = null; // Polling do status da raspagem ativa
+        let statusPollingIntervalId = null; // Polling do status da raspagem ativa de 60s
         let currentSessionId = null; // ID único da sessão de raspagem ativa
 
         window.onload = function() {
@@ -334,7 +327,6 @@
             }
         }
 
-        // Sistema de login integrado ao Webhook com Basic Auth do n8n
         async function handleLogin(e) {
             e.preventDefault();
             const user = document.getElementById("username").value;
@@ -344,14 +336,13 @@
             const submitBtn = e.target.querySelector("button[type='submit']");
 
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2 text-sm"></i> Autenticando...`;
+            submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1.5 text-xs"></i> Autenticando...`;
             errorBox.classList.add("hidden");
 
             try {
                 // Passo Hacker: Codifica usuário e senha para o formato padrão do Basic Auth (Base64)
                 const credentials = btoa(`${user}:${pass}`);
 
-                // Dispara o POST direto para o endpoint seguro do n8n da StudioTesta
                 const response = await fetch("https://n8n.studiotesta.com.br/webhook/login-painel-duda", {
                     method: "POST",
                     headers: {
@@ -378,7 +369,7 @@
                 errorBox.classList.remove("hidden");
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = `Entrar no Workspace <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>`;
+                submitBtn.innerHTML = `Entrar no Workspace <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>`;
             }
         }
 
@@ -405,30 +396,23 @@
             if (autoSyncIntervalId) clearInterval(autoSyncIntervalId);
             autoSyncIntervalId = setInterval(() => {
                 fetchCreatedLeads(true);
-            }, 60000); // Sincronização automática dos cards a cada 60 segundos
+            }, 60000); // Sincronização automática dos cards a cada 60 segundos (poupando processamento)
         }
 
         function startStatusPolling(sessionId) {
             if (statusPollingIntervalId) clearInterval(statusPollingIntervalId);
             
-            const consoleBox = document.getElementById("scrapingConsole");
-            const statusText = document.getElementById("scrapingStatusText");
             const barFill = document.getElementById("scrapingBarFill");
             const percentText = document.getElementById("scrapingPercentText");
 
-            if (consoleBox) {
-                consoleBox.innerHTML += `<div class="text-pink-400 mt-2 font-bold">&gt; [Status] Monitor de sessão ativa iniciado para ID: ${sessionId}</div>`;
-                consoleBox.scrollTop = consoleBox.scrollHeight;
-            }
-
-            // O seu webhook busca status do n8n é cadastrado para requisições POST no path status-raspagem
             const urlStatus = `https://n8n.studiotesta.com.br/webhook/status-raspagem`;
 
             let stableCycles = 0;
 
+            // Polling inteligente e sincronizado a cada 60 segundos (poupando o processador i7-2600)
             statusPollingIntervalId = setInterval(async () => {
                 try {
-                    // Executa o POST conforme desenhado na sua engenharia do n8n para consultar o status no Sheets
+                    // Executa o POST conforme desenhado na engenharia do n8n para consultar o status na aba de controle
                     const res = await fetch(urlStatus, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -438,24 +422,19 @@
                     if (res.ok) {
                         const data = await res.json();
                         
-                        // Incrementa a barra progressivamente para dar feedback visual de processamento
+                        // Incrementa o preenchimento visual progressivamente até o fim
                         stableCycles++;
-                        let simulatedPercent = Math.min(84 + (stableCycles * 2), 98);
+                        let simulatedPercent = Math.min(60 + (stableCycles * 4), 98);
                         if (barFill) barFill.style.width = `${simulatedPercent}%`;
                         if (percentText) percentText.textContent = `${simulatedPercent}%`;
 
-                        if (consoleBox) {
-                            consoleBox.innerHTML += `<div class="text-slate-500 mt-1">&gt; [Status] Verificando progresso com o servidor auxiliar... (Sessão: ${sessionId})</div>`;
-                            consoleBox.scrollTop = consoleBox.scrollHeight;
-                        }
-
                         // Algoritmo de Verificação Inteligente de Fim de Fluxo:
-                        // Se a resposta retornar dados da sessão concluída (seja um array contendo a linha concluída ou objeto direto)
+                        // Se a resposta retornar dados da sessão concluída
                         let isFinished = false;
                         if (Array.isArray(data)) {
-                            isFinished = data.some(row => Object.values(row).some(val => String(val).includes(sessionId)));
+                            isFinished = data.some(row => Object.values(row).some(val => String(val).includes(sessionId) && String(val).includes("concluido")));
                         } else if (typeof data === 'object' && data !== null) {
-                            isFinished = Object.values(data).some(val => String(val).includes(sessionId)) || data.status === "concluido";
+                            isFinished = Object.values(data).some(val => String(val).includes(sessionId) && String(val).includes("concluido")) || data.status === "concluido";
                         }
 
                         if (isFinished) {
@@ -465,7 +444,7 @@
                 } catch (err) {
                     console.error("Erro ao ler status da raspagem:", err);
                 }
-            }, 60000); // Polling sincronizado a cada 60 segundos para evitar sobrecarga no i7-2600 e na API do Google Sheets
+            }, 60000); // Polling perfeitamente sincronizado com a atualização de 60s
         }
 
         function finishScrapingFlowSuccessfully() {
@@ -479,19 +458,10 @@
             const barFill = document.getElementById("scrapingBarFill");
             const percentText = document.getElementById("scrapingPercentText");
             const statusText = document.getElementById("scrapingStatusText");
-            const consoleBox = document.getElementById("scrapingConsole");
 
             if (barFill) barFill.style.width = "100%";
             if (percentText) percentText.textContent = "100%";
-            if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Varredura Concluída!`;
-            
-            if (consoleBox) {
-                consoleBox.innerHTML += `
-                    <div class="text-emerald-400 font-bold mt-3">&gt; [SUCESSO] O fluxo auxiliar do n8n confirmou a conclusão total do processo!</div>
-                    <div class="text-emerald-300 mt-1">&gt; Importando todos os leads gerados e salvos na planilha...</div>
-                `;
-                consoleBox.scrollTop = consoleBox.scrollHeight;
-            }
+            if (statusText) statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Varredura Concluída!`;
 
             if (btn) {
                 btn.disabled = false;
@@ -522,22 +492,20 @@
             const originalText = btn.querySelector("span").textContent;
 
             btn.disabled = true;
-            icon.className = "fa-solid fa-circle-notch animate-spin mr-2.5 text-sm";
+            icon.className = "fa-solid fa-circle-notch animate-spin mr-2 text-xs";
             btn.querySelector("span").textContent = "Varrendo no Servidor...";
 
             const progressContainer = document.getElementById("scrapingProgressContainer");
             const barFill = document.getElementById("scrapingBarFill");
             const percentText = document.getElementById("scrapingPercentText");
             const statusText = document.getElementById("scrapingStatusText");
-            const consoleBox = document.getElementById("scrapingConsole");
 
             if (progressContainer) progressContainer.classList.remove("hidden");
             if (barFill) barFill.style.width = "5%";
             if (percentText) percentText.textContent = "5%";
-            if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping"></span> Inicializando Browserless...`;
-            if (consoleBox) consoleBox.innerHTML = `<div class="text-pink-400 font-bold">&gt; Disparando Webhook no Servidor local com ID: ${currentSessionId}...</div>`;
+            if (statusText) statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span> Inicializando Browserless...`;
 
-            // Configura cronômetro de 20 minutos
+            // Configura cronômetro regressivo de 20 minutos (1200s)
             let secondsLeft = 1200;
             const countdownEl = document.getElementById("timeoutCountdown");
             if (activeCountdown) clearInterval(activeCountdown);
@@ -550,21 +518,11 @@
                 
                 if (secondsLeft <= 0) {
                     clearInterval(activeCountdown);
-                    logConsoleError("A requisição excedeu o timeout de 20 minutos.");
+                    showToast("Limite Alcançado", "Tempo máximo expirou, mas o robô pode continuar rodando no Docker.", "error");
                 }
             }, 1000);
 
             let percent = 5;
-            let consoleSteps = [
-                { t: 15, m: "Invocando o contêiner Docker do Browserless...", c: "text-slate-300" },
-                { t: 30, m: "Localizando coordenadas GPS para " + cidade + "...", c: "text-slate-300" },
-                { t: 45, m: "Scraper navegando em modo oculto no Google Maps...", c: "text-pink-400" },
-                { t: 60, m: "Iniciando raspagem e rolagem automática do feed...", c: "text-pink-400" },
-                { t: 75, m: "Processando lote de dados limpos do Maps...", c: "text-pink-400" },
-                { t: 83, m: "Filtro Ativo: Higienizando lote na Evolution API...", c: "text-emerald-400" }
-            ];
-            let loggedSteps = new Set();
-
             const progressInterval = setInterval(() => {
                 if (percent < 84) {
                     percent += (84 - percent) * 0.02 + 0.1;
@@ -573,23 +531,20 @@
                 if (barFill) barFill.style.width = currentPercent + "%";
                 if (percentText) percentText.textContent = currentPercent + "%";
 
-                consoleSteps.forEach(step => {
-                    if (currentPercent >= step.t && !loggedSteps.has(step.t)) {
-                        loggedSteps.add(step.t);
-                        if (consoleBox) {
-                            consoleBox.innerHTML += `<div class="${step.c} mt-1.5">&gt; ${step.m}</div>`;
-                            consoleBox.scrollTop = consoleBox.scrollHeight;
-                        }
-                        if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse"></span> ${step.m}`;
-                    }
-                });
+                if (currentPercent >= 15 && currentPercent < 45) {
+                    statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span> Mapeando Coordenadas...`;
+                } else if (currentPercent >= 45 && currentPercent < 75) {
+                    statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span> Capturando no Maps...`;
+                } else if (currentPercent >= 75) {
+                    statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span> Filtrando WhatsApp...`;
+                }
             }, 1500);
 
-            // Iniciamos o Monitor de Status imediatamente, antes mesmo do timeout ocorrer!
+            // Iniciamos o Monitor de Status imediatamente, antes mesmo do timeout de requisição estourar
             startStatusPolling(currentSessionId);
 
             controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1200000); // 20 minutos
+            const timeoutId = setTimeout(() => controller.abort(), 1200000); // 20 minutos de timeout
 
             const endpoint = `https://n8n.studiotesta.com.br/webhook/duda-leads`;
 
@@ -601,7 +556,7 @@
                         termo: nicho,
                         nicho: nicho,
                         cidade: cidade,
-                        id_sessao: currentSessionId // Passa o ID único para o n8n
+                        id_sessao: currentSessionId // Passa o ID único para a planilha e webhook
                     }),
                     signal: controller.signal
                 });
@@ -611,7 +566,7 @@
 
                 if (!response.ok) throw new Error("Status " + response.status);
                 
-                // Se o fluxo responder rápido (dentro dos 100s do Cloudflare), finalizamos imediatamente
+                // Se responder de forma síncrona rápida, encerra com sucesso
                 finishScrapingFlowSuccessfully();
 
             } catch (err) {
@@ -620,32 +575,13 @@
                 
                 if (err.name === 'AbortError') {
                     clearInterval(activeCountdown);
-                    logConsoleError("Erro de Timeout: A varredura demorou mais que 20 minutos.");
-                    showToast("Timeout Alcançado", "O robô ainda está processando os dados localmente no Docker.", "error");
-                    
                     btn.disabled = false;
                     icon.className = "fa-solid fa-play";
                     btn.querySelector("span").textContent = originalText;
                 } else {
-                    logConsoleError("Conexão interrompida pelo Cloudflare Tunnel (Timeout HTTP)");
-                    if (consoleBox) {
-                        consoleBox.innerHTML += `
-                            <div class="text-amber-400 mt-2.5 font-bold">&gt; Não entre em pânico! O i7-2600 continua processando em segundo plano no Docker.</div>
-                            <div class="text-slate-400 mt-1.5">&gt; O n8n continuará salvando os leads e notificará o fluxo auxiliar quando terminar.</div>
-                            <div class="text-pink-400 mt-1.5 font-bold">&gt; Aguardando notificação de conclusão em segundo plano...</div>
-                        `;
-                        consoleBox.scrollTop = consoleBox.scrollHeight;
-                    }
-                    if (statusText) statusText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span> Rodando em background...`;
+                    // Sem pânico! O Cloudflare derrubou a requisição HTTP mas o i7-2600 continuará executando
+                    if (statusText) statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Processando em background...`;
                 }
-            }
-        }
-
-        function logConsoleError(msg) {
-            const consoleBox = document.getElementById("scrapingConsole");
-            if (consoleBox) {
-                consoleBox.innerHTML += `<div class="text-red-400 mt-2 font-bold">&gt; Alerta: ${msg}</div>`;
-                consoleBox.scrollTop = consoleBox.scrollHeight;
             }
         }
 
@@ -714,10 +650,10 @@
 
             if (leads.length === 0) {
                 container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-center p-12 text-slate-500 py-24">
-                        <i class="fa-solid fa-cloud-arrow-down text-5xl mb-4 text-pink-500 opacity-40"></i>
-                        <p class="text-base font-black text-slate-400">Nenhum lead importado do Sheets</p>
-                        <p class="text-sm text-slate-500 max-w-sm mt-2">Preencha o termo e a cidade ao lado e inicie o robô para capturar leads.</p>
+                    <div class="flex flex-col items-center justify-center h-full text-center p-10 text-slate-500 py-20">
+                        <i class="fa-solid fa-cloud-arrow-down text-4xl mb-3 text-pink-500 opacity-40"></i>
+                        <p class="text-xs font-black text-slate-400">Nenhum lead importado do Sheets</p>
+                        <p class="text-[11px] text-slate-500 max-w-sm mt-1.5">Preencha o termo e a cidade ao lado e inicie o robô para capturar leads.</p>
                     </div>`;
                 return;
             }
@@ -746,51 +682,51 @@
                 const hasFace = faceUrl.length > 0;
 
                 const ratingBadge = rating ? `
-                    <span class="bg-amber-500/20 text-amber-400 text-xs font-black px-3 py-1 rounded-full border border-amber-500/20 flex items-center gap-1 shadow-sm">
-                        <i class="fa-solid fa-star text-[10px]"></i> ${rating}
+                    <span class="bg-amber-500/20 text-amber-400 text-[10px] font-black px-2 py-0.5 rounded-full border border-amber-500/20 flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-star text-[9px]"></i> ${rating}
                     </span>
                 ` : '';
 
                 const card = document.createElement("div");
-                card.className = `p-5 rounded-2xl border transition-all duration-300 relative flex flex-col justify-between gap-4 ${isSelected ? 'bg-pink-950/20 border-pink-500/50 neon-border' : 'bg-slate-900/40 border-white/5 hover:border-white/15'}`;
+                card.className = `p-4.5 rounded-xl border transition-all duration-300 relative flex flex-col justify-between gap-3.5 ${isSelected ? 'bg-pink-950/20 border-pink-500/50 neon-border' : 'bg-slate-900/40 border-white/5 hover:border-white/12'}`;
                 
                 card.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between gap-3 flex-wrap">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="bg-pink-500/10 text-pink-400 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border border-pink-500/10">
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="bg-pink-500/10 text-pink-400 text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border border-pink-500/10">
                                     ${category}
                                 </span>
-                                <span class="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/10 flex items-center gap-1.5">
-                                    <i class="fa-brands fa-whatsapp text-sm"></i> Validado Whats
+                                <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/10 flex items-center gap-1">
+                                    <i class="fa-brands fa-whatsapp text-xs"></i> Whats Ativo
                                 </span>
                                 ${ratingBadge}
                             </div>
                             <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelectLead(${index})" 
-                                   class="w-5 h-5 rounded-md accent-pink-500 border-white/10 bg-slate-950 cursor-pointer focus:ring-0 focus:ring-offset-0">
+                                   class="w-4 h-4 rounded accent-pink-500 border-white/10 bg-slate-950 cursor-pointer focus:ring-0 focus:ring-offset-0">
                         </div>
 
-                        <h3 class="text-lg md:text-xl font-black text-white hover:text-pink-400 transition-colors leading-tight pt-1">${title}</h3>
-                        <p class="text-xs md:text-sm text-slate-400 flex items-start gap-2 leading-relaxed">
-                            <i class="fa-solid fa-map-location-dot text-pink-500 text-base mt-0.5 shrink-0"></i>
+                        <h3 class="text-base font-black text-white hover:text-pink-400 transition-colors leading-snug pt-0.5">${title}</h3>
+                        <p class="text-[11px] text-slate-400 flex items-start gap-1.5 leading-relaxed">
+                            <i class="fa-solid fa-map-location-dot text-pink-500 text-sm mt-0.5 shrink-0"></i>
                             <span>${address}</span>
                         </p>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2.5 pt-2">
+                    <div class="grid grid-cols-3 gap-2 pt-1.5">
                         <a href="https://wa.me/${whatsappNumber}" target="_blank" 
-                           class="py-2.5 bg-slate-950 hover:bg-slate-900 text-slate-200 hover:text-white rounded-xl text-xs md:text-sm font-bold border border-white/5 hover:border-pink-500/20 flex items-center justify-center gap-1.5 transition-all">
-                            <i class="fa-brands fa-whatsapp text-sm text-emerald-400"></i>
+                           class="py-2 bg-slate-950 hover:bg-slate-900 text-slate-200 hover:text-white rounded-lg text-xs font-bold border border-white/5 hover:border-pink-500/10 flex items-center justify-center gap-1.5 transition-all">
+                            <i class="fa-brands fa-whatsapp text-xs text-emerald-400"></i>
                             <span>Abrir Whats</span>
                         </a>
                         <a ${hasInsta ? `href="${instaUrl}" target="_blank"` : 'href="#" onclick="showNoSocialAlert(event)"'} 
-                           class="py-2.5 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs md:text-sm font-bold border border-white/5 hover:border-pink-500/20 flex items-center justify-center gap-1.5 transition-all ${hasInsta ? 'text-slate-200 hover:text-white' : 'text-slate-600 cursor-not-allowed'}">
-                            <i class="fa-brands fa-instagram text-sm text-pink-500"></i>
+                           class="py-2 bg-slate-950 hover:bg-slate-900 rounded-lg text-xs font-bold border border-white/5 hover:border-pink-500/10 flex items-center justify-center gap-1.5 transition-all ${hasInsta ? 'text-slate-200 hover:text-white' : 'text-slate-600 cursor-not-allowed'}">
+                            <i class="fa-brands fa-instagram text-xs text-pink-500"></i>
                             <span>Instagram</span>
                         </a>
                         <a ${hasFace ? `href="${faceUrl}" target="_blank"` : 'href="#" onclick="showNoSocialAlert(event)"'} 
-                           class="py-2.5 bg-slate-950 hover:bg-slate-900 rounded-xl text-xs md:text-sm font-bold border border-white/5 hover:border-pink-500/20 flex items-center justify-center gap-1.5 transition-all ${hasFace ? 'text-slate-200 hover:text-white' : 'text-slate-600 cursor-not-allowed'}">
-                            <i class="fa-brands fa-facebook text-sm text-blue-500"></i>
+                           class="py-2 bg-slate-950 hover:bg-slate-900 rounded-lg text-xs font-bold border border-white/5 hover:border-pink-500/10 flex items-center justify-center gap-1.5 transition-all ${hasFace ? 'text-slate-200 hover:text-white' : 'text-slate-600 cursor-not-allowed'}">
+                            <i class="fa-brands fa-facebook text-xs text-blue-500"></i>
                             <span>Facebook</span>
                         </a>
                     </div>
@@ -812,7 +748,7 @@
                 selectedLeads.delete(index);
             } else {
                 if (selectedLeads.size >= 50) {
-                    showToast("Limite Atingido", "Você só pode selecionar até 50 leads por lote.", "error");
+                    showToast("Limite Ativo", "Você só pode selecionar até 50 leads por lote.", "error");
                     renderLeads(scrapedLeads); // Redesenha para re-sincronizar o check do checkbox
                     return;
                 }
@@ -852,7 +788,7 @@
                 }
 
                 if (limitExceeded) {
-                    showToast("Limite Ativado", "Selecionamos apenas os primeiros 50 itens permitidos.", "error");
+                    showToast("Limite de Lote", "Selecionamos apenas os primeiros 50 itens permitidos.", "error");
                 } else if (addedCount > 0) {
                     showToast("Lote Selecionado", `${addedCount} leads selecionados com sucesso!`, "success");
                 }
@@ -900,7 +836,7 @@
         async function confirmarExclusaoLeads() {
             const modalBtn = document.getElementById("btnConfirmarDelete");
             modalBtn.disabled = true;
-            modalBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Processando...`;
+            modalBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1.5 text-xs"></i> Processando...`;
 
             // Mapeia os leads selecionados trazendo o index dinâmico da planilha (+ 2 do cabeçalho)
             const itensParaExcluir = Array.from(selectedLeads).map(originalIndex => {
@@ -947,7 +883,6 @@
             }
         }
 
-        // Exportação clássica formatada para CSV
         function exportToCSV() {
             if (scrapedLeads.length === 0) {
                 showToast("Erro", "Não existem dados carregados para exportar.", "error");
@@ -988,21 +923,21 @@
             tMsg.textContent = msg;
 
             if (type === "success") {
-                tIcon.className = "w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-base";
+                tIcon.className = "w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs";
                 tIcon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
-                tTitle.className = "text-sm font-bold uppercase tracking-wider text-emerald-400";
+                tTitle.className = "text-[11px] font-bold uppercase tracking-wider text-emerald-400";
             } else {
-                tIcon.className = "w-10 h-10 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-base";
+                tIcon.className = "w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs";
                 tIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
-                tTitle.className = "text-sm font-bold uppercase tracking-wider text-rose-400";
+                tTitle.className = "text-[11px] font-bold uppercase tracking-wider text-rose-400";
             }
 
-            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.remove("translate-y-10", "opacity-0");
             toast.classList.add("translate-y-0", "opacity-100");
 
             setTimeout(() => {
                 toast.classList.remove("translate-y-0", "opacity-100");
-                toast.classList.add("translate-y-20", "opacity-0");
+                toast.classList.add("translate-y-10", "opacity-0");
             }, 5000);
         }
     </script>
