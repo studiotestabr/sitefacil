@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="STUDIOTESTA é sua agência de marketing em Mongaguá, SP. Criamos sites de alta performance, automação WhatsApp e estratégias digitais para transformar cliques em lucro real para seu negócio local. Aumente seu faturamento com um site rápido, moderno e que realmente converte.">
+    <title>STUDIOTESTA | Marketing Digital e Sites de Alta Performance em Mongaguá, SP</title>
+
+    <!-- Preload Hero Image for LCP -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1557804506-66380c1df074?ixlib=rb-4.0.3&fm=webp&q=80&w=1920&fit=crop&crop=entropy" fetchpriority="high">
+
+    <!-- Preconnect & DNS-Prefetch for faster resource loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+
+    <!-- Google Fonts: Outfit for modern, clean typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome for crisp, scalable icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Tailwind CSS CDN with custom configuration for brand colors and fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'studiotesta-blue': '#0087c3',
+                        'studiotesta-darkblue': '#0f87c3',
+                        'whatsapp-green': '#25D366',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'], // Primary font for all text
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom styles using Tailwind's @layer directive for reusable components and animations -->
+    <style type="text/tailwindcss">
+        @layer base {
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 5rem; /* Adjust for fixed header height */
+            }
+            body {
+                font-family: 'Outfit', sans-serif;
+            }
+            .section-heading {
+                @apply text-4xl md:text-5xl font-bold text-gray-800 mb-6 md:mb-12 text-center relative after:content-[''] after:block after:w-20 after:h-1 after:bg-studiotesta-blue after:mx-auto after:mt-4;
+            }
+            .sub-heading {
+                @apply text-lg md:text-xl text-gray-600 mb-8 text-center max-w-3xl mx-auto;
+            }
+            .cta-button {
+                @apply inline-flex items-center justify-center px-8 py-4 rounded-full text-white font-bold text-lg bg-gradient-to-r from-studiotesta-blue to-studiotesta-darkblue hover:scale-105 transition-all duration-300 ease-in-out shadow-xl;
+            }
+            .card-base {
+                @apply bg-white rounded-xl shadow-xl p-6 lg:p-8 flex flex-col items-center text-center hover:-translate-y-1 transition-all duration-300 ease-in-out;
+            }
+        }
+        /* Keyframe animations for Hero section for immediate visual impact */
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
+        .animate-fade-in { animation: fade-in 1s ease-out forwards 0.3s; } /* Sub-headline delay */
+        .animate-pulse-slow { animation: pulse-slow 3s infinite ease-in-out; }
+    </style>
+</head>
+<body class="font-sans text-gray-700 bg-gray-50 antialiased">
+
+    <!-- Floating WhatsApp Button - Always visible, highly converting CTA -->
+    <a href="https://wa.me/5513974251486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20STUDIOTESTA!"
+       target="_blank" rel="noopener noreferrer"
+       class="fixed bottom-6 right-6 z-50 bg-whatsapp-green text-white p-4 rounded-full shadow-2xl animate-bounce hover:scale-110 transition-all duration-300 ease-in-out"
+       aria-label="Fale conosco pelo WhatsApp">
+        <i class="fab fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- Header & Navigation - Sticky, responsive, with clear CTA -->
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-lg">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="#hero" class="flex items-center space-x-3" aria-label="STUDIOTESTA - Voltar ao Início">
+                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/studiotesta_ia/logo_1784909737014.png" alt="Logo da STUDIOTESTA" width="48" height="48" decoding="async" loading="eager" class="w-12 h-12">
+                <span class="text-2xl font-bold text-gray-900">STUDIOTESTA</span>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#hero" class="text-gray-600 hover:text-studiotesta-blue font-medium transition-colors duration-300" aria-label="Navegar para a seção Início">Início</a>
+                <a href="#problemas" class="text-gray-600 hover:text-studiotesta-blue font-medium transition-colors duration-300" aria-label="Navegar para a seção Problemas">Problemas</a>
+                <a href="#solucao" class="text-gray-600 hover:text-studiotesta-blue font-medium transition-colors duration-300" aria-label="Navegar para a seção Solução">Solução</a>
+                <a href="#servicos" class="text-gray-600 hover:text-studiotesta-blue font-medium transition-colors duration-300" aria-label="Navegar para a seção Serviços">Serviços</a>
+                <a href="#depoimentos" class="text-gray-600 hover:text-studiotesta-blue font-medium transition-colors duration-300" aria-label="Navegar para a seção Depoimentos">Depoimentos</a>
+                <a href="#sobre" class="text-gray-600 hover:text-studiotesta-blue font-medium transition-colors duration-300" aria-label="Navegar para a seção Sobre Nós">Sobre</a>
+                <a href="#contato" class="text-gray-600 hover:text-studiotesta-blue font-medium transition-colors duration-300" aria-label="Navegar para a seção Contato">Contato</a>
+            </div>
+            <a href="https://wa.me/5513974251486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20STUDIOTESTA!"
+               target="_blank" rel="noopener noreferrer"
+               class="hidden md:block cta-button px-6 py-2 text-base" aria-label="Entre em contato via WhatsApp">
+                Fale Conosco
+            </a>
+            <button id="mobile-menu-button" class="md:hidden text-gray-800 text-2xl" aria-label="Abrir menu mobile">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+        <!-- Mobile Menu Overlay - Glassmorphism effect -->
+        <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50">
+            <div class="bg-white w-3/4 h-full p-6 shadow-xl relative transform transition-transform duration-300 ease-out -translate-x-full" data-state="closed">
+                <button id="close-mobile-menu" class="absolute top-4 right-4 text-gray-600 text-2xl" aria-label="Fechar menu mobile">
+                    <i class="fas fa-times"></i>
+                </button>
+                <nav class="flex flex-col space-y-4 mt-12">
+                    <a href="#hero" class="text-gray-700 hover:text-studiotesta-blue text-lg font-medium py-2 transition-colors duration-300" aria-label="Navegar para a seção Início">Início</a>
+                    <a href="#problemas" class="text-gray-700 hover:text-studiotesta-blue text-lg font-medium py-2 transition-colors duration-300" aria-label="Navegar para a seção Problemas">Problemas</a>
+                    <a href="#solucao" class="text-gray-700 hover:text-studiotesta-blue text-lg font-medium py-2 transition-colors duration-300" aria-label="Navegar para a seção Solução">Solução</a>
+                    <a href="#servicos" class="text-gray-700 hover:text-studiotesta-blue text-lg font-medium py-2 transition-colors duration-300" aria-label="Navegar para a seção Serviços">Serviços</a>
+                    <a href="#depoimentos" class="text-gray-700 hover:text-studiotesta-blue text-lg font-medium py-2 transition-colors duration-300" aria-label="Navegar para a seção Depoimentos">Depoimentos</a>
+                    <a href="#sobre" class="text-gray-700 hover:text-studiotesta-blue text-lg font-medium py-2 transition-colors duration-300" aria-label="Navegar para a seção Sobre Nós">Sobre</a>
+                    <a href="#contato" class="text-gray-700 hover:text-studiotesta-blue text-lg font-medium py-2 transition-colors duration-300" aria-label="Navegar para a seção Contato">Contato</a>
+                    <a href="https://wa.me/5513974251486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20STUDIOTESTA!"
+                       target="_blank" rel="noopener noreferrer"
+                       class="cta-button mt-4 w-full text-center" aria-label="Entre em contato via WhatsApp">
+                        Fale Conosco
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- SEÇÃO HERO - Primeiros 3 segundos de impacto visual e persuasão -->
+        <section id="hero" class="relative bg-black h-screen flex items-center justify-center overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1557804506-66380c1df074?ixlib=rb-4.0.3&fm=webp&q=80&w=1920&fit=crop&crop=entropy"
+                 alt="Equipe de marketing digital colaborando em um escritório moderno e vibrante"
+                 class="absolute inset-0 w-full h-full object-cover z-0"
+                 width="1920" height="1080" decoding="async" loading="eager">
+            <div class="absolute inset-0 bg-gradient-to-br from-studiotesta-blue/70 to-studiotesta-darkblue/70 z-10"></div>
+            <div class="relative z-20 text-center text-white px-4">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-lg animate-fade-in-up">
+                    Transforme Cliques em <span class="text-yellow-300">Lucro Real</span> para Seu Negócio Local em Mongaguá!
+                </h1>
+                <p class="text-lg md:text-2xl mb-8 max-w-4xl mx-auto opacity-90 drop-shadow-md animate-fade-in">
+                    Sites de alta performance e automação inteligente que impulsionam seu faturamento e eliminam a perda de clientes.
+                </p>
+                <a href="https://wa.me/5513974251486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20da%20STUDIOTESTA!"
+                   target="_blank" rel="noopener noreferrer"
+                   class="cta-button text-xl px-10 py-5 transition-transform duration-500 animate-pulse-slow" aria-label="Fale com nossos especialistas via WhatsApp">
+                    FALE COM UM ESPECIALISTA AGORA!
+                </a>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DE DOR E EMPATIA - Conecta com as dores do cliente, mostrando que entendemos seus problemas -->
+        <section id="problemas" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading">Você se identifica com algum destes problemas?</h2>
+                <p class="sub-heading">Muitos negócios locais enfrentam desafios comuns no ambiente digital. Veja como podemos ajudar a superá-los.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="card-base">
+                        <div class="text-studiotesta-blue text-5xl mb-4"><i class="fas fa-eye-slash"></i></div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800">Baixa Visibilidade Online</h3>
+                        <p class="text-gray-600">Seu negócio não aparece quando clientes potenciais buscam por seus serviços no Google.</p>
+                    </div>
+                    <div class="card-base">
+                        <div class="text-studiotesta-blue text-5xl mb-4"><i class="fas fa-tachometer-alt-slow"></i></div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800">Sites Lentos e Não Responsivos</h3>
+                        <p class="text-gray-600">Clientes abandonam seu site se ele não carrega rápido ou não funciona bem no celular.</p>
+                    </div>
+                    <div class="card-base">
+                        <div class="text-studiotesta-blue text-5xl mb-4"><i class="fas fa-users-slash"></i></div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800">Perda de Clientes para a Concorrência</h3>
+                        <p class="text-gray-600">Seus concorrentes estão investindo em presença digital e capturando sua fatia de mercado.</p>
+                    </div>
+                    <div class="card-base">
+                        <div class="text-studiotesta-blue text-5xl mb-4"><i class="fas fa-headset"></i></div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800">Atendimento Ineficiente no WhatsApp</h3>
+                        <p class="text-gray-600">Dificuldade em gerenciar o volume de mensagens e responder clientes de forma ágil.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROPOSTA ÚNICA DE VALOR (SOLUÇÃO / DIFERENCIAIS) - Posiciona a empresa como a heroína da história do cliente -->
+        <section id="solucao" class="py-16 md:py-24 bg-studiotesta-blue text-white">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading text-white after:bg-white">Nossa Solução: Transformando Desafios em Oportunidades</h2>
+                <p class="sub-heading text-blue-100">A STUDIOTESTA é a parceira ideal para levar seu negócio local ao próximo nível digital.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="card-base bg-white/10 text-white shadow-none p-6 border border-white/20">
+                        <div class="text-4xl mb-4"><i class="fas fa-rocket"></i></div>
+                        <h3 class="text-xl font-semibold mb-2">Sites de Performance Extrema</h3>
+                        <p class="text-blue-100">Carregamento instantâneo (PageSpeed 100%) e otimizado para a sua conversão.</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-none p-6 border border-white/20">
+                        <div class="text-4xl mb-4"><i class="fas fa-paint-brush"></i></div>
+                        <h3 class="text-xl font-semibold mb-2">Design Estratégico e Moderno</h3>
+                        <p class="text-blue-100">Interface intuitiva que cativa e converte visitantes em clientes fiéis.</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-none p-6 border border-white/20">
+                        <div class="text-4xl mb-4"><i class="fas fa-robot"></i></div>
+                        <h3 class="text-xl font-semibold mb-2">Automação WhatsApp Inteligente</h3>
+                        <p class="text-blue-100">Atendimento 24/7, respondendo dúvidas e capturando leads automaticamente.</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-none p-6 border border-white/20">
+                        <div class="text-4xl mb-4"><i class="fas fa-search-dollar"></i></div>
+                        <h3 class="text-xl font-semibold mb-2">Curadoria Digital Especializada</h3>
+                        <p class="text-blue-100">Conteúdo e estratégias de SEO pensados exclusivamente para o seu público local.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- APRESENTAÇÃO DE SERVIÇOS - Detalha a oferta de forma clara e atrativa -->
+        <section id="servicos" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading">Nossos Serviços: Otimize Sua Presença Online</h2>
+                <p class="sub-heading">Construímos a ponte entre seu negócio e seus clientes, garantindo resultados tangíveis.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="card-base overflow-hidden p-0 text-left">
+                        <img src="https://images.unsplash.com/photo-1549603212-f4728d844c80?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Pessoa trabalhando em laptop, criando um site profissional"
+                             class="w-full h-52 object-cover" width="600" height="400" decoding="async" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-3 text-gray-800">Criação de Sites Profissionais</h3>
+                            <p class="text-gray-600 mb-4">Desenvolvemos sites personalizados, rápidos e otimizados para o seu negócio:</p>
+                            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Design Exclusivo</li>
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Otimização para SEO Local</li>
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Integração com Redes Sociais</li>
+                            </ul>
+                            <a href="https://wa.me/5513974251486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20a%20cria%C3%A7%C3%A3o%20de%20sites%20profissionais!"
+                               target="_blank" rel="noopener noreferrer"
+                               class="cta-button mt-6 text-sm px-6 py-3" aria-label="Solicitar orçamento para Criação de Sites Profissionais">
+                                Quero meu Site!
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-base overflow-hidden p-0 text-left">
+                        <img src="https://images.unsplash.com/photo-1581457388703-9d9361a334e1?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Gráfico de velocidade de internet e otimização de performance"
+                             class="w-full h-52 object-cover" width="600" height="400" decoding="async" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-3 text-gray-800">Otimização de Performance (Web Vitals)</h3>
+                            <p class="text-gray-600 mb-4">Garanta a melhor experiência para seus usuários e alcance o topo do Google:</p>
+                            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>PageSpeed Score 100/100</li>
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Carregamento Instantâneo</li>
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Melhora do Ranqueamento SEO</li>
+                            </ul>
+                            <a href="https://wa.me/5513974251486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20a%20otimiza%C3%A7%C3%A3o%20de%20performance%20Web%20Vitals!"
+                               target="_blank" rel="noopener noreferrer"
+                               class="cta-button mt-6 text-sm px-6 py-3" aria-label="Otimizar a performance do meu site">
+                                Acelerar meu Site!
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-base overflow-hidden p-0 text-left">
+                        <img src="https://images.unsplash.com/photo-1616763355562-b13c77d013e8?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Smartphone com ícone do WhatsApp e balões de conversa, representando automação"
+                             class="w-full h-52 object-cover" width="600" height="400" decoding="async" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold mb-3 text-gray-800">Chatbot e Automação via WhatsApp</h3>
+                            <p class="text-gray-600 mb-4">Atenda seus clientes de forma rápida e eficiente, 24 horas por dia:</p>
+                            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Respostas Instantâneas</li>
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Geração Automática de Leads</li>
+                                <li><i class="fas fa-check-circle text-studiotesta-blue mr-2"></i>Redução de Carga de Atendimento</li>
+                            </ul>
+                            <a href="https://wa.me/5513974251486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20automa%C3%A7%C3%A3o%20e%20chatbot%20no%20WhatsApp!"
+                               target="_blank" rel="noopener noreferrer"
+                               class="cta-button mt-6 text-sm px-6 py-3" aria-label="Implementar chatbot no meu WhatsApp">
+                                Quero Automação!
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROVA SOCIAL - Constrói autoridade e confiança com depoimentos reais e métricas de satisfação -->
+        <section id="depoimentos" class="py-16 md:py-24 bg-studiotesta-blue text-white">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading text-white after:bg-white">O que Nossos Clientes Dizem</h2>
+                <p class="sub-heading text-blue-100">Mais de 30 negócios satisfeitos já transformaram sua presença digital conosco.</p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center mb-10">
+                    <div class="flex text-yellow-400 text-3xl space-x-1 mr-4" aria-label="Classificação de 5 estrelas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-white text-2xl font-semibold mt-2 sm:mt-0">5.0 de 5 estrelas</span>
+                    <span class="text-blue-100 text-lg ml-2 sm:mt-0">(Baseado em 31 avaliações)</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="card-base bg-white/10 text-white shadow-lg p-6">
+                        <p class="text-blue-100 text-lg italic mb-4">"A STUDIOTESTA transformou nosso negócio! O site ficou incrível e a velocidade é impressionante. Já vemos o impacto nas vendas."</p>
+                        <p class="font-semibold text-xl">- Ana Paula, Loja Essencial</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-lg p-6">
+                        <p class="text-blue-100 text-lg italic mb-4">"Profissionalismo e resultados acima das expectativas. Nosso chatbot no WhatsApp tem sido um diferencial enorme no atendimento."</p>
+                        <p class="font-semibold text-xl">- Carlos Lima, Construtora Horizon</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-lg p-6">
+                        <p class="text-blue-100 text-lg italic mb-4">"Recomendo a STUDIOTESTA de olhos fechados. O design e a estratégia deles são de outro nível. Parabéns!"</p>
+                        <p class="font-semibold text-xl">- Mariana Silva, Clínica OdontoPrime</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-lg p-6">
+                        <p class="text-blue-100 text-lg italic mb-4">"Finalmente um site que realmente converte! A equipe é muito atenciosa e o suporte é excelente."</p>
+                        <p class="font-semibold text-xl">- Roberto Mendes, Pizzaria Sabor & Arte</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-lg p-6">
+                        <p class="text-blue-100 text-lg italic mb-4">"Fiquei impressionado com a otimização de performance. Meu site carrega instantaneamente, e o número de contatos aumentou."</p>
+                        <p class="font-semibold text-xl">- Fernanda Costa, Salão Bela Vista</p>
+                    </div>
+                    <div class="card-base bg-white/10 text-white shadow-lg p-6">
+                        <p class="text-blue-100 text-lg italic mb-4">"O investimento valeu cada centavo. A STUDIOTESTA entregou muito mais do que prometeu em termos de resultados."</p>
+                        <p class="font-semibold text-xl">- Gustavo Pereira, Consultoria GPM</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO SOBRE NÓS HUMANIZADA - Conta a história da marca, valores e paixão -->
+        <section id="sobre" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading">STUDIOTESTA: Sua Parceria Estratégica em Marketing Digital</h2>
+                <p class="sub-heading">Mais do que uma agência, somos um time apaixonado por fazer seu negócio prosperar.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 md:order-1">
+                        <p class="text-lg leading-relaxed mb-6">
+                            Na STUDIOTESTA, entendemos que um site não é um gasto, mas um investimento crucial para o crescimento do seu negócio. Nascemos da paixão por transformar ideias em realidade digital, com foco exclusivo em empresas e comércios locais que buscam faturar de verdade.
+                        </p>
+                        <p class="text-lg leading-relaxed mb-6">
+                            Nossa missão é clara: <span class="font-semibold text-studiotesta-blue">pare de perder clientes para a concorrência!</span> Criamos sites profissionais de altíssima performance, com curadoria inteligente e velocidade de carregamento absurda. Cada pixel é pensado no comportamento de compra, transformando simples cliques em faturamento.
+                        </p>
+                        <p class="text-lg leading-relaxed mb-8">
+                            Além disso, somos especialistas em sistemas de automação de atendimento e chatbot via WhatsApp. Seus clientes terão um atendimento rápido, eficiente e personalizado, liberando seu tempo para focar no que realmente importa: seu negócio.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+                            <div class="flex items-center space-x-4 bg-white p-4 rounded-xl shadow-md">
+                                <i class="fas fa-users text-studiotesta-blue text-3xl"></i>
+                                <div>
+                                    <span class="text-3xl font-bold text-gray-800">30+</span>
+                                    <p class="text-gray-600">Clientes Satisfeitos</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 bg-white p-4 rounded-xl shadow-md">
+                                <i class="fas fa-tachometer-alt text-studiotesta-blue text-3xl"></i>
+                                <div>
+                                    <span class="text-3xl font-bold text-gray-800">100/100</span>
+                                    <p class="text-gray-600">PageSpeed Score</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <img src="https://images.unsplash.com/photo-1552581234-26379f60c7f7?ixlib=rb-4.0.3&fm=webp&q=80&w=900&fit=crop&crop=entropy"
+                             alt="Equipe da STUDIOTESTA colaborando em um escritório moderno"
+                             class="rounded-xl shadow-2xl w-full h-auto object-cover"
+                             width="900" height="600" decoding="async" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ESTRUTURA DA LOJA (Galeria Imersiva) - Apresenta o ambiente físico e profissional da empresa -->
+        <section id="galeria" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading">Nosso Espaço de Criação e Inovação</h2>
+                <p class="sub-heading">Um ambiente onde ideias se transformam em resultados digitais de alta performance.</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
+                    <div class="overflow-hidden rounded-xl shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1522204523234-87295a702a06?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Espaço de trabalho colaborativo moderno e aconchegante na STUDIOTESTA"
+                             class="w-full h-48 md:h-64 object-cover hover:scale-110 transition-transform duration-500"
+                             width="600" height="600" decoding="async" loading="lazy">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1507238691740-b5266cb79805?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Mesa de trabalho com computadores, focada em design e desenvolvimento web na agência"
+                             class="w-full h-48 md:h-64 object-cover hover:scale-110 transition-transform duration-500"
+                             width="600" height="600" decoding="async" loading="lazy">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1629904853716-e421ac0705a6?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Sala de reuniões moderna com tela grande para apresentações estratégicas na STUDIOTESTA"
+                             class="w-full h-48 md:h-64 object-cover hover:scale-110 transition-transform duration-500"
+                             width="600" height="600" decoding="async" loading="lazy">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1582213780517-5b682b13edbf?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Ambiente de escritório espaçoso com várias estações de trabalho na STUDIOTESTA"
+                             class="w-full h-48 md:h-64 object-cover hover:scale-110 transition-transform duration-500"
+                             width="600" height="600" decoding="async" loading="lazy">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1596557879486-53d9e46a788c?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Whiteboard com anotações de estratégias de marketing digital da STUDIOTESTA"
+                             class="w-full h-48 md:h-64 object-cover hover:scale-110 transition-transform duration-500"
+                             width="600" height="600" decoding="async" loading="lazy">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1560472355-32e67657d425?ixlib=rb-4.0.3&fm=webp&q=80&w=600&fit=crop&crop=entropy"
+                             alt="Área de recepção moderna e acolhedora da agência STUDIOTESTA"
+                             class="w-full h-48 md:h-64 object-cover hover:scale-110 transition-transform duration-500"
+                             width="600" height="600" decoding="async" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO FAQ (Sanfona/Accordion) - Quebra objeções e fornece informações úteis -->
+        <section id="faq" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading">Perguntas Frequentes</h2>
+                <p class="sub-heading">Esclareça suas dúvidas e dê o próximo passo com confiança.</p>
+
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="accordion-item bg-white rounded-xl shadow-xl overflow-hidden">
+                        <button class="accordion-header w-full text-left p-6 flex justify-between items-center text-xl font-semibold text-gray-800 hover:bg-gray-50 transition-colors duration-300" aria-expanded="false" aria-controls="faq-content-1" id="faq-toggle-1">
+                            Por que preciso de um site profissional para meu negócio local?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-1" class="accordion-content px-6 pb-6 text-gray-600 hidden" aria-labelledby="faq-toggle-1">
+                            <p>Um site profissional estabelece credibilidade, funciona como uma vitrine 24/7 para seus produtos/serviços, atrai clientes locais via busca orgânica e é fundamental para se destacar da concorrência que ainda não está presente digitalmente ou tem uma presença fraca.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-white rounded-xl shadow-xl overflow-hidden">
+                        <button class="accordion-header w-full text-left p-6 flex justify-between items-center text-xl font-semibold text-gray-800 hover:bg-gray-50 transition-colors duration-300" aria-expanded="false" aria-controls="faq-content-2" id="faq-toggle-2">
+                            Quanto tempo leva para criar um site?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-2" class="accordion-content px-6 pb-6 text-gray-600 hidden" aria-labelledby="faq-toggle-2">
+                            <p>O tempo de criação varia de acordo com a complexidade e o escopo do projeto. No entanto, nossos sites de alta performance para negócios locais são entregues de forma ágil, geralmente entre 2 a 4 semanas, após a coleta de todo o material necessário.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-white rounded-xl shadow-xl overflow-hidden">
+                        <button class="accordion-header w-full text-left p-6 flex justify-between items-center text-xl font-semibold text-gray-800 hover:bg-gray-50 transition-colors duration-300" aria-expanded="false" aria-controls="faq-content-3" id="faq-toggle-3">
+                            A STUDIOTESTA oferece suporte após a entrega do site?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-3" class="accordion-content px-6 pb-6 text-gray-600 hidden" aria-labelledby="faq-toggle-3">
+                            <p>Sim! Oferecemos planos de manutenção e suporte para garantir que seu site esteja sempre atualizado, seguro e com performance otimizada. Nosso objetivo é uma parceria de longo prazo para o sucesso do seu negócio.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-white rounded-xl shadow-xl overflow-hidden">
+                        <button class="accordion-header w-full text-left p-6 flex justify-between items-center text-xl font-semibold text-gray-800 hover:bg-gray-50 transition-colors duration-300" aria-expanded="false" aria-controls="faq-content-4" id="faq-toggle-4">
+                            Como a automação do WhatsApp pode ajudar meu negócio?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-4" class="accordion-content px-6 pb-6 text-gray-600 hidden" aria-labelledby="faq-toggle-4">
+                            <p>A automação do WhatsApp permite atendimento instantâneo a clientes, 24 horas por dia, 7 dias por semana. Isso melhora a satisfação do cliente, gera leads qualificados automaticamente, reduz o tempo de resposta e libera sua equipe para tarefas mais complexas.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-white rounded-xl shadow-xl overflow-hidden">
+                        <button class="accordion-header w-full text-left p-6 flex justify-between items-center text-xl font-semibold text-gray-800 hover:bg-gray-50 transition-colors duration-300" aria-expanded="false" aria-controls="faq-content-5" id="faq-toggle-5">
+                            Quais são os custos envolvidos na criação de um site?
+                            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
+                        </button>
+                        <div id="faq-content-5" class="accordion-content px-6 pb-6 text-gray-600 hidden" aria-labelledby="faq-toggle-5">
+                            <p>O investimento varia conforme as funcionalidades e o tamanho do projeto. Na STUDIOTESTA, oferecemos soluções personalizadas para cada negócio. Recomendamos que entre em contato para um orçamento detalhado e sem compromisso, adequado às suas necessidades e objetivos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ONDE ESTAMOS (Facilidade de Acesso) - Facilita a localização e o contato -->
+        <section id="contato" class="py-16 md:py-24 bg-studiotesta-blue text-white">
+            <div class="container mx-auto px-4">
+                <h2 class="section-heading text-white after:bg-white">Onde Estamos</h2>
+                <p class="sub-heading text-blue-100">Visite nosso escritório ou entre em contato. Estamos prontos para atender você!</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-3xl font-bold mb-4">STUDIOTESTA</h3>
+                        <p class="text-xl mb-2 flex items-center"><i class="fas fa-map-marker-alt mr-3 text-2xl"></i>Av. Jussara - Balneário Jussara - Mongaguá - SP</p>
+                        <p class="text-xl mb-4 flex items-center"><i class="fas fa-phone mr-3 text-2xl"></i><a href="tel:+5513974251486" class="hover:underline" aria-label="Ligar para STUDIOTESTA">+55 13 97425-1486</a></p>
+                        <p class="text-xl mb-6 flex items-center"><i class="fas fa-envelope mr-3 text-2xl"></i><a href="mailto:studiotesta.br@gmail.com" class="hover:underline" aria-label="Enviar e-mail para STUDIOTESTA">studiotesta.br@gmail.com</a></p>
+
+                        <h4 class="text-2xl font-semibold mb-3">Horário de Atendimento:</h4>
+                        <table class="w-full max-w-sm text-lg text-blue-100 bg-white/10 rounded-lg overflow-hidden shadow-lg">
+                            <tbody>
+                                <tr class="border-b border-white/20">
+                                    <td class="p-3 font-medium">Segunda-feira:</td>
+                                    <td class="p-3 text-right">08:00 – 18:00</td>
+                                </tr>
+                                <tr class="border-b border-white/20">
+                                    <td class="p-3 font-medium">Terça-feira:</td>
+                                    <td class="p-3 text-right">08:00 – 18:00</td>
+                                </tr>
+                                <tr class="border-b border-white/20">
+                                    <td class="p-3 font-medium">Quarta-feira:</td>
+                                    <td class="p-3 text-right">08:00 – 18:00</td>
+                                </tr>
+                                <tr class="border-b border-white/20">
+                                    <td class="p-3 font-medium">Quinta-feira:</td>
+                                    <td class="p-3 text-right">08:00 – 18:00</td>
+                                </tr>
+                                <tr class="border-b border-white/20">
+                                    <td class="p-3 font-medium">Sexta-feira:</td>
+                                    <td class="p-3 text-right">08:00 – 18:00</td>
+                                </tr>
+                                <tr class="bg-white/5">
+                                    <td class="p-3 font-medium">Sábado:</td>
+                                    <td class="p-3 text-right">Fechado</td>
+                                </tr>
+                                <tr class="bg-white/5">
+                                    <td class="p-3 font-medium">Domingo:</td>
+                                    <td class="p-3 text-right">Fechado</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <a href="https://www.google.com/maps?hl=pt-BR&mat=Cew8PsTqKGlYElcBa0lj_3qFUwQQCqXwVn-DHhtAco-IXsg9aozSALgSJJ-CKl1eC4J65iIaK7Dqn34YI0ed0pkuYLJ2JIA0et7D5BNONPNLB3OdndmFc30uCrVypHve1Z0&authuser=1&um=1&ie=UTF-8&fb=1&gl=br&sa=X&geocode=KTcirA_iKc6UMcTfN0oTwnrX&daddr=Av.+Jussara+-+Balneario+Jussara,+Mongagu%C3%A1+-+SP,+11735-020"
+                           target="_blank" rel="noopener noreferrer" class="cta-button w-full mt-8 flex items-center justify-center bg-whatsapp-green from-whatsapp-green to-green-600" aria-label="Abrir rota no Google Maps">
+                            <i class="fas fa-map-marked-alt mr-3"></i> Como Chegar (Google Maps)
+                        </a>
+                    </div>
+                    <div class="flex justify-center">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.457816154308!2d-46.6025686!3d-24.1165203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce1ec3837905d1%3A0x629c41793132e185!2sAv.%20Jussara%2C%20Balne%C3%A1rio%20Jussara%2C%20Mongagu%C3%A1%20-%20SP%2C%2011735-020!5e0!3m2!1spt-BR!2sbr!4v1717342938837!5m2!1spt-BR!2sbr"
+                                width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                                class="rounded-xl shadow-2xl w-full max-w-lg h-96 md:h-[450px]" aria-label="Mapa de localização da STUDIOTESTA"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER COMPLETO - Informações legais, de contato e links importantes -->
+    <footer class="bg-gray-800 text-gray-300 py-12 md:py-16">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+                <h4 class="text-xl font-bold text-white mb-4">STUDIOTESTA</h4>
+                <p class="mb-2">Razão Social: STUDIOTESTA</p>
+                <p class="mb-2">CNPJ: 54.404.992/0001-41</p>
+                <p class="mb-2">Endereço: Av. Jussara - Balneário Jussara - Mongaguá - SP</p>
+                <p class="mb-4">Horário de Atendimento: Seg-Sex, 08:00 - 18:00</p>
+            </div>
+
+            <div>
+                <h4 class="text-xl font-bold text-white mb-4">Links Úteis</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-studiotesta-blue transition-colors duration-300" aria-label="Acessar nossa Política de Privacidade">Política de Privacidade</a></li>
+                    <li><a href="#" class="hover:text-studiotesta-blue transition-colors duration-300" aria-label="Acessar nossos Termos de Uso">Termos de Uso</a></li>
+                    <li><a href="#servicos" class="hover:text-studiotesta-blue transition-colors duration-300" aria-label="Ver todos os nossos Serviços">Nossos Serviços</a></li>
+                    <li><a href="#faq" class="hover:text-studiotesta-blue transition-colors duration-300" aria-label="Ver Perguntas Frequentes">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-xl font-bold text-white mb-4">Conecte-se Conosco</h4>
+                <div class="flex space-x-4 mb-6">
+                    <a href="https://www.instagram.com/studiotesta.ia/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-studiotesta-blue transition-colors duration-300 text-3xl" aria-label="Visitar nosso Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/studiotesta.ia" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-studiotesta-blue transition-colors duration-300 text-3xl" aria-label="Visitar nosso Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://wa.me/5513974251486" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-studiotesta-blue transition-colors duration-300 text-3xl" aria-label="Fale conosco pelo WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="mailto:studiotesta.br@gmail.com" class="text-gray-400 hover:text-studiotesta-blue transition-colors duration-300 text-3xl" aria-label="Enviar e-mail para STUDIOTESTA">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="mt-12 pt-8 border-t border-gray-700 text-center text-gray-500 text-sm">
+            <p>&copy; 2024 STUDIOTESTA. Todos os direitos reservados.</p>
+            <p class="mt-2">Site criado e mantido por <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="text-studiotesta-blue hover:underline font-semibold" aria-label="Visitar o site da STUDIOTESTA">STUDIOTESTA</a></p>
+        </div>
+    </footer>
+
+    <!-- Vanilla JS for interactive elements (Mobile Menu and FAQ Accordion) -->
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuContent = mobileMenu.querySelector('div'); // The actual sliding panel
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // Prevent scrolling body
+            setTimeout(() => {
+                mobileMenuContent.classList.remove('-translate-x-full');
+                mobileMenuContent.classList.add('translate-x-0');
+            }, 10); // Small delay to allow 'hidden' removal to apply
+        });
+
+        closeMobileMenuButton.addEventListener('click', () => {
+            mobileMenuContent.classList.remove('translate-x-0');
+            mobileMenuContent.classList.add('-translate-x-full');
+            mobileMenuContent.addEventListener('transitionend', () => {
+                mobileMenu.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }, { once: true });
+        });
+
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Trigger close animation when a link is clicked
+                mobileMenuContent.classList.remove('translate-x-0');
+                mobileMenuContent.classList.add('-translate-x-full');
+                mobileMenuContent.addEventListener('transitionend', () => {
+                    mobileMenu.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }, { once: true });
+            });
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            const icon = header.querySelector('i');
+
+            header.addEventListener('click', () => {
+                const isOpen = header.getAttribute('aria-expanded') === 'true';
+
+                // Close all other open accordions
+                document.querySelectorAll('.accordion-item').forEach(otherItem => {
+                    const otherHeader = otherItem.querySelector('.accordion-header');
+                    const otherContent = otherItem.querySelector('.accordion-content');
+                    const otherIcon = otherHeader.querySelector('i');
+
+                    if (otherHeader !== header && otherHeader.getAttribute('aria-expanded') === 'true') {
+                        otherHeader.setAttribute('aria-expanded', 'false');
+                        otherContent.classList.add('hidden');
+                        otherIcon.classList.remove('rotate-180');
+                    }
+                });
+
+                // Toggle current accordion
+                header.setAttribute('aria-expanded', String(!isOpen));
+                content.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            });
+        });
+    </script>
+</body>
+</html>
