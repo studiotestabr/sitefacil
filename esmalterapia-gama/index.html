@@ -3,153 +3,1095 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Esmalterapia Gama em Mongaguá - Referência em unhas impecáveis, podologia e bem-estar. Agende seu horário e eleve sua autoestima conosco.">
-    <title>Esmalterapia Gama | Manicure e Podologia de Elite em Mongaguá</title>
+    <title>Esmalterapia Gama | Unhas Impecáveis & Podologia em Mongaguá</title>
     
+    <meta name="description" content="Experimente o mais alto padrão em Manicure, Pedicure, Podologia e Estética dos pés em Mongaguá. Biossegurança, durabilidade e beleza incomparável para suas unhas.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://esmalterapiagama.com.br">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://esmalterapiagama.com.br">
+    <meta property="og:title" content="Esmalterapia Gama | Unhas Impecáveis & Podologia">
+    <meta property="og:description" content="O seu momento exclusivo de autocuidado em Mongaguá. Cutilagem perfeita, esmaltação de alta durabilidade e podologia especializada.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/logo_1785178697118.jpg">
+
+    <!-- Preconnect CDNs para Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Google Fonts: Outfit (Moderna/Premium) -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- FontAwesome Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Tailwind CSS Oficial via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Custom Tailwind Configuration para Paleta Temática -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#35e0f1',
-                        dark: '#3c3c2d',
+                        brand: {
+                            dark: '#3c3c2d', // Oliva Escuro Imperial
+                            accent: '#35e0f1', // Ciano Vibrante Neon
+                            accentDark: '#12b5c5',
+                            light: '#fcfbf7', // Creme Suave Luxo
+                            muted: '#72725e',
+                            gold: '#d4af37'
+                        }
                     },
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif']
                     }
                 }
             }
         }
     </script>
+
     <style>
-        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); }
-        .hero-gradient { background: linear-gradient(rgba(60, 60, 45, 0.8), rgba(60, 60, 45, 0.8)), url('https://images.unsplash.com/photo-1632345031435-8727f6897d53?fm=webp&q=80&w=1920'); background-size: cover; background-position: center; }
+        /* Estilos customizados e animações avançadas */
+        .glass-header {
+            background: rgba(60, 60, 45, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(60,60,45,0.95) 0%, rgba(30,30,22,0.85) 100%);
+        }
+        .service-card:hover .service-overlay {
+            opacity: 1;
+        }
+        .whatsapp-pulse {
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fcfbf7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3c3c2d;
+            border-radius: 4px;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased">
+<body class="bg-brand-light text-brand-dark font-sans antialiased selection:bg-brand-accent selection:text-brand-dark">
 
-    <!-- Header -->
-    <header class="fixed w-full z-50 glass border-b border-gray-100">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/logo_1785178697118.jpg" alt="Logo Esmalterapia Gama" class="w-12 h-12 rounded-full object-cover">
-                <span class="font-serif text-xl font-bold text-dark tracking-tight">Esmalterapia Gama</span>
+    <!-- 1. HEADER & NAVIGATION -->
+    <header class="fixed w-full top-0 z-50 transition-all duration-300 glass-header border-b border-white/10 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group" aria-label="Esmalterapia Gama Home">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/logo_1785178697118.jpg" 
+                         alt="Logo Esmalterapia Gama" 
+                         class="h-14 w-14 rounded-full border-2 border-brand-accent object-cover transition-transform duration-300 group-hover:scale-110 shadow-md"
+                         width="56" height="56">
+                    <div class="flex flex-col">
+                        <span class="text-white font-extrabold text-xl tracking-tight leading-none group-hover:text-brand-accent transition-colors duration-300">Esmalterapia</span>
+                        <span class="text-brand-accent text-sm font-semibold tracking-widest uppercase">Gama</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#diferenciais" class="text-white/90 hover:text-brand-accent font-medium text-sm transition-colors tracking-wide">Diferenciais</a>
+                    <a href="#servicos" class="text-white/90 hover:text-brand-accent font-medium text-sm transition-colors tracking-wide">Serviços</a>
+                    <a href="#depoimentos" class="text-white/90 hover:text-brand-accent font-medium text-sm transition-colors tracking-wide">Depoimentos</a>
+                    <a href="#sobre" class="text-white/90 hover:text-brand-accent font-medium text-sm transition-colors tracking-wide">Nossa História</a>
+                    <a href="#galeria" class="text-white/90 hover:text-brand-accent font-medium text-sm transition-colors tracking-wide">Galeria</a>
+                    <a href="#onde-estamos" class="text-white/90 hover:text-brand-accent font-medium text-sm transition-colors tracking-wide">Onde Estamos</a>
+                </nav>
+
+                <!-- CTA Button Header -->
+                <div class="hidden lg:flex items-center">
+                    <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20na%20Esmalterapia%20Gama." 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       aria-label="Agendar via WhatsApp"
+                       class="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-bold text-brand-dark transition-all duration-300 bg-brand-accent rounded-full hover:bg-white group shadow-lg hover:shadow-brand-accent/20">
+                        <span class="absolute right-0 flex items-center justify-start w-10 h-10 duration-300 transform translate-x-full group-hover:translate-x-0 ease">
+                            <i class="fab fa-whatsapp text-lg"></i>
+                        </span>
+                        <span class="relative transition-all duration-300 group-hover:pr-10">Agendar Agora</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex md:hidden">
+                    <button type="button" id="mobile-menu-btn" class="text-white hover:text-brand-accent focus:outline-none focus:text-brand-accent p-2" aria-label="Abrir Menu">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path class="inline-flex" id="hamburger" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path class="hidden" id="cross" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <a href="https://wa.me/5513991185329?text=Olá,%20gostaria%20de%20agendar%20um%20horário!" class="bg-dark text-white px-6 py-2 rounded-full hover:bg-primary transition-all duration-300 font-semibold text-sm hover:scale-105">Agendar Agora</a>
-        </nav>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div class="hidden md:hidden bg-brand-dark/95 border-t border-white/10" id="mobile-menu">
+            <div class="px-4 pt-2 pb-6 space-y-3 shadow-2xl">
+                <a href="#diferenciais" class="block text-white hover:text-brand-accent px-3 py-2.5 rounded-md text-base font-semibold">Diferenciais</a>
+                <a href="#servicos" class="block text-white hover:text-brand-accent px-3 py-2.5 rounded-md text-base font-semibold">Serviços</a>
+                <a href="#depoimentos" class="block text-white hover:text-brand-accent px-3 py-2.5 rounded-md text-base font-semibold">Depoimentos</a>
+                <a href="#sobre" class="block text-white hover:text-brand-accent px-3 py-2.5 rounded-md text-base font-semibold">Nossa História</a>
+                <a href="#galeria" class="block text-white hover:text-brand-accent px-3 py-2.5 rounded-md text-base font-semibold">Galeria</a>
+                <a href="#onde-estamos" class="block text-white hover:text-brand-accent px-3 py-2.5 rounded-md text-base font-semibold">Onde Estamos</a>
+                <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20na%20Esmalterapia%20Gama." 
+                   target="_blank" 
+                   rel="noopener" 
+                   class="flex items-center justify-center gap-2 w-full text-center bg-brand-accent text-brand-dark py-3 rounded-xl font-bold hover:bg-brand-accentDark transition-all mt-4">
+                    <i class="fab fa-whatsapp"></i> Agendar por WhatsApp
+                </a>
+            </div>
+        </div>
     </header>
 
-    <!-- Hero -->
-    <section class="hero-gradient min-h-screen flex items-center pt-20">
-        <div class="container mx-auto px-6 text-center text-white">
-            <h1 class="font-serif text-5xl md:text-7xl mb-6 leading-tight">Unhas impecáveis, <br><span class="text-primary">autoestima renovada.</span></h1>
-            <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto font-light">Transformamos o cuidado com suas mãos e pés em uma experiência de luxo em Mongaguá.</p>
-            <a href="https://wa.me/5513991185329?text=Quero%20agendar%20meu%20horário" class="inline-block bg-primary text-dark px-10 py-4 rounded-full text-lg font-bold hover:scale-105 transition-all duration-300 shadow-2xl animate-pulse">Agendar Transformação</a>
+    <!-- 2. SEÇÃO HERO (Topo de Alto Impacto) -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-brand-dark">
+        <!-- Background Imagem Otimizada com Overlay Escuro -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179015574_2.webp" 
+                 alt="Profissional da Esmalterapia Gama fazendo alongamento de unhas de alta precisão" 
+                 class="w-full h-full object-cover object-center scale-105 filter brightness-[0.35] saturate-[0.85]"
+                 loading="eager" decoding="async">
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-brand-dark/80"></div>
         </div>
-    </section>
 
-    <!-- Dor -->
-    <section class="py-20 bg-white">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-serif text-center mb-16">Cansada de um atendimento apressado ou resultados que não duram?</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="p-8 border border-gray-100 rounded-2xl shadow-xl hover:-translate-y-2 transition-all">
-                    <i class="fa-solid fa-clock text-primary text-3xl mb-4"></i>
-                    <h3 class="font-bold text-xl mb-2">Falta de Tempo</h3>
-                    <p class="text-gray-600">Entendemos sua rotina. Oferecemos um atendimento ágil sem abrir mão da perfeição nos detalhes.</p>
+        <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-accent/10 border border-brand-accent/30 text-brand-accent text-sm font-bold uppercase tracking-widest mb-8 animate-fade-in">
+                <i class="fas fa-sparkles text-xs"></i> Experiência de Spa Premium em Mongaguá
+            </div>
+
+            <!-- Headline -->
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6">
+                Sua autoestima traduzida em <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-white">unhas perfeitas</span> e pés renovados.
+            </h1>
+
+            <!-- Sub-headline -->
+            <p class="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-10 font-light leading-relaxed">
+                Muito além de uma simples esmaltação: entregamos terapia de beleza completa, biossegurança rigorosa e a sofisticação que você merece no Balneário Agenor de Campos.
+            </p>
+
+            <!-- CTAs Duplos -->
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20na%20Esmalterapia%20Gama." 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="w-full sm:w-auto px-8 py-4 bg-brand-accent text-brand-dark font-extrabold text-lg rounded-xl shadow-2xl hover:bg-white transition-all duration-300 transform hover:-translate-y-1 hover:shadow-brand-accent/20 flex items-center justify-center gap-3">
+                    <i class="fab fa-whatsapp text-xl"></i> Agende Seu Horário
+                </a>
+                <a href="#servicos" 
+                   class="w-full sm:w-auto px-8 py-4 bg-white/10 text-white hover:bg-white/20 font-bold text-lg rounded-xl transition-all duration-300 backdrop-blur-md border border-white/20 hover:-translate-y-1 flex items-center justify-center gap-2">
+                    Conhecer Serviços <i class="fas fa-arrow-down text-sm"></i>
+                </a>
+            </div>
+
+            <!-- Social Metrics -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mx-auto pt-8 border-t border-white/10">
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl font-extrabold text-brand-accent">125+</div>
+                    <div class="text-xs sm:text-sm text-gray-400 mt-1 uppercase tracking-wider">Avaliações 5 Estrelas</div>
                 </div>
-                <div class="p-8 border border-gray-100 rounded-2xl shadow-xl hover:-translate-y-2 transition-all">
-                    <i class="fa-solid fa-heart-crack text-primary text-3xl mb-4"></i>
-                    <h3 class="font-bold text-xl mb-2">Unhas Fracas</h3>
-                    <p class="text-gray-600">Tratamentos especializados para fortalecer e revitalizar suas unhas com as melhores técnicas do mercado.</p>
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl font-extrabold text-white">4.8</div>
+                    <div class="text-xs sm:text-sm text-gray-400 mt-1 uppercase tracking-wider">Nota Média Google</div>
                 </div>
-                <div class="p-8 border border-gray-100 rounded-2xl shadow-xl hover:-translate-y-2 transition-all">
-                    <i class="fa-solid fa-gem text-primary text-3xl mb-4"></i>
-                    <h3 class="font-bold text-xl mb-2">Falta de Estilo</h3>
-                    <p class="text-gray-600">Design personalizado com pedrarias, películas e esmaltação premium que expressam sua personalidade.</p>
+                <div class="text-center col-span-2 md:col-span-1 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0">
+                    <div class="text-3xl sm:text-4xl font-extrabold text-brand-accent">100%</div>
+                    <div class="text-xs sm:text-sm text-gray-400 mt-1 uppercase tracking-wider">Materiais Esterilizados</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Serviços -->
-    <section class="py-20 bg-gray-50">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-serif text-center mb-16">Nossos Serviços Premium</h2>
-            <div class="grid md:grid-cols-4 gap-6">
-                {['Manicure e Pedicure', 'Podologia', 'Plástica dos Pés', 'Unhas Decoradas'].map((serv) => (
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-primary">
-                        <h3 class="font-bold text-xl mb-2">{serv}</h3>
-                        <p class="text-gray-600 text-sm mb-4">Técnicas avançadas e higiene rigorosa para um resultado impecável.</p>
-                        <a href="#" class="text-dark font-bold underline">Saber mais</a>
+    <!-- 3. SEÇÃO DE DOR E EMPATIA (O Problema) -->
+    <section id="diferenciais" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-muted font-bold text-sm tracking-widest uppercase">Chega de Insatisfações</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-brand-dark mt-2 tracking-tight">Você sofre com algum desses problemas nas suas unhas?</h2>
+                <div class="h-1 w-16 bg-brand-accent mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card Dor 1 -->
+                <div class="bg-brand-light p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-t-4 border-brand-dark group hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-full bg-brand-dark/10 flex items-center justify-center mb-6 group-hover:bg-brand-dark transition-all duration-300">
+                        <i class="fas fa-heart-broken text-2xl text-brand-dark group-hover:text-brand-accent"></i>
                     </div>
-                ))}
+                    <h3 class="text-xl font-bold text-brand-dark mb-3">Durabilidade Curta</h3>
+                    <p class="text-brand-muted leading-relaxed font-light">
+                        Frustrada com esmaltes que lascam logo no segundo dia ou alongamentos que descolam rapidamente? Nós garantimos preparações químicas avançadas.
+                    </p>
+                </div>
+
+                <!-- Card Dor 2 -->
+                <div class="bg-brand-light p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-t-4 border-brand-accent group hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-full bg-brand-accent/10 flex items-center justify-center mb-6 group-hover:bg-brand-accent transition-all duration-300">
+                        <i class="fas fa-shield-virus text-2xl text-brand-accentDark group-hover:text-brand-dark"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-dark mb-3">Insegurança Sanitária</h3>
+                    <p class="text-brand-muted leading-relaxed font-light">
+                        Preocupada com a higiene e riscos de micose ou infecções? Na Esmalterapia Gama, a esterilização por autoclave cirúrgica é regra inegociável.
+                    </p>
+                </div>
+
+                <!-- Card Dor 3 -->
+                <div class="bg-brand-light p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-t-4 border-brand-dark group hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-full bg-brand-dark/10 flex items-center justify-center mb-6 group-hover:bg-brand-dark transition-all duration-300">
+                        <i class="fas fa-sad-tear text-2xl text-brand-dark group-hover:text-brand-accent"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-dark mb-3">Atendimento Corrido</h3>
+                    <p class="text-brand-muted leading-relaxed font-light">
+                        Cansada de salões barulhentos onde você é tratada apenas como um número? Oferecemos um ambiente de real acolhimento e relaxamento para você.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Prova Social -->
-    <section class="py-20 bg-white">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-serif text-center mb-4">Avaliações que Inspiram</h2>
-            <div class="flex justify-center mb-12 text-yellow-400 text-xl">★★★★★ <span class="text-gray-600 ml-2 font-bold">4.8 (125 avaliações)</span></div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-gray-50 p-6 rounded-2xl italic">"Atendimento sensacional, unhas de bonecas, eu amei demais!" - <span class="block font-bold mt-2 text-primary">- Byannca Rocha</span></div>
-                <div class="bg-gray-50 p-6 rounded-2xl italic">"Experiência maravilhosa, profissional super qualificada e atenciosa." - <span class="block font-bold mt-2 text-primary">- Renata Monteiro</span></div>
-                <div class="bg-gray-50 p-6 rounded-2xl italic">"Ambiente familiar e acolhedor, unhas perfeitas, simpatia que contagia." - <span class="block font-bold mt-2 text-primary">- Shirlei Dias</span></div>
+    <!-- 4. PROPOSTA ÚNICA DE VALOR (Solução/Diferenciais) -->
+    <section class="py-24 bg-brand-dark text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center opacity-5" style="background-image: url('https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179018180_4.webp');"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <!-- Lado Texto -->
+                <div>
+                    <span class="text-brand-accent font-bold text-sm tracking-widest uppercase">Por que Escolher a Esmalterapia Gama?</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-6 tracking-tight">O cuidado de luxo que suas mãos e pés merecem, de forma segura e impecável.</h2>
+                    <p class="text-gray-300 font-light leading-relaxed mb-8">
+                        Criamos um novo conceito em Mongaguá para entregar não apenas embelezamento, mas tratamentos profundos e personalizados para sua pele e unhas.
+                    </p>
+
+                    <!-- Benefícios com Ícones -->
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent">
+                                <i class="fas fa-fingerprint text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white">Especialistas em Cutilagem Fina</h4>
+                                <p class="text-gray-400 font-light">Cutilagem contínua, sem machucar, respeitando a anatomia natural de seus dedos.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent">
+                                <i class="fas fa-hand-holding-medical text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white">Biossegurança Inegociável</h4>
+                                <p class="text-gray-400 font-light">Alicates, espátulas e materiais de corte 100% esterilizados em autoclave com embalagens seladas.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent">
+                                <i class="fas fa-award text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white">Esmaltação de Alta Durabilidade</h4>
+                                <p class="text-gray-400 font-light">Técnicas de polimento e marcas internacionais para manter a cor e o brilho intensos por muito mais tempo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lado Visual Imagem Real -->
+                <div class="relative">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-brand-accent to-brand-muted rounded-2xl blur-lg opacity-30"></div>
+                    <div class="relative bg-brand-dark p-2 rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179014284_1.webp" 
+                             alt="Esmaltação premium feita pela equipe da Esmalterapia Gama" 
+                             class="w-full h-[450px] object-cover rounded-xl shadow-inner"
+                             loading="lazy" width="600" height="450">
+                        <div class="absolute bottom-6 left-6 right-6 bg-brand-dark/90 backdrop-blur-md p-6 rounded-xl border border-white/10">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-brand-accent text-brand-dark w-10 h-10 rounded-full flex items-center justify-center font-bold">5★</div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Procedimentos Customizados</p>
+                                    <p class="text-xs text-gray-400">Desenvolvidos de acordo com o formato e necessidade das suas unhas.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- FAQ -->
-    <section class="py-20 bg-gray-900 text-white">
-        <div class="container mx-auto px-6 max-w-3xl">
-            <h2 class="text-3xl font-serif text-center mb-12 text-primary">Dúvidas Frequentes</h2>
+    <!-- 5. APRESENTAÇÃO DE SERVIÇOS (A Oferta) -->
+    <section id="servicos" class="py-24 bg-brand-light">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-muted font-bold text-sm tracking-widest uppercase">Tratamentos Especializados</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-brand-dark mt-2 tracking-tight">O Catálogo de Soluções de Elite</h2>
+                <div class="h-1 w-16 bg-brand-accent mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Serviço 1: Manicure e Pedicure -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-black/[0.03]">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179012918_0.webp" 
+                             alt="Manicure e Pedicure Profissional" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             loading="lazy" width="400" height="256">
+                        <span class="absolute top-4 left-4 bg-brand-dark text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase border border-brand-accent/20">Mais Procurado</span>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-dark mb-2">Manicure & Pedicure</h3>
+                            <p class="text-brand-muted font-light text-sm mb-6 leading-relaxed">
+                                Cutilagem delicada, hidratação profunda e esmaltação ultra-duradoura com paletas modernas e acabamento impecável.
+                            </p>
+                            <ul class="space-y-2 mb-6">
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Remoção perfeita de cutículas
+                                </li>
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Modelagem simétrica das unhas
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20Manicure%20e%20Pedicure%20na%20Esmalterapia%20Gama." 
+                           target="_blank" rel="noopener" class="w-full text-center bg-brand-dark text-white py-3 rounded-xl font-bold hover:bg-brand-accent hover:text-brand-dark transition-all">
+                            Agendar Atendimento
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Serviço 2: Podologia -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-black/[0.03]">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179018180_4.webp" 
+                             alt="Podologia especializada" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             loading="lazy" width="400" height="256">
+                        <span class="absolute top-4 left-4 bg-brand-dark text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase border border-brand-accent/20">Saúde e Alívio</span>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-dark mb-2">Podologia Avançada</h3>
+                            <p class="text-brand-muted font-light text-sm mb-6 leading-relaxed">
+                                Cuidado e alívio completo para seus pés. Tratamento especializado para calosidades, unhas encravadas e prevenção.
+                            </p>
+                            <ul class="space-y-2 mb-6">
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Remoção indolor de calosidades
+                                </li>
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Prevenção e alívio de unhas encravadas
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20Podologia%20na%20Esmalterapia%20Gama." 
+                           target="_blank" rel="noopener" class="w-full text-center bg-brand-dark text-white py-3 rounded-xl font-bold hover:bg-brand-accent hover:text-brand-dark transition-all">
+                            Agendar Atendimento
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Serviço 3: Plástica dos Pés -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-black/[0.03]">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179019463_5.webp" 
+                             alt="Plástica dos pés spa" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             loading="lazy" width="400" height="256">
+                        <span class="absolute top-4 left-4 bg-brand-dark text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase border border-brand-accent/20">Relaxamento Profundo</span>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-dark mb-2">Plástica dos Pés (Spa)</h3>
+                            <p class="text-brand-muted font-light text-sm mb-6 leading-relaxed">
+                                Renovação celular completa, eliminando calos e rachaduras, devolvendo a maciez e hidratação de pele de bebê.
+                            </p>
+                            <ul class="space-y-2 mb-6">
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Eliminação rápida de rachaduras
+                                </li>
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Massagem relaxante profunda
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20a%20Pl%C3%A1stica%20dos%20P%C3%A9s%20na%20Esmalterapia%20Gama." 
+                           target="_blank" rel="noopener" class="w-full text-center bg-brand-dark text-white py-3 rounded-xl font-bold hover:bg-brand-accent hover:text-brand-dark transition-all">
+                            Agendar Atendimento
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Serviço 4: Alongamento & Unhas Postiças -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-black/[0.03]">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179016976_3.webp" 
+                             alt="Alongamento e unhas postiças" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             loading="lazy" width="400" height="256">
+                        <span class="absolute top-4 left-4 bg-brand-dark text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase border border-brand-accent/20">Sucesso Imediato</span>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-dark mb-2">Unhas Postiças & Alongamentos</h3>
+                            <p class="text-brand-muted font-light text-sm mb-6 leading-relaxed">
+                                Unhas com comprimento ideal instantâneo. Aplicação profissional de postiças e alongamentos com resistência inabalável.
+                            </p>
+                            <ul class="space-y-2 mb-6">
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Fixação segura e duradoura
+                                </li>
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Formatos customizados (Almond, Bailarina, Quadrada)
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20Alongamento%20de%20Unhas%20na%20Esmalterapia%20Gama." 
+                           target="_blank" rel="noopener" class="w-full text-center bg-brand-dark text-white py-3 rounded-xl font-bold hover:bg-brand-accent hover:text-brand-dark transition-all">
+                            Agendar Atendimento
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Serviço 5: Nail Art & Pedrarias -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-black/[0.03]">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179020821_6.webp" 
+                             alt="Nail Art e joias de unhas" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             loading="lazy" width="400" height="256">
+                        <span class="absolute top-4 left-4 bg-brand-dark text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase border border-brand-accent/20">Arte Exclusiva</span>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-dark mb-2">Películas, Adesivos & Pedrarias</h3>
+                            <p class="text-brand-muted font-light text-sm mb-6 leading-relaxed">
+                                Transforme suas unhas em verdadeiras joias. Desenhos, películas de alta definição e pedrarias luxuosas com fixação premium.
+                            </p>
+                            <ul class="space-y-2 mb-6">
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Pedrarias que não descolam
+                                </li>
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Designs manuais e adesivos de alta qualidade
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20Nail%20Art%20na%20Esmalterapia%20Gama." 
+                           target="_blank" rel="noopener" class="w-full text-center bg-brand-dark text-white py-3 rounded-xl font-bold hover:bg-brand-accent hover:text-brand-dark transition-all">
+                            Agendar Atendimento
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Serviço 6: Blindagem & Nivelamento -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group hover:-translate-y-1 border border-black/[0.03]">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179022034_7.webp" 
+                             alt="Blindagem de unhas" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             loading="lazy" width="400" height="256">
+                        <span class="absolute top-4 left-4 bg-brand-dark text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase border border-brand-accent/20">Proteção Total</span>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-dark mb-2">Blindagem de Gel</h3>
+                            <p class="text-brand-muted font-light text-sm mb-6 leading-relaxed">
+                                Ideal para quem deseja manter as unhas naturais grandes e fortes. Uma barreira protetora que impede que a unha trinque ou quebre.
+                            </p>
+                            <ul class="space-y-2 mb-6">
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Perfeito para crescimento natural das unhas
+                                </li>
+                                <li class="text-sm text-brand-muted flex items-center gap-2">
+                                    <i class="fas fa-check text-brand-accent"></i> Brilho espelhado inalterável
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20Blindagem%20na%20Esmalterapia%20Gama." 
+                           target="_blank" rel="noopener" class="w-full text-center bg-brand-dark text-white py-3 rounded-xl font-bold hover:bg-brand-accent hover:text-brand-dark transition-all">
+                            Agendar Atendimento
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. PROVA SOCIAL (Opinião dos Clientes) -->
+    <section id="depoimentos" class="py-24 bg-brand-dark text-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-accent font-bold text-sm tracking-widest uppercase">Garantia de Satisfação</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">O que dizem as clientes da Esmalterapia Gama</h2>
+                <p class="text-gray-300 mt-2 font-light">Somos avaliados com nota 4.8/5 no Google Business por 125 clientes atendidas e felizes!</p>
+                <div class="h-1 w-16 bg-brand-accent mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <!-- Grid de Depoimentos Reais -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Depoimento 1 -->
+                <div class="bg-brand-light/5 border border-white/10 p-8 rounded-2xl flex flex-col justify-between hover:bg-brand-light/10 transition-all duration-300">
+                    <div>
+                        <div class="flex items-center gap-1 mb-4 text-brand-gold">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 font-light text-base leading-relaxed mb-6 italic">
+                            "Amooo e recomendo com certeza, ambiente familiar e acolhedor, Thamires excelente profissional, unhas perfeitas, tudo muito bem feito e sua simpatia que contagia. Somos clientes eu e minha mãe e nós amamos Esmalteria Gama!"
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center font-bold text-brand-dark">SD</div>
+                        <div>
+                            <h4 class="font-semibold text-white text-sm">Shirlei Dias</h4>
+                            <p class="text-xs text-gray-400">Local Guide · Mongaguá</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Depoimento 2 -->
+                <div class="bg-brand-light/5 border border-white/10 p-8 rounded-2xl flex flex-col justify-between hover:bg-brand-light/10 transition-all duration-300">
+                    <div>
+                        <div class="flex items-center gap-1 mb-4 text-brand-gold">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 font-light text-base leading-relaxed mb-6 italic">
+                            "Simplesmente é sensacional, todas trabalham com muita dedicação, detalhes e deixam as unhas simplesmente impecáveis, unhas de bonecas, eu amei demais!! Incrível incrível."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center font-bold text-brand-dark">BR</div>
+                        <div>
+                            <h4 class="font-semibold text-white text-sm">Byannca Rocha</h4>
+                            <p class="text-xs text-gray-400">Cliente Recorrente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Depoimento 3 -->
+                <div class="bg-brand-light/5 border border-white/10 p-8 rounded-2xl flex flex-col justify-between hover:bg-brand-light/10 transition-all duration-300">
+                    <div>
+                        <div class="flex items-center gap-1 mb-4 text-brand-gold">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 font-light text-base leading-relaxed mb-6 italic">
+                            "Experiência maravilhosa. Profissional super qualificada, atenciosa, detalhista. Transforma nossas unhas, e eleva a auto estima só gratidão."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center font-bold text-brand-dark">RM</div>
+                        <div>
+                            <h4 class="font-semibold text-white text-sm">Renata Monteiro</h4>
+                            <p class="text-xs text-gray-400">Cliente Verificada</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Depoimento 4 -->
+                <div class="bg-brand-light/5 border border-white/10 p-8 rounded-2xl flex flex-col justify-between hover:bg-brand-light/10 transition-all duration-300">
+                    <div>
+                        <div class="flex items-center gap-1 mb-4 text-brand-gold">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 font-light text-base leading-relaxed mb-6 italic">
+                            "Sempre arrasando nessas unhas um cuidado todo especial em cada atendimento."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center font-bold text-brand-dark">GB</div>
+                        <div>
+                            <h4 class="font-semibold text-white text-sm">Ge Best</h4>
+                            <p class="text-xs text-gray-400">Local Guide</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Depoimento 5 -->
+                <div class="bg-brand-light/5 border border-white/10 p-8 rounded-2xl flex flex-col justify-between hover:bg-brand-light/10 transition-all duration-300">
+                    <div>
+                        <div class="flex items-center gap-1 mb-4 text-brand-gold">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 font-light text-base leading-relaxed mb-6 italic">
+                            "Sempre maravilhoso 🤩 Excelente profissionalismo e capricho sem igual no agendamento."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center font-bold text-brand-dark">RC</div>
+                        <div>
+                            <h4 class="font-semibold text-white text-sm">Roberta Conti Motta Bellini</h4>
+                            <p class="text-xs text-gray-400">Cliente Satisfeita</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Depoimento 6 -->
+                <div class="bg-brand-light/5 border border-white/10 p-8 rounded-2xl flex flex-col justify-between hover:bg-brand-light/10 transition-all duration-300">
+                    <div>
+                        <div class="flex items-center gap-1 mb-4 text-brand-gold">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 font-light text-base leading-relaxed mb-6 italic">
+                            "Profissionais de alta qualidade. Atendimento excelente. Super recomendo"
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-brand-accent flex items-center justify-center font-bold text-brand-dark">MS</div>
+                        <div>
+                            <h4 class="font-semibold text-white text-sm">Marta Silva</h4>
+                            <p class="text-xs text-gray-400">Cliente Verificada</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. SEÇÃO SOBRE NÓS HUMANIZADA -->
+    <section id="sobre" class="py-24 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <!-- Lado Esquerdo: Colagem de Fotos Reais -->
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179015574_2.webp" 
+                         alt="Processo profissional de esmaltação Esmalterapia" 
+                         class="w-full h-64 object-cover rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300"
+                         loading="lazy" width="300" height="256">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179014284_1.webp" 
+                         alt="Unhas prontas com finalização brilhante" 
+                         class="w-full h-64 object-cover rounded-2xl shadow-lg mt-8 hover:scale-105 transition-transform duration-300"
+                         loading="lazy" width="300" height="256">
+                </div>
+
+                <!-- Lado Direito: Texto Histórico e Valores -->
+                <div>
+                    <span class="text-brand-muted font-bold text-sm tracking-widest uppercase">Tradição & Amor ao Ofício</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-brand-dark mt-2 mb-6 tracking-tight">Esmalterapia Gama: Mais que estética, um ritual de saúde para suas mãos e pés.</h2>
+                    <p class="text-brand-muted font-light leading-relaxed mb-6 text-justify">
+                        Fundada no coração de Mongaguá, a <strong>Esmalterapia Gama</strong> nasceu para transformar o simples hábito de "fazer as unhas" em uma verdadeira sessão de saúde integrativa e terapia relaxante. Sob comando de profissionais apaixonadas por estética e podologia de alta qualificação, oferecemos tratamentos precisos de acordo com a individualidade de cada cliente.
+                    </p>
+                    <p class="text-brand-muted font-light leading-relaxed mb-8 text-justify">
+                        Trabalhamos focadas em altos padrões de biossegurança (com autoclave real), marcas de alta performance e inovação contínua nas técnicas de cutilagem, manicure russa, plástica dos pés e tratamentos ortofitoterápicos da podologia.
+                    </p>
+
+                    <!-- Lista de Valores em Grid -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-heart text-brand-accent text-xl"></i>
+                            <span class="text-brand-dark font-medium text-sm">Atendimento Humano</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-viruses-slash text-brand-accent text-xl"></i>
+                            <span class="text-brand-dark font-medium text-sm">100% Esterilizado</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-star text-brand-accent text-xl"></i>
+                            <span class="text-brand-dark font-medium text-sm">Profissionais de Elite</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-gem text-brand-accent text-xl"></i>
+                            <span class="text-brand-dark font-medium text-sm">Produtos Premium</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. ESTRUTURA DA LOJA (Galeria Imersiva) -->
+    <section id="galeria" class="py-24 bg-brand-light">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-muted font-bold text-sm tracking-widest uppercase">Espaço & Resultados</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-brand-dark mt-2 tracking-tight">Galeria de Resultados Reais</h2>
+                <p class="text-brand-muted mt-2 font-light">Confira o capricho, perfeição milimétrica e dedicação em cada detalhe de nosso portfólio.</p>
+                <div class="h-1 w-16 bg-brand-accent mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <!-- Grid de Fotos Reais -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179012918_0.webp" 
+                         alt="Portfólio unhas delicadas" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179014284_1.webp" 
+                         alt="Decoração de unhas impecável" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179015574_2.webp" 
+                         alt="Cutilagem de alta precisão" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179016976_3.webp" 
+                         alt="Nail Art sofisticada com pedraria" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179018180_4.webp" 
+                         alt="Cuidado e podologia de alto nível" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179019463_5.webp" 
+                         alt="Plástica dos pés spa de hidratação" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179020821_6.webp" 
+                         alt="Esmaltação brilhante com películas e pedraria" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl shadow-md group relative">
+                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/images/img_1785179022034_7.webp" 
+                         alt="Unhas decoradas em Mongaguá" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy" width="280" height="288">
+                    <div class="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. SEÇÃO FAQ (Sanfona/Accordion) -->
+    <section class="py-24 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-brand-muted font-bold text-sm tracking-widest uppercase">Perguntas Comuns</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-brand-dark mt-2 tracking-tight">Suas principais dúvidas respondidas</h2>
+                <div class="h-1 w-16 bg-brand-accent mx-auto mt-4 rounded-full"></div>
+            </div>
+
             <div class="space-y-4">
-                <details class="bg-gray-800 p-5 rounded-lg cursor-pointer">
-                    <summary class="font-bold">Quais as formas de pagamento?</summary>
-                    <p class="mt-4 text-gray-400">Aceitamos cartões, PIX e dinheiro para maior conveniência das nossas clientes.</p>
-                </details>
-                <details class="bg-gray-800 p-5 rounded-lg cursor-pointer">
-                    <summary class="font-bold">Como agendar um horário?</summary>
-                    <p class="mt-4 text-gray-400">Através do nosso WhatsApp clicando no botão flutuante em qualquer página.</p>
-                </details>
+                <!-- FAQ 1 -->
+                <div class="border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-brand-accent">
+                    <button class="w-full px-6 py-5 bg-brand-light text-left font-bold text-brand-dark flex justify-between items-center focus:outline-none faq-btn">
+                        <span>Preciso agendar meu atendimento com antecedência?</span>
+                        <i class="fas fa-plus text-sm transition-transform duration-300"></i>
+                    </button>
+                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out faq-content">
+                        <div class="p-6 text-brand-muted font-light leading-relaxed border-t border-gray-200">
+                            Sim. Para manter nosso padrão de excelência de spa, atendimentos individuais, higienização impecável de sala e materiais, os atendimentos acontecem preferencialmente sob agendamento prévio via WhatsApp.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-brand-accent">
+                    <button class="w-full px-6 py-5 bg-brand-light text-left font-bold text-brand-dark flex justify-between items-center focus:outline-none faq-btn">
+                        <span>Como funciona o processo de esterilização dos alicates e espátulas?</span>
+                        <i class="fas fa-plus text-sm transition-transform duration-300"></i>
+                    </button>
+                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out faq-content">
+                        <div class="p-6 text-brand-muted font-light leading-relaxed border-t border-gray-200">
+                            Prezamos integralmente pela sua saúde. Todos os nossos instrumentais metálicos são submetidos à limpeza química profunda, embalados em envelopes cirúrgicos individuais com indicador químico e esterilizados em autoclave de padrão cirúrgico de alta pressão, abertos exclusivamente em sua presença.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-brand-accent">
+                    <button class="w-full px-6 py-5 bg-brand-light text-left font-bold text-brand-dark flex justify-between items-center focus:outline-none faq-btn">
+                        <span>O que é a Plástica dos Pés e para quem é indicada?</span>
+                        <i class="fas fa-plus text-sm transition-transform duration-300"></i>
+                    </button>
+                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out faq-content">
+                        <div class="p-6 text-brand-muted font-light leading-relaxed border-t border-gray-200">
+                            É um tratamento reparador contra calosidades, ressecamentos extremos e fissuras ou rachaduras nos pés. É indicado para qualquer pessoa que sinta desconforto tátil nos pés, utilizando produtos emolientes seguros, sem cortes ou lixamento abrasivo violento, devolvendo elasticidade e extrema maciez.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-brand-accent">
+                    <button class="w-full px-6 py-5 bg-brand-light text-left font-bold text-brand-dark flex justify-between items-center focus:outline-none faq-btn">
+                        <span>Quais as formas de pagamento aceitas no local?</span>
+                        <i class="fas fa-plus text-sm transition-transform duration-300"></i>
+                    </button>
+                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out faq-content">
+                        <div class="p-6 text-brand-muted font-light leading-relaxed border-t border-gray-200">
+                            Aceitamos pagamentos via Pix, cartões de débito e cartões de crédito (com possibilidade de parcelamento dependendo do pacote contratado).
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-12">
-        <div class="container mx-auto px-6 text-center">
-            <p class="font-serif text-2xl mb-4">Esmalterapia Gama</p>
-            <p class="text-gray-400 mb-6">Av. Nossa Sra. de Fátima, 1006 - Mongaguá - SP</p>
-            <div class="flex justify-center gap-6 mb-8 text-2xl">
-                <a href="https://www.instagram.com/esmalterapiagama/"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.facebook.com/GamaEsmalterapia"><i class="fab fa-facebook"></i></a>
+    <!-- 10. ONDE ESTAMOS (Facilidade de Acesso) -->
+    <section id="onde-estamos" class="py-24 bg-brand-light border-t border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Lado Informações e Rotas -->
+                <div>
+                    <span class="text-brand-muted font-bold text-sm tracking-widest uppercase">Fácil Localização</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-brand-dark mt-2 mb-6 tracking-tight">Onde Estamos Localizadas</h2>
+                    <p class="text-brand-muted font-light leading-relaxed mb-8">
+                        Localização privilegiada e aconchegante no Balneário Agenor de Campos, em Mongaguá, preparada para acolher você com todo o conforto. Veja como é fácil chegar!
+                    </p>
+
+                    <div class="space-y-6 mb-8">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-brand-dark/10 flex items-center justify-center text-brand-dark flex-shrink-0 mt-1">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brand-dark">Endereço Completo</h4>
+                                <p class="text-brand-muted text-sm font-light leading-relaxed">
+                                    Av. Nossa Sra. de Fátima, 1006 - Balneário Agenor de Campos, Mongaguá - SP, 11730-000
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-brand-dark/10 flex items-center justify-center text-brand-dark flex-shrink-0 mt-1">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brand-dark">Horários de Atendimento</h4>
+                                <div class="grid grid-cols-2 gap-x-6 text-sm text-brand-muted font-light mt-1">
+                                    <span>Segunda-feira:</span> <span class="font-semibold text-red-500">Fechado</span>
+                                    <span>Terça-feira:</span> <span>09:00 – 18:00</span>
+                                    <span>Quarta-feira:</span> <span>09:00 – 18:00</span>
+                                    <span>Quinta-feira:</span> <span>09:00 – 18:00</span>
+                                    <span>Sexta-feira:</span> <span>09:00 – 18:00</span>
+                                    <span>Sábado:</span> <span>09:00 – 18:00</span>
+                                    <span>Domingo:</span> <span class="font-semibold text-red-500">Fechado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="https://www.google.com/maps/place/Esmalterapia+Gama/data=!4m7!3m6!1s0x94ce2979a2c99837:0x2810a2e2d19cdc5a!8m2!3d-24.124664!4d-46.6947323!16s%2Fg%2F11kpsmnycp!19sChIJN5jJonkpzpQRWtyc0eKiECg?authuser=0&hl=pt-BR&rclk=1" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="inline-flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 bg-brand-dark text-white font-bold rounded-xl shadow-lg hover:bg-brand-accent hover:text-brand-dark transition-all duration-300">
+                        <i class="fas fa-map-marked-alt text-lg"></i> Abrir Trajeto no Google Maps
+                    </a>
+                </div>
+
+                <!-- Lado Mapa Iframe -->
+                <div class="relative h-[450px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1d3639.4674068551984!2d-46.69730722384736!3d-24.124659082937746!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce2979a2c99837%3A0x2810a2e2d19cdc5a!2sEsmalterapia%20Gama!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Mapa Local Esmalterapia Gama">
+                    </iframe>
+                </div>
+
             </div>
-            <p class="text-xs text-gray-600">CNPJ: 30.344.624/0001-97</p>
-            <p class="mt-8 text-sm">Site criado e mantido por <a href="https://studiotesta.com.br/" class="text-primary hover:underline">STUDIOTESTA</a></p>
+        </div>
+    </section>
+
+    <!-- 11. FOOTER COMPLETO -->
+    <footer class="bg-brand-dark text-white py-16 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                
+                <!-- Coluna 1: Logo e Identidade -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-6">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/esmalterapia-gama/logo_1785178697118.jpg" 
+                             alt="Logo Esmalterapia Gama" 
+                             class="h-12 w-12 rounded-full border-2 border-brand-accent object-cover"
+                             loading="lazy" width="48" height="48">
+                        <div class="flex flex-col">
+                            <span class="font-extrabold text-lg tracking-tight">Esmalterapia</span>
+                            <span class="text-brand-accent text-xs tracking-wider uppercase">Gama</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 font-light text-sm leading-relaxed mb-6 max-w-sm">
+                        O refúgio perfeito para suas unhas e pés em Mongaguá. Combinamos as melhores técnicas do mercado com biossegurança hospitalar para seu total conforto e bem-estar.
+                    </p>
+                    <!-- Redes Sociais -->
+                    <div class="flex items-center gap-4">
+                        <a href="https://www.instagram.com/esmalterapiagama/" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition-all" aria-label="Instagram Esmalterapia Gama">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="https://www.facebook.com/GamaEsmalterapia" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition-all" aria-label="Facebook Esmalterapia Gama">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition-all" aria-label="WhatsApp Esmalterapia Gama">
+                            <i class="fab fa-whatsapp text-lg"></i>
+                        </a>
+                        <a href="mailto:contato@empresa.com.br" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition-all" aria-label="E-mail Esmalterapia Gama">
+                            <i class="far fa-envelope text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Navegação Rápida -->
+                <div>
+                    <h4 class="font-bold text-sm tracking-wider uppercase text-brand-accent mb-6">Navegação</h4>
+                    <ul class="space-y-3 text-sm text-gray-400 font-light">
+                        <li><a href="#diferenciais" class="hover:text-brand-accent transition-colors">Diferenciais</a></li>
+                        <li><a href="#servicos" class="hover:text-brand-accent transition-colors">Catálogo de Serviços</a></li>
+                        <li><a href="#depoimentos" class="hover:text-brand-accent transition-colors">Depoimentos</a></li>
+                        <li><a href="#sobre" class="hover:text-brand-accent transition-colors">Sobre Nós</a></li>
+                        <li><a href="#galeria" class="hover:text-brand-accent transition-colors">Portfólio Real</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 3: Links Jurídicos e Localização -->
+                <div>
+                    <h4 class="font-bold text-sm tracking-wider uppercase text-brand-accent mb-6">Informações Legais</h4>
+                    <p class="text-sm text-gray-400 font-light leading-relaxed mb-4">
+                        Esmalterapia Gama<br>
+                        CNPJ: 30.344.624/0001-97<br>
+                        Mongaguá - SP
+                    </p>
+                    <div class="flex flex-col gap-2 text-xs text-gray-500">
+                        <a href="#" class="hover:underline">Políticas de Privacidade</a>
+                        <a href="#" class="hover:underline">Termos de Uso</a>
+                        <span class="text-[10px] mt-2 block text-gray-500">Conformidade Geral com LGPD</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Divisor de Base -->
+            <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-gray-500">
+                <p class="text-center sm:text-left">&copy; 2024 Esmalterapia Gama. Todos os direitos reservados.</p>
+                <p class="text-center sm:text-right">
+                    Site criado e mantido por <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="text-brand-accent hover:underline font-semibold">STUDIOTESTA</a>
+                </p>
+            </div>
         </div>
     </footer>
 
-    <!-- WhatsApp Flutuante -->
-    <a href="https://wa.me/5513991185329?text=Olá,%20vi%20o%20site%20e%20gostaria%20de%20agendar" class="fixed bottom-6 right-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl animate-bounce hover:scale-110 transition-all">
+    <!-- Botão de WhatsApp Flutuante com Animação Premium -->
+    <a href="https://wa.me/5513991185329?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20na%20Esmalterapia%20Gama." 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       aria-label="Agendar Atendimento pelo WhatsApp" 
+       class="fixed bottom-6 right-6 z-50 bg-[#25d366] text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl whatsapp-pulse hover:scale-110 transition-transform duration-300">
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
+    <!-- JavaScript Vanilla para Menu Mobile, FAQ Accordion e Header Blur -->
     <script>
-        document.querySelectorAll('details').forEach((el) => {
-            el.addEventListener('click', () => {
-                document.querySelectorAll('details').forEach((d) => { if(d !== el) d.removeAttribute('open'); });
+        // Configuração Menu Mobile
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburger = document.getElementById('hamburger');
+        const cross = document.getElementById('cross');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            hamburger.classList.toggle('hidden');
+            cross.classList.toggle('hidden');
+        });
+
+        // Fechar menu ao clicar em algum link interno (Mobile)
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                hamburger.classList.remove('hidden');
+                cross.classList.add('hidden');
             });
+        });
+
+        // Configuração FAQ Accordion
+        const faqBtns = document.querySelectorAll('.faq-btn');
+        faqBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const content = btn.nextElementSibling;
+                const icon = btn.querySelector('i');
+                
+                // Fechar outros FAQs abertos
+                faqBtns.forEach(otherBtn => {
+                    if (otherBtn !== btn) {
+                        otherBtn.nextElementSibling.style.maxHeight = null;
+                        otherBtn.querySelector('i').classList.replace('fa-minus', 'fa-plus');
+                    }
+                });
+
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    icon.classList.replace('fa-minus', 'fa-plus');
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    icon.classList.replace('fa-plus', 'fa-minus');
+                }
+            });
+        });
+
+        // Dinâmica do Header Scroll Effect
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('py-2', 'shadow-2xl');
+                header.classList.remove('py-4');
+            } else {
+                header.classList.remove('py-2', 'shadow-2xl');
+                header.classList.add('py-4');
+            }
         });
     </script>
 </body>
