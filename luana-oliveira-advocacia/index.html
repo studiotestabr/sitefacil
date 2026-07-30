@@ -1,141 +1,883 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="scroll-smooth">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Luana Oliveira Advocacia - Atendimento jurídico especializado 24h na Baixada Santista. Solução rápida e eficiente em Direito Previdenciário, Família, Imobiliário e Civil. Fale com um advogado agora.">
-    <title>Luana Oliveira Advocacia | Consultoria Jurídica 24h - Mongaguá/SP</title>
+    <title>Luana Oliveira Advocacia | Advogada Especialista 24h na Baixada Santista e Todo Brasil</title>
+    <meta name="description" content="Precisa de advogado especialista? Atendimento jurídico 24h online e presencial em Mongaguá e Baixada Santista. Direito Previdenciário, Família, Imobiliário, Cível e Criminal. Fale agora!">
     
+    <!-- Preconnect & DNS-Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     
+    <!-- Google Fonts: Outfit & Playfair Display -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome para Ícones Profissionais -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#ffd25a',
-                        dark: '#0a101f',
+                        brand: {
+                            dark: '#0a101f',
+                            gold: '#ffd25a',
+                            goldlight: '#ffe58f',
+                            golddark: '#dfb439',
+                            slate: '#131d35'
+                        }
                     },
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
+                        serif: ['Playfair Display', 'serif']
                     }
                 }
             }
         }
     </script>
     <style>
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-nav {
+            background: rgba(10, 16, 31, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .hero-bg {
+            background-image: linear-gradient(to right, rgba(10, 16, 31, 0.95), rgba(10, 16, 31, 0.75)), url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWldnBfKs48WsOsDn9uTwnkjRHMyYvB0OPDG09V4UDJs6W8K0Q9HFCKrM87QYjmVaBjyNa9tf9JMVeg3W2OCygpuPLwKMe8OI1vTsWwz6G-4jgLVdtplzCnwEuZ9--S6l2htc_Kw4Udz0qj6=w408-h544-k-no&fm=webp&q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-brand-dark text-gray-100 font-sans antialiased selection:bg-brand-gold selection:text-brand-dark">
 
-    <!-- Header -->
-    <header class="fixed w-full z-50 bg-dark/90 text-white p-4 shadow-xl">
-        <nav class="max-w-7xl mx-auto flex justify-between items-center">
-            <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/logo_1785412791264.png" alt="Logo Luana Oliveira Advocacia" class="h-12 w-auto">
-            <a href="https://wa.me/5513982311323?text=Olá,%20preciso%20de%20ajuda%20jurídica." class="bg-primary text-dark font-bold px-6 py-2 rounded-full hover:scale-105 transition-all">Falar com Advogado</a>
-        </nav>
+    <!-- BOTÃO WHATSAPP FLUTUANTE -->
+    <a href="https://wa.me/5513982311323?text=Olá,%20Dra.%20Luana.%20Preciso%20de%20uma%20consulta%20jurídica%20urgente." 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       aria-label="Fale conosco via WhatsApp"
+       class="fixed bottom-6 right-6 z-50 bg-emerald-500 hover:bg-emerald-600 text-white w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 animate-bounce group">
+        <i class="fa-brands fa-whatsapp text-2xl md:text-3xl"></i>
+        <span class="absolute right-full mr-3 bg-white text-brand-dark font-semibold text-xs px-3 py-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none hidden md:block">
+            Atendimento 24h Online
+        </span>
+    </a>
+
+    <!-- 1. HEADER & NAVIGATION -->
+    <header class="fixed top-0 left-0 right-0 z-40 glass-nav border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group" aria-label="Luana Oliveira Advocacia - Início">
+                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/logo_1785412791264.png" 
+                     alt="Logo Luana Oliveira Advocacia" 
+                     width="45" height="45" 
+                     loading="eager" decoding="async"
+                     class="w-11 h-11 object-contain rounded-lg transition-transform duration-300 group-hover:scale-105">
+                <div class="flex flex-col">
+                    <span class="font-serif text-lg md:text-xl font-bold text-white tracking-wide">Luana Oliveira</span>
+                    <span class="text-[10px] text-brand-gold uppercase tracking-widest font-semibold">Advocacia & Consultoria</span>
+                </div>
+            </a>
+
+            <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-300">
+                <a href="#sobre" class="hover:text-brand-gold transition-colors">Sobre</a>
+                <a href="#servicos" class="hover:text-brand-gold transition-colors">Áreas de Atuação</a>
+                <a href="#diferenciais" class="hover:text-brand-gold transition-colors">Diferenciais</a>
+                <a href="#depoimentos" class="hover:text-brand-gold transition-colors">Avaliações</a>
+                <a href="#contato" class="hover:text-brand-gold transition-colors">Onde Estamos</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20falar%20com%20um%20advogado%20agora." 
+                   target="_blank" rel="noopener noreferrer"
+                   class="hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-brand-gold to-brand-golddark text-brand-dark font-bold px-5 py-2.5 rounded-xl shadow-lg hover:shadow-brand-gold/20 hover:scale-105 transition-all duration-300 text-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Plantão 24h</span>
+                </a>
+                <button id="mobile-menu-btn" class="lg:hidden text-white p-2 focus:outline-none" aria-label="Abrir Menu">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-brand-dark/95 border-b border-white/10 px-4 pt-2 pb-6 space-y-3">
+            <a href="#sobre" class="block py-2 text-gray-300 hover:text-brand-gold font-medium mobile-link">Sobre</a>
+            <a href="#servicos" class="block py-2 text-gray-300 hover:text-brand-gold font-medium mobile-link">Áreas de Atuação</a>
+            <a href="#diferenciais" class="block py-2 text-gray-300 hover:text-brand-gold font-medium mobile-link">Diferenciais</a>
+            <a href="#depoimentos" class="block py-2 text-gray-300 hover:text-brand-gold font-medium mobile-link">Avaliações</a>
+            <a href="#contato" class="block py-2 text-gray-300 hover:text-brand-gold font-medium mobile-link">Onde Estamos</a>
+            <div class="pt-2">
+                <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20falar%20com%20um%20advogado%20agora." 
+                   target="_blank" rel="noopener noreferrer"
+                   class="w-full flex items-center justify-center gap-2 bg-brand-gold text-brand-dark font-bold px-5 py-3 rounded-xl shadow-md text-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Plantão 24h via WhatsApp</span>
+                </a>
+            </div>
+        </div>
     </header>
 
-    <!-- Hero -->
-    <section class="relative h-screen flex items-center justify-center text-white overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1589829545856-d13d55403075?fm=webp&q=80&w=1920" alt="Consultoria Jurídica" class="absolute w-full h-full object-cover brightness-[0.3]">
-        <div class="relative z-10 max-w-4xl text-center px-6">
-            <h1 class="text-5xl md:text-7xl font-serif mb-6 leading-tight">Solução Jurídica <span class="text-primary">Imediata e Eficiente</span> na Baixada Santista</h1>
-            <p class="text-xl md:text-2xl mb-10 text-gray-200 font-light">Atendimento 24h via WhatsApp. Experiência, transparência e defesa incansável dos seus direitos.</p>
-            <a href="https://wa.me/5513982311323?text=Olá,%20preciso%20de%20ajuda%20jurídica." class="bg-primary text-dark px-10 py-4 rounded-lg font-bold text-lg hover:bg-white transition-all shadow-2xl hover:scale-105">Agendar Consulta 24h</a>
-        </div>
-    </section>
+    <main>
+        <!-- 2. SEÇÃO HERO -->
+        <section class="relative min-h-[90vh] flex items-center pt-28 pb-20 hero-bg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10">
+                <div class="max-w-3xl">
+                    <div class="inline-flex items-center gap-2 bg-brand-gold/10 border border-brand-gold/30 px-4 py-2 rounded-full text-brand-gold font-semibold text-xs md:text-sm mb-6 backdrop-blur-md">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>OAB/SP 369.145 • Atendimento em Todo Território Nacional</span>
+                    </div>
+                    
+                    <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
+                        Solução Rápida e Eficiente para o Seu <span class="text-brand-gold underline decoration-brand-gold/40">Caso Jurídico</span>
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed font-light">
+                        Advogados especialistas e consulta jurídica 24h na Baixada Santista e online para todo o Brasil. Atendimento humanizado, transparente e focado em resultados.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+                        <a href="https://wa.me/5513982311323?text=Olá,%20estou%20enfrentando%20um%20problema%20jurídico%20e%20preciso%20de%20ajuda%20imediata." 
+                           target="_blank" rel="noopener noreferrer"
+                           class="bg-gradient-to-r from-brand-gold to-brand-golddark text-brand-dark font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-brand-gold/30 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 text-base">
+                            <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            <span>Falar com Advogado Agora</span>
+                        </a>
+                        <a href="#servicos" 
+                           class="bg-white/10 hover:bg-white/20 text-white font-medium px-8 py-4 rounded-xl border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center text-base">
+                            Ver Áreas de Atuação
+                        </a>
+                    </div>
 
-    <!-- Problemas -->
-    <section class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-6">
-            <h2 class="text-4xl font-serif text-center mb-16">Está enfrentando um destes problemas?</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="p-8 shadow-xl rounded-2xl border-b-4 border-primary hover:-translate-y-2 transition-all">
-                    <i class="fas fa-gavel text-4xl text-primary mb-4"></i>
-                    <h3 class="text-xl font-bold mb-3">Problemas Previdenciários</h3>
-                    <p class="text-gray-600">Dificuldade com o INSS ou aposentadoria negada? Resolvemos com agilidade técnica.</p>
-                </div>
-                <div class="p-8 shadow-xl rounded-2xl border-b-4 border-primary hover:-translate-y-2 transition-all">
-                    <i class="fas fa-home text-4xl text-primary mb-4"></i>
-                    <h3 class="text-xl font-bold mb-3">Conflitos de Família</h3>
-                    <p class="text-gray-600">Divórcios e guardas tratados com a sensibilidade e o rigor que sua família merece.</p>
-                </div>
-                <div class="p-8 shadow-xl rounded-2xl border-b-4 border-primary hover:-translate-y-2 transition-all">
-                    <i class="fas fa-file-contract text-4xl text-primary mb-4"></i>
-                    <h3 class="text-xl font-bold mb-3">Questões Contratuais</h3>
-                    <p class="text-gray-600">Proteja seu patrimônio e direitos do consumidor contra abusos bancários e contratuais.</p>
+                    <!-- Trust indicators no Hero -->
+                    <div class="mt-12 pt-8 border-t border-white/10 grid grid-cols-3 gap-4 text-left">
+                        <div>
+                            <p class="font-serif text-2xl md:text-3xl font-bold text-brand-gold">10+ Anos</p>
+                            <p class="text-xs text-gray-400">De Tradição e Êxito</p>
+                        </div>
+                        <div>
+                            <p class="font-serif text-2xl md:text-3xl font-bold text-brand-gold">4.8★</p>
+                            <p class="text-xs text-gray-400">Mais de 100 Avaliações</p>
+                        </div>
+                        <div>
+                            <p class="font-serif text-2xl md:text-3xl font-bold text-brand-gold">24 Horas</p>
+                            <p class="text-xs text-gray-400">Casos Urgentes</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Sobre -->
-    <section class="py-20 bg-gray-900 text-white">
-        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-            <div>
-                <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?fm=webp&q=80&w=800" alt="Dra Luana Oliveira" class="rounded-2xl shadow-2xl" width="600" height="400" loading="lazy">
-            </div>
-            <div>
-                <h2 class="text-4xl font-serif mb-6 text-primary">Compromisso com a sua Justiça</h2>
-                <p class="mb-6 text-gray-300">Inaugurado há mais de 10 anos, nosso escritório combina a expertise acadêmica da Dra. Luana Oliveira (OAB/SP 369.145) com um atendimento humanizado e 24h.</p>
-                <div class="grid grid-cols-2 gap-8">
-                    <div><span class="block text-3xl font-bold text-primary">10+</span> Anos de Experiência</div>
-                    <div><span class="block text-3xl font-bold text-primary">100%</span> Foco no Cliente</div>
+        <!-- 3. SEÇÃO DE DOR E EMPATIA (O Problema) -->
+        <section class="py-20 bg-brand-slate relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-brand-gold font-semibold uppercase tracking-wider text-sm">Empatia e Entendimento</span>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
+                        Enfrentando um problema jurídico e sem saber o que fazer?
+                    </h2>
+                    <p class="text-gray-400 text-base md:text-lg">
+                        Sabemos que lidar com burocracias, processos travados ou conflitos inesperados gera desgaste emocional e incerteza. Você não precisa passar por isso sozinho.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Card Dor 1 -->
+                    <div class="bg-brand-dark/80 p-8 rounded-2xl border border-white/5 shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <div class="w-14 h-14 bg-red-500/10 text-red-400 rounded-xl flex items-center justify-center text-2xl mb-6">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white mb-3">Processos Demorados</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Acompanhamento ineficiente e falta de clareza sobre o andamento do seu direito, deixando você ansioso e sem respostas.
+                        </p>
+                    </div>
+
+                    <!-- Card Dor 2 -->
+                    <div class="bg-brand-dark/80 p-8 rounded-2xl border border-white/5 shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-2xl mb-6">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white mb-3">Urgências Inesperadas</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Situações criminais, prisões ou bloqueios judiciais que exigem atuação imediata de um especialista, dia ou noite.
+                        </p>
+                    </div>
+
+                    <!-- Card Dor 3 -->
+                    <div class="bg-brand-dark/80 p-8 rounded-2xl border border-white/5 shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <div class="w-14 h-14 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center text-2xl mb-6">
+                            <i class="fa-solid fa-file-circle-xmark"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white mb-3">Benefícios e Direitos Negados</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            INSS negado, pensões não pagas ou acordos abusivos que prejudicam o seu sustento e o da sua família.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- FAQ -->
-    <section class="py-20 bg-gray-50">
-        <div class="max-w-3xl mx-auto px-6">
-            <h2 class="text-4xl font-serif text-center mb-12">Perguntas Frequentes</h2>
-            <div class="space-y-4">
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <button class="w-full text-left font-bold flex justify-between" onclick="this.nextElementSibling.classList.toggle('hidden')">Como funciona o atendimento 24h? <span>+</span></button>
-                    <p class="hidden mt-4 text-gray-600">Estamos disponíveis via WhatsApp para urgências jurídicas a qualquer hora do dia ou da noite.</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <button class="w-full text-left font-bold flex justify-between" onclick="this.nextElementSibling.classList.toggle('hidden')">Atendem presencialmente? <span>+</span></button>
-                    <p class="hidden mt-4 text-gray-600">Sim, estamos na Av. Marina, 201 - Centro, Mongaguá, com atendimento agendado.</p>
+        <!-- 4. PROPOSTA ÚNICA DE VALOR (Solução / Diferenciais) -->
+        <section id="diferenciais" class="py-20 bg-brand-dark relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <span class="text-brand-gold font-semibold uppercase tracking-wider text-sm">Por que nos escolher</span>
+                        <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mt-2 mb-6">
+                            Sua tranquilidade é nossa maior prioridade profissional
+                        </h2>
+                        <p class="text-gray-300 text-base mb-6 leading-relaxed">
+                            Inaugurado há mais de 10 anos, nosso escritório possui uma atuação diferenciada. Contamos com advogados especialistas associados e apoio constante e individualizado.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-brand-gold/20 text-brand-gold flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fa-solid fa-check text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Atendimento Humanizado e Personalizado</h3>
+                                    <p class="text-gray-400 text-sm">Ouvimos sua história com atenção, oferecendo clareza e transparência em cada etapa.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-brand-gold/20 text-brand-gold flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fa-solid fa-check text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Plantão e Prontidão 24 Horas</h3>
+                                    <p class="text-gray-400 text-sm">Suporte online via WhatsApp ou telefone para casos urgentes e orientações rápidas.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-brand-gold/20 text-brand-gold flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fa-solid fa-check text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Atuação Nacional</h3>
+                                    <p class="text-gray-400 text-sm">Atendimento digital em todo território brasileiro ou presencial com horário agendado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                            <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413478982_0.png" 
+                                 alt="Escritório Luana Oliveira Advocacia" 
+                                 width="600" height="700" 
+                                 loading="lazy" decoding="async"
+                                 class="w-full h-[450px] object-cover hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="absolute -bottom-6 -left-6 bg-brand-slate p-6 rounded-2xl border border-white/10 shadow-2xl hidden sm:block">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-brand-gold text-brand-dark rounded-xl flex items-center justify-center font-bold text-xl">
+                                    10+
+                                </div>
+                                <div>
+                                    <p class="text-white font-bold text-sm">Anos de Experiência</p>
+                                    <p class="text-xs text-brand-gold">Compromisso e Ética</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Localização -->
-    <section class="py-20">
-        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12">
-            <div>
-                <h2 class="text-4xl font-serif mb-6">Onde estamos</h2>
-                <p class="mb-4">Av. Marina, 201 - Sl 2, Centro, Mongaguá - SP</p>
-                <a href="https://www.google.com/maps/place/Oliveiras+Advocacia" class="inline-block bg-green-600 text-white px-8 py-3 rounded-lg font-bold">Como chegar no Maps</a>
+        <!-- 5. APRESENTAÇÃO DE SERVIÇOS / ÁREAS DE ATUAÇÃO -->
+        <section id="servicos" class="py-20 bg-brand-slate">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-brand-gold font-semibold uppercase tracking-wider text-sm">Especialidades</span>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
+                        Áreas de Atuação Jurídica
+                    </h2>
+                    <p class="text-gray-400 text-base md:text-lg">
+                        Soluções jurídicas completas e estratégicas para proteger seus direitos e patrimônio.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Serviço 1: Previdenciário -->
+                    <div class="bg-brand-dark p-8 rounded-2xl border border-white/5 shadow-xl hover:border-brand-gold/40 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-brand-gold/10 text-brand-gold rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-id-card"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-white mb-3">Direito Previdenciário</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                Planejamento de aposentadoria, INSS, auxílio-doença, BPC LOAS, pensão por morte, revisões e perícias médicas com assessoria completa.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Direito%20Previdenciário." 
+                           target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-brand-gold font-semibold text-sm hover:underline">
+                            <span>Consultar especialista</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Serviço 2: Família -->
+                    <div class="bg-brand-dark p-8 rounded-2xl border border-white/5 shadow-xl hover:border-brand-gold/40 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-brand-gold/10 text-brand-gold rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-people-roof"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-white mb-3">Direito de Família</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                Divórcio consensual e litigioso, guarda, pensão alimentícia, inventário e partilha, regulamentação de visitas e medidas protetivas.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Direito%20de%20Família." 
+                           target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-brand-gold font-semibold text-sm hover:underline">
+                            <span>Consultar especialista</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Serviço 3: Imobiliário -->
+                    <div class="bg-brand-dark p-8 rounded-2xl border border-white/5 shadow-xl hover:border-brand-gold/40 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-brand-gold/10 text-brand-gold rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-house-chimney"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-white mb-3">Direito Imobiliário</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                Usucapião, regularização de imóveis, contratos, despejo, reintegração de posse, consultoria para compra e venda e condomínios.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Direito%20Imobiliário." 
+                           target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-brand-gold font-semibold text-sm hover:underline">
+                            <span>Consultar especialista</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Serviço 4: Consumidor -->
+                    <div class="bg-brand-dark p-8 rounded-2xl border border-white/5 shadow-xl hover:border-brand-gold/40 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-brand-gold/10 text-brand-gold rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-white mb-3">Direito do Consumidor</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                Ações de indenização, cobranças indevidas, problemas com bancos, planos de saúde, serviços públicos e danos morais ou materiais.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Direito%20do%20Consumidor." 
+                           target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-brand-gold font-semibold text-sm hover:underline">
+                            <span>Consultar especialista</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Serviço 5: Cível -->
+                    <div class="bg-brand-dark p-8 rounded-2xl border border-white/5 shadow-xl hover:border-brand-gold/40 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-brand-gold/10 text-brand-gold rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-file-contract"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-white mb-3">Direito Cível</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                Elaboração e revisão de contratos, ações de cobrança, rescisão contratual, despejo, disputas de posse e testamentos.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Direito%20Cível." 
+                           target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-brand-gold font-semibold text-sm hover:underline">
+                            <span>Consultar especialista</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Serviço 6: Criminal & Extrajudicial -->
+                    <div class="bg-brand-dark p-8 rounded-2xl border border-white/5 shadow-xl hover:border-brand-gold/40 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-brand-gold/10 text-brand-gold rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-gavel"></i>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-white mb-3">Criminal & Extrajudicial</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                Atendimento criminal especializado 24h para casos urgentes, além de acompanhamento em cartórios e órgãos públicos.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Atendimento%20Criminal." 
+                           target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-brand-gold font-semibold text-sm hover:underline">
+                            <span>Consultar especialista</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <a href="https://wa.me/5513982311323?text=Olá,%20tenho%20uma%20dúvida%20sobre%20meu%20caso%20jurídico." 
+                       target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-3 bg-brand-gold text-brand-dark font-bold px-8 py-4 rounded-xl shadow-lg hover:scale-105 transition-all duration-300">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                        <span>Falar com a Dra. Luana Oliveira Agora</span>
+                    </a>
+                </div>
             </div>
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3652.8804068303115!2d-46.62146262463765!3d-24.095945400000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce2711b43a2625%3A0xb130b84fff19adae!2sOliveiras%20Advocacia!5e0!3m2!1spt-BR!2sbr!4v1710000000000" width="100%" height="300" class="rounded-xl shadow-2xl" allowfullscreen="" loading="lazy"></iframe>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-gray-400 py-12 text-center">
-        <p class="mb-4 font-bold text-white uppercase tracking-widest">Luana Oliveira Advocacia</p>
-        <p class="text-sm">CNPJ: 30.344.624/0001-97</p>
-        <div class="mt-8">
-            <p>&copy; 2024 Todos os direitos reservados.</p>
-            <p class="mt-2 text-xs">Site criado e mantido por <a href="https://studiotesta.com.br/" class="text-primary hover:underline">STUDIOTESTA</a></p>
+        <!-- 6. PROVA SOCIAL (Autoridade, Google Reviews) -->
+        <section id="depoimentos" class="py-20 bg-brand-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <div class="inline-flex items-center gap-1 text-brand-gold text-lg mb-2">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-3">
+                        Nota 4.8 de 5 Estrelas no Google
+                    </h2>
+                    <p class="text-gray-400 text-base">
+                        Veja o que nossos clientes dizem sobre o atendimento e dedicação da Dra. Luana Oliveira e equipe.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Depoimento 1 -->
+                    <div class="bg-brand-slate p-6 rounded-2xl border border-white/5 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="text-brand-gold text-sm mb-3">⭐⭐⭐⭐⭐</div>
+                            <p class="text-gray-300 text-sm italic mb-4">
+                                "A Dra. Luana é simplesmente incrível! Muito competente, atenciosa e super ágil. Me senti bem amparada desde o início, porque ela explica tudo com paciência..."
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <span class="font-bold text-white text-sm">Shirley Gomes</span>
+                            <span class="text-xs text-gray-400">Cliente Google</span>
+                        </div>
+                    </div>
+
+                    <!-- Depoimento 2 -->
+                    <div class="bg-brand-slate p-6 rounded-2xl border border-white/5 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="text-brand-gold text-sm mb-3">⭐⭐⭐⭐⭐</div>
+                            <p class="text-gray-300 text-sm italic mb-4">
+                                "Uma pessoa que transmite confiança, muito educada, capaz, em tudo que faz. Avaliação do que já fez e está fazendo por mim, só gratidão por estar nos cuidados da Dr Luana!"
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <span class="font-bold text-white text-sm">Regina Victorino</span>
+                            <span class="text-xs text-gray-400">Cliente Google</span>
+                        </div>
+                    </div>
+
+                    <!-- Depoimento 3 -->
+                    <div class="bg-brand-slate p-6 rounded-2xl border border-white/5 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="text-brand-gold text-sm mb-3">⭐⭐⭐⭐⭐</div>
+                            <p class="text-gray-300 text-sm italic mb-4">
+                                "Atendimento maravilhoso, a profissional é excelente, esclarece com facilidade minha dúvida e muita rapidez. Ótima profissional, super indico."
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <span class="font-bold text-white text-sm">Wanessa Pereira</span>
+                            <span class="text-xs text-gray-400">Cliente Google</span>
+                        </div>
+                    </div>
+
+                    <!-- Depoimento 4 -->
+                    <div class="bg-brand-slate p-6 rounded-2xl border border-white/5 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="text-brand-gold text-sm mb-3">⭐⭐⭐⭐⭐</div>
+                            <p class="text-gray-300 text-sm italic mb-4">
+                                "Fui muito bem atendido pela Dra. Luana. Sempre respondeu minhas dúvidas com atenção e rapidez, passando muita segurança. Competente e dedicada, especialmente na área previdenciária!"
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <span class="font-bold text-white text-sm">Diego S. Olive</span>
+                            <span class="text-xs text-gray-400">Cliente Google</span>
+                        </div>
+                    </div>
+
+                    <!-- Depoimento 5 -->
+                    <div class="bg-brand-slate p-6 rounded-2xl border border-white/5 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="text-brand-gold text-sm mb-3">⭐⭐⭐⭐⭐</div>
+                            <p class="text-gray-300 text-sm italic mb-4">
+                                "Graças a Dra Luana tive um resultado positivo no meu caso muito melhor do que eu estava esperando. Um ótimo atendimento, super dedicada e disposta a esclarecer todas as dúvidas."
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <span class="font-bold text-white text-sm">Matheus Santos</span>
+                            <span class="text-xs text-gray-400">Cliente Google</span>
+                        </div>
+                    </div>
+
+                    <!-- Depoimento 6 -->
+                    <div class="bg-brand-slate p-6 rounded-2xl border border-white/5 flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="text-brand-gold text-sm mb-3">⭐⭐⭐⭐⭐</div>
+                            <p class="text-gray-300 text-sm italic mb-4">
+                                "Profissionalismo impecável! Graças a dedicação da Dra. Luana, a aposentadoria do meu pai saiu em menos de um mês! Sem dúvidas, a melhor!"
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <span class="font-bold text-white text-sm">Rafael Cerqueira</span>
+                            <span class="text-xs text-gray-400">Cliente Google</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <p class="text-gray-400 text-sm mb-4">Baseado em mais de 104 avaliações reais publicadas no Google.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. SEÇÃO SOBRE NÓS HUMANIZADA -->
+        <section id="sobre" class="py-20 bg-brand-slate">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 lg:order-1">
+                        <span class="text-brand-gold font-semibold uppercase tracking-wider text-sm">Conheça a Profissional</span>
+                        <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mt-2 mb-6">
+                            Dra. Luana dos Santos Oliveira
+                        </h2>
+                        <p class="text-gray-300 text-base mb-4 leading-relaxed">
+                            Inscrita na <strong>OAB/SP 369.145</strong>, graduada em Direito na Universidade Católica de Santos em 2014. Possui pós-graduações em Direito Previdenciário, Constitucional, Processual Civil e de Família, além de especializações em advocacia extrajudicial e consultiva.
+                        </p>
+                        <p class="text-gray-300 text-base mb-6 leading-relaxed">
+                            Ex-pesquisadora do CNPq/PIBIC, a Dra. Luana lidera um escritório pautado pela ética, seriedade e atendimento humanizado, garantindo que cada cliente seja tratado com total exclusividade e respeito.
+                        </p>
+
+                        <div class="grid grid-cols-3 gap-4 border-t border-white/10 pt-6">
+                            <div>
+                                <p class="font-serif text-2xl font-bold text-brand-gold">10+</p>
+                                <p class="text-xs text-gray-400">Anos de Atuação</p>
+                            </div>
+                            <div>
+                                <p class="font-serif text-2xl font-bold text-brand-gold">104+</p>
+                                <p class="text-xs text-gray-400">Avaliações 5 Estrelas</p>
+                            </div>
+                            <div>
+                                <p class="font-serif text-2xl font-bold text-brand-gold">100%</p>
+                                <p class="text-xs text-gray-400">Comprometimento</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-1 lg:order-2">
+                        <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                            <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413480810_1.webp" 
+                                 alt="Dra. Luana dos Santos Oliveira" 
+                                 width="600" height="700" 
+                                 loading="lazy" decoding="async"
+                                 class="w-full h-[500px] object-cover hover:scale-105 transition-transform duration-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. ESTRUTURA DA LOJA (Galeria Imersiva) -->
+        <section class="py-20 bg-brand-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-brand-gold font-semibold uppercase tracking-wider text-sm">Nosso Escritório</span>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
+                        Estrutura Moderna e Acolhedora
+                    </h2>
+                    <p class="text-gray-400 text-base">
+                        Ambiente preparado para receber você e sua família com conforto, sigilo e segurança jurídica.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                    <div class="overflow-hidden rounded-xl shadow-lg group">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413482161_2.webp" 
+                             alt="Escritório Luana Oliveira - Foto 2" width="400" height="300" loading="lazy" decoding="async"
+                             class="w-full h-56 md:h-72 object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-lg group">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413483738_3.webp" 
+                             alt="Escritório Luana Oliveira - Foto 3" width="400" height="300" loading="lazy" decoding="async"
+                             class="w-full h-56 md:h-72 object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-lg group">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413485086_4.webp" 
+                             alt="Escritório Luana Oliveira - Foto 4" width="400" height="300" loading="lazy" decoding="async"
+                             class="w-full h-56 md:h-72 object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-lg group">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413486302_5.webp" 
+                             alt="Escritório Luana Oliveira - Foto 5" width="400" height="300" loading="lazy" decoding="async"
+                             class="w-full h-56 md:h-72 object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-lg group">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413487521_6.webp" 
+                             alt="Escritório Luana Oliveira - Foto 6" width="400" height="300" loading="lazy" decoding="async"
+                             class="w-full h-56 md:h-72 object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow-lg group">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/images/img_1785413488805_7.webp" 
+                             alt="Escritório Luana Oliveira - Foto 7" width="400" height="300" loading="lazy" decoding="async"
+                             class="w-full h-56 md:h-72 object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. SEÇÃO FAQ (Sanfona / Accordion) -->
+        <section class="py-20 bg-brand-slate">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-brand-gold font-semibold uppercase tracking-wider text-sm">Dúvidas Frequentes</span>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
+                        Perguntas e Respostas
+                    </h2>
+                    <p class="text-gray-400 text-base">
+                        Esclareça suas principais dúvidas sobre nossos serviços e atendimento jurídico.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- FAQ 1 -->
+                    <div class="bg-brand-dark rounded-xl border border-white/5 overflow-hidden">
+                        <button class="faq-btn w-full px-6 py-4 text-left font-serif font-bold text-white flex justify-between items-center focus:outline-none">
+                            <span>Como funciona o atendimento online 24h?</span>
+                            <i class="fa-solid fa-chevron-down text-brand-gold transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">
+                            Nosso canal de WhatsApp (13) 98231-1323 está disponível 24 horas por dia para receber relatos de urgência, dúvidas e agendamentos. Um advogado especialista avaliará sua situação com prontidão.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="bg-brand-dark rounded-xl border border-white/5 overflow-hidden">
+                        <button class="faq-btn w-full px-6 py-4 text-left font-serif font-bold text-white flex justify-between items-center focus:outline-none">
+                            <span>O escritório atende fora de Mongaguá ou apenas na Baixada Santista?</span>
+                            <i class="fa-solid fa-chevron-down text-brand-gold transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">
+                            Atendemos presencialmente em nosso escritório localizado em Mongaguá - SP, mas prestamos serviços jurídicos em todo o território nacional de forma online, com total segurança e eficiência.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="bg-brand-dark rounded-xl border border-white/5 overflow-hidden">
+                        <button class="faq-btn w-full px-6 py-4 text-left font-serif font-bold text-white flex justify-between items-center focus:outline-none">
+                            <span>Quais documentos preciso levar para uma consulta previdenciária?</span>
+                            <i class="fa-solid fa-chevron-down text-brand-gold transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">
+                            Geralmente RG, CPF, comprovante de residência, carteira de trabalho (CTPS), carnês de contribuição e extrato do CNIS (obtido no Meu INSS). Nossa equipe orientará exatamente o que é necessário para o seu caso específico.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="bg-brand-dark rounded-xl border border-white/5 overflow-hidden">
+                        <button class="faq-btn w-full px-6 py-4 text-left font-serif font-bold text-white flex justify-between items-center focus:outline-none">
+                            <span>Em casos criminais urgentes, como devo proceder?</span>
+                            <i class="fa-solid fa-chevron-down text-brand-gold transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">
+                            Entre em contato imediatamente pelo nosso WhatsApp de plantão 24h. Temos advogado criminalista especializado pronto para prestar assessoria em delegacias, audiências de custódia e casos emergenciais.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. ONDE ESTAMOS (Facilidade de Acesso) -->
+        <section id="contato" class="py-20 bg-brand-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-brand-gold font-semibold uppercase tracking-wider text-sm">Localização</span>
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
+                        Onde Estamos
+                    </h2>
+                    <p class="text-gray-400 text-base">
+                        Venha nos fazer uma visita ou entre em contato pelos nossos canais oficiais.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                    <!-- Lado Esquerdo: Endereço e Horários -->
+                    <div class="bg-brand-slate p-8 rounded-2xl border border-white/5 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif text-2xl font-bold text-white mb-6">Luana Oliveira Advocacia</h3>
+                            
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="w-10 h-10 bg-brand-gold/10 text-brand-gold rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white text-sm">Endereço:</p>
+                                    <p class="text-gray-300 text-sm">Av. Marina, 201 - Sl 2, Primeiro andar - Centro, Mongaguá - SP, 11730-000</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 mb-8">
+                                <div class="w-10 h-10 bg-brand-gold/10 text-brand-gold rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white text-sm">Horário de Funcionamento:</p>
+                                    <p class="text-emerald-400 text-sm font-semibold">Segunda a Sábado: Atendimento 24 horas</p>
+                                    <p class="text-gray-400 text-xs mt-1">Domingo: Fechado (Plantão emergencial via WhatsApp)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <a href="https://www.google.com/maps/place/Oliveiras+Advocacia/data=!4m7!3m6!1s0x94ce2711b43a2625:0xb130b84fff19adae!8m2!3d-24.0929672!4d-46.6192749!16s%2Fg%2F11v013v39s!19sChIJJSY6tBEnzpQRrq0Z_0-4MLE?authuser=0&hl=pt-BR&rclk=1" 
+                               target="_blank" rel="noopener noreferrer"
+                               class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300">
+                                <i class="fa-solid fa-diamond-turn-right text-lg"></i>
+                                <span>Como Chegar (Google Maps)</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Lado Direito: Mapa Iframe -->
+                    <div class="rounded-2xl overflow-hidden border border-white/5 shadow-2xl h-[400px] lg:h-auto">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3644.591979007671!2d-46.6214619!3d-24.0929672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce2711b43a2625%3A0xb130b84fff19adae!2sOliveiras%20Advocacia!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" 
+                                width="100%" height="100%" 
+                                style="border:0;" allowfullscreen="" loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="Mapa de localização Luana Oliveira Advocacia">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 11. FOOTER COMPLETO (Segurança Jurídica & LGPD) -->
+    <footer class="bg-brand-slate border-t border-white/10 pt-16 pb-12 text-gray-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/luana-oliveira-advocacia/logo_1785412791264.png" 
+                             alt="Logo Luana Oliveira Advocacia" width="35" height="35" loading="lazy" decoding="async"
+                             class="w-9 h-9 object-contain rounded-lg">
+                        <span class="font-serif text-lg font-bold text-white">Luana Oliveira Advocacia</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4 leading-relaxed">
+                        Advogados especialistas e consulta jurídica 24h na Baixada Santista e em todo o Brasil. Defesa intransigente dos seus direitos.
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <a href="https://www.instagram.com/advocacia24h" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-9 h-9 bg-brand-dark rounded-full flex items-center justify-center text-white hover:bg-brand-gold hover:text-brand-dark transition-colors">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-9 h-9 bg-brand-dark rounded-full flex items-center justify-center text-white hover:bg-brand-gold hover:text-brand-dark transition-colors">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                        <a href="https://wa.me/5513982311323" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="w-9 h-9 bg-brand-dark rounded-full flex items-center justify-center text-white hover:bg-brand-gold hover:text-brand-dark transition-colors">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-serif text-white font-bold text-base mb-4">Áreas de Atuação</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#servicos" class="hover:text-brand-gold transition-colors">Direito Previdenciário</a></li>
+                        <li><a href="#servicos" class="hover:text-brand-gold transition-colors">Direito de Família</a></li>
+                        <li><a href="#servicos" class="hover:text-brand-gold transition-colors">Direito Imobiliário</a></li>
+                        <li><a href="#servicos" class="hover:text-brand-gold transition-colors">Direito do Consumidor</a></li>
+                        <li><a href="#servicos" class="hover:text-brand-gold transition-colors">Direito Cível e Criminal</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif text-white font-bold text-base mb-4">Links Rápidos</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#sobre" class="hover:text-brand-gold transition-colors">Sobre a Advogada</a></li>
+                        <li><a href="#diferenciais" class="hover:text-brand-gold transition-colors">Diferenciais</a></li>
+                        <li><a href="#depoimentos" class="hover:text-brand-gold transition-colors">Avaliações do Google</a></li>
+                        <li><a href="#contato" class="hover:text-brand-gold transition-colors">Onde Estamos</a></li>
+                        <li><a href="#" class="hover:text-brand-gold transition-colors">Política de Privacidade (LGPD)</a></li>
+                        <li><a href="#" class="hover:text-brand-gold transition-colors">Termos de Uso</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif text-white font-bold text-base mb-4">Contato Direto</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot text-brand-gold mt-1"></i>
+                            <span>Av. Marina, 201 - Sl 2, Centro, Mongaguá - SP</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-brands fa-whatsapp text-brand-gold"></i>
+                            <a href="https://wa.me/5513982311323" target="_blank" rel="noopener noreferrer" class="hover:text-brand-gold transition-colors">(13) 98231-1323</a>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-envelope text-brand-gold"></i>
+                            <span>contato@empresa.com.br</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Dados Jurídicos e Assinatura -->
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 gap-4">
+                <div>
+                    <p>Razão Social: Luana Oliveira Advocacia | CNPJ: 30.344.624/0001-97 | OAB/SP 369.145</p>
+                    <p class="mt-1">© Todos os direitos reservados. Atendimento em conformidade com o Código de Ética da OAB.</p>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <p>Site criado e mantido por <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="text-brand-gold hover:underline font-semibold">STUDIOTESTA</a></p>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <!-- Whatsapp Flutuante -->
-    <a href="https://wa.me/5513982311323?text=Olá,%20gostaria%20de%20uma%20consulta." class="fixed bottom-8 right-8 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl animate-bounce hover:scale-110 transition-all">
-        <i class="fab fa-whatsapp text-3xl"></i>
-    </a>
+    <!-- JavaScript para Menu Mobile e FAQ Accordion -->
+    <script>
+        // Toggle Menu Mobile
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
 
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // FAQ Accordion
+        const faqBtns = document.querySelectorAll('.faq-btn');
+        faqBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const content = btn.nextElementSibling;
+                const icon = btn.querySelector('fa-chevron-down');
+                
+                // Toggle current
+                content.classList.toggle('hidden');
+                btn.classList.toggle('text-brand-gold');
+                
+                // Rotate icon
+                const chevron = btn.querySelector('i');
+                if (chevron) {
+                    chevron.classList.toggle('rotate-180');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
