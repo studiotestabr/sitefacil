@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turbine seu Instagram - StudioTesta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#e1306c',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Container Principal -->
+    <div class="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Aumenta Digital</span>
+            <h1 class="text-2xl font-extrabold mt-3 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500">
+                Turbine seu Instagram
+            </h1>
+            <p class="text-zinc-400 text-sm mt-1">Escolha seu pacote ideal</p>
+        </div>
+
+        <!-- Opções de Pacotes -->
+        <div class="grid grid-cols-1 gap-3 mb-6">
+            <!-- Destaque 10k -->
+            <label class="cursor-pointer border-2 border-red-500 bg-red-950/20 hover:bg-red-900/30 p-4 rounded-xl flex items-center justify-between transition-all relative">
+                <input type="radio" name="pacote" value="10000" data-preco="99.90" class="hidden peer" checked>
+                <div class="flex flex-col">
+                    <span class="text-xs text-red-400 font-bold uppercase tracking-wider">Mais Vendido 🔥</span>
+                    <span class="text-xl font-black text-white">10.000 SEGUIDORES</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-2xl font-black text-yellow-400">R$ 99,90</span>
+                </div>
+                <div class="absolute inset-0 border-2 border-yellow-400 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-all"></div>
+            </label>
+
+            <!-- Grid 3 Opções de Entrada -->
+            <div class="grid grid-cols-3 gap-2">
+                <label class="cursor-pointer border border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800 p-3 rounded-xl flex flex-col items-center justify-between text-center relative">
+                    <input type="radio" name="pacote" value="1000" data-preco="14.90" class="hidden peer">
+                    <span class="text-sm font-bold text-blue-400">1.000</span>
+                    <span class="text-xs text-zinc-400">Seguidores</span>
+                    <span class="text-sm font-bold text-yellow-400 mt-2">R$ 14,90</span>
+                    <div class="absolute inset-0 border-2 border-blue-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-all"></div>
+                </label>
+
+                <label class="cursor-pointer border border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800 p-3 rounded-xl flex flex-col items-center justify-between text-center relative">
+                    <input type="radio" name="pacote" value="3000" data-preco="35.90" class="hidden peer">
+                    <span class="text-sm font-bold text-emerald-400">3.000</span>
+                    <span class="text-xs text-zinc-400">Seguidores</span>
+                    <span class="text-sm font-bold text-yellow-400 mt-2">R$ 35,90</span>
+                    <div class="absolute inset-0 border-2 border-emerald-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-all"></div>
+                </label>
+
+                <label class="cursor-pointer border border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800 p-3 rounded-xl flex flex-col items-center justify-between text-center relative">
+                    <input type="radio" name="pacote" value="5000" data-preco="55.90" class="hidden peer">
+                    <span class="text-sm font-bold text-amber-400">5.000</span>
+                    <span class="text-xs text-zinc-400">Seguidores</span>
+                    <span class="text-sm font-bold text-yellow-400 mt-2">R$ 55,90</span>
+                    <div class="absolute inset-0 border-2 border-amber-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-all"></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Garantias -->
+        <div class="grid grid-cols-3 gap-2 text-center text-[10px] text-zinc-400 mb-6 bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
+            <div>🚀 Entrega Imediata</div>
+            <div>🛡️ Não precisa de senha</div>
+            <div>🔒 Envio 100% Seguro</div>
+        </div>
+
+        <!-- Formulário de Compra -->
+        <form id="orderForm" onsubmit="enviarPedido(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1">Seu @ do Instagram</label>
+                <input type="text" id="username" placeholder="@seu.perfil" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 text-white placeholder-zinc-600">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1">Seu WhatsApp (Para confirmação)</label>
+                <input type="tel" id="whatsapp" placeholder="(13) 99999-9999" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 text-white placeholder-zinc-600">
+            </div>
+
+            <button type="submit" id="btnSubmit" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-pink-500/20 active:scale-[0.98]">
+                Gerar Pix para Pagamento
+            </button>
+        </form>
+
+        <!-- Modais / Retornos (Ocultos) -->
+        <div id="loading" class="hidden text-center py-4">
+            <p class="text-sm text-pink-400 animate-pulse">Gerando seu Pix seguro via StudioTesta...</p>
+        </div>
+
+        <div id="qrCodeContainer" class="hidden text-center mt-4 p-4 bg-zinc-950 rounded-xl border border-zinc-800">
+            <p class="text-xs text-zinc-400 mb-2">Escaneie ou copie o Pix para ativar:</p>
+            <div id="pixPayload" class="bg-zinc-900 p-2 text-[10px] break-all rounded border border-zinc-800 text-zinc-300 select-all mb-3"></div>
+            <button onclick="copiarPix()" class="bg-zinc-800 hover:bg-zinc-700 text-xs px-4 py-2 rounded-lg font-bold w-full">Copiar Código Pix</button>
+        </div>
+    </div>
+
+    <script>
+        // COLE A SUA URL DE PRODUÇÃO DO WEBHOOK DO N8N NA LINHA ABAIXO:
+        const WEBHOOK_N8N_URL = 'https://studiotesta.com.br/webhook/smm-compra';
+
+        async function enviarPedido(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const loading = document.getElementById('loading');
+            const qrContainer = document.getElementById('qrCodeContainer');
+            
+            const pacoteEl = document.querySelector('input[name="pacote"]:checked');
+            const username = document.getElementById('username').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+
+            const payload = {
+                quantidade: pacoteEl.value,
+                preco: pacoteEl.getAttribute('data-preco'),
+                username: username,
+                whatsapp: whatsapp
+            };
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            loading.classList.remove('hidden');
+
+            try {
+                const response = await fetch(WEBHOOK_N8N_URL, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Servidor retornou Status ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                loading.classList.add('hidden');
+                qrContainer.classList.remove('hidden');
+                document.getElementById('pixPayload').innerText = data.pix_code || 'Chave Pix não gerada.';
+            } catch (err) {
+                console.error('Erro de conexão:', err);
+                alert(`Erro ao conectar com n8n: ${err.message}\n\nCertifique-se de que o workflow está ATIVO (Active) no n8n.`);
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                loading.classList.add('hidden');
+            }
+        }
+
+        function copiarPix() {
+            const texto = document.getElementById('pixPayload').innerText;
+            navigator.clipboard.writeText(texto);
+            alert('Código Pix copiado!');
+        }
+    </script>
+</body>
+</html>
