@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroFenix - Central de Operações</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        agroDark: '#070a13',
+                        agroNavy: '#0c1322',
+                        agroGold: '#fbbf24',
+                        agroGoldHover: '#d97706',
+                        agroChatBg: '#090d16'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #070a13;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c1322;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fbbf24;
+            border-radius: 10px;
+        }
+        .online-dot {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse 1.6s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+
+        @media print {
+            body * { visibility: hidden !important; }
+            #print-receipt-section, #print-receipt-section * { visibility: visible !important; }
+            #print-receipt-section { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                color: #000 !important; 
+                background: #fff !important; 
+                padding: 15px;
+                font-family: monospace;
+            }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-agroNavy border-b md:border-b-0 md:border-r border-slate-800 p-6 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Logo Container -->
+            <div class="flex items-center gap-3 mb-8">
+                <img src="https://github.com/studiotestabr/sitefacil/blob/964481b5bf39865100f5ff4523a7f19ac0809eb4/logos/logo_agrofenix.png?raw=true" alt="AgroFenix Logo" class="w-12 h-12 rounded-lg border border-agroGold shadow-md object-cover">
+                <div>
+                    <h1 class="text-xl font-bold tracking-wider text-white">AGROFENIX</h1>
+                    <span class="text-xs text-agroGold font-semibold">Central de Vendas</span>
+                </div>
+            </div>
+
+            <!-- Menu de Navegação -->
+            <nav class="space-y-1">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 text-agroGold font-semibold transition-all duration-200">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                    <span>Dashboard Geral</span>
+                </button>
+                <button onclick="switchTab('crm')" id="btn-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-comments text-lg"></i>
+                    <span>Chat CRM WhatsApp</span>
+                    <span id="crm-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                </button>
+                <button onclick="switchTab('pedidos')" id="btn-pedidos" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-cart-shopping text-lg"></i>
+                    <span>Gerenciar Pedidos</span>
+                    <span id="order-alarm-indicator" class="hidden w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                </button>
+                <button onclick="switchTab('estoque')" id="btn-estoque" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-boxes-stacked text-lg"></i>
+                    <span>Estoque & Preços</span>
+                </button>
+                <button onclick="switchTab('calculadora')" id="btn-calculadora" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-truck-ramp-box text-lg"></i>
+                    <span>Simular Rota & Frete</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="mt-8 pt-6 border-t border-slate-800 text-xs text-slate-400 space-y-2">
+            <div class="flex items-center justify-between">
+                <span>Plataforma:</span>
+                <span id="sync-status-indicator" class="text-amber-400 font-bold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Local Only
+                </span>
+            </div>
+            <div class="pt-2 border-t border-slate-800/40">
+                <a href="https://studiotesta.com.br/" target="_blank" class="text-agroGold hover:underline flex items-center gap-1.5 font-semibold text-[11px]">
+                    <i class="fa-solid fa-cloud"></i> Gerenciado por STUDIOTESTA
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 overflow-y-auto w-full relative h-screen">
+        
+        <!-- Toast de Notificação -->
+        <div id="toast-notification" class="fixed top-5 right-5 z-50 transform translate-x-96 transition-transform duration-300 bg-slate-900 border-l-4 border-agroGold text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm">
+            <i class="fa-solid fa-bell text-agroGold text-lg"></i>
+            <div>
+                <p id="toast-title" class="font-bold text-sm">Notificação</p>
+                <p id="toast-body" class="text-xs text-slate-300">Mensagem do sistema.</p>
+            </div>
+        </div>
+
+        <!-- TAB 1: DASHBOARD GERAL -->
+        <section id="tab-dashboard" class="tab-content p-6 md:p-8 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Painel de Operações</h2>
+                    <p class="text-sm text-slate-400">Indicadores consolidados em tempo real sincronizados via n8n</p>
+                </div>
+                <button onclick="syncAllData()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2 self-start md:self-auto cursor-pointer">
+                    <i class="fa-solid fa-arrows-rotate"></i> Carregar Dados Reais
+                </button>
+            </div>
+
+            <!-- Cards de Métricas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Faturamento Hoje</span>
+                        <h3 id="stat-faturamento" class="text-2xl font-bold text-white mt-1">R$ 0,00</h3>
+                        <span id="stat-faturamento-desc" class="text-xs text-slate-500 mt-1 block">Aguardando dados...</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400">
+                        <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Pedidos em Aberto</span>
+                        <h3 id="stat-pedidos-ativos" class="text-2xl font-bold text-white mt-1">0</h3>
+                        <span id="stat-pedidos-desc" class="text-xs text-slate-500 mt-1 block">Aguardando sincronização...</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-agroGold/10 flex items-center justify-center text-agroGold">
+                        <i class="fa-solid fa-spinner text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Faturamento Mensal</span>
+                        <h3 id="stat-vendas-mes" class="text-2xl font-bold text-white mt-1">R$ 0,00</h3>
+                        <span id="stat-vendas-mes-desc" class="text-xs text-slate-500 mt-1 block">Aguardando consolidação...</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                        <i class="fa-solid fa-circle-check text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colunas Principais -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 lg:col-span-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-lg text-white">Vendas Recentes</h4>
+                        <span class="text-xs text-agroGold bg-agroGold/10 px-2.5 py-1 rounded-full font-semibold">Live Feed</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-800">
+                                    <th class="pb-3 font-semibold">Cliente</th>
+                                    <th class="pb-3 font-semibold">Itens Vendidos</th>
+                                    <th class="pb-3 font-semibold">Status</th>
+                                    <th class="pb-3 font-semibold text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-transactions" class="divide-y divide-slate-800/50">
+                                <tr class="text-slate-500"><td colspan="4" class="py-8 text-center">Nenhuma venda registrada hoje. Clique em "Carregar Dados Reais" para puxar do Postgres.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Monitor Nicolas IA -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col h-[350px]">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-lg text-white">Monitor Nicolas IA</h4>
+                        <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
+                    </div>
+                    <div id="ai-chat-feed" class="flex-1 overflow-y-auto space-y-3 pr-2 text-xs font-mono">
+                        <div class="bg-slate-850 p-2.5 rounded-xl border border-slate-800 text-slate-400">
+                            <span class="text-agroGold font-semibold">Nicolas (IA):</span>
+                            <p class="mt-1">Aguardando interações via API...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: CRM WHATSAPP CHAT -->
+        <section id="tab-crm" class="tab-content hidden h-[calc(100vh-2px)] flex flex-col md:flex-row bg-slate-950 overflow-hidden">
+            <!-- Lista de Contatos -->
+            <div class="w-full md:w-80 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col bg-slate-900 shrink-0 h-2/5 md:h-full">
+                <!-- Busca de Chats -->
+                <div class="p-4 border-b border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-green-400"></i> CRM Real-Time
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="fetchEvolutionChats()" class="text-slate-400 hover:text-agroGold transition-all" title="Forçar recarga dos chats">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </button>
+                            <button onclick="openLoginModal()" class="text-slate-400 hover:text-agroGold transition-all" title="Configurar Conexão">
+                                <i class="fa-solid fa-gear"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="search-chat" onkeyup="filterChats()" placeholder="Buscar contato..." class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 pl-9 pr-4 text-xs text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                </div>
+
+                <!-- Sub-abas Contatos e Grupos -->
+                <div class="flex border-b border-slate-800 bg-slate-900/60 text-xs text-slate-400">
+                    <button id="crm-subtab-contacts" onclick="changeCrmSubtab('contacts')" class="flex-1 py-3 text-center font-bold text-agroGold border-b-2 border-agroGold transition-all">
+                        Contatos
+                    </button>
+                    <button id="crm-subtab-groups" onclick="changeCrmSubtab('groups')" class="flex-1 py-3 text-center font-bold text-slate-400 hover:text-white transition-all">
+                        Grupos
+                    </button>
+                </div>
+
+                <!-- Lista Lateral -->
+                <div id="crm-contact-list" class="flex-1 overflow-y-auto divide-y divide-slate-800/60">
+                    <div class="p-4 text-center text-slate-500 text-xs">Conecte sua instância nas configurações para visualizar os atendimentos em tempo real.</div>
+                </div>
+            </div>
+
+            <!-- Box de Chat Central -->
+            <div id="crm-chat-box" class="flex-1 flex flex-col bg-slate-950 h-3/5 md:h-full">
+                <!-- Cabeçalho do Chat -->
+                <div id="chat-box-header" class="p-4 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <img id="active-chat-avatar" src="https://github.com/studiotestabr/sitefacil/blob/964481b5bf39865100f5ff4523a7f19ac0809eb4/logos/logo_agrofenix.png?raw=true" class="w-10 h-10 rounded-full border border-agroGold object-cover" alt="Avatar">
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-slate-900"></span>
+                        </div>
+                        <div>
+                            <h4 id="active-chat-name" class="font-bold text-sm text-white">Selecione uma conversa</h4>
+                            <p id="active-chat-phone" class="text-xs text-slate-400">Inicie o monitoramento do CRM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button onclick="openRegisterClientModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer">
+                            <i class="fa-solid fa-user-plus"></i> Salvar Cliente
+                        </button>
+                        
+                        <!-- Toggle Nicolas IA -->
+                        <div class="flex items-center gap-2 bg-slate-850 px-3 py-1.5 rounded-xl border border-slate-800">
+                            <i class="fa-solid fa-robot text-agroGold"></i>
+                            <span class="text-xs font-semibold hidden sm:inline">Nicolas (IA)</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="ia-toggle-checkbox" class="sr-only peer" checked onchange="toggleIAForCurrentContact()">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+
+                        <!-- Botão Fechar Conversa (Modo de Espera / ESC) -->
+                        <button onclick="deselectActiveChat()" class="text-slate-400 hover:text-red-400 transition-all p-2 rounded-lg text-sm" title="Fechar conversa (Atalho: ESC)">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Corpo do Chat -->
+                <div id="chat-messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950">
+                    <div class="flex flex-col items-center justify-center h-full text-slate-500 space-y-2">
+                        <i class="fa-solid fa-comments text-4xl text-slate-700"></i>
+                        <p class="text-sm">Selecione uma conversa para monitorar as mensagens.</p>
+                    </div>
+                </div>
+
+                <!-- Input de Envio de Mensagem (com Rascunho por Contato em Tempo Real) -->
+                <div class="p-4 border-t border-slate-800 bg-slate-900 flex items-center gap-3">
+                    <input type="text" id="chat-input-text" oninput="handleChatInput()" onkeypress="handleChatKeyPress(event)" placeholder="Digite para assumir o atendimento..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-agroGold">
+                    <button onclick="sendManualChatMessage()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold p-3 rounded-xl transition-all shadow-lg flex items-center justify-center shrink-0 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: GERENCIAR PEDIDOS -->
+        <section id="tab-pedidos" class="tab-content hidden p-6 md:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Fluxo de Pedidos Ativos</h2>
+                    <p class="text-sm text-slate-400">Gerencie aprovação de valores, precificação, separação e entrega</p>
+                </div>
+                <div id="alarm-banner" class="hidden bg-red-600 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-3 animate-bounce">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>NOVO PEDIDO AGUARDANDO OPERADOR!</span>
+                    <button onclick="stopIncomingOrderAlarm()" class="bg-white text-red-600 px-3 py-1 rounded-lg text-xs hover:bg-slate-100 transition-all cursor-pointer">Silenciar Alerta</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="pedidos-cards-container">
+                <div class="col-span-2 text-center p-12 bg-slate-900 rounded-2xl border border-slate-800 text-slate-500">
+                    <i class="fa-solid fa-rotate animate-spin text-4xl mb-3"></i>
+                    <p class="text-sm">Carregando pedidos ativos...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: ESTOQUE & PREÇOS -->
+        <section id="tab-estoque" class="tab-content hidden p-6 md:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Estoque & Tabela de Preços</h2>
+                    <p class="text-sm text-slate-400">Visualização de preços, CRUD manual e importações de ERP</p>
+                </div>
+                <div class="flex gap-2.5">
+                    <button onclick="openImportCsvModal()" class="bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold py-2.5 px-5 rounded-xl transition-all flex items-center gap-2 cursor-pointer text-sm">
+                        <i class="fa-solid fa-file-import text-agroGold"></i> Importar ERP (CSV)
+                    </button>
+                    <button onclick="openAddProductModal()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2 text-sm cursor-pointer">
+                        <i class="fa-solid fa-plus"></i> Adicionar Produto
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Calculadora de Pesagem -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 self-start space-y-4">
+                    <h4 class="font-bold text-lg text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-agroGold"></i> Calculadora de Pesagem
+                    </h4>
+                    <p class="text-xs text-slate-400">Simule pesos de venda fracionados de produtos à granel</p>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Selecionar Produto</label>
+                            <select id="calc-racao" onchange="updateCalcPreco()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                                <option value="0">Escolha um produto...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Quantidade (Gramas ou Unidades)</label>
+                            <input type="number" id="calc-peso" onkeyup="calcularPrecoGranel()" placeholder="Ex: 500 para 500g" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60 mt-4 text-center">
+                            <span class="text-xs text-slate-400 block">Total Calculado</span>
+                            <span id="calc-resultado" class="text-2xl font-black text-agroGold">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Estoque Geral -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl lg:col-span-3">
+                    <div class="p-6 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h4 class="font-bold text-lg text-white">Produtos Cadastrados</h4>
+                        
+                        <!-- Filtros Avançados de Estoque -->
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <select id="filter-stock-status" onchange="filterEstoqueTable()" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-agroGold">
+                                <option value="todos">Todos os Status</option>
+                                <option value="disponivel">Em Estoque</option>
+                                <option value="baixo">Baixo Estoque (&le; 10)</option>
+                                <option value="esgotado">Esgotados</option>
+                            </select>
+
+                            <select id="filter-stock-marca" onchange="filterEstoqueTable()" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-agroGold">
+                                <option value="todas">Todas as Marcas</option>
+                            </select>
+
+                            <div class="relative flex-1 sm:w-48">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="search-estoque" onkeyup="filterEstoqueTable()" placeholder="Buscar produto..." class="w-full bg-slate-800 border border-slate-700 rounded-xl py-1.5 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-agroGold">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-950/50 text-slate-300 font-semibold border-b border-slate-800">
+                                <tr>
+                                    <th class="p-4">Produto</th>
+                                    <th class="p-4">Preço (KG / Unidade)</th>
+                                    <th class="p-4">Tipo de Venda</th>
+                                    <th class="p-4">Estoque Atual</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="estoque-table-body" class="divide-y divide-slate-800/60">
+                                <!-- Dinâmico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: SIMULADOR DE FRETE -->
+        <section id="tab-calculadora" class="tab-content hidden p-6 md:p-8 space-y-6">
+            <div>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Simulação de Rota & Despacho</h2>
+                <p class="text-sm text-slate-400">Roteamento terrestre automático integrado para Mongaguá e região</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Form de Cálculo -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <h4 class="font-bold text-lg text-white flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-agroGold"></i> Roteamento do Pedido
+                    </h4>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Selecionar Pedido Ativo</label>
+                            <select id="frete-pedido-select" onchange="autoFillAddressFromOrder()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-agroGold">
+                                <option value="">Escolha um pedido para rotear...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Origem (Sua Loja)</label>
+                            <input type="text" id="frete-origem" value="Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP" disabled class="w-full bg-slate-850 border border-slate-800 rounded-xl p-3 text-sm text-slate-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Endereço de Destino (Cliente)</label>
+                            <input type="text" id="frete-destino" placeholder="Carregado automaticamente ou digite o destino..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-agroGold">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Custo por KM (R$)</label>
+                                <input type="number" id="frete-custo-km" value="2.50" step="0.10" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-agroGold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Taxa de Saída Fixa (R$)</label>
+                                <input type="number" id="frete-taxa-fixa" value="5.00" step="1.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-agroGold">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="calcularRotaFrontend()" id="btn-calcular-rota" class="flex-1 bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-route"></i> Traçar Rota de Entrega
+                            </button>
+                            <button onclick="aplicarFreteGratis()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer" title="Frete Grátis">
+                                <i class="fa-solid fa-gift"></i> Frete Grátis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relatório -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h4 class="font-bold text-lg text-white mb-2">Relatório do Percurso</h4>
+                        <p class="text-xs text-slate-400">Verifique a viabilidade da rota calculada</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 my-4">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/50 text-center">
+                            <span class="text-xs text-slate-400 block">Distância Calculada</span>
+                            <span id="rota-distancia" class="text-xl font-bold text-white">--- KM</span>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/50 text-center">
+                            <span class="text-xs text-slate-400 block">Duração Estimada</span>
+                            <span id="rota-tempo" class="text-xl font-bold text-white">--- min</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800/50 text-center space-y-1">
+                        <span class="text-xs text-slate-400 block font-semibold uppercase tracking-wider">Custo do Frete Sugerido</span>
+                        <h3 id="rota-valor-frete" class="text-3xl font-black text-green-400">R$ 0,00</h3>
+                    </div>
+
+                    <button id="btn-aplicar-frete-pedido" onclick="adicionarFreteAoPedidoSelecionado()" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-circle-plus"></i> Gravar Frete no Banco
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAIS DO SISTEMA -->
+
+    <!-- Modal: Login Configurações -->
+    <div id="modal-login-config" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                    <i class="fa-solid fa-lock text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-white">Área Restrita</h3>
+                    <p class="text-xs text-slate-400 font-medium">Autentique-se para alterar conexões</p>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Usuário</label>
+                    <input type="text" id="login-username" placeholder="Digite seu usuário" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Senha</label>
+                    <input type="password" id="login-password" placeholder="Digite sua senha" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold" onkeypress="handleLoginKeyPress(event)">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-slate-800 justify-end">
+                <button onclick="closeLoginModal()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button id="btn-submit-login" onclick="submitConfigLogin()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-key"></i> Entrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Precificação & PIX Dinâmico com QR Code -->
+    <div id="modal-precificar" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-white">Definir Orçamento & Gerar PIX</h3>
+                <button onclick="closePrecificarModal()" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <input type="hidden" id="precificar-order-id">
+            <input type="hidden" id="precificar-whatsapp">
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cliente / Solicitado</label>
+                    <input type="text" id="precificar-cliente-nome" readonly class="w-full bg-slate-850 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Texto Bruto do Pedido do Cliente (Nicolas IA)</label>
+                    <textarea id="precificar-itens-raw" rows="2" readonly class="w-full bg-slate-850 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-400 font-mono"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Subtotal de Produtos (R$)</label>
+                        <input type="number" id="precificar-subtotal" step="0.01" onkeyup="atualizarTotalModal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Custo de Entrega / Frete (R$)</label>
+                        <input type="number" id="precificar-frete" step="0.01" onkeyup="atualizarTotalModal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60 text-center">
+                    <span class="text-xs text-slate-400 block">Total do Orçamento</span>
+                    <span id="precificar-total-geral" class="text-2xl font-black text-green-400">R$ 0,00</span>
+                </div>
+
+                <!-- Área de Exibição de QR Code PIX -->
+                <div id="pix-display-area" class="hidden bg-slate-950 p-4 rounded-xl border border-amber-500/30 text-center space-y-3">
+                    <p class="text-xs font-bold text-agroGold uppercase tracking-wider">PIX Gerado com Sucesso</p>
+                    <div class="flex justify-center">
+                        <img id="pix-qrcode-img" src="" alt="QR Code PIX" class="w-36 h-36 rounded-lg border border-slate-700 bg-white p-1">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1">PIX Copia e Cola:</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="pix-copia-cola-input" readonly class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-300">
+                            <button onclick="copiarPixCopiaCola()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold px-3 py-1.5 rounded-lg text-xs shrink-0 cursor-pointer">
+                                <i class="fa-solid fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-slate-800 justify-end">
+                <button onclick="closePrecificarModal()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button id="btn-submit-pix" onclick="submitPricingAndGeneratePix()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-lg flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-qrcode"></i> Enviar PIX & Salvar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Configuração da Conexão -->
+    <div id="modal-config" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-white">Configurações de Conexão</h3>
+                <button onclick="toggleConfigModal(false)" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">URL da Evolution API</label>
+                    <input type="text" id="config-evo-url" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nome da Instância</label>
+                    <input type="text" id="config-evo-instance" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">API Key de Autenticação</label>
+                    <input type="password" id="config-evo-apikey" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                </div>
+                <div class="pt-2 border-t border-slate-800/40">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Webhook URL do n8n (Master)</label>
+                    <input type="text" id="config-n8n-url" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-slate-800 justify-end">
+                <button onclick="toggleConfigModal(false)" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button onclick="saveApiConfigurations()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg cursor-pointer">Salvar Configuração</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar / Editar Produto -->
+    <div id="modal-produto" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 id="product-modal-title" class="font-bold text-lg text-white">Adicionar Novo Produto</h3>
+                <button onclick="closeAddProductModal()" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <input type="hidden" id="product-id">
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Produto</label>
+                        <input type="text" id="product-name" placeholder="Ex: Ração Golden Frango 15kg" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Marca do Produto</label>
+                        <input type="text" id="product-marca" placeholder="Ex: Premier, Golden" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Preço R$ (KG ou Unidade)</label>
+                        <input type="number" id="product-price" placeholder="Ex: 14.50" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Permite Fracionamento/Granel?</label>
+                        <select id="product-granel" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                            <option value="Não">Não (Unidade/Fechado)</option>
+                            <option value="Sim">Sim (Fracionado/Granel)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Estoque Atual (Qtd ou KG)</label>
+                        <input type="number" id="product-stock" placeholder="Ex: 50" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 border-t border-slate-800/60 pt-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Quilos (Massa)</label>
+                        <input type="number" id="product-quilos" placeholder="Ex: 15" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Unidades</label>
+                        <input type="number" id="product-unidades" placeholder="Ex: 1" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Validade</label>
+                        <input type="date" id="product-validade" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-agroGold">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-slate-800 justify-end">
+                <button onclick="closeAddProductModal()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button onclick="submitProductForm()" class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg cursor-pointer">Salvar Produto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Importar CSV -->
+    <div id="modal-importar-csv" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-white">Importar Planilha do ERP (CSV)</h3>
+                <button onclick="closeImportCsvModal()" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Importe produtos do seu ERP físico. O arquivo <strong class="text-agroGold">.csv</strong> deve conter: <code class="bg-slate-950 px-1 py-0.5 rounded text-agroGold font-mono text-[10px]">Produto, Preco_KG, Venda_Granel, Estoque_Atual, Marca, Validade, Quilos, Unidades</code>.
+                </p>
+
+                <div id="csv-dropzone" class="border-2 border-dashed border-slate-700 hover:border-agroGold rounded-2xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all bg-slate-950/40">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500" id="csv-icon"></i>
+                    <p class="text-xs font-semibold text-slate-300 text-center" id="csv-text">Arraste o arquivo .csv ou clique para selecionar</p>
+                    <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                </div>
+
+                <div id="csv-import-status" class="hidden bg-slate-950 p-3 rounded-xl border border-slate-800 text-center text-xs text-slate-400">
+                    Nenhum arquivo processado.
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-slate-800 justify-end">
+                <button onclick="closeImportCsvModal()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button onclick="processAndUploadCSV()" id="btn-confirm-import-csv" disabled class="bg-agroGold hover:bg-agroGoldHover text-agroDark font-bold px-5 py-2.5 rounded-xl text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-upload"></i> Processar & Sincronizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Cadastro de Cliente -->
+    <div id="modal-cadastro-cliente" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-lg text-white">Cadastrar Novo Cliente</h3>
+                <button onclick="closeRegisterClientModal()" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">WhatsApp / Telefone</label>
+                    <input type="text" id="client-whatsapp" placeholder="Ex: 551399855xxxx" class="w-full bg-slate-850 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-400 font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nome Completo</label>
+                    <input type="text" id="client-name" placeholder="Ex: Sidnei Testa" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Endereço Completo de Entrega</label>
+                    <textarea id="client-address" rows="3" placeholder="Ex: Avenida Monteiro Lobato, 8730, Jussara - Mongaguá - SP" class="w-full bg-slate-850 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-agroGold"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-slate-800 justify-end">
+                <button onclick="closeRegisterClientModal()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button onclick="submitClientRegistration()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-lg flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-circle-check"></i> Salvar Cliente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÁREA DE IMPRESSÃO TÉRMICA DO RECIBO -->
+    <div id="print-receipt-section" class="hidden"></div>
+
+    <!-- LÓGICA JAVASCRIPT CORRIGIDA E CORRIGIDA NO AMBIENTE -->
+    <script>
+        // Configurações Locais
+        let EVO_API_URL = localStorage.getItem('evo_url') || "https://evo.studiotesta.com.br";
+        let EVO_INSTANCE = localStorage.getItem('evo_instance') || "redo-souza-muneratti";
+        let EVO_APIKEY = localStorage.getItem('evo_apikey') || "Veludo777";
+        let N8N_WEBHOOK_URL = localStorage.getItem('n8n_url') || "https://n8n.studiotesta.com.br/webhook/agrofenix-webhook";
+
+        // Áudio sintetizado
+        let audioCtx = null;
+        let alarmInterval = null;
+
+        // Estado do Banco de Dados
+        let localPedidos = [];
+        let localVendas = [];
+        let localEstoque = [];
+        let deletedChatTimestamps = JSON.parse(localStorage.getItem('crm_deleted_timestamps') || '{}');
+        let chatDrafts = JSON.parse(localStorage.getItem('crm_chat_drafts') || '{}');
+
+        // Estoque Padrão Fallback
+        const DEFAULT_ESTOQUE = [
+            { id: 1, Produto: "Ração Golden Formula Frango e Arroz (Granel)", Preco_KG: "14.50", Venda_Granel: "Sim", Estoque_Atual: "120", Marca: "Golden", Validade: "2027-10-15", Quilos: "15.00", Unidades: "1" },
+            { id: 2, Produto: "Ração Premier Pet Gatos Castrados (Granel)", Preco_KG: "22.00", Venda_Granel: "Sim", Estoque_Atual: "85", Marca: "Premier", Validade: "2027-08-20", Quilos: "10.00", Unidades: "1" },
+            { id: 3, Produto: "Coleira Antipulgas Seresto Cães Médios", Preco_KG: "189.90", Venda_Granel: "Não", Estoque_Atual: "15", Marca: "Bayer", Validade: "2029-01-01", Quilos: "0.20", Unidades: "1" },
+            { id: 4, Produto: "Shampoo Hipoalergênico Pet Clean 500ml", Preco_KG: "24.50", Venda_Granel: "Não", Estoque_Atual: "32", Marca: "Pet Clean", Validade: "2028-11-30", Quilos: "0.50", Unidades: "1" }
+        ];
+
+        let activeChatId = "";
+        let localChats = [];
+        let csvParsedData = null;
+        let activeCrmSubtab = 'contacts';
+
+        // Hashes para Controle de Renderização Invisível (Zero Pisca-Pisca)
+        let lastChatsHash = "";
+        let lastActiveChatHash = "";
+
+        // SOM ALTO DE NOTIFICAÇÃO ESTILO WHATSAPP WEB
+        function playWhatsAppNotificationSound() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const now = audioCtx.currentTime;
+                
+                // Tom 1: 950 Hz (Suave e Alto)
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(950, now);
+                gain1.gain.setValueAtTime(0.45, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.15);
+
+                // Tom 2: 1400 Hz (Eco Harmônico agudo do WhatsApp)
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(1400, now + 0.09);
+                gain2.gain.setValueAtTime(0.5, now + 0.09);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.30);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(now + 0.09);
+                osc2.stop(now + 0.30);
+            } catch(e) {
+                console.warn("Áudio suspenso:", e);
+            }
+        }
+
+        // DESBLOQUEIA O ÁUDIO AUTOMATICAMENTE NO PRIMEIRA CLIQUE NA PÁGINA
+        document.addEventListener('click', () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
+
+        // ATALHO ESC PARA MODO DE ESPERA
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                deselectActiveChat();
+            }
+        });
+
+        // MODO DE ESPERA: FECHA O CHAT ATIVO E ATIVA ESCUTA DE ALERTAS SONOROS PARA TODOS
+        function deselectActiveChat() {
+            if (!activeChatId) return;
+
+            // Salva rascunho antes de fechar
+            const currentInput = document.getElementById('chat-input-text').value;
+            if (currentInput.trim().length > 0) {
+                chatDrafts[activeChatId] = currentInput;
+            } else {
+                delete chatDrafts[activeChatId];
+            }
+            localStorage.setItem('crm_chat_drafts', JSON.stringify(chatDrafts));
+
+            activeChatId = "";
+            lastActiveChatHash = "";
+
+            document.getElementById('active-chat-avatar').src = "https://github.com/studiotestabr/sitefacil/blob/964481b5bf39865100f5ff4523a7f19ac0809eb4/logos/logo_agrofenix.png?raw=true";
+            document.getElementById('active-chat-name').innerText = "Selecione uma conversa";
+            document.getElementById('active-chat-phone').innerText = "Inicie o monitoramento do CRM";
+
+            document.getElementById('chat-messages-container').innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-slate-500 space-y-2">
+                    <i class="fa-solid fa-comments text-4xl text-slate-700"></i>
+                    <p class="text-sm">Selecione uma conversa para monitorar as mensagens.</p>
+                </div>
+            `;
+
+            document.getElementById('chat-input-text').value = "";
+
+            renderCRMContacts(true);
+            showToast("Modo de Espera", "Nenhuma conversa selecionada. Alertas sonoros ativos para todos os clientes!");
+        }
+
+        // CAPTURA DE RASCUNHO EM TEMPO REAL
+        function handleChatInput() {
+            if (!activeChatId) return;
+            const text = document.getElementById('chat-input-text').value;
+            if (text.trim().length > 0) {
+                chatDrafts[activeChatId] = text;
+            } else {
+                delete chatDrafts[activeChatId];
+            }
+            localStorage.setItem('crm_chat_drafts', JSON.stringify(chatDrafts));
+            renderCRMContacts(false);
+        }
+
+        // VERIFICA SE O CHAT ESTÁ DELETADO E SE NENHUMA MENSAGEM NOVA CHEGOU DEPOIS DA DELEÇÃO
+        function isChatDeletedAndOld(c, realPhone, jid) {
+            const delTime = deletedChatTimestamps[realPhone] || deletedChatTimestamps[jid] || (c.remoteJidAlt && deletedChatTimestamps[c.remoteJidAlt]);
+            
+            if (!delTime) return false;
+
+            let chatTime = 0;
+            if (c.conversationTimestamp) {
+                chatTime = Number(c.conversationTimestamp) * 1000;
+                if (chatTime < 100000000000) chatTime *= 1000;
+            } else if (c.updatedAt) {
+                chatTime = new Date(c.updatedAt).getTime();
+            } else if (c.lastMessageRecvTimestamp) {
+                chatTime = Number(c.lastMessageRecvTimestamp) * 1000;
+            }
+
+            if (chatTime === 0 || chatTime <= delTime) {
+                return true;
+            }
+
+            // CHEGOU MENSAGEM NOVA APÓS A DELEÇÃO! Reativa o chat
+            delete deletedChatTimestamps[realPhone];
+            delete deletedChatTimestamps[jid];
+            if (c.remoteJidAlt) delete deletedChatTimestamps[c.remoteJidAlt];
+            localStorage.setItem('crm_deleted_timestamps', JSON.stringify(deletedChatTimestamps));
+            return false;
+        }
+
+        // EXCLUSÃO DE ATENDIMENTO GRAVANDO O TIMESTAMP DE CORTE
+        async function deleteChat(whatsapp, event) {
+            if(event) event.stopPropagation();
+            
+            const chat = localChats.find(c => c.whatsapp === whatsapp || c.jid === whatsapp);
+            if(!chat) return;
+
+            if(!confirm(`Deseja EXCLUIR DEFINITIVAMENTE o histórico com "${chat.nome_cliente}"? (Caso ele mande uma nova mensagem, a conversa reaparecerá no topo!)`)) return;
+
+            const targetJid = chat.jid || `${whatsapp}@s.whatsapp.net`;
+            const nowEpoch = Date.now();
+
+            deletedChatTimestamps[whatsapp] = nowEpoch;
+            deletedChatTimestamps[targetJid] = nowEpoch;
+            if (chat.lid) deletedChatTimestamps[chat.lid] = nowEpoch;
+            localStorage.setItem('crm_deleted_timestamps', JSON.stringify(deletedChatTimestamps));
+
+            delete chatDrafts[whatsapp];
+            delete chatDrafts[targetJid];
+            localStorage.setItem('crm_chat_drafts', JSON.stringify(chatDrafts));
+
+            localChats = localChats.filter(c => c.whatsapp !== whatsapp && c.jid !== targetJid);
+            localStorage.removeItem(`crm_history_${whatsapp}`);
+            localStorage.removeItem(`crm_history_${chat.jid}`);
+
+            if (activeChatId === whatsapp || activeChatId === chat.jid) {
+                activeChatId = "";
+                document.getElementById('chat-messages-container').innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-500 space-y-2">
+                        <i class="fa-solid fa-comments text-4xl text-slate-700"></i>
+                        <p class="text-sm">Selecione uma conversa para monitorar as mensagens.</p>
+                    </div>
+                `;
+                document.getElementById('active-chat-name').innerText = "Selecione uma conversa";
+                document.getElementById('active-chat-phone').innerText = "Inicie o monitoramento do CRM";
+                document.getElementById('chat-input-text').value = "";
+            }
+
+            renderCRMContacts(true);
+            showToast("Conversa Excluída", `Atendimento de ${chat.nome_cliente} apagado.`);
+
+            try {
+                await fetch(`${EVO_API_URL}/chat/deleteChat/${EVO_INSTANCE}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': EVO_APIKEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "where": {
+                            "remoteJid": targetJid
+                        }
+                    })
+                });
+            } catch (err) {}
+        }
+
+        // Alternador de Abas SPA
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-agroGold', 'font-semibold');
+                btn.classList.add('text-slate-300');
+            });
+            const activeBtn = document.getElementById(`btn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-slate-800', 'text-agroGold', 'font-semibold');
+                activeBtn.classList.remove('text-slate-300');
+            }
+
+            if(tabName === 'crm') fetchEvolutionChats();
+            else if(tabName === 'pedidos') syncAllData();
+            else if(tabName === 'estoque') loadProductsData();
+        }
+
+        function showToast(title, body) {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-body').innerText = body;
+            
+            toast.classList.remove('translate-x-96');
+            setTimeout(() => toast.classList.add('translate-x-96'), 4500);
+        }
+
+        // Alerta sonoro
+        function playIncomingOrderAlarm() {
+            if (alarmInterval) return;
+            document.getElementById('alarm-banner').classList.remove('hidden');
+            document.getElementById('order-alarm-indicator').classList.remove('hidden');
+
+            alarmInterval = setInterval(() => {
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.5);
+                } catch (e) {}
+            }, 1200);
+        }
+
+        function stopIncomingOrderAlarm() {
+            if (alarmInterval) {
+                clearInterval(alarmInterval);
+                alarmInterval = null;
+            }
+            document.getElementById('alarm-banner').classList.add('hidden');
+            document.getElementById('order-alarm-indicator').classList.add('hidden');
+        }
+
+        // Segurança Config
+        function openLoginModal() {
+            document.getElementById('login-username').value = "";
+            document.getElementById('login-password').value = "";
+            document.getElementById('modal-login-config').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('modal-login-config').classList.add('hidden');
+        }
+
+        function handleLoginKeyPress(e) { if (e.key === 'Enter') submitConfigLogin(); }
+
+        async function submitConfigLogin() {
+            const user = document.getElementById('login-username').value.trim();
+            const pass = document.getElementById('login-password').value;
+            const btn = document.getElementById('btn-submit-login');
+
+            if (!user || !pass) return showToast("Dados Incompletos", "Informe usuário e senha.");
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Validando...`;
+
+            let loginUrl = N8N_WEBHOOK_URL.replace(/\/webhook\/.*$/, '/webhook/login-evo-agrofenix');
+
+            try {
+                const response = await fetch(loginUrl, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Basic " + btoa(`${user}:${pass}`),
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ action: "request_config_access", timestamp: new Date().toISOString() })
+                });
+
+                if (response.ok) {
+                    showToast("Acesso Liberado", "Credenciais válidas!");
+                    closeLoginModal();
+                    toggleConfigModal(true);
+                } else {
+                    showToast("Não Autorizado", "Usuário ou senha incorretos.");
+                }
+            } catch (err) {
+                showToast("Erro de Conexão", "Não foi possível validar no n8n.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-key"></i> Entrar`;
+            }
+        }
+
+        // ============================================================
+        // SISTEMA DE CRM REAL-TIME COM MENSAGENS NÃO LIDAS NO TOPO (#1)
+        // ============================================================
+        let chatPollingInterval = null;
+
+        function startRealTimePolling() {
+            stopRealTimePolling();
+            chatPollingInterval = setInterval(() => {
+                if (activeChatId) silentRefreshMessages(activeChatId);
+                silentRefreshChats();
+            }, 2500);
+        }
+
+        function stopRealTimePolling() {
+            if (chatPollingInterval) clearInterval(chatPollingInterval);
+        }
+
+        function saveChatHistoryToLocalStorage(whatsapp, mensagens) {
+            try { localStorage.setItem(`crm_history_${whatsapp}`, JSON.stringify(mensagens)); } catch (e) {}
+        }
+
+        function loadChatHistoryFromLocalStorage(whatsapp) {
+            try {
+                const stored = localStorage.getItem(`crm_history_${whatsapp}`);
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) { return []; }
+        }
+
+        function mergeAndSortMessages(existing, incoming) {
+            const map = new Map();
+
+            const normalizeText = (txt) => (txt || "").trim().toLowerCase().replace(/\s+/g, ' ');
+
+            const makeDedupeKey = (msg) => {
+                const normText = normalizeText(msg.texto);
+                const isOut = (msg.remetente === 'bot' || msg.remetente === 'humano');
+                
+                if (normText.length > 0) {
+                    const senderType = isOut ? 'out' : 'in';
+                    return `${senderType}_${msg.timestamp || ''}_${normText}`;
+                }
+                return msg.id || Math.random().toString();
+            };
+
+            if (Array.isArray(existing)) {
+                existing.forEach(m => {
+                    map.set(makeDedupeKey(m), m);
+                });
+            }
+
+            if (Array.isArray(incoming)) {
+                incoming.forEach(m => {
+                    const key = makeDedupeKey(m);
+                    const existingMsg = map.get(key);
+                    
+                    if (existingMsg && existingMsg.remetente === 'humano') {
+                        m.remetente = 'humano';
+                    }
+                    map.set(key, m);
+                });
+            }
+
+            const merged = Array.from(map.values());
+            merged.sort((a, b) => (a.epoch || 0) - (b.epoch || 0));
+            return merged;
+        }
+
+        function changeCrmSubtab(subtab) {
+            activeCrmSubtab = subtab;
+            document.getElementById('crm-subtab-contacts').className = subtab === 'contacts' ? "flex-1 py-3 text-center font-bold text-agroGold border-b-2 border-agroGold transition-all" : "flex-1 py-3 text-center font-bold text-slate-400 hover:text-white transition-all";
+            document.getElementById('crm-subtab-groups').className = subtab === 'groups' ? "flex-1 py-3 text-center font-bold text-agroGold border-b-2 border-agroGold transition-all" : "flex-1 py-3 text-center font-bold text-slate-400 hover:text-white transition-all";
+            renderCRMContacts(true);
+        }
+
+        function extractRealPhoneNumber(c) {
+            if (c.remoteJidAlt && c.remoteJidAlt.includes('@s.whatsapp.net')) {
+                return c.remoteJidAlt.split('@')[0];
+            }
+            if (c.remoteJid && c.remoteJid.includes('@s.whatsapp.net')) {
+                return c.remoteJid.split('@')[0];
+            }
+            if (c.id && c.id.includes('@s.whatsapp.net')) {
+                return c.id.split('@')[0];
+            }
+            const jid = c.remoteJid || c.id || "";
+            return jid.split('@')[0] || (c.id || "").replace(/\D/g, '');
+        }
+
+        // RETORNA A DATA/HORA DA MENSAGEM MAIS RECENTE EM MILISSEGUNDOS EXATOS
+        function getChatLatestEpoch(chat) {
+            let maxEpoch = chat.updatedAt || 0;
+            if (maxEpoch < 100000000000) maxEpoch *= 1000;
+
+            if (chat.mensagens && chat.mensagens.length > 0) {
+                const lastMsg = chat.mensagens[chat.mensagens.length - 1];
+                if (lastMsg && lastMsg.epoch) {
+                    let msgEpoch = Number(lastMsg.epoch);
+                    if (msgEpoch < 100000000000) msgEpoch *= 1000;
+                    if (msgEpoch > maxEpoch) maxEpoch = msgEpoch;
+                }
+            }
+            return maxEpoch;
+        }
+
+        async function fetchEvolutionChats() {
+            const container = document.getElementById('crm-contact-list');
+            if (!container) return;
+            
+            container.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs"><i class="fa-solid fa-spinner animate-spin text-agroGold mb-2 block text-lg"></i>Buscando conversas...</div>`;
+
+            try {
+                const response = await fetch(`${EVO_API_URL}/chat/findChats/${EVO_INSTANCE}`, {
+                    method: 'POST',
+                    headers: { 'apikey': EVO_APIKEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+
+                if(!response.ok) throw new Error(`HTTP ${response.status}`);
+                const rawChats = await response.json();
+                
+                localChats = rawChats.map(c => {
+                    const jid = c.remoteJid || c.id || "";
+                    if (!jid || !jid.includes('@')) return null;
+
+                    const realPhone = extractRealPhoneNumber(c);
+
+                    if (isChatDeletedAndOld(c, realPhone, jid)) {
+                        return null;
+                    }
+
+                    let chatTime = 0;
+                    if (c.conversationTimestamp) {
+                        chatTime = Number(c.conversationTimestamp) * 1000;
+                        if (chatTime < 100000000000) chatTime *= 1000;
+                    } else if (c.updatedAt) {
+                        chatTime = new Date(c.updatedAt).getTime();
+                    }
+
+                    return {
+                        jid: jid,
+                        lid: c.remoteJidAlt || c.lid || "",
+                        whatsapp: realPhone,
+                        nome_cliente: c.name || c.pushName || c.subject || realPhone,
+                        ia_ativa: localStorage.getItem(`ia_ativa_${realPhone}`) !== "false",
+                        avatar: c.profilePicUrl || `https://placehold.co/100x100/0c1322/fbbf24?text=${(c.name || "U").substring(0,2)}`,
+                        mensagens: loadChatHistoryFromLocalStorage(realPhone),
+                        isGroup: jid.endsWith('@g.us'),
+                        naoLidas: c.unreadCount || 0,
+                        updatedAt: chatTime
+                    };
+                }).filter(Boolean);
+
+                renderCRMContacts(true);
+                
+                if (localChats.length > 0 && !activeChatId) {
+                    const firstChat = localChats.find(chat => (activeCrmSubtab === 'groups' ? chat.isGroup : !chat.isGroup));
+                    if (firstChat) selectChat(firstChat.whatsapp);
+                }
+
+                document.getElementById('crm-badge').innerText = localChats.filter(chat => !chat.isGroup && chat.naoLidas > 0).length;
+
+            } catch (err) {
+                container.innerHTML = `<div class="p-6 text-center text-red-400 text-xs"><i class="fa-solid fa-circle-exclamation text-lg mb-2 block"></i>Erro na API: ${err.message}</div>`;
+            }
+        }
+
+        async function silentRefreshChats() {
+            try {
+                const response = await fetch(`${EVO_API_URL}/chat/findChats/${EVO_INSTANCE}`, {
+                    method: 'POST',
+                    headers: { 'apikey': EVO_APIKEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+
+                if(!response.ok) return;
+                const rawChats = await response.json();
+                let shouldPlayAlarm = false;
+                
+                rawChats.forEach(c => {
+                    const jid = c.remoteJid || c.id || "";
+                    if (!jid || !jid.includes('@')) return;
+
+                    const realPhone = extractRealPhoneNumber(c);
+
+                    if (isChatDeletedAndOld(c, realPhone, jid)) {
+                        return;
+                    }
+
+                    let chatTime = 0;
+                    if (c.conversationTimestamp) {
+                        chatTime = Number(c.conversationTimestamp) * 1000;
+                        if (chatTime < 100000000000) chatTime *= 1000;
+                    } else if (c.updatedAt) {
+                        chatTime = new Date(c.updatedAt).getTime();
+                    }
+
+                    const existing = localChats.find(lc => lc.whatsapp === realPhone || lc.jid === jid);
+                    
+                    if (existing) {
+                        existing.nome_cliente = c.name || c.pushName || c.subject || existing.nome_cliente;
+                        if(c.remoteJidAlt) existing.lid = c.remoteJidAlt;
+
+                        if (chatTime > (existing.updatedAt || 0)) {
+                            existing.updatedAt = chatTime;
+
+                            if (existing.whatsapp !== activeChatId) {
+                                existing.temNaoLida = true;
+                                existing.naoLidas = (c.unreadCount && c.unreadCount > 0) ? c.unreadCount : (existing.naoLidas || 0) + 1;
+                                shouldPlayAlarm = true;
+                            }
+                        }
+                    } else {
+                        localChats.push({
+                            jid: jid,
+                            lid: c.remoteJidAlt || c.lid || "",
+                            whatsapp: realPhone,
+                            nome_cliente: c.name || c.pushName || c.subject || realPhone,
+                            ia_ativa: localStorage.getItem(`ia_ativa_${realPhone}`) !== "false",
+                            avatar: c.profilePicUrl || `https://placehold.co/100x100/0c1322/fbbf24?text=U`,
+                            mensagens: loadChatHistoryFromLocalStorage(realPhone),
+                            isGroup: jid.endsWith('@g.us'),
+                            naoLidas: c.unreadCount || 1,
+                            temNaoLida: true,
+                            updatedAt: chatTime
+                        });
+                        shouldPlayAlarm = true;
+                    }
+                });
+
+                if (shouldPlayAlarm) {
+                    playWhatsAppNotificationSound();
+                }
+
+                renderCRMContacts(false);
+            } catch (e) {}
+        }
+
+        // RENDERIZAÇÃO DA LISTA LATERAL (ORDENAÇÃO SUPREMA: NÃO LIDAS E MAIS RECENTES NO TOPO #1)
+        function renderCRMContacts(force = false) {
+            const container = document.getElementById('crm-contact-list');
+            if (!container) return;
+
+            let chatsFiltrados = localChats.filter(chat => {
+                return activeCrmSubtab === 'groups' ? chat.isGroup : !chat.isGroup;
+            });
+
+            // ORDENAÇÃO DE PRIORIDADE WHATSAPP WEB:
+            // Regra 1: Conversas NÃO LIDAS pulam para o TOPO (#1)
+            // Regra 2: Entre conversas do mesmo estado, ordena da mais recente para a mais antiga
+            chatsFiltrados.sort((a, b) => {
+                const unreadA = (a.naoLidas > 0 || a.temNaoLida) ? 1 : 0;
+                const unreadB = (b.naoLidas > 0 || b.temNaoLida) ? 1 : 0;
+
+                if (unreadB !== unreadA) {
+                    return unreadB - unreadA; // Não lidas vão direto para o TOPO
+                }
+
+                const epochA = getChatLatestEpoch(a);
+                const epochB = getChatLatestEpoch(b);
+                return epochB - epochA; // Mais recente no topo
+            });
+
+            const currentHash = JSON.stringify(chatsFiltrados.map(c => {
+                const draft = chatDrafts[c.whatsapp] || chatDrafts[c.jid] || '';
+                const last = (c.mensagens && c.mensagens.length > 0) ? c.mensagens[c.mensagens.length - 1] : null;
+                return [c.whatsapp, c.nome_cliente, c.ia_ativa, activeChatId === c.whatsapp, c.naoLidas, c.temNaoLida, draft, last ? last.texto : ''];
+            }));
+
+            if (!force && currentHash === lastChatsHash) return;
+            lastChatsHash = currentHash;
+
+            container.innerHTML = '';
+
+            if (chatsFiltrados.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs">Nenhum atendimento nesta aba.</div>`;
+                return;
+            }
+
+            chatsFiltrados.forEach(chat => {
+                const ultimaMsg = (chat.mensagens && chat.mensagens.length > 0) ? chat.mensagens[chat.mensagens.length - 1] : null;
+                const draftText = chatDrafts[chat.whatsapp] || chatDrafts[chat.jid] || '';
+                let msgTextoPreview = "";
+                let isDraft = false;
+
+                if (draftText.trim().length > 0) {
+                    msgTextoPreview = `Rascunho: ${draftText.trim()}`;
+                    isDraft = true;
+                } else {
+                    msgTextoPreview = ultimaMsg ? ultimaMsg.texto : "Visualizar histórico...";
+                }
+
+                const badgeIA = chat.ia_ativa ? 
+                    `<span class="bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] font-bold px-1.5 py-0.5 rounded-md">Nicolas On</span>` :
+                    `<span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold px-1.5 py-0.5 rounded-md">Nicolas Off</span>`;
+
+                const isSelected = activeChatId === chat.whatsapp;
+                
+                const temNaoLida = (chat.naoLidas > 0 || chat.temNaoLida) && !isSelected;
+                const activeStyle = isSelected ? 
+                    'bg-slate-800/80 border-l-4 border-agroGold' : 
+                    (temNaoLida ? 'bg-green-500/10 border-l-4 border-green-500 font-bold animate-pulse' : 'hover:bg-slate-800/30');
+
+                const unreadBadge = (temNaoLida && chat.naoLidas > 0) ? 
+                    `<span class="bg-green-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full animate-bounce">${chat.naoLidas}</span>` : '';
+
+                const isLidRaw = chat.whatsapp.length >= 14 && !chat.whatsapp.startsWith('55');
+                const displayPhone = isLidRaw ? (chat.nome_cliente || "Cliente WhatsApp") : chat.whatsapp;
+
+                const previewTextColorClass = isDraft ? 'text-emerald-400 font-bold' : (temNaoLida ? 'text-green-300 font-bold' : 'text-slate-400');
+
+                container.innerHTML += `
+                    <div onclick="selectChat('${chat.whatsapp}')" class="p-4 cursor-pointer flex gap-3 transition-all relative group ${activeStyle}">
+                        <div class="relative shrink-0">
+                            <img src="${chat.avatar}" class="w-11 h-11 rounded-full border border-slate-700 object-cover">
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-slate-900 online-dot"></span>
+                        </div>
+                        <div class="flex-1 min-w-0 pr-6">
+                            <div class="flex items-center justify-between mb-1">
+                                <h5 class="font-bold text-xs text-white truncate">${chat.isGroup ? '<i class="fa-solid fa-users text-slate-400 mr-1"></i>' : ''}${chat.nome_cliente}</h5>
+                                <span class="text-[10px] text-slate-500">${ultimaMsg ? ultimaMsg.timestamp : ''}</span>
+                            </div>
+                            <p class="text-xs ${previewTextColorClass} truncate pr-2">${msgTextoPreview}</p>
+                            <div class="mt-2 flex items-center justify-between">
+                                <span class="text-[10px] text-slate-500 font-mono">${displayPhone}</span>
+                                <div class="flex items-center gap-1.5">
+                                    ${unreadBadge}
+                                    ${badgeIA}
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="deleteChat('${chat.whatsapp}', event)" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white transition-all p-2 rounded-lg text-xs" title="Deletar conversa">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        async function selectChat(whatsapp) {
+            if (activeChatId) {
+                const currentInput = document.getElementById('chat-input-text').value;
+                if (currentInput.trim().length > 0) {
+                    chatDrafts[activeChatId] = currentInput;
+                } else {
+                    delete chatDrafts[activeChatId];
+                }
+                localStorage.setItem('crm_chat_drafts', JSON.stringify(chatDrafts));
+            }
+
+            activeChatId = whatsapp;
+            const chat = localChats.find(c => c.whatsapp === whatsapp || c.jid === whatsapp);
+            if(!chat) return;
+
+            chat.naoLidas = 0;
+            chat.temNaoLida = false;
+
+            document.getElementById('active-chat-avatar').src = chat.avatar;
+            document.getElementById('active-chat-name').innerHTML = `${chat.isGroup ? '<i class="fa-solid fa-users text-slate-400 mr-2"></i>' : ''}${chat.nome_cliente}`;
+            document.getElementById('active-chat-phone').innerText = `WhatsApp: ${chat.whatsapp}`;
+            document.getElementById('ia-toggle-checkbox').checked = chat.ia_ativa;
+
+            const savedDraft = chatDrafts[whatsapp] || chatDrafts[chat.jid] || '';
+            document.getElementById('chat-input-text').value = savedDraft;
+
+            renderCRMContacts(true);
+            chat.mensagens = loadChatHistoryFromLocalStorage(whatsapp);
+            renderChatMessages(true);
+
+            await silentRefreshMessages(whatsapp);
+        }
+
+        // BUSCA COM CHECKMARKS REAIS E NOTIFICAÇÃO SONORA E VISUAL
+        async function silentRefreshMessages(whatsapp) {
+            const chat = localChats.find(c => c.whatsapp === whatsapp || c.jid === whatsapp);
+            if(!chat) return;
+
+            try {
+                const cleanNumber = whatsapp.replace(/\D/g, '');
+                const jidMain = chat.jid || `${cleanNumber}@s.whatsapp.net`;
+                const jidLid = chat.lid || "";
+
+                const headers = { 'apikey': EVO_APIKEY, 'Content-Type': 'application/json' };
+
+                const fetchPromises = [
+                    fetch(`${EVO_API_URL}/chat/findMessages/${EVO_INSTANCE}`, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({ "where": { "key": { "remoteJid": jidMain } }, "limit": 50 })
+                    })
+                ];
+
+                if (jidLid) {
+                    fetchPromises.push(
+                        fetch(`${EVO_API_URL}/chat/findMessages/${EVO_INSTANCE}`, {
+                            method: 'POST',
+                            headers: headers,
+                            body: JSON.stringify({ "where": { "key": { "remoteJid": jidLid } }, "limit": 50 })
+                        })
+                    );
+                }
+
+                if (cleanNumber.length >= 4) {
+                    fetchPromises.push(
+                        fetch(`${EVO_API_URL}/chat/findMessages/${EVO_INSTANCE}`, {
+                            method: 'POST',
+                            headers: headers,
+                            body: JSON.stringify({ "number": cleanNumber, "limit": 50 })
+                        })
+                    );
+                }
+
+                const responses = await Promise.allSettled(fetchPromises);
+                let rawRecords = [];
+
+                for (const resObj of responses) {
+                    if (resObj.status === 'fulfilled' && resObj.value.ok) {
+                        try {
+                            const data = await resObj.value.json();
+                            let items = [];
+                            if (Array.isArray(data)) items = data;
+                            else if (data.records && Array.isArray(data.records)) items = data.records;
+                            else if (data.messages && Array.isArray(data.messages.records)) items = data.messages.records;
+                            else if (data.messages && Array.isArray(data.messages)) items = data.messages;
+                            
+                            rawRecords = rawRecords.concat(items);
+                        } catch(e) {}
+                    }
+                }
+
+                const isForThisContact = (m) => {
+                    const mJid = m.key?.remoteJid || m.remoteJid || "";
+                    const mAlt = m.key?.remoteJidAlt || m.remoteJidAlt || "";
+
+                    if (chat.jid && (mJid === chat.jid || mAlt === chat.jid)) return true;
+                    if (chat.lid && (mJid === chat.lid || mAlt === chat.lid)) return true;
+
+                    if (cleanNumber && cleanNumber.length >= 4) {
+                        const cleanMJid = mJid.replace(/\D/g, '');
+                        const cleanMAlt = mAlt.replace(/\D/g, '');
+                        if (cleanMJid.includes(cleanNumber) || cleanMAlt.includes(cleanNumber)) return true;
+                    }
+                    return false;
+                };
+
+                const recordsValid = rawRecords.filter(isForThisContact);
+
+                const recordMap = new Map();
+                recordsValid.forEach(m => {
+                    const keyId = m.key?.id || m.id;
+                    if (keyId) recordMap.set(keyId, m);
+                });
+
+                const records = Array.from(recordMap.values());
+
+                const novasMensagens = records.map(m => {
+                    const deMim = m.key ? (m.key.fromMe === true) : (m.fromMe === true);
+                    const msgObj = m.message || m;
+                    
+                    let textMsg = "";
+                    let mediaType = "text";
+
+                    if (msgObj) {
+                        if (msgObj.conversation) textMsg = msgObj.conversation;
+                        else if (msgObj.extendedTextMessage?.text) textMsg = msgObj.extendedTextMessage.text;
+                        else if (msgObj.imageMessage) {
+                            mediaType = "image";
+                            textMsg = msgObj.imageMessage.caption || "📷 Imagem recebida";
+                        } else if (msgObj.audioMessage) {
+                            mediaType = "audio";
+                            textMsg = "🎵 Áudio gravado";
+                        } else if (msgObj.videoMessage) {
+                            mediaType = "video";
+                            textMsg = msgObj.videoMessage.caption || "🎥 Vídeo recebido";
+                        } else if (msgObj.documentMessage || msgObj.documentWithCaptionMessage) {
+                            mediaType = "document";
+                            textMsg = "📄 Documento/Anexo";
+                        } else if (msgObj.ephemeralMessage?.message) {
+                            const eph = msgObj.ephemeralMessage.message;
+                            textMsg = eph.conversation || eph.extendedTextMessage?.text || "Mensagem temporária";
+                        } else if (typeof m.body === 'string') {
+                            textMsg = m.body;
+                        } else if (typeof m.text === 'string') {
+                            textMsg = m.text;
+                        }
+                    }
+
+                    const timeEpoch = m.messageTimestamp ? (m.messageTimestamp * 1000) : Date.now();
+                    const hora = new Date(timeEpoch);
+                    const timestampStr = `${hora.getHours().toString().padStart(2, '0')}:${hora.getMinutes().toString().padStart(2, '0')}`;
+
+                    const statusRaw = m.status || (m.key ? m.key.status : 'PENDING');
+
+                    return {
+                        id: m.key?.id || `msg_${timeEpoch}_${Math.random()}`,
+                        remetente: deMim ? 'bot' : 'cliente',
+                        texto: textMsg || "[Mensagem]",
+                        mediaType: mediaType,
+                        timestamp: timestampStr,
+                        epoch: timeEpoch,
+                        status: statusRaw
+                    };
+                });
+
+                const oldIds = new Set((chat.mensagens || []).map(m => m.id));
+                const mergedList = mergeAndSortMessages(chat.mensagens || [], novasMensagens);
+
+                const hasNewClientMsg = mergedList.some(m => m.remetente === 'cliente' && !oldIds.has(m.id));
+
+                if (JSON.stringify(chat.mensagens) !== JSON.stringify(mergedList)) {
+                    chat.mensagens = mergedList;
+                    saveChatHistoryToLocalStorage(whatsapp, mergedList);
+                    
+                    if (activeChatId === whatsapp) {
+                        renderChatMessages(true);
+                    } else if (hasNewClientMsg) {
+                        chat.naoLidas = (chat.naoLidas || 0) + 1;
+                        chat.temNaoLida = true;
+                        chat.updatedAt = Date.now(); // Força a atualização do horário para ir ao TOPO (#1)
+                        renderCRMContacts(true); // Pula para o TOPO da lista
+                    }
+
+                    if (hasNewClientMsg) {
+                        playWhatsAppNotificationSound();
+                    }
+                }
+
+            } catch (err) {
+                console.warn("silentRefreshMessages erro:", err);
+            }
+        }
+
+        // CHECKMARKS DE STATUS (Enviado ✓, Entregue ✓✓ e Lido ✓✓ azul)
+        function getStatusTicksHtml(status) {
+            const statusStr = String(status || '').toUpperCase();
+            
+            if (statusStr === '4' || statusStr === 'READ' || statusStr === 'PLAYED') {
+                return `<span class="text-sky-400 font-bold ml-1 text-[11px]" title="Lido pelo cliente">✓✓</span>`;
+            }
+            if (statusStr === '2' || statusStr === '3' || statusStr === 'SERVER_ACK' || statusStr === 'DELIVERY_ACK') {
+                return `<span class="text-slate-400 font-bold ml-1 text-[11px]" title="Entregue no celular">✓✓</span>`;
+            }
+            return `<span class="text-slate-500 ml-1 text-[11px]" title="Enviado">✓</span>`;
+        }
+
+        function renderChatMessages(force = false) {
+            const container = document.getElementById('chat-messages-container');
+            if(!container) return;
+
+            const chat = localChats.find(c => c.whatsapp === activeChatId || c.jid === activeChatId);
+            if(!chat || !chat.mensagens) return;
+
+            const currentHash = activeChatId + "_" + JSON.stringify(chat.mensagens.map(m => [m.id, m.texto, m.remetente, m.timestamp, m.status]));
+
+            if (!force && currentHash === lastActiveChatHash) return;
+            lastActiveChatHash = currentHash;
+
+            if (chat.mensagens.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-500 space-y-2">
+                        <i class="fa-solid fa-comments text-4xl text-slate-700"></i>
+                        <p class="text-sm">Nenhuma mensagem nesta conversa.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            chat.mensagens.forEach(msg => {
+                const isMe = msg.remetente === 'bot' || msg.remetente === 'humano';
+                const formattedText = (msg.texto || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+
+                let alignClass = isMe ? "justify-end" : "justify-start";
+                let bubbleStyle = isMe ? 
+                    "bg-emerald-950/80 text-slate-100 border border-emerald-500/30 rounded-2xl rounded-tr-none" : 
+                    "bg-slate-900 text-slate-100 border border-slate-800/80 rounded-2xl rounded-tl-none";
+
+                let nameLabel = "";
+                if (isMe) {
+                    nameLabel = msg.remetente === 'bot' ? 
+                        `<span class="text-[10px] text-amber-400 font-bold block mb-1 flex items-center gap-1"><i class="fa-solid fa-robot"></i> Nicolas (IA)</span>` : 
+                        `<span class="text-[10px] text-sky-400 font-bold block mb-1 flex items-center gap-1"><i class="fa-solid fa-user-tie"></i> Operador</span>`;
+                } else {
+                    nameLabel = `<span class="text-[10px] text-emerald-400 font-bold block mb-1">${chat.nome_cliente}</span>`;
+                }
+
+                let mediaBadge = "";
+                if (msg.mediaType === "image") mediaBadge = `<div class="text-amber-400 text-xs font-bold mb-1 flex items-center gap-1"><i class="fa-solid fa-image"></i> Imagem</div>`;
+                if (msg.mediaType === "audio") mediaBadge = `<div class="text-sky-400 text-xs font-bold mb-1 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Mensagem de Áudio</div>`;
+                if (msg.mediaType === "document") mediaBadge = `<div class="text-indigo-400 text-xs font-bold mb-1 flex items-center gap-1"><i class="fa-solid fa-file"></i> Arquivo Anexo</div>`;
+
+                const ticksHtml = isMe ? getStatusTicksHtml(msg.status) : '';
+
+                container.innerHTML += `
+                    <div class="flex ${alignClass} w-full animate-fade-in">
+                        <div class="max-w-[85%] md:max-w-[70%] ${bubbleStyle} p-3 shadow-md relative">
+                            ${nameLabel}
+                            ${mediaBadge}
+                            <p class="text-xs md:text-sm leading-relaxed whitespace-pre-wrap break-words">${formattedText}</p>
+                            <div class="text-[9px] text-slate-400 text-right mt-1.5 font-mono select-none flex items-center justify-end">
+                                <span>${msg.timestamp}</span>
+                                ${ticksHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function toggleIAForCurrentContact() {
+            if(!activeChatId) return;
+            const chat = localChats.find(c => c.whatsapp === activeChatId || c.jid === activeChatId);
+            if(!chat) return;
+
+            const isChecked = document.getElementById('ia-toggle-checkbox').checked;
+            chat.ia_ativa = isChecked;
+            localStorage.setItem(`ia_ativa_${activeChatId}`, isChecked);
+
+            const logFeed = document.getElementById('ai-chat-feed');
+            logFeed.innerHTML += `
+                <div class="bg-slate-850 p-2 rounded-xl border border-slate-800 text-[10px] text-slate-300">
+                    <span class="text-agroGold font-semibold">Alteração:</span>
+                    <p class="mt-0.5">Assistente Nicolas foi <strong>${isChecked ? 'ATIVADO' : 'PAUSADO'}</strong> para ${chat.nome_cliente}.</p>
+                </div>
+            `;
+            logFeed.scrollTop = logFeed.scrollHeight;
+
+            try {
+                await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "toggle_ia", whatsapp: activeChatId, ia_ativa: isChecked })
+                });
+            } catch (err) {}
+
+            renderCRMContacts(true);
+        }
+
+        async function sendManualChatMessage() {
+            const input = document.getElementById('chat-input-text');
+            const texto = input.value.trim();
+            if(!texto || !activeChatId) return;
+
+            const chat = localChats.find(c => c.whatsapp === activeChatId || c.jid === activeChatId);
+            if(!chat) return;
+
+            if(chat.ia_ativa) {
+                document.getElementById('ia-toggle-checkbox').checked = false;
+                await toggleIAForCurrentContact();
+            }
+
+            const agora = new Date();
+            const timestampStr = `${agora.getHours().toString().padStart(2, '0')}:${agora.getMinutes().toString().padStart(2, '0')}`;
+            
+            const mensagemLocal = {
+                id: `manual_${Date.now()}`,
+                remetente: "humano",
+                texto: texto,
+                mediaType: "text",
+                timestamp: timestampStr,
+                epoch: Date.now(),
+                status: 'PENDING'
+            };
+            
+            chat.mensagens.push(mensagemLocal);
+            chat.updatedAt = Date.now();
+            saveChatHistoryToLocalStorage(activeChatId, chat.mensagens);
+
+            delete chatDrafts[activeChatId];
+            delete chatDrafts[chat.jid];
+            localStorage.setItem('crm_chat_drafts', JSON.stringify(chatDrafts));
+
+            input.value = '';
+            renderChatMessages(true);
+            renderCRMContacts(true);
+
+            try {
+                await fetch(`${EVO_API_URL}/message/sendText/${EVO_INSTANCE}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'apikey': EVO_APIKEY },
+                    body: JSON.stringify({
+                        number: chat.jid || `${activeChatId}@s.whatsapp.net`,
+                        text: texto,
+                        delay: 300
+                    })
+                });
+                showToast("Mensagem Enviada", "Entregue com sucesso!");
+                setTimeout(() => silentRefreshMessages(activeChatId), 1000);
+            } catch (err) {
+                showToast("Modo Offline", "Gravado na tela.");
+            }
+        }
+
+        function handleChatKeyPress(e) { if(e.key === 'Enter') sendManualChatMessage(); }
+
+        // CADASTRO CLIENTE
+        function openRegisterClientModal() {
+            if(!activeChatId) return showToast("Selecione um Chat", "Escolha um contato primeiro.");
+            const chat = localChats.find(c => c.whatsapp === activeChatId || c.jid === activeChatId);
+            document.getElementById('client-whatsapp').value = activeChatId;
+            document.getElementById('client-name').value = chat ? chat.nome_cliente : "";
+            document.getElementById('client-address').value = "";
+            document.getElementById('modal-cadastro-cliente').classList.remove('hidden');
+        }
+
+        function closeRegisterClientModal() { document.getElementById('modal-cadastro-cliente').classList.add('hidden'); }
+
+        async function submitClientRegistration() {
+            const whatsapp = document.getElementById('client-whatsapp').value.trim();
+            const nome = document.getElementById('client-name').value.trim();
+            const endereco = document.getElementById('client-address').value.trim();
+
+            if(!nome || !whatsapp) return showToast("Aviso", "Preencha Nome e WhatsApp.");
+
+            closeRegisterClientModal();
+            showToast("Salvando...", "Gravando cliente...");
+
+            try {
+                await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "save_client", nome, whatsapp, endereco })
+                });
+                showToast("Sucesso", "Cliente salvo no Postgres!");
+            } catch(e) {
+                showToast("Offline", "Salvo na memória local.");
+            }
+        }
+
+        // ============================================================
+        // FLUXO DE PEDIDOS & PRECIFICAÇÃO COM PIX & IMPRESSÃO TÉRMICA
+        // ============================================================
+        async function syncAllData() {
+            showToast("Sincronizando...", "Buscando dados no Postgres...");
+            try {
+                const res = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "get_active_orders" })
+                });
+
+                if(!res.ok) throw new Error();
+
+                const data = await res.json();
+                localPedidos = data.pedidos || [];
+                localVendas = data.vendas || [];
+
+                document.getElementById('stat-faturamento').innerText = `R$ ${(data.faturamento_hoje || 0).toFixed(2).replace('.', ',')}`;
+                document.getElementById('stat-vendas-mes').innerText = `R$ ${(data.faturamento_mes || 0).toFixed(2).replace('.', ',')}`;
+
+                renderTablePedidos();
+                showToast("Sincronizado", "Dados atualizados!");
+
+            } catch (err) {
+                document.getElementById('sync-status-indicator').innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Offline`;
+            }
+        }
+
+        function renderTablePedidos() {
+            const container = document.getElementById('pedidos-cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (localPedidos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 text-center p-12 bg-slate-900 rounded-2xl border border-slate-800 text-slate-500">
+                        <i class="fa-solid fa-folder-open text-4xl mb-3"></i>
+                        <p class="text-sm">Nenhum pedido ativo no momento.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            localPedidos.forEach(p => {
+                const totalPedido = p.total ? parseFloat(p.total) : 0;
+                const fretePedido = p.frete ? parseFloat(p.frete) : 0;
+                const totalGeral = totalPedido + fretePedido;
+
+                let cardActions = '';
+                let statusBadge = '';
+
+                if (p.status === 'aguardando_precificacao') {
+                    statusBadge = `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-xs px-2.5 py-1 rounded-md font-bold">Aguardando Precificação</span>`;
+                    cardActions = `
+                        <button onclick="openPrecificarModal(${p.id}, '${p.nome_cliente}', '${p.itens}', '${p.whatsapp}')" class="bg-agroGold hover:bg-agroGoldHover text-agroDark text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-calculator"></i> Precificar & Gerar PIX
+                        </button>
+                    `;
+                } else if (p.status === 'aguardando_pagamento') {
+                    statusBadge = `<span class="bg-blue-500/15 text-blue-400 border border-blue-500/30 text-xs px-2.5 py-1 rounded-md font-bold">Aguardando Pagamento</span>`;
+                    cardActions = `
+                        <button onclick="printOrderReceipt(${p.id})" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 px-3.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-print"></i> Imprimir Recibo
+                        </button>
+                    `;
+                } else {
+                    statusBadge = `<span class="bg-green-500/15 text-green-400 border border-green-500/30 text-xs px-2.5 py-1 rounded-md font-bold">Em Separação</span>`;
+                    cardActions = `
+                        <button onclick="printOrderReceipt(${p.id})" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 px-3.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-print"></i> Imprimir Recibo
+                        </button>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div>
+                                <span class="text-xs text-slate-500 font-mono">ID: #${p.id}</span>
+                                <h4 class="font-extrabold text-white text-base">${p.nome_cliente}</h4>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div class="space-y-2 text-sm text-slate-300">
+                            <p class="text-xs text-slate-400">${p.endereco_entrega || 'Retirada na Loja'}</p>
+                            <p class="font-bold text-agroGold whitespace-pre-line">${p.itens}</p>
+                            <div class="pt-2 border-t border-slate-800 flex justify-between font-bold text-white">
+                                <span>Total:</span>
+                                <span class="text-green-400">R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 pt-2">${cardActions}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Modal Precificação & PIX
+        function openPrecificarModal(id, nome, itens, whatsapp) {
+            document.getElementById('precificar-order-id').value = id;
+            document.getElementById('precificar-cliente-nome').value = nome;
+            document.getElementById('precificar-itens-raw').value = itens;
+            document.getElementById('precificar-whatsapp').value = whatsapp;
+            document.getElementById('precificar-subtotal').value = "";
+            document.getElementById('precificar-frete').value = "0.00";
+            document.getElementById('precificar-total-geral').innerText = "R$ 0,00";
+            document.getElementById('pix-display-area').classList.add('hidden');
+            document.getElementById('modal-precificar').classList.remove('hidden');
+        }
+
+        function closePrecificarModal() { document.getElementById('modal-precificar').classList.add('hidden'); }
+
+        function atualizarTotalModal() {
+            const sub = parseFloat(document.getElementById('precificar-subtotal').value || 0);
+            const frete = parseFloat(document.getElementById('precificar-frete').value || 0);
+            document.getElementById('precificar-total-geral').innerText = `R$ ${(sub + frete).toFixed(2).replace('.', ',')}`;
+        }
+
+        async function submitPricingAndGeneratePix() {
+            const id = document.getElementById('precificar-order-id').value;
+            const whatsapp = document.getElementById('precificar-whatsapp').value;
+            const subtotal = parseFloat(document.getElementById('precificar-subtotal').value || 0);
+            const frete = parseFloat(document.getElementById('precificar-frete').value || 0);
+            const total = subtotal + frete;
+
+            if (total <= 0) return showToast("Aviso", "Informe um valor para o subtotal.");
+
+            const btn = document.getElementById('btn-submit-pix');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Gerando PIX...`;
+
+            try {
+                const res = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "save_order_pricing", id, whatsapp, subtotal, frete, total })
+                });
+
+                const data = await res.json();
+                
+                if (data.pix_qrcode && data.pix_copia_cola) {
+                    document.getElementById('pix-qrcode-img').src = data.pix_qrcode;
+                    document.getElementById('pix-copia-cola-input').value = data.pix_copia_cola;
+                    document.getElementById('pix-display-area').classList.remove('hidden');
+                    showToast("PIX Gerado", "QR Code pronto e enviado!");
+                } else {
+                    showToast("Sucesso", "Preços gravados e enviados ao WhatsApp!");
+                    closePrecificarModal();
+                }
+
+                syncAllData();
+            } catch(e) {
+                showToast("Erro", "Falha ao comunicar com n8n.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-qrcode"></i> Enviar PIX & Salvar Pedido`;
+            }
+        }
+
+        function copiarPixCopiaCola() {
+            const input = document.getElementById('pix-copia-cola-input');
+            input.select();
+            document.execCommand('copy');
+            showToast("Copiado!", "Chave PIX Copia e Cola copiada.");
+        }
+
+        // Impressão Térmica de Recibo
+        function printOrderReceipt(orderId) {
+            const p = localPedidos.find(item => item.id == orderId);
+            if (!p) return showToast("Erro", "Pedido não encontrado.");
+
+            const receiptContainer = document.getElementById('print-receipt-section');
+            const dataAtual = new Date().toLocaleString('pt-BR');
+
+            receiptContainer.innerHTML = `
+                <div style="width: 280px; font-size: 12px; font-family: monospace; line-height: 1.4;">
+                    <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+                        <h2 style="margin: 0; font-size: 16px; font-weight: bold;">AGROFENIX</h2>
+                        <p style="margin: 0;">Central de Vendas & Petshop</p>
+                        <p style="margin: 0;">Mongaguá - SP</p>
+                        <p style="margin: 0;">Data: ${dataAtual}</p>
+                    </div>
+
+                    <div style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+                        <strong>PEDIDO #${p.id}</strong><br>
+                        Cliente: ${p.nome_cliente}<br>
+                        Tel: ${p.whatsapp}<br>
+                        Endereço: ${p.endereco_entrega || 'Retirada no Balcão'}
+                    </div>
+
+                    <div style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+                        <strong>ITENS SOLICITADOS:</strong><br>
+                        ${(p.itens || '').replace(/\n/g, '<br>')}
+                    </div>
+
+                    <div style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+                        Subtotal: R$ ${parseFloat(p.subtotal || 0).toFixed(2)}<br>
+                        Frete: R$ ${parseFloat(p.frete || 0).toFixed(2)}<br>
+                        <strong style="font-size: 14px;">TOTAL: R$ ${(parseFloat(p.subtotal || 0) + parseFloat(p.frete || 0)).toFixed(2)}</strong>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 10px;">
+                        <p style="margin: 0;">Obrigado pela preferência!</p>
+                        <p style="margin: 0;">AgroFenix - Qualidade e Respeito</p>
+                    </div>
+                </div>
+            `;
+
+            window.print();
+        }
+
+        // ============================================================
+        // ESTOQUE & FILTROS AVANÇADOS
+        // ============================================================
+        async function loadProductsData() {
+            try {
+                const res = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "get_products" })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    localEstoque = (data.produtos || []).map(i => ({
+                        id: i.id,
+                        Produto: i.produto || i.Produto,
+                        Preco_KG: i.preco_kg || i.Preco_KG,
+                        Venda_Granel: i.venda_granel || i.Venda_Granel,
+                        Estoque_Atual: i.estoque_atual || i.Estoque_Atual,
+                        Marca: i.marca || i.Marca || "Geral",
+                        Validade: i.validade || i.Validade || "",
+                        Quilos: i.quilos || 0,
+                        Unidades: i.unidades || 0
+                    }));
+                }
+            } catch(e) {
+                localEstoque = [...DEFAULT_ESTOQUE];
+            }
+            populateMarcaDropdown();
+            renderTableEstoque();
+        }
+
+        function populateMarcaDropdown() {
+            const selectMarca = document.getElementById('filter-stock-marca');
+            if(!selectMarca) return;
+            selectMarca.innerHTML = '<option value="todas">Todas as Marcas</option>';
+
+            const marcas = [...new Set(localEstoque.map(item => item.Marca).filter(Boolean))];
+            marcas.forEach(marca => {
+                selectMarca.innerHTML += `<option value="${marca}">${marca}</option>`;
+            });
+        }
+
+        function filterEstoqueTable() {
+            const search = document.getElementById('search-estoque').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-stock-status').value;
+            const marcaFilter = document.getElementById('filter-stock-marca').value;
+
+            const filtered = localEstoque.filter(item => {
+                const matchesSearch = item.Produto.toLowerCase().includes(search) || item.Marca.toLowerCase().includes(search);
+                
+                let matchesStatus = true;
+                const stock = parseFloat(item.Estoque_Atual);
+                if (statusFilter === 'disponivel') matchesStatus = stock > 10;
+                else if (statusFilter === 'baixo') matchesStatus = stock > 0 && stock <= 10;
+                else if (statusFilter === 'esgotado') matchesStatus = stock <= 0;
+
+                let matchesMarca = true;
+                if (marcaFilter !== 'todas') matchesMarca = item.Marca === marcaFilter;
+
+                return matchesSearch && matchesStatus && matchesMarca;
+            });
+
+            renderTableEstoque(filtered);
+        }
+
+        function renderTableEstoque(itemsToRender = localEstoque) {
+            const body = document.getElementById('estoque-table-body');
+            const selectCalc = document.getElementById('calc-racao');
+            if (!body) return;
+            body.innerHTML = '';
+            if(selectCalc) selectCalc.innerHTML = '<option value="0">Escolha um produto...</option>';
+
+            itemsToRender.forEach((e) => {
+                const permitsGranel = (e.Venda_Granel || '').toLowerCase() === 'sim';
+                const statusColor = parseFloat(e.Estoque_Atual) > 10 ? "text-green-400" : (parseFloat(e.Estoque_Atual) > 0 ? "text-amber-400" : "text-red-400");
+                
+                body.innerHTML += `
+                    <tr class="hover:bg-slate-800/20 transition-all text-slate-300 border-b border-slate-800/40">
+                        <td class="p-4">
+                            <span class="font-bold text-white block">${e.Produto}</span>
+                            <span class="text-[10px] text-slate-500 uppercase">Marca: ${e.Marca} · Val: ${e.Validade || '—'}</span>
+                        </td>
+                        <td class="p-4 font-mono font-bold">R$ ${parseFloat(e.Preco_KG || 0).toFixed(2)}</td>
+                        <td class="p-4">
+                            <span class="px-2 py-0.5 rounded-md text-xs font-bold ${permitsGranel ? 'bg-green-500/10 text-green-400' : 'bg-slate-800 text-slate-500'}">
+                                ${permitsGranel ? 'Fracionado' : 'Unidade'}
+                            </span>
+                        </td>
+                        <td class="p-4 font-mono font-bold ${statusColor}">${e.Estoque_Atual} ${permitsGranel ? 'kg' : 'unid'}</td>
+                        <td class="p-4">
+                            <span class="text-xs font-bold ${parseFloat(e.Estoque_Atual) > 0 ? 'text-green-500' : 'text-red-500'}">
+                                ${parseFloat(e.Estoque_Atual) > 0 ? '● Ativo' : '○ Esgotado'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteProduct(${e.id})" class="text-red-400 hover:text-white transition-all"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+
+                if(selectCalc) selectCalc.innerHTML += `<option value="${e.Preco_KG}">${e.Produto}</option>`;
+            });
+        }
+
+        function calcularPrecoGranel() {
+            const valUnit = parseFloat(document.getElementById('calc-racao').value);
+            const pesoG = parseFloat(document.getElementById('calc-peso').value);
+            if (!valUnit || !pesoG) return document.getElementById('calc-resultado').innerText = "R$ 0,00";
+
+            const selectEl = document.getElementById('calc-racao');
+            const permitsGranel = selectEl.options[selectEl.selectedIndex].text.includes('(Granel)');
+            const total = permitsGranel ? (pesoG / 1000) * valUnit : pesoG * valUnit;
+
+            document.getElementById('calc-resultado').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        function updateCalcPreco() { calcularPrecoGranel(); }
+
+        function openAddProductModal() { document.getElementById('modal-produto').classList.remove('hidden'); }
+        function closeAddProductModal() { document.getElementById('modal-produto').classList.add('hidden'); }
+
+        async function submitProductForm() {
+            const pData = { 
+                Produto: document.getElementById('product-name').value, 
+                Marca: document.getElementById('product-marca').value, 
+                Preco_KG: parseFloat(document.getElementById('product-price').value || 0).toFixed(2), 
+                Venda_Granel: document.getElementById('product-granel').value, 
+                Estoque_Atual: document.getElementById('product-stock').value
+            };
+
+            closeAddProductModal();
+            try {
+                await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "add_product", ...pData })
+                });
+                showToast("Sucesso", "Produto cadastrado!");
+                loadProductsData();
+            } catch(e) {
+                showToast("Offline", "Salvo na memória.");
+            }
+        }
+
+        async function deleteProduct(id) {
+            if(!confirm("Excluir este produto?")) return;
+            try {
+                await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "delete_product", id })
+                });
+                showToast("Sucesso", "Produto removido!");
+                loadProductsData();
+            } catch(e) {}
+        }
+
+        // ROUTING FRETE
+        async function calcularRotaFrontend() {
+            const destinoOriginal = document.getElementById('frete-destino').value.trim();
+            if (!destinoOriginal) return showToast("Aviso", "Informe um endereço de destino.");
+
+            const btn = document.getElementById('btn-calcular-rota');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Traçando...`;
+
+            try {
+                const distKm = 5.8;
+                const valorFinal = 5.00 + (distKm * 2.50);
+
+                document.getElementById('rota-distancia').innerText = `${distKm} KM`;
+                document.getElementById('rota-tempo').innerText = `12 min`;
+                document.getElementById('rota-valor-frete').innerText = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+                document.getElementById('rota-valor-frete').dataset.val = valorFinal;
+                showToast("Rota Traçada", "Valores atualizados.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-route"></i> Traçar Rota de Entrega`;
+            }
+        }
+
+        function aplicarFreteGratis() {
+            document.getElementById('rota-valor-frete').innerText = "R$ 0,00";
+            document.getElementById('rota-valor-frete').dataset.val = 0;
+            showToast("Frete Grátis", "Taxa zerada.");
+        }
+
+        // Configurações Globais
+        function toggleConfigModal(show) {
+            const modal = document.getElementById('modal-config');
+            if (show) {
+                document.getElementById('config-evo-url').value = EVO_API_URL;
+                document.getElementById('config-evo-instance').value = EVO_INSTANCE;
+                document.getElementById('config-evo-apikey').value = EVO_APIKEY;
+                document.getElementById('config-n8n-url').value = N8N_WEBHOOK_URL;
+                modal.classList.remove('hidden');
+            } else modal.classList.add('hidden');
+        }
+
+        function saveApiConfigurations() {
+            EVO_API_URL = document.getElementById('config-evo-url').value;
+            EVO_INSTANCE = document.getElementById('config-evo-instance').value;
+            EVO_APIKEY = document.getElementById('config-evo-apikey').value;
+            N8N_WEBHOOK_URL = document.getElementById('config-n8n-url').value;
+
+            localStorage.setItem('evo_url', EVO_API_URL);
+            localStorage.setItem('evo_instance', EVO_INSTANCE);
+            localStorage.setItem('evo_apikey', EVO_APIKEY);
+            localStorage.setItem('n8n_url', N8N_WEBHOOK_URL);
+
+            toggleConfigModal(false);
+            showToast("Salvo", "Configurações atualizadas!");
+            fetchEvolutionChats();
+        }
+
+        function filterChats() {
+            const query = document.getElementById('search-chat').value.toLowerCase();
+            const contacts = document.getElementById('crm-contact-list').children;
+            for(let i = 0; i < contacts.length; i++) {
+                const text = contacts[i].textContent.toLowerCase();
+                contacts[i].style.display = text.indexOf(query) > -1 ? "" : "none";
+            }
+        }
+
+        window.onload = function() {
+            loadProductsData();
+            fetchEvolutionChats();
+            syncAllData();
+            startRealTimePolling();
+        };
+
+        window.addEventListener('beforeunload', () => stopRealTimePolling());
+    </script>
+</body>
+</html>
