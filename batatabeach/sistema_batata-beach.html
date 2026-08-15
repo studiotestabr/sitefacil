@@ -1,0 +1,3156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batata Beach - Central de Delivery</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        batataDark: '#0e0704',
+                        batataCard: '#1a0d08',
+                        batataCardDark: '#120805',
+                        batataHeader: '#22120b',
+                        batataInput: '#2a160d',
+                        batataBorder: '#3d2015',
+                        batataBorderLight: '#54281a',
+                        batataGold: '#f59e0b',
+                        batataGoldHover: '#d97706',
+                        batataOrange: '#f97316',
+                        batataTextMuted: '#a89288',
+                        batataTextDim: '#7a665d'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0e0704;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #120805;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 10px;
+        }
+        .online-dot {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse 1.6s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+
+        .kanban-col {
+            min-width: 310px;
+            max-width: 350px;
+        }
+
+        /* CORREÇÃO DO LAYOUT DE IMPRESSÃO */
+        @media print {
+            body > *:not(#print-receipt-section) {
+                display: none !important;
+            }
+
+            #print-receipt-section { 
+                display: block !important;
+                visibility: visible !important;
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                width: 100% !important; 
+                color: #000 !important; 
+                background: #fff !important; 
+                padding: 10px !important;
+                margin: 0 !important;
+                font-family: monospace !important;
+            }
+
+            #print-receipt-section * { 
+                visibility: visible !important;
+                color: #000 !important;
+            }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="text-amber-50 min-h-screen flex flex-col md:flex-row overflow-hidden bg-batataDark">
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-batataCard border-b md:border-b-0 md:border-r border-batataBorder p-6 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Logo Container -->
+            <div class="flex items-center gap-3 mb-8">
+                <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/batatabeach/Logo_Batata-Beach.png" alt="Batata Beach Logo" class="w-16 h-16 object-contain shrink-0">
+                <div class="flex flex-col justify-center">
+                    <h1 class="text-xl font-black tracking-wider text-white leading-none">BATATA<br>BEACH</h1>
+                    <span class="text-[11px] text-batataGold font-bold tracking-wide mt-1">Central de Delivery</span>
+                </div>
+            </div>
+
+            <!-- Menu de Navegação -->
+            <nav class="space-y-1">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-950/40 text-batataGold font-semibold border border-amber-500/20 transition-all duration-200">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                    <span>Dashboard Geral</span>
+                </button>
+                <button onclick="switchTab('crm')" id="btn-crm" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-amber-100/70 hover:bg-batataInput hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-comments text-lg"></i>
+                    <span>Atendimento WhatsApp</span>
+                    <span id="crm-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                </button>
+                <button onclick="switchTab('pedidos')" id="btn-pedidos" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-amber-100/70 hover:bg-batataInput hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-cart-shopping text-lg"></i>
+                    <span>Gerenciar Pedidos</span>
+                    <span id="order-alarm-indicator" class="hidden w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                </button>
+                <button onclick="switchTab('estoque')" id="btn-estoque" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-amber-100/70 hover:bg-batataInput hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-utensils text-lg"></i>
+                    <span>Estoque & Cardápio</span>
+                </button>
+                <button onclick="switchTab('calculadora')" id="btn-calculadora" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-amber-100/70 hover:bg-batataInput hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-motorcycle text-lg"></i>
+                    <span>Simular Rota & Frete</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="mt-8 pt-6 border-t border-batataBorder text-xs text-batataTextMuted space-y-2">
+            <div class="flex items-center justify-between">
+                <span>Plataforma:</span>
+                <span id="sync-status-indicator" class="text-green-400 font-bold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Conectado
+                </span>
+            </div>
+            <div class="pt-2 border-t border-batataBorder">
+                <a href="https://studiotesta.com.br/" target="_blank" class="text-batataGold hover:underline flex items-center gap-1.5 font-semibold text-[11px]">
+                    <i class="fa-solid fa-cloud"></i> Gerenciado por STUDIOTESTA
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 overflow-y-auto w-full relative h-screen bg-batataDark">
+        
+        <!-- Toast de Notificação -->
+        <div id="toast-notification" class="fixed top-5 right-5 z-50 transform translate-x-96 transition-transform duration-300 bg-batataCard border-l-4 border-batataGold text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm border border-batataBorder">
+            <i class="fa-solid fa-bell text-batataGold text-lg"></i>
+            <div>
+                <p id="toast-title" class="font-bold text-sm">Notificação</p>
+                <p id="toast-body" class="text-xs text-batataTextMuted">Mensagem do sistema.</p>
+            </div>
+        </div>
+
+        <!-- TAB 1: DASHBOARD GERAL -->
+        <section id="tab-dashboard" class="tab-content p-6 md:p-8 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">Painel de Operações</h2>
+                    <p class="text-sm text-batataTextMuted">Indicadores consolidados em tempo real sincronizados via n8n</p>
+                </div>
+                <button onclick="syncAllData()" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2 self-start md:self-auto cursor-pointer">
+                    <i class="fa-solid fa-arrows-rotate"></i> Carregar Dados Reais
+                </button>
+            </div>
+
+            <!-- Cards de Métricas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-batataCard border border-batataBorder p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <span class="text-xs text-batataTextMuted font-semibold tracking-wider uppercase">Faturamento Hoje</span>
+                        <h3 id="stat-faturamento" class="text-2xl font-bold text-white mt-1">R$ 0,00</h3>
+                        <span id="stat-faturamento-desc" class="text-xs text-batataTextDim mt-1 block">Aguardando dados...</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-batataCard border border-batataBorder p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <span class="text-xs text-batataTextMuted font-semibold tracking-wider uppercase">Pedidos em Aberto</span>
+                        <h3 id="stat-pedidos-ativos" class="text-2xl font-bold text-white mt-1">0</h3>
+                        <span id="stat-pedidos-desc" class="text-xs text-batataTextDim mt-1 block">Aguardando sincronização...</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-batataGold/10 border border-batataGold/20 flex items-center justify-center text-batataGold">
+                        <i class="fa-solid fa-spinner text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-batataCard border border-batataBorder p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <span class="text-xs text-batataTextMuted font-semibold tracking-wider uppercase">Faturamento Mensal</span>
+                        <h3 id="stat-vendas-mes" class="text-2xl font-bold text-white mt-1">R$ 0,00</h3>
+                        <span id="stat-vendas-mes-desc" class="text-xs text-batataTextDim mt-1 block">Aguardando consolidação...</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-batataGold">
+                        <i class="fa-solid fa-circle-check text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colunas Principais -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-batataCard border border-batataBorder rounded-2xl p-6 lg:col-span-2 shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-lg text-white">Vendas Recentes</h4>
+                        <span class="text-xs text-batataGold bg-batataGold/10 border border-batataGold/20 px-2.5 py-1 rounded-full font-semibold">Live Feed</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-batataTextMuted border-b border-batataBorder">
+                                    <th class="pb-3 font-semibold">Cliente</th>
+                                    <th class="pb-3 font-semibold">Itens Vendidos</th>
+                                    <th class="pb-3 font-semibold">Status</th>
+                                    <th class="pb-3 font-semibold text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-transactions" class="divide-y divide-batataBorder/50">
+                                <tr class="text-batataTextDim"><td colspan="4" class="py-8 text-center">Nenhuma venda registrada hoje. Clique em "Carregar Dados Reais" para puxar do Postgres.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Monitor Nicolas IA -->
+                <div class="bg-batataCard border border-batataBorder rounded-2xl p-6 flex flex-col h-[350px] shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-lg text-white">Monitor Nicolas IA</h4>
+                        <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
+                    </div>
+                    <div id="ai-chat-feed" class="flex-1 overflow-y-auto space-y-3 pr-2 text-xs font-mono">
+                        <div class="bg-batataCardDark p-2.5 rounded-xl border border-batataBorder text-batataTextMuted">
+                            <span class="text-batataGold font-semibold">Nicolas (IA):</span>
+                            <p class="mt-1">Aguardando interações via API...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: CRM WHATSAPP CHAT -->
+        <section id="tab-crm" class="tab-content hidden h-[calc(100vh-2px)] flex flex-col md:flex-row bg-batataCardDark overflow-hidden">
+            <!-- Lista de Contatos -->
+            <div class="w-full md:w-80 border-b md:border-b-0 md:border-r border-batataBorder flex flex-col bg-batataCard shrink-0 h-2/5 md:h-full">
+                <!-- Busca de Chats -->
+                <div class="p-4 border-b border-batataBorder space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-green-400"></i> CRM Real-Time
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="fetchEvolutionChats()" class="text-batataTextMuted hover:text-batataGold transition-all" title="Forçar recarga dos chats">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </button>
+                            <button onclick="toggleConfigModal(true)" class="text-batataTextMuted hover:text-batataGold transition-all" title="Conexão & QR Code WhatsApp">
+                                <i class="fa-solid fa-qrcode text-green-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-batataTextMuted"></i>
+                        <input type="text" id="search-chat" onkeyup="filterChats()" placeholder="Buscar contato..." class="w-full bg-batataInput border border-batataBorderLight rounded-xl py-2 pl-9 pr-4 text-xs text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                </div>
+
+                <!-- Sub-abas Contatos e Grupos -->
+                <div class="flex border-b border-batataBorder bg-batataCardDark/60 text-xs text-batataTextMuted">
+                    <button id="crm-subtab-contacts" onclick="changeCrmSubtab('contacts')" class="flex-1 py-3 text-center font-bold text-batataGold border-b-2 border-batataGold transition-all">
+                        Contatos
+                    </button>
+                    <button id="crm-subtab-groups" onclick="changeCrmSubtab('groups')" class="flex-1 py-3 text-center font-bold text-batataTextMuted hover:text-white transition-all">
+                        Grupos
+                    </button>
+                </div>
+
+                <!-- Lista Lateral -->
+                <div id="crm-contact-list" class="flex-1 overflow-y-auto divide-y divide-batataBorder/60">
+                    <div class="p-4 text-center text-batataTextDim text-xs">Conecte sua instância nas configurações para visualizar os atendimentos em tempo real.</div>
+                </div>
+            </div>
+
+            <!-- Box de Chat Central -->
+            <div id="crm-chat-box" class="flex-1 flex flex-col bg-batataCardDark h-3/5 md:h-full relative">
+                <!-- Cabeçalho do Chat -->
+                <div id="chat-box-header" class="p-4 border-b border-batataBorder bg-batataCard flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <img id="active-chat-avatar" src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/batatabeach/Logo_Batata-Beach.png" class="w-10 h-10 rounded-full border border-batataGold object-cover" alt="Avatar">
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-batataDark"></span>
+                        </div>
+                        <div>
+                            <h4 id="active-chat-name" class="font-bold text-sm text-white">Selecione uma conversa</h4>
+                            <p id="active-chat-phone" class="text-xs text-batataTextMuted">Inicie o monitoramento do CRM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button onclick="openRegisterClientModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer">
+                            <i class="fa-solid fa-user-plus"></i> Salvar Cliente
+                        </button>
+                        
+                        <!-- Toggle Nicolas IA -->
+                        <div class="flex items-center gap-2 bg-batataHeader px-3 py-1.5 rounded-xl border border-batataBorder">
+                            <i class="fa-solid fa-robot text-batataGold"></i>
+                            <span class="text-xs font-semibold hidden sm:inline">Nicolas (IA)</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="ia-toggle-checkbox" class="sr-only peer" checked onchange="toggleIAForCurrentContact()">
+                                <div class="w-9 h-5 bg-batataInput peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-batataBorder after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+
+                        <!-- Botão Fechar Conversa -->
+                        <button onclick="deselectActiveChat()" class="text-batataTextMuted hover:text-red-400 transition-all p-2 rounded-lg text-sm" title="Fechar conversa (Atalho: ESC)">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Corpo do Chat -->
+                <div id="chat-messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-batataCardDark relative">
+                    <div class="flex flex-col items-center justify-center h-full text-batataTextDim space-y-2">
+                        <i class="fa-solid fa-comments text-4xl text-batataBorder"></i>
+                        <p class="text-sm">Selecione uma conversa para monitorar as mensagens.</p>
+                    </div>
+                </div>
+
+                <!-- Painel de Resposta Citada -->
+                <div id="reply-quote-banner" class="hidden bg-batataCard border-t border-batataBorder p-2.5 px-4 flex items-center justify-between text-xs border-l-4 border-batataGold">
+                    <div class="flex flex-col">
+                        <span class="text-batataGold font-bold text-[10px]">Respondendo à mensagem:</span>
+                        <p id="reply-quote-text" class="text-amber-100/90 truncate max-w-xl font-mono text-[11px]"></p>
+                    </div>
+                    <button onclick="cancelReplyQuote()" class="text-batataTextMuted hover:text-white p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Pop-up de Emojis Expandido -->
+                <div id="emoji-picker-popup" class="hidden absolute bottom-20 left-4 bg-batataCard border border-batataBorder rounded-2xl p-4 shadow-2xl z-40 w-72 max-h-64 overflow-y-auto space-y-3">
+                    <div>
+                        <span class="text-[10px] text-batataGold font-bold uppercase tracking-wider block mb-1">Delícias & Bebidas</span>
+                        <div class="grid grid-cols-6 gap-2 text-lg">
+                            <button onclick="insertEmoji('🥔')" class="hover:scale-125 transition-transform">🥔</button>
+                            <button onclick="insertEmoji('🧀')" class="hover:scale-125 transition-transform">🧀</button>
+                            <button onclick="insertEmoji('🥓')" class="hover:scale-125 transition-transform">🥓</button>
+                            <button onclick="insertEmoji('🍤')" class="hover:scale-125 transition-transform">🍤</button>
+                            <button onclick="insertEmoji('🌶️')" class="hover:scale-125 transition-transform">🌶️</button>
+                            <button onclick="insertEmoji('🍗')" class="hover:scale-125 transition-transform">🍗</button>
+                            <button onclick="insertEmoji('🍟')" class="hover:scale-125 transition-transform">🍟</button>
+                            <button onclick="insertEmoji('🍔')" class="hover:scale-125 transition-transform">🍔</button>
+                            <button onclick="insertEmoji('🥤')" class="hover:scale-125 transition-transform">🥤</button>
+                            <button onclick="insertEmoji('🍺')" class="hover:scale-125 transition-transform">🍺</button>
+                            <button onclick="insertEmoji('😋')" class="hover:scale-125 transition-transform">😋</button>
+                            <button onclick="insertEmoji('😍')" class="hover:scale-125 transition-transform">😍</button>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-batataGold font-bold uppercase tracking-wider block mb-1">Gestos & Reações</span>
+                        <div class="grid grid-cols-6 gap-2 text-lg">
+                            <button onclick="insertEmoji('👍')" class="hover:scale-125 transition-transform">👍</button>
+                            <button onclick="insertEmoji('👌')" class="hover:scale-125 transition-transform">👌</button>
+                            <button onclick="insertEmoji('👏')" class="hover:scale-125 transition-transform">👏</button>
+                            <button onclick="insertEmoji('🙏')" class="hover:scale-125 transition-transform">🙏</button>
+                            <button onclick="insertEmoji('❤️')" class="hover:scale-125 transition-transform">❤️</button>
+                            <button onclick="insertEmoji('😀')" class="hover:scale-125 transition-transform">😀</button>
+                            <button onclick="insertEmoji('😂')" class="hover:scale-125 transition-transform">😂</button>
+                            <button onclick="insertEmoji('😉')" class="hover:scale-125 transition-transform">😉</button>
+                            <button onclick="insertEmoji('🌟')" class="hover:scale-125 transition-transform">🌟</button>
+                            <button onclick="insertEmoji('🎉')" class="hover:scale-125 transition-transform">🎉</button>
+                            <button onclick="insertEmoji('👋')" class="hover:scale-125 transition-transform">👋</button>
+                            <button onclick="insertEmoji('💬')" class="hover:scale-125 transition-transform">💬</button>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-batataGold font-bold uppercase tracking-wider block mb-1">Entrega & Pagamento</span>
+                        <div class="grid grid-cols-6 gap-2 text-lg">
+                            <button onclick="insertEmoji('🛵')" class="hover:scale-125 transition-transform">🛵</button>
+                            <button onclick="insertEmoji('🚗')" class="hover:scale-125 transition-transform">🚗</button>
+                            <button onclick="insertEmoji('📦')" class="hover:scale-125 transition-transform">📦</button>
+                            <button onclick="insertEmoji('⏰')" class="hover:scale-125 transition-transform">⏰</button>
+                            <button onclick="insertEmoji('📍')" class="hover:scale-125 transition-transform">📍</button>
+                            <button onclick="insertEmoji('🗺️')" class="hover:scale-125 transition-transform">🗺️</button>
+                            <button onclick="insertEmoji('💳')" class="hover:scale-125 transition-transform">💳</button>
+                            <button onclick="insertEmoji('💵')" class="hover:scale-125 transition-transform">💵</button>
+                            <button onclick="insertEmoji('🧾')" class="hover:scale-125 transition-transform">🧾</button>
+                            <button onclick="insertEmoji('🏠')" class="hover:scale-125 transition-transform">🏠</button>
+                            <button onclick="insertEmoji('📞')" class="hover:scale-125 transition-transform">📞</button>
+                            <button onclick="insertEmoji('🚀')" class="hover:scale-125 transition-transform">🚀</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input de Envio de Mensagem -->
+                <div class="p-4 border-t border-batataBorder bg-batataCard flex items-center gap-2 relative">
+                    <!-- Botão Emojis -->
+                    <button onclick="toggleEmojiPicker()" class="text-batataTextMuted hover:text-batataGold p-2.5 rounded-xl transition-all text-lg cursor-pointer" title="Emojis">
+                        <i class="fa-regular fa-face-smile"></i>
+                    </button>
+
+                    <!-- Botão Anexar Mídia -->
+                    <button onclick="document.getElementById('chat-file-input').click()" class="text-batataTextMuted hover:text-batataGold p-2.5 rounded-xl transition-all text-lg cursor-pointer" title="Anexar Foto, Vídeo ou Documento">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                    <input type="file" id="chat-file-input" onchange="handleSendMediaFile(this)" class="hidden" accept="image/*,video/*,application/pdf,audio/*">
+
+                    <input type="text" id="chat-input-text" oninput="handleChatInput()" onkeypress="handleChatKeyPress(event)" placeholder="Digite para assumir o atendimento..." class="flex-1 bg-batataInput border border-batataBorderLight rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-batataGold">
+                    
+                    <button onclick="sendManualChatMessage()" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold p-3 rounded-xl transition-all shadow-lg flex items-center justify-center shrink-0 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: GERENCIAR PEDIDOS (KANBAN) -->
+        <section id="tab-pedidos" class="tab-content hidden p-6 md:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-batataBorder pb-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">CRM Kanban de Pedidos Ativos</h2>
+                    <p class="text-sm text-batataTextMuted">Arraste os cards entre as colunas para atualizar a etapa do pedido no banco de dados em tempo real</p>
+                </div>
+                <button onclick="openManualOrderModal()" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2 text-sm cursor-pointer self-start sm:self-auto">
+                    <i class="fa-solid fa-plus-circle"></i> Novo Pedido Manual
+                </button>
+            </div>
+
+            <!-- CONTAINER KANBAN EM COLUNAS ARRASTÁVEIS -->
+            <div class="flex gap-4 overflow-x-auto pb-6 min-h-[calc(100vh-230px)] select-none" id="kanban-board-container">
+                <!-- COLUNA 1: Aguardando Precificação -->
+                <div class="kanban-col bg-batataCard/90 border border-amber-500/30 rounded-2xl flex flex-col shrink-0 shadow-2xl" 
+                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'aguardando_precificacao')">
+                    <div class="p-4 border-b border-batataBorder bg-amber-500/10 rounded-t-2xl flex items-center justify-between">
+                        <span class="font-extrabold text-xs text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> 1. Precificação
+                        </span>
+                        <span id="badge-count-precificacao" class="bg-amber-500/20 text-amber-400 text-xs font-black px-2 py-0.5 rounded-full border border-amber-500/30">0</span>
+                    </div>
+                    <div id="col-aguardando_precificacao" class="p-3 flex-1 space-y-3 overflow-y-auto max-h-[calc(100vh-310px)]"></div>
+                </div>
+
+                <!-- COLUNA 2: Aguardando Pagamento -->
+                <div class="kanban-col bg-batataCard/90 border border-blue-500/30 rounded-2xl flex flex-col shrink-0 shadow-2xl"
+                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'aguardando_pagamento')">
+                    <div class="p-4 border-b border-batataBorder bg-blue-500/10 rounded-t-2xl flex items-center justify-between">
+                        <span class="font-extrabold text-xs text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-qrcode"></i> 2. Aguardando PIX
+                        </span>
+                        <span id="badge-count-pagamento" class="bg-blue-500/20 text-blue-400 text-xs font-black px-2 py-0.5 rounded-full border border-blue-500/30">0</span>
+                    </div>
+                    <div id="col-aguardando_pagamento" class="p-3 flex-1 space-y-3 overflow-y-auto max-h-[calc(100vh-310px)]"></div>
+                </div>
+
+                <!-- COLUNA 3: Em Separação -->
+                <div class="kanban-col bg-batataCard/90 border border-indigo-500/30 rounded-2xl flex flex-col shrink-0 shadow-2xl"
+                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'em_separacao')">
+                    <div class="p-4 border-b border-batataBorder bg-indigo-500/10 rounded-t-2xl flex items-center justify-between">
+                        <span class="font-extrabold text-xs text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-kitchen-set"></i> 3. Na Cozinha
+                        </span>
+                        <span id="badge-count-separacao" class="bg-indigo-500/20 text-indigo-400 text-xs font-black px-2 py-0.5 rounded-full border border-indigo-500/30">0</span>
+                    </div>
+                    <div id="col-em_separacao" class="p-3 flex-1 space-y-3 overflow-y-auto max-h-[calc(100vh-310px)]"></div>
+                </div>
+
+                <!-- COLUNA 4: Saiu para Entrega / Balcão -->
+                <div class="kanban-col bg-batataCard/90 border border-purple-500/30 rounded-2xl flex flex-col shrink-0 shadow-2xl"
+                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'saiu_entrega')">
+                    <div class="p-4 border-b border-batataBorder bg-purple-500/10 rounded-t-2xl flex items-center justify-between">
+                        <span class="font-extrabold text-xs text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-motorcycle"></i> 4. Saiu para Entrega
+                        </span>
+                        <span id="badge-count-entrega" class="bg-purple-500/20 text-purple-400 text-xs font-black px-2 py-0.5 rounded-full border border-purple-500/30">0</span>
+                    </div>
+                    <div id="col-saiu_entrega" class="p-3 flex-1 space-y-3 overflow-y-auto max-h-[calc(100vh-310px)]"></div>
+                </div>
+
+                <!-- COLUNA 5: Concluídos -->
+                <div class="kanban-col bg-batataCard/90 border border-green-500/30 rounded-2xl flex flex-col shrink-0 shadow-2xl"
+                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'concluido')">
+                    <div class="p-4 border-b border-batataBorder bg-green-500/10 rounded-t-2xl flex items-center justify-between">
+                        <span class="font-extrabold text-xs text-green-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> 5. Concluídos
+                        </span>
+                        <span id="badge-count-concluido" class="bg-green-500/20 text-green-400 text-xs font-black px-2 py-0.5 rounded-full border border-green-500/30">0</span>
+                    </div>
+                    <div id="col-concluido" class="p-3 flex-1 space-y-3 overflow-y-auto max-h-[calc(100vh-310px)]"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: ESTOQUE & PREÇOS -->
+        <section id="tab-estoque" class="tab-content hidden p-6 md:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">Estoque & Cardápio</h2>
+                    <p class="text-sm text-batataTextMuted">Visualização de preços, CRUD manual e importações de ERP</p>
+                </div>
+                <div class="flex gap-2.5">
+                    <button onclick="exportProductsToCSV()" class="bg-batataHeader hover:bg-batataInput border border-batataBorderLight text-amber-100/90 font-bold py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 cursor-pointer text-sm" title="Exportar Planilha ERP">
+                        <i class="fa-solid fa-file-export text-green-400"></i> Exportar ERP (CSV)
+                    </button>
+                    <button onclick="openImportCsvModal()" class="bg-batataHeader hover:bg-batataInput border border-batataBorderLight text-amber-100/90 font-bold py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 cursor-pointer text-sm">
+                        <i class="fa-solid fa-file-import text-batataGold"></i> Importar ERP (CSV)
+                    </button>
+                    <button onclick="openAddProductModal()" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2 text-sm cursor-pointer">
+                        <i class="fa-solid fa-plus"></i> Adicionar Item
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabela de Estoque Geral Ocupando Largura Total (Ajuste 3) -->
+            <div class="w-full">
+                <div class="bg-batataCard border border-batataBorder rounded-2xl overflow-hidden shadow-xl w-full">
+                    <div class="p-6 border-b border-batataBorder flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h4 class="font-bold text-lg text-white">Cardápio & Pratos Cadastrados</h4>
+                        
+                        <!-- Filtros Avançados -->
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <select id="filter-stock-status" onchange="filterEstoqueTable()" class="bg-batataInput border border-batataBorderLight rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-batataGold">
+                                <option value="todos">Todos os Status</option>
+                                <option value="disponivel">Disponível em Estoque</option>
+                                <option value="baixo">Baixo Estoque (&le; 10)</option>
+                                <option value="esgotado">Esgotados</option>
+                            </select>
+
+                            <select id="filter-stock-marca" onchange="filterEstoqueTable()" class="bg-batataInput border border-batataBorderLight rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-batataGold">
+                                <option value="todas">Todas as Categorias</option>
+                            </select>
+
+                            <div class="relative flex-1 sm:w-48">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-batataTextMuted"></i>
+                                <input type="text" id="search-estoque" onkeyup="filterEstoqueTable()" placeholder="Buscar prato..." class="w-full bg-batataInput border border-batataBorderLight rounded-xl py-1.5 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-batataGold">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-batataCardDark/50 text-amber-200/70 font-semibold border-b border-batataBorder">
+                                <tr>
+                                    <th class="p-4">Produto</th>
+                                    <th class="p-4">Preço (KG / Unidade)</th>
+                                    <th class="p-4">Tipo de Venda</th>
+                                    <th class="p-4">Estoque Atual</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="estoque-table-body" class="divide-y divide-batataBorder/60">
+                                <!-- Dinâmico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: SIMULADOR DE FRETE -->
+        <section id="tab-calculadora" class="tab-content hidden p-6 md:p-8 space-y-6">
+            <div>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">Simulação de Rota & Despacho</h2>
+                <p class="text-sm text-batataTextMuted">Roteamento terrestre automático integrado para Mongaguá e região</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Form de Cálculo -->
+                <div class="bg-batataCard border border-batataBorder rounded-2xl p-6 space-y-4 shadow-lg">
+                    <h4 class="font-bold text-lg text-white flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-batataGold"></i> Roteamento do Pedido
+                    </h4>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-batataTextMuted mb-1">Selecionar Pedido Ativo</label>
+                            <select id="frete-pedido-select" onchange="autoFillAddressFromOrder()" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-3 text-sm text-white focus:outline-none focus:border-batataGold">
+                                <option value="">Escolha um pedido para rotear...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-batataTextMuted mb-1">Origem (Sua Loja)</label>
+                            <!-- Input de Origem Editável (Ajuste 2) -->
+                            <input type="text" id="frete-origem" onchange="saveOriginAddress()" placeholder="Digite o endereço de origem da sua loja..." class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-3 text-sm text-white focus:outline-none focus:border-batataGold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-batataTextMuted mb-1">Endereço de Destino (Cliente)</label>
+                            <input type="text" id="frete-destino" placeholder="Carregado automaticamente ou digite o destino..." class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-3 text-sm text-white focus:outline-none focus:border-batataGold">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-batataTextMuted mb-1">Custo por KM (R$)</label>
+                                <input type="number" id="frete-custo-km" value="2.50" step="0.10" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-3 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-batataTextMuted mb-1">Taxa de Saída Fixa (R$)</label>
+                                <input type="number" id="frete-taxa-fixa" value="5.00" step="1.00" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-3 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="calcularRotaFrontend()" id="btn-calcular-rota" class="flex-1 bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-route"></i> Traçar Rota de Entrega
+                            </button>
+                            <button onclick="aplicarFreteGratis()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer" title="Frete Grátis">
+                                <i class="fa-solid fa-gift"></i> Frete Grátis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relatório -->
+                <div class="bg-batataCard border border-batataBorder rounded-2xl p-6 flex flex-col justify-between space-y-4 shadow-lg">
+                    <div>
+                        <h4 class="font-bold text-lg text-white mb-2">Relatório do Percurso</h4>
+                        <p class="text-xs text-batataTextMuted">Verifique a viabilidade da rota calculada</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 my-4">
+                        <div class="bg-batataCardDark p-4 rounded-xl border border-batataBorder/50 text-center">
+                            <span class="text-xs text-batataTextMuted block">Distância Calculada</span>
+                            <span id="rota-distancia" class="text-xl font-bold text-white">--- KM</span>
+                        </div>
+                        <div class="bg-batataCardDark p-4 rounded-xl border border-batataBorder/50 text-center">
+                            <span class="text-xs text-batataTextMuted block">Duração Estimada</span>
+                            <span id="rota-tempo" class="text-xl font-bold text-white">--- min</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-batataCardDark p-6 rounded-2xl border border-batataBorder/50 text-center space-y-1">
+                        <span class="text-xs text-batataTextMuted block font-semibold uppercase tracking-wider">Custo do Frete Sugerido</span>
+                        <h3 id="rota-valor-frete" class="text-3xl font-black text-green-400">R$ 0,00</h3>
+                    </div>
+
+                    <button id="btn-aplicar-frete-pedido" onclick="adicionarFreteAoPedidoSelecionado()" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-batataInput disabled:text-batataTextDim text-white font-bold py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-circle-plus"></i> Gravar Frete no Banco
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAIS DO SISTEMA -->
+
+    <!-- MODAL DE PEDIDO MANUAL -->
+    <div id="modal-pedido-manual" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-batataCard border border-batataBorder w-full max-w-2xl rounded-2xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-batataBorder pb-3">
+                <div>
+                    <h3 class="font-bold text-lg text-white">Criar Pedido Manual Delivery</h3>
+                    <p class="text-xs text-batataTextMuted">Monte o pedido do cliente na hora e envie para o preparo</p>
+                </div>
+                <button onclick="closeManualOrderModal()" class="text-batataTextMuted hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Esquerda: Dados do Cliente -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-batataGold uppercase tracking-wider">1. Dados do Cliente</h4>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Nome do Cliente</label>
+                        <input type="text" id="manual-order-cliente" placeholder="Ex: João da Silva" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">WhatsApp / Telefone</label>
+                        <input type="text" id="manual-order-whatsapp" placeholder="Ex: 5513998808210" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Endereço de Entrega</label>
+                        <textarea id="manual-order-endereco" rows="2" placeholder="Ex: Av. Monteiro Lobato, 1200 - Centro" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Taxa de Frete / Entrega (R$)</label>
+                        <input type="number" id="manual-order-frete" step="0.01" value="0.00" onkeyup="recalcularTotalManualOrder()" onchange="recalcularTotalManualOrder()" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                </div>
+
+                <!-- Direita: Adicionar Itens -->
+                <div class="space-y-3 flex flex-col justify-between border-t md:border-t-0 md:border-l border-batataBorder md:pl-4">
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold text-batataGold uppercase tracking-wider">2. Adicionar Pratos / Bebidas</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-batataTextMuted mb-1">Escolher Item do Cardápio</label>
+                            <select id="manual-order-product-select" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                                <!-- Carregado dinamicamente -->
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-batataTextMuted mb-1">Quantidade</label>
+                                <input type="number" id="manual-order-qty" value="1" min="1" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="addManualOrderItem()" class="w-full bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Itens Adicionados -->
+                    <div class="flex-1 mt-3">
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Itens do Pedido</label>
+                        <div class="bg-batataCardDark border border-batataBorder rounded-xl p-2.5 max-h-40 overflow-y-auto space-y-1.5" id="manual-order-items-list">
+                            <div class="text-center text-xs text-batataTextDim py-4">Nenhum item adicionado ainda.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Totais e Finalização -->
+            <div class="pt-4 border-t border-batataBorder flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-center sm:text-left">
+                    <span class="text-xs text-batataTextMuted block">Valor Total do Pedido</span>
+                    <span id="manual-order-total-display" class="text-2xl font-black text-green-400 font-mono">R$ 0,00</span>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="closeManualOrderModal()" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-batataTextMuted hover:text-white font-semibold text-sm cursor-pointer border border-batataBorder bg-transparent hover:bg-batataInput">Cancelar</button>
+                    <button onclick="submitManualOrder()" class="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-circle-check"></i> Finalizar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO COMPLETA DE PEDIDO -->
+    <div id="modal-editar-pedido" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-batataCard border border-batataBorder w-full max-w-lg rounded-2xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-batataBorder pb-3">
+                <div>
+                    <h3 id="edit-order-modal-title" class="font-bold text-lg text-white">Editar Pedido</h3>
+                    <p class="text-xs text-batataTextMuted">Ajuste itens, valores, endereço ou etapa do pedido</p>
+                </div>
+                <button onclick="closeEditOrderModal()" class="text-batataTextMuted hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <input type="hidden" id="edit-order-id">
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Nome do Cliente</label>
+                        <input type="text" id="edit-order-cliente" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">WhatsApp / Telefone</label>
+                        <input type="text" id="edit-order-whatsapp" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Endereço Completo de Entrega</label>
+                    <input type="text" id="edit-order-endereco" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Itens do Pedido (Descrição detalhada)</label>
+                    <textarea id="edit-order-itens" rows="3" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-batataGold font-mono focus:outline-none focus:border-batataGold"></textarea>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Subtotal (R$)</label>
+                        <input type="number" id="edit-order-subtotal" step="0.01" onkeyup="recalcularTotalEditOrder()" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Frete (R$)</label>
+                        <input type="number" id="edit-order-frete" step="0.01" onkeyup="recalcularTotalEditOrder()" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Total (R$)</label>
+                        <input type="number" id="edit-order-total" readonly class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm font-bold text-green-400 font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Etapa / Status do Pedido</label>
+                    <select id="edit-order-status" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                        <option value="aguardando_precificacao">1. Aguardando Precificação</option>
+                        <option value="aguardando_pagamento">2. Aguardando PIX / Pagamento</option>
+                        <option value="em_separacao">3. Na Cozinha</option>
+                        <option value="saiu_entrega">4. Saiu para Entrega</option>
+                        <option value="concluido">5. Concluído / Entregue</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-batataBorder">
+                <button onclick="deleteCurrentEditOrder()" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white transition-all p-2 rounded-lg text-xs" title="Deletar">
+                    <i class="fa-solid fa-trash"></i> Cancelar/Excluir Pedido
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closeEditOrderModal()" class="px-4 py-2 rounded-xl text-batataTextMuted hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                    <button onclick="submitEditOrderForm()" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold px-5 py-2 rounded-xl text-sm transition-all shadow-lg flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-floppy-disk"></i> Salvar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNIFICADO DE CONEXÃO DA INSTÂNCIA -->
+    <div id="modal-config" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-batataCard border border-batataBorder w-full max-w-lg rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-batataBorder pb-3">
+                <div>
+                    <h3 class="font-bold text-lg text-white">Conexão do WhatsApp (SaaS)</h3>
+                    <p class="text-xs text-batataTextMuted">Gerencie a conexão da sua loja ou escaneie o QR Code</p>
+                </div>
+                <button onclick="toggleConfigModal(false)" class="text-batataTextMuted hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- PAINEL ÚNICO DE CRIAÇÃO / DESCONEXÃO E QR CODE -->
+            <div class="space-y-4 py-2">
+                <!-- Status Badge Banner -->
+                <div id="instance-status-banner" class="bg-batataCardDark p-3 rounded-xl border border-batataBorder flex items-center justify-between">
+                    <span class="text-xs text-batataTextMuted">Status da Instância:</span>
+                    <span id="instance-status-badge" class="text-xs font-bold text-batataTextMuted flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-notch animate-spin"></i> Verificando...
+                    </span>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Nome da Instância (Sua Loja)</label>
+                        <input type="text" id="config-evo-instance-input" onchange="checkInstanceStatus()" placeholder="Ex: batatabeach" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Número do WhatsApp (com DDI e DDD)</label>
+                        <input type="text" id="config-evo-number-input" placeholder="Ex: 5513998808210" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+
+                    <!-- Botão Dinâmico -->
+                    <button onclick="handleInstanceAction()" id="btn-request-qr" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-2">
+                        <i class="fa-solid fa-qrcode"></i> Criar Instância & Gerar QR Code
+                    </button>
+                </div>
+
+                <div id="qrcode-display-container" class="hidden flex flex-col items-center justify-center bg-batataCardDark p-5 rounded-2xl border border-batataBorder space-y-3">
+                    <img id="qrcode-img-element" src="" alt="QR Code WhatsApp" class="w-52 h-52 rounded-xl border border-batataBorderLight bg-white p-2">
+                    <span id="qrcode-status-text" class="text-xs font-bold text-amber-400 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span> Aguardando Leitura do Celular...
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LIGHTBOX PARA VISUALIZAR FOTOS -->
+    <div id="modal-lightbox-media" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col items-center justify-center hidden p-4">
+        <div class="absolute top-4 right-4 flex gap-3 z-50">
+            <a id="lightbox-download-btn" href="" download class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl shadow-lg transition-all text-sm font-bold flex items-center gap-2">
+                <i class="fa-solid fa-download"></i> Baixar Mídia
+            </a>
+            <button onclick="closeLightboxModal()" class="bg-batataInput hover:bg-batataBorderLight text-white p-3 rounded-xl shadow-lg transition-all text-sm font-bold cursor-pointer">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div class="max-w-4xl max-h-[85vh] flex items-center justify-center overflow-hidden rounded-2xl border border-batataBorder shadow-2xl">
+            <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain rounded-2xl">
+        </div>
+    </div>
+
+    <!-- Modal: Precificação & PIX Dinâmico -->
+    <div id="modal-precificar" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-batataCard border border-batataBorder w-full max-w-lg rounded-2xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-batataBorder pb-3">
+                <h3 class="font-bold text-lg text-white">Definir Orçamento & Gerar PIX</h3>
+                <button onclick="closePrecificarModal()" class="text-batataTextMuted hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <input type="hidden" id="precificar-order-id">
+            <input type="hidden" id="precificar-whatsapp">
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Cliente / Solicitado</label>
+                    <input type="text" id="precificar-cliente-nome" readonly class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white font-semibold focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Texto Bruto do Pedido do Cliente (Nicolas IA)</label>
+                    <textarea id="precificar-itens-raw" rows="3" readonly class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-batataGold font-mono focus:outline-none"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Subtotal de Produtos (R$)</label>
+                        <input type="number" id="precificar-subtotal" step="0.01" onkeyup="atualizarTotalModal()" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white font-mono focus:outline-none focus:border-batataGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Custo de Entrega / Frete (R$)</label>
+                        <input type="number" id="precificar-frete" step="0.01" onkeyup="atualizarTotalModal()" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white font-mono focus:outline-none focus:border-batataGold">
+                    </div>
+                </div>
+
+                <div class="bg-batataCardDark p-3 rounded-xl border border-batataBorder text-center">
+                    <span class="text-xs text-batataTextMuted block">Total do Orçamento</span>
+                    <span id="precificar-total-geral" class="text-2xl font-black text-green-400 font-mono">R$ 0,00</span>
+                </div>
+
+                <!-- Área de Exibição de QR Code PIX -->
+                <div id="pix-display-area" class="hidden bg-batataCardDark p-4 rounded-xl border border-amber-500/30 text-center space-y-3">
+                    <p class="text-xs font-bold text-batataGold uppercase tracking-wider">PAGAMENTO PRONTO COM SUCESSO</p>
+                    <div class="flex justify-center">
+                        <img id="pix-qrcode-img" src="" alt="QR Code Pagamento" class="w-48 h-48 rounded-lg border border-batataBorderLight bg-white p-2">
+                    </div>
+                    <div>
+                        <label id="pix-copia-cola-label" class="block text-[10px] text-batataTextMuted mb-1">Link de Pagamento / PIX Copia e Cola:</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="pix-copia-cola-input" readonly class="w-full bg-batataInput border border-batataBorderLight rounded-lg p-2 text-xs font-mono text-amber-100/90">
+                            <button onclick="copiarPixCopiaCola()" id="btn-copiar-pix-text" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold px-3 py-1.5 rounded-lg text-xs shrink-0 cursor-pointer">
+                                <i class="fa-solid fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-batataBorder justify-end">
+                <button onclick="closePrecificarModal()" class="px-4 py-2 rounded-xl text-batataTextMuted hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button id="btn-submit-pix" onclick="submitPricingAndGeneratePix()" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-lg flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-qrcode"></i> Enviar PIX / Link & Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar / Editar Produto (Delivery Food) -->
+    <div id="modal-produto" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-batataCard border border-batataBorder w-full max-w-lg rounded-2xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-batataBorder pb-3">
+                <h3 id="product-modal-title" class="font-bold text-lg text-white">Adicionar Novo Produto</h3>
+                <button onclick="closeAddProductModal()" class="text-batataTextMuted hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <input type="hidden" id="product-id">
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Cód. Item</label>
+                        <input type="text" id="product-codigo" placeholder="Ex: 1, #101" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Nome do Prato / Lanche / Bebida</label>
+                        <input type="text" id="product-name" placeholder="Ex: Batata Recheada Pernil Desfiado" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Categoria (ex: Batatas, Bebidas)</label>
+                        <input type="text" id="product-marca" placeholder="Ex: Batatas Recheadas, Bebidas" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Preço R$ (Unidade ou KG)</label>
+                        <input type="number" id="product-price" placeholder="Ex: 34.90" step="0.01" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Descrição / Ingredientes do Prato</label>
+                    <textarea id="product-descricao" rows="2" placeholder="Ex: Batata assada de 500g com base cremosa de manteiga e muçarela, recheada com pernil desfiado..." class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Permite Meio a Meio / Fração?</label>
+                        <select id="product-granel" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                            <option value="Não">Não (Inteira/Unidade)</option>
+                            <option value="Sim">Sim (Meio a Meio / Fracionado)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Estoque / Limite Diário</label>
+                        <input type="number" id="product-stock" placeholder="Ex: 50" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 border-t border-batataBorder pt-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Peso Médio (kg)</label>
+                        <input type="number" id="product-quilos" placeholder="Ex: 0.50" step="0.01" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Rendimento (Porções)</label>
+                        <input type="number" id="product-unidades" placeholder="Ex: 1" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-batataTextMuted mb-1">Data Validade / Lote</label>
+                        <input type="date" id="product-validade" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2 text-sm text-white focus:outline-none focus:border-batataGold font-mono">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-batataBorder justify-end">
+                <button onclick="closeAddProductModal()" class="px-4 py-2 rounded-xl text-batataTextMuted hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button onclick="submitProductForm()" class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold px-5 py-2 rounded-xl text-sm transition-all shadow-lg cursor-pointer">Salvar Produto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Importar CSV -->
+    <div id="modal-importar-csv" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-batataCard border border-batataBorder w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-batataBorder pb-3">
+                <h3 class="font-bold text-lg text-white">Importar Planilha do ERP (CSV)</h3>
+                <button onclick="closeImportCsvModal()" class="text-batataTextMuted hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-xs text-batataTextMuted leading-relaxed">
+                    Importe produtos do seu ERP físico ou planilha do Excel. O arquivo <strong class="text-batataGold">.csv</strong> deve conter as colunas: <code class="bg-batataCardDark px-1 py-0.5 rounded text-batataGold font-mono text-[10px]">Codigo, Produto, Preco_KG, Categoria, Descricao, Venda_Granel, Estoque_Atual</code>.
+                </p>
+
+                <div id="csv-dropzone" class="border-2 border-dashed border-batataBorderLight hover:border-batataGold rounded-2xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all bg-batataCardDark/40">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-batataTextDim" id="csv-icon"></i>
+                    <p class="text-xs font-semibold text-amber-100/90 text-center" id="csv-text">Arraste o arquivo .csv ou clique para selecionar</p>
+                    <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                </div>
+
+                <div id="csv-import-status" class="hidden bg-batataCardDark p-3 rounded-xl border border-batataBorder text-center text-xs text-batataTextMuted">
+                    Nenhum arquivo processado.
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-batataBorder justify-end">
+                <button onclick="closeImportCsvModal()" class="px-4 py-2 rounded-xl text-batataTextMuted hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button onclick="processAndUploadCSV()" id="btn-confirm-import-csv" disabled class="bg-batataGold hover:bg-batataGoldHover text-batataDark font-bold px-5 py-2.5 rounded-xl text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-upload"></i> Processar & Sincronizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Cadastro de Cliente -->
+    <div id="modal-cadastro-cliente" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-batataCard border border-batataBorder w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-batataBorder pb-3">
+                <h3 class="font-bold text-lg text-white">Cadastrar Novo Cliente</h3>
+                <button onclick="closeRegisterClientModal()" class="text-batataTextMuted hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">WhatsApp / Telefone</label>
+                    <input type="text" id="client-whatsapp" placeholder="Ex: 551399855xxxx" class="w-full bg-batataHeader border border-batataBorder rounded-xl p-2.5 text-sm text-batataTextMuted font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Nome Completo</label>
+                    <input type="text" id="client-name" placeholder="Ex: Sidnei Testa" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-batataTextMuted mb-1">Endereço Completo de Entrega</label>
+                    <textarea id="client-address" rows="3" placeholder="Ex: Avenida Monteiro Lobato, 8730, Jussara - Mongaguá - SP" class="w-full bg-batataInput border border-batataBorderLight rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-batataGold"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-3 border-t border-batataBorder justify-end">
+                <button onclick="closeRegisterClientModal()" class="px-4 py-2 rounded-xl text-batataTextMuted hover:text-white font-semibold text-sm cursor-pointer">Cancelar</button>
+                <button onclick="submitClientRegistration()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-lg flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-circle-check"></i> Salvar Cliente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÁREA DE IMPRESSÃO TÉRMICA DO RECIBO -->
+    <div id="print-receipt-section" class="hidden"></div>
+
+    <!-- LÓGICA JAVASCRIPT COMPLETA E INTEGRADA -->
+    <script>
+        // ============================================================
+        // ARQUITETURA MULTIEMPRESAS (SAAS TENANT ISOLATION)
+        // ============================================================
+        const COMPANY_ID = "batatabeach"; // Identificador único da empresa
+
+        // Configurações Locais com Cache Isolado por Empresa
+        let EVO_API_URL = localStorage.getItem(`${COMPANY_ID}_evo_url`) || "https://evo.studiotesta.com.br";
+        let EVO_INSTANCE = localStorage.getItem(`${COMPANY_ID}_evo_instance`) || "batatabeach";
+        let EVO_APIKEY = localStorage.getItem(`${COMPANY_ID}_evo_apikey`) || "Veludo777";
+        
+        let N8N_WEBHOOK_PAINEL = localStorage.getItem(`${COMPANY_ID}_n8n_url_painel`) || "https://n8n.studiotesta.com.br/webhook/gerencia-painel";
+        let N8N_WEBHOOK_INSTANCE = localStorage.getItem(`${COMPANY_ID}_n8n_url_instance`) || "https://n8n.studiotesta.com.br/webhook/instancia-qrcode";
+
+        // Helper para injetar a identificação da empresa em todas as requisições ao n8n
+        function buildMultiTenantPayload(extraData = {}) {
+            return {
+                company: COMPANY_ID,
+                empresa: COMPANY_ID,
+                company_id: COMPANY_ID,
+                instanceName: EVO_INSTANCE,
+                ...extraData
+            };
+        }
+
+        // Áudio sintetizado
+        let audioCtx = null;
+        let alarmInterval = null;
+        let qrStatusCheckInterval = null;
+
+        // Estado Global da Instância do WhatsApp
+        let currentInstanceStatus = "disconnected";
+
+        // Cache Global de Contatos
+        let globalContactsMap = new Map();
+
+        // Estado do Banco de Dados Isolado
+        let localPedidos = [];
+        let localVendas = [];
+        let localEstoque = [];
+        let manualOrderItems = []; // Itens do pedido manual ativo
+        let deletedChatTimestamps = JSON.parse(localStorage.getItem(`${COMPANY_ID}_crm_deleted_timestamps`) || '{}');
+        let chatDrafts = JSON.parse(localStorage.getItem(`${COMPANY_ID}_crm_chat_drafts`) || '{}');
+        let currentReplyQuote = null;
+
+        // Controle de Sincronização
+        let knownOrderIds = new Set();
+        let initialOrderLoadDone = false;
+
+        // Controle de Arquivos CSV Parsed
+        let csvParsedData = null;
+
+        // Estoque Padrão Fallback - Cardápio de Batatas
+        const DEFAULT_ESTOQUE = [
+            { id: 1, Codigo: "1", Produto: "Batata Recheada Pernil Desfiado", Preco_KG: "34.90", Categoria: "Batatas Recheadas", Descricao: "Batata assada de 500g com base cremosa de manteiga e muçarela, recheada com pernil desfiado sucuslento e finalizada com cobertura premium.", Venda_Granel: "Sim", Estoque_Atual: "50", Marca: "Batatas Recheadas", Validade: "2026-12-31", Quilos: "0.50", Unidades: "1" },
+            { id: 2, Codigo: "2", Produto: "Batata Recheada Calabresa Acebolada", Preco_KG: "29.90", Categoria: "Batatas Recheadas", Descricao: "Batata assada de 500g com base cremosa de manteiga e muçarela, recheada com calabresa acebolada e finalizada com batata palha crocante.", Venda_Granel: "Sim", Estoque_Atual: "40", Marca: "Batatas Recheadas", Validade: "2026-12-31", Quilos: "0.50", Unidades: "1" },
+            { id: 3, Codigo: "3", Produto: "Batata Recheada Frango com Catupiry", Preco_KG: "32.90", Categoria: "Batatas Recheadas", Descricao: "Batata assada de 500g com base cremosa de manteiga e muçarela, recheada com frango desfiado temperado e fios de Catupiry legítimo.", Venda_Granel: "Sim", Estoque_Atual: "45", Marca: "Batatas Recheadas", Validade: "2026-12-31", Quilos: "0.50", Unidades: "1" },
+            { id: 4, Codigo: "4", Produto: "Refrigerante Coca-Cola Lata 350ml", Preco_KG: "6.00", Categoria: "Bebidas", Descricao: "Lata 350ml trincando de gelada.", Venda_Granel: "Não", Estoque_Atual: "100", Marca: "Bebidas", Validade: "2027-06-30", Quilos: "0.35", Unidades: "1" }
+        ];
+
+        let activeChatId = "";
+        let localChats = [];
+        let activeCrmSubtab = 'contacts';
+
+        // Hashes para Controle de Renderização Invisível
+        let lastChatsHash = "";
+        let lastActiveChatHash = "";
+
+        // ============================================================
+        // FORMATADORES E GERENCIADOR DE NOMES/CONTATOS REAIS
+        // ============================================================
+
+        function formatDateBR(dateStr) {
+            if (!dateStr) return '—';
+            const cleanStr = dateStr.toString().split('T')[0];
+            const parts = cleanStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateStr;
+        }
+
+        function formatPhoneNumber(phone) {
+            if (!phone) return "";
+            const clean = phone.replace(/\D/g, '');
+
+            if (clean.length === 13 && clean.startsWith('55')) {
+                return `+55 (${clean.substring(2,4)}) ${clean.substring(4,9)}-${clean.substring(9)}`;
+            } else if (clean.length === 12 && clean.startsWith('55')) {
+                return `+55 (${clean.substring(2,4)}) ${clean.substring(4,8)}-${clean.substring(8)}`;
+            } else if (clean.length === 11) {
+                return `(${clean.substring(0,2)}) ${clean.substring(2,7)}-${clean.substring(7)}`;
+            } else if (clean.length === 10) {
+                return `(${clean.substring(0,2)}) ${clean.substring(2,6)}-${clean.substring(6)}`;
+            }
+
+            if (phone.length > 13 && !phone.startsWith('55')) {
+                return "Cliente WhatsApp";
+            }
+
+            return phone;
+        }
+
+        function formatOrderItemsHTML(itensRaw) {
+            if (!itensRaw) return '<div class="text-batataTextDim italic text-[11px]">Nenhum item informado</div>';
+
+            const lines = itensRaw.split(/\s*\+\s*|\n+/).map(l => l.trim()).filter(Boolean);
+
+            if (lines.length === 0) return `<div class="text-batataGold font-semibold text-[11px]">${itensRaw}</div>`;
+
+            let html = '<div class="space-y-1.5 font-sans text-[11px]">';
+            
+            lines.forEach(line => {
+                const priceMatch = line.match(/\(?R\$\s*[\d\.,]+\)?$/i) || line.match(/\(R\$\s*[\d\.,]+\)/i) || line.match(/R\$\s*[\d\.,]+/i);
+                
+                let name = line;
+                let price = '';
+
+                if (priceMatch) {
+                    price = priceMatch[0].replace(/[\(\)]/g, '').trim();
+                    if (!price.toLowerCase().includes('r$')) {
+                        price = `R$ ${price}`;
+                    }
+                    name = line.replace(priceMatch[0], '').trim();
+                    name = name.replace(/[\(\)\-\s]+$/, '').trim();
+                }
+
+                if (price) {
+                    html += `
+                        <div class="flex items-start justify-between gap-2 border-b border-batataBorder/60 pb-1.5 last:border-b-0 last:pb-0">
+                            <span class="text-amber-100/90 text-left font-medium leading-snug break-words flex-1">${name}</span>
+                            <span class="text-batataGold font-mono font-bold whitespace-nowrap shrink-0 text-right">${price}</span>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="border-b border-batataBorder/60 pb-1.5 last:border-b-0 last:pb-0 text-amber-100/90 font-medium text-left break-words">
+                            ${line}
+                        </div>
+                    `;
+                }
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        function generateInitialsAvatar(name) {
+            const cleanName = (name || "Cliente").replace(/[^a-zA-Z0-9\s]/g, '').trim();
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=1c0d08&color=f59e0b&bold=true`;
+        }
+
+        async function loadGlobalContacts() {
+            try {
+                const res = await fetch(`${EVO_API_URL}/chat/findContacts/${EVO_INSTANCE}`, {
+                    method: 'POST',
+                    headers: { 'apikey': EVO_APIKEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                if (res.ok) {
+                    const contacts = await res.json();
+                    if (Array.isArray(contacts)) {
+                        contacts.forEach(ct => {
+                            const jid = ct.id || ct.remoteJid || ct.jid || "";
+                            const cleanNum = (ct.number || jid.split('@')[0] || "").replace(/\D/g, '');
+                            const name = ct.name || ct.pushName || ct.verifiedName || "";
+                            const pic = ct.profilePicUrl || ct.picture || "";
+
+                            if (jid) globalContactsMap.set(jid, { name, pic, number: cleanNum });
+                            if (cleanNum) globalContactsMap.set(cleanNum, { name, pic, number: cleanNum });
+                        });
+                    }
+                }
+            } catch(e) {}
+        }
+
+        // ============================================================
+        // SISTEMA DE CRIAÇÃO DE PEDIDO MANUAL
+        // ============================================================
+
+        function openManualOrderModal() {
+            document.getElementById('manual-order-cliente').value = '';
+            document.getElementById('manual-order-whatsapp').value = '';
+            document.getElementById('manual-order-endereco').value = '';
+            document.getElementById('manual-order-frete').value = '0.00';
+            document.getElementById('manual-order-qty').value = '1';
+            manualOrderItems = [];
+            renderManualOrderItems();
+
+            const select = document.getElementById('manual-order-product-select');
+            select.innerHTML = '<option value="">Escolha um item...</option>';
+            
+            const sortedProducts = [...localEstoque].sort((a,b) => a.Produto.localeCompare(b.Produto, 'pt-BR'));
+            sortedProducts.forEach(p => {
+                const price = parseFloat(p.Preco_KG || 0).toFixed(2);
+                const codigoDisplay = (p.Codigo || p.codigo) ? `#${p.Codigo || p.codigo} - ` : '';
+                const catDisplay = (p.Categoria || p.categoria || p.Marca) ? ` [${p.Categoria || p.categoria || p.Marca}]` : '';
+                select.innerHTML += `<option value="${p.id}" data-name="${p.Produto}" data-price="${price}">${codigoDisplay}${p.Produto}${catDisplay} (R$ ${price})</option>`;
+            });
+
+            document.getElementById('modal-pedido-manual').classList.remove('hidden');
+        }
+
+        function closeManualOrderModal() {
+            document.getElementById('modal-pedido-manual').classList.add('hidden');
+        }
+
+        function addManualOrderItem() {
+            const select = document.getElementById('manual-order-product-select');
+            const qtyInput = document.getElementById('manual-order-qty');
+            const qty = parseInt(qtyInput.value || 1);
+
+            if (!select.value) {
+                return showToast("Aviso", "Selecione um produto do cardápio.");
+            }
+            if (qty < 1) {
+                return showToast("Aviso", "A quantidade deve ser de pelo menos 1.");
+            }
+
+            const option = select.options[select.selectedIndex];
+            const prodId = select.value;
+            const prodName = option.getAttribute('data-name');
+            const prodPrice = parseFloat(option.getAttribute('data-price') || 0);
+
+            const existing = manualOrderItems.find(item => item.id === prodId);
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                manualOrderItems.push({
+                    id: prodId,
+                    name: prodName,
+                    qty: qty,
+                    price: prodPrice
+                });
+            }
+
+            qtyInput.value = '1';
+            select.value = '';
+            renderManualOrderItems();
+            recalcularTotalManualOrder();
+        }
+
+        function removeManualOrderItem(index) {
+            manualOrderItems.splice(index, 1);
+            renderManualOrderItems();
+            recalcularTotalManualOrder();
+        }
+
+        function renderManualOrderItems() {
+            const container = document.getElementById('manual-order-items-list');
+            if (!container) return;
+
+            if (manualOrderItems.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-batataTextDim py-4">Nenhum item adicionado ainda.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            manualOrderItems.forEach((item, index) => {
+                const itemTotal = item.qty * item.price;
+                container.innerHTML += `
+                    <div class="flex items-center justify-between text-xs py-1.5 border-b border-batataBorder/40 last:border-b-0 pb-1.5 last:pb-0">
+                        <div class="min-w-0 flex-1 pr-2">
+                            <span class="font-bold text-white">${item.qty}x</span>
+                            <span class="text-amber-100/90 ml-1">${item.name}</span>
+                            <span class="text-batataTextDim block text-[10px]">Unitário: R$ ${item.price.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="font-mono font-bold text-batataGold">R$ ${itemTotal.toFixed(2).replace('.', ',')}</span>
+                            <button onclick="removeManualOrderItem(${index})" class="text-red-400 hover:text-white transition-all cursor-pointer p-1">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function recalcularTotalManualOrder() {
+            const subtotal = manualOrderItems.reduce((acc, item) => acc + (item.qty * item.price), 0);
+            const frete = parseFloat(document.getElementById('manual-order-frete').value || 0);
+            const total = subtotal + frete;
+            document.getElementById('manual-order-total-display').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        async function submitManualOrder() {
+            const nome_cliente = document.getElementById('manual-order-cliente').value.trim();
+            const whatsapp = document.getElementById('manual-order-whatsapp').value.trim();
+            const endereco_entrega = document.getElementById('manual-order-endereco').value.trim();
+            const frete = parseFloat(document.getElementById('manual-order-frete').value || 0);
+
+            if (!nome_cliente || !whatsapp) {
+                return showToast("Aviso", "Por favor, preencha o Nome e o WhatsApp do cliente.");
+            }
+            if (manualOrderItems.length === 0) {
+                return showToast("Aviso", "Adicione pelo menos um item ao pedido.");
+            }
+
+            const itemLines = manualOrderItems.map(item => {
+                const itemTotal = item.qty * item.price;
+                return `${item.qty}x ${item.name} (R$ ${itemTotal.toFixed(2).replace('.', ',')})`;
+            });
+            const itens = itemLines.join('\n');
+
+            const subtotal = manualOrderItems.reduce((acc, item) => acc + (item.qty * item.price), 0);
+            const total = subtotal + frete;
+
+            const payload = {
+                action: "add_order",
+                nome_cliente,
+                whatsapp,
+                endereco_entrega: endereco_entrega || "Retirada no Balcão",
+                itens,
+                subtotal,
+                frete,
+                total,
+                status: "aguardando_precificacao"
+            };
+
+            showToast("Criando pedido...", "Enviando informações para o banco de dados...");
+
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload(payload))
+                });
+
+                if (!res.ok) throw new Error();
+                showToast("Sucesso!", "Pedido manual registrado com sucesso!");
+                closeManualOrderModal();
+                
+                await syncAllData();
+                switchTab('pedidos');
+            } catch (err) {
+                const localId = Date.now();
+                const mockOrder = {
+                    id: localId,
+                    nome_cliente,
+                    whatsapp,
+                    endereco_entrega: endereco_entrega || "Retirada no Balcão",
+                    itens,
+                    subtotal,
+                    frete,
+                    total,
+                    status: "aguardando_precificacao"
+                };
+                localPedidos.unshift(mockOrder);
+                renderTablePedidos();
+                closeManualOrderModal();
+                switchTab('pedidos');
+                showToast("Offline", "Pedido salvo localmente temporariamente.");
+            }
+        }
+
+        // ============================================================
+        // KANBAN DRAG & DROP E MUDANÇA DE ETAPA DE PEDIDOS
+        // ============================================================
+
+        function handleDragStart(e, orderId) {
+            e.dataTransfer.setData("text/plain", orderId);
+            e.target.classList.add("opacity-50", "scale-95");
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove("opacity-50", "scale-95");
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add("bg-batataInput/60", "border-batataGold");
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove("bg-batataInput/60", "border-batataGold");
+        }
+
+        async function handleDrop(e, targetStatus) {
+            e.preventDefault();
+            e.currentTarget.classList.remove("bg-batataInput/60", "border-batataGold");
+
+            const orderId = e.dataTransfer.getData("text/plain");
+            if (!orderId) return;
+
+            await updateOrderStatus(orderId, targetStatus);
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            const p = localPedidos.find(item => item.id == orderId);
+            if (!p || p.status === newStatus) return;
+
+            const statusOld = p.status;
+            p.status = newStatus;
+            
+            renderTablePedidos();
+
+            showToast("Atualizando Pedido...", `Movendo #${orderId} no Postgres...`);
+
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "update_order_status", id: orderId, status: newStatus }))
+                });
+
+                if (!res.ok) throw new Error();
+                showToast("Status Updated!", `Pedido #${orderId} movido com sucesso!`);
+            } catch (err) {
+                p.status = statusOld;
+                renderTablePedidos();
+                showToast("Erro ao Salvar", "Não foi possível atualizar o status.");
+            }
+        }
+
+        // ============================================================
+        // GERENCIADOR DE EDIÇÃO E EXCLUSÃO MANUAIS DE PEDIDOS
+        // ============================================================
+
+        function openEditOrderModal(orderId) {
+            const p = localPedidos.find(item => item.id == orderId);
+            if (!p) return showToast("Erro", "Pedido não encontrado.");
+
+            document.getElementById('edit-order-id').value = p.id;
+            document.getElementById('edit-order-cliente').value = p.nome_cliente || '';
+            document.getElementById('edit-order-whatsapp').value = p.whatsapp || '';
+            document.getElementById('edit-order-endereco').value = p.endereco_entrega || '';
+            document.getElementById('edit-order-itens').value = p.itens || '';
+            
+            const sub = parseFloat(p.subtotal || 0);
+            const frete = parseFloat(p.frete || 0);
+            document.getElementById('edit-order-subtotal').value = sub.toFixed(2);
+            document.getElementById('edit-order-frete').value = frete.toFixed(2);
+            document.getElementById('edit-order-total').value = (sub + frete).toFixed(2);
+            
+            document.getElementById('edit-order-status').value = p.status || 'aguardando_precificacao';
+            document.getElementById('edit-order-modal-title').innerText = `Editar Pedido #${p.id}`;
+            document.getElementById('modal-editar-pedido').classList.remove('hidden');
+        }
+
+        function closeEditOrderModal() {
+            document.getElementById('modal-editar-pedido').classList.add('hidden');
+        }
+
+        function recalcularTotalEditOrder() {
+            const sub = parseFloat(document.getElementById('edit-order-subtotal').value || 0);
+            const frete = parseFloat(document.getElementById('edit-order-frete').value || 0);
+            document.getElementById('edit-order-total').value = (sub + frete).toFixed(2);
+        }
+
+        async function submitEditOrderForm() {
+            const orderId = document.getElementById('edit-order-id').value;
+            const sub = parseFloat(document.getElementById('edit-order-subtotal').value || 0);
+            const frete = parseFloat(document.getElementById('edit-order-frete').value || 0);
+            const total = sub + frete;
+
+            const updatedData = {
+                id: orderId,
+                nome_cliente: document.getElementById('edit-order-cliente').value,
+                whatsapp: document.getElementById('edit-order-whatsapp').value,
+                endereco_entrega: document.getElementById('edit-order-endereco').value,
+                itens: document.getElementById('edit-order-itens').value,
+                subtotal: sub,
+                frete: frete,
+                total: total,
+                status: document.getElementById('edit-order-status').value
+            };
+
+            closeEditOrderModal();
+            showToast("Atualizando Pedido...", "Gravando alterações no banco de dados...");
+
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "edit_order", ...updatedData }))
+                });
+
+                if (!res.ok) throw new Error();
+                showToast("Sucesso!", `Pedido #${orderId} atualizado no Postgres!`);
+                syncAllData();
+            } catch (err) {
+                showToast("Erro ao Salvar", "Não foi possível atualizar o pedido.");
+            }
+        }
+
+        async function deleteCurrentEditOrder() {
+            const orderId = document.getElementById('edit-order-id').value;
+            if (!orderId) return;
+
+            if (!confirm(`Deseja realmente CANCELAR/EXCLUIR o Pedido #${orderId} do sistema?`)) return;
+
+            closeEditOrderModal();
+            showToast("Excluindo Pedido...", `Removendo pedido #${orderId}...`);
+
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "delete_order", id: orderId }))
+                });
+
+                if (!res.ok) throw new Error();
+                showToast("Pedido Removido", `Pedido #${orderId} excluído com sucesso!`);
+                syncAllData();
+            } catch (err) {
+                showToast("Erro ao Excluir", "Não foi possível remover o pedido.");
+            }
+        }
+
+        async function deleteOrderDirect(orderId, event) {
+            if (event) event.stopPropagation();
+            if (!confirm(`Deseja EXCLUIR/CANCELAR o Pedido #${orderId}?`)) return;
+
+            showToast("Excluindo Pedido...", `Removendo pedido #${orderId}...`);
+
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "delete_order", id: orderId }))
+                });
+
+                if (!res.ok) throw new Error();
+                showToast("Pedido Removido", `Pedido #${orderId} excluído com sucesso!`);
+                syncAllData();
+            } catch (err) {
+                showToast("Erro ao Excluir", "Não foi possível remover o pedido.");
+            }
+        }
+
+        // ============================================================
+        // GERENCIADOR DE EXPORTAÇÃO E IMPORTAÇÃO ERP (CSV)
+        // ============================================================
+
+        function exportProductsToCSV() {
+            if (!localEstoque || localEstoque.length === 0) {
+                return showToast("Aviso", "Não há produtos para exportar no momento.");
+            }
+
+            const produtosOrdenados = [...localEstoque].sort((a, b) => 
+                a.Produto.localeCompare(b.Produto, 'pt-BR', { sensitivity: 'base' })
+            );
+
+            let csvContent = "Codigo,Produto,Preco_KG,Categoria,Descricao,Venda_Granel,Estoque_Atual\n";
+
+            produtosOrdenados.forEach(p => {
+                const cod = `"${(p.Codigo || p.codigo || '').replace(/"/g, '""')}"`;
+                const name = `"${(p.Produto || p.produto || '').replace(/"/g, '""')}"`;
+                const preco = parseFloat(p.Preco_KG || 0).toFixed(2);
+                const cat = `"${(p.Categoria || p.categoria || p.Marca || 'Geral').replace(/"/g, '""')}"`;
+                const desc = `"${(p.Descricao || p.descricao || '').replace(/"/g, '""')}"`;
+                const granel = p.Venda_Granel || 'Não';
+                const estoque = parseFloat(p.Estoque_Atual || 0);
+
+                csvContent += `${cod},${name},${preco},${cat},${desc},${granel},${estoque}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `cardapio_batata_beach_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Exportado!", "Cardápio do ERP gerado e baixado com sucesso!");
+        }
+
+        function openImportCsvModal() {
+            document.getElementById('modal-importar-csv').classList.remove('hidden');
+            document.getElementById('csv-file-input').value = '';
+            document.getElementById('csv-text').innerText = 'Arraste o arquivo .csv ou clique para selecionar';
+            document.getElementById('btn-confirm-import-csv').disabled = true;
+            document.getElementById('csv-import-status').classList.add('hidden');
+            csvParsedData = null;
+        }
+
+        function closeImportCsvModal() {
+            document.getElementById('modal-importar-csv').classList.add('hidden');
+        }
+
+        function handleCsvFileSelected(file) {
+            if (!file.name.endsWith('.csv')) {
+                showToast("Erro", "Por favor, selecione um arquivo .csv válido.");
+                return;
+            }
+
+            document.getElementById('csv-text').innerText = `Arquivo selecionado: ${file.name}`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                csvParsedData = parseCSVText(text);
+                
+                const statusDiv = document.getElementById('csv-import-status');
+                statusDiv.classList.remove('hidden');
+                statusDiv.innerHTML = `<span class="text-green-400 font-bold"><i class="fa-solid fa-circle-check"></i> ${csvParsedData.length} pratos encontrados na planilha!</span>`;
+                
+                document.getElementById('btn-confirm-import-csv').disabled = csvParsedData.length === 0;
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSVText(csvText) {
+            const lines = csvText.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
+            if (lines.length < 2) return [];
+
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+            const products = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const delimiter = lines[i].includes(';') ? ';' : ',';
+                const values = lines[i].split(delimiter).map(v => v.trim().replace(/^"|"$/g, ''));
+                if (values.length < 2) continue;
+
+                const row = {};
+                headers.forEach((h, idx) => {
+                    row[h] = values[idx] || '';
+                });
+
+                const prodName = row.produto || row['nome do produto'] || row.prato || '';
+                if (prodName) {
+                    products.push({
+                        Codigo: row.codigo || row.cod || row['código'] || (i).toString(),
+                        Produto: prodName,
+                        Preco_KG: parseFloat((row.preco_kg || row.preco || row['preço'] || row.valor || "0").toString().replace(',', '.')),
+                        Categoria: row.categoria || row.marca || 'Geral',
+                        Descricao: row.descricao || row['descrição'] || row.ingredientes || '',
+                        Venda_Granel: (row.venda_granel || row.granel || row.fracionado || "Não").toLowerCase().includes("sim") ? "Sim" : "Não",
+                        Estoque_Atual: parseFloat((row.estoque_atual || row.estoque || "50").toString().replace(',', '.')),
+                        Marca: row.categoria || row.marca || 'Geral',
+                        Validade: row.validade || "2028-01-01",
+                        Quilos: parseFloat((row.quilos || row.peso || "0.50").toString().replace(',', '.')),
+                        Unidades: parseInt(row.unidades || row.porcoes || "1")
+                    });
+                }
+            }
+            return products;
+        }
+
+        async function processAndUploadCSV() {
+            if (!csvParsedData || csvParsedData.length === 0) return;
+
+            const btn = document.getElementById('btn-confirm-import-csv');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Importando no Postgres...`;
+
+            showToast("Importando ERP...", `Enviando ${csvParsedData.length} pratos para o banco de dados...`);
+
+            try {
+                for (const item of csvParsedData) {
+                    await fetch(N8N_WEBHOOK_PAINEL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(buildMultiTenantPayload({ 
+                            action: "add_product", 
+                            codigo: item.Codigo,
+                            produto: item.Produto,
+                            categoria: item.Categoria,
+                            descricao: item.Descricao,
+                            preco_kg: item.Preco_KG,
+                            venda_granel: item.Venda_Granel,
+                            estoque_atual: item.Estoque_Atual,
+                            marca: item.Categoria,
+                            quilos: item.Quilos,
+                            unidades: item.Unidades,
+                            validade: item.Validade,
+                            Codigo: item.Codigo,
+                            Produto: item.Produto,
+                            Marca: item.Categoria,
+                            Preco_KG: item.Preco_KG,
+                            Venda_Granel: item.Venda_Granel,
+                            Estoque_Atual: item.Estoque_Atual
+                        }))
+                    });
+                }
+
+                showToast("Sucesso", `${csvParsedData.length} itens importados e sincronizados!`);
+                closeImportCsvModal();
+                loadProductsData();
+            } catch (e) {
+                showToast("Erro de Importação", "Ocorreu uma falha ao enviar pratos.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-upload"></i> Processar & Sincronizar`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropzone = document.getElementById('csv-dropzone');
+            const fileInput = document.getElementById('csv-file-input');
+
+            if (dropzone && fileInput) {
+                dropzone.addEventListener('click', () => fileInput.click());
+
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) handleCsvFileSelected(file);
+                });
+
+                dropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('border-batataGold');
+                });
+
+                dropzone.addEventListener('dragleave', () => {
+                    dropzone.classList.remove('border-batataGold');
+                });
+
+                dropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('border-batataGold');
+                    const file = e.dataTransfer.files[0];
+                    if (file) handleCsvFileSelected(file);
+                });
+            }
+        });
+
+        // ============================================================
+        // GERENCIADOR INTELIGENTE DE INSTÂNCIA WHATSAPP & QR CODE
+        // ============================================================
+
+        function extractStateFromResponse(obj) {
+            if (!obj) return "close";
+            
+            if (Array.isArray(obj)) {
+                obj = obj[0] || {};
+            }
+
+            let state = obj.state || 
+                        obj.status || 
+                        obj.instance?.state || 
+                        obj.instance?.status || 
+                        obj.connectionState?.state ||
+                        obj.connectionStatus ||
+                        "";
+
+            if (typeof state === 'string') {
+                state = state.toLowerCase().trim();
+            } else {
+                state = "";
+            }
+
+            if (state === 'open' || state === 'connected' || state === 'connecting_qr' || state === 'connecting') {
+                return state;
+            }
+            return state || "close";
+        }
+
+        async function fetchRealInstanceStatus(instName) {
+            try {
+                const resN8n = await fetch(N8N_WEBHOOK_INSTANCE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "get_instance_status", instanceName: instName }))
+                });
+                if (resN8n.ok) {
+                    const dataN8n = await resN8n.json();
+                    const stateN8n = extractStateFromResponse(dataN8n);
+                    if (stateN8n === 'open' || stateN8n === 'connected') {
+                        return 'open';
+                    }
+                }
+            } catch(e) {}
+
+            try {
+                const resEvo1 = await fetch(`${EVO_API_URL}/instance/connectionState/${instName}`, {
+                    method: 'GET',
+                    headers: { 'apikey': EVO_APIKEY }
+                });
+                if (resEvo1.ok) {
+                    const dataEvo1 = await resEvo1.json();
+                    const stateEvo1 = extractStateFromResponse(dataEvo1);
+                    if (stateEvo1 === 'open' || stateEvo1 === 'connected') {
+                        return 'open';
+                    }
+                }
+            } catch(e) {}
+
+            return 'close';
+        }
+
+        function toggleConfigModal(show) {
+            const modal = document.getElementById('modal-config');
+            if (show) {
+                document.getElementById('config-evo-instance-input').value = EVO_INSTANCE;
+                document.getElementById('config-evo-number-input').value = "5513998808210";
+                modal.classList.remove('hidden');
+                checkInstanceStatus();
+            } else {
+                modal.classList.add('hidden');
+                if (qrStatusCheckInterval) {
+                    clearInterval(qrStatusCheckInterval);
+                    qrStatusCheckInterval = null;
+                }
+            }
+        }
+
+        async function checkInstanceStatus() {
+            const instNameInput = document.getElementById('config-evo-instance-input').value.trim() || EVO_INSTANCE;
+            const badge = document.getElementById('instance-status-badge');
+            badge.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-amber-400"></i> Verificando...`;
+
+            EVO_INSTANCE = instNameInput;
+            localStorage.setItem(`${COMPANY_ID}_evo_instance`, EVO_INSTANCE);
+
+            const status = await fetchRealInstanceStatus(instNameInput);
+            updateInstanceUIState(status);
+        }
+
+        function updateInstanceUIState(status) {
+            const normStatus = (status || "").toString().toLowerCase();
+            currentInstanceStatus = normStatus;
+            
+            const badge = document.getElementById('instance-status-badge');
+            const btn = document.getElementById('btn-request-qr');
+            const qrContainer = document.getElementById('qrcode-display-container');
+
+            if (normStatus === 'open' || normStatus === 'connected') {
+                badge.innerHTML = `<span class="text-green-400 font-bold"><i class="fa-solid fa-circle-check"></i> Instância Conectada e Ativa</span>`;
+                btn.className = "w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-5 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-2";
+                btn.innerHTML = `<i class="fa-solid fa-power-off"></i> Desconectar da Instância`;
+                qrContainer.classList.add('hidden');
+            } else if (normStatus === 'connecting' || normStatus === 'connecting_qr') {
+                badge.innerHTML = `<span class="text-amber-400 font-bold"><i class="fa-solid fa-spinner animate-spin"></i> Aguardando Leitura do QR Code</span>`;
+                btn.className = "w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-5 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-2";
+                btn.innerHTML = `<i class="fa-solid fa-rotate animate-spin"></i> Gerar Novo QR Code / Reconectar`;
+                qrContainer.classList.remove('hidden');
+            } else {
+                badge.innerHTML = `<span class="text-red-400 font-bold"><i class="fa-solid fa-circle-xmark"></i> Instância Desconectada</span>`;
+                btn.className = "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-2";
+                btn.innerHTML = `<i class="fa-solid fa-qrcode"></i> Criar Instância & Gerar QR Code`;
+                qrContainer.classList.add('hidden');
+            }
+        }
+
+        async function handleInstanceAction() {
+            if (currentInstanceStatus === 'open' || currentInstanceStatus === 'connected') {
+                await disconnectWhatsAppInstance();
+            } else {
+                await requestWhatsAppQRCode();
+            }
+        }
+
+        async function disconnectWhatsAppInstance() {
+            const instNameInput = document.getElementById('config-evo-instance-input').value.trim() || EVO_INSTANCE;
+
+            if(!confirm(`Deseja realmente DESCONECTAR o WhatsApp da instância "${instNameInput}"?`)) return;
+
+            const btn = document.getElementById('btn-request-qr');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Desconectando...`;
+
+            try {
+                await fetch(N8N_WEBHOOK_INSTANCE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({
+                        action: "logout_instance",
+                        instanceName: instNameInput
+                    }))
+                });
+
+                showToast("Desconectado", "Instância do WhatsApp desconectada com sucesso!");
+                updateInstanceUIState("disconnected");
+            } catch (err) {
+                showToast("Erro", "Não foi possível desconectar a instância.");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function requestWhatsAppQRCode() {
+            const instNameInput = document.getElementById('config-evo-instance-input').value.trim() || EVO_INSTANCE;
+            const numberInput = document.getElementById('config-evo-number-input').value.trim();
+
+            const btn = document.getElementById('btn-request-qr');
+            const qrContainer = document.getElementById('qrcode-display-container');
+            const qrImg = document.getElementById('qrcode-img-element');
+            const qrStatus = document.getElementById('qrcode-status-text');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Solicitando QR Code...`;
+
+            try {
+                const response = await fetch(N8N_WEBHOOK_INSTANCE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({
+                        action: "create_and_connect_instance",
+                        instanceName: instNameInput,
+                        whatsappNumber: numberInput
+                    }))
+                });
+
+                const data = await response.json();
+                const qrcodeBase64 = data.qrcode || data.base64 || (data.code ? `data:image/png;base64,${data.code}` : "");
+
+                if (qrcodeBase64) {
+                    qrImg.src = qrcodeBase64.startsWith('data:') ? qrcodeBase64 : `data:image/png;base64,${qrcodeBase64}`;
+                    qrContainer.classList.remove('hidden');
+                    updateInstanceUIState("connecting_qr");
+                    showToast("QR Code Gerado", "Aponte a câmera do WhatsApp para conectar!");
+
+                    if (qrStatusCheckInterval) clearInterval(qrStatusCheckInterval);
+                    qrStatusCheckInterval = setInterval(async () => {
+                        const state = await fetchRealInstanceStatus(instNameInput);
+                        if (state === 'open' || state === 'connected') {
+                            clearInterval(qrStatusCheckInterval);
+                            qrStatusCheckInterval = null;
+                            qrStatus.innerHTML = `<span class="text-green-400 font-bold"><i class="fa-solid fa-circle-check"></i> WhatsApp Conectado com Sucesso!</span>`;
+                            showToast("Conectado!", "WhatsApp emparelhado com sucesso.");
+                            updateInstanceUIState("open");
+                            setTimeout(() => toggleConfigModal(false), 2000);
+                            fetchEvolutionChats();
+                        }
+                    }, 3000);
+                } else {
+                    showToast("Status", data.message || "WhatsApp já conectado ou aguardando resposta.");
+                    checkInstanceStatus();
+                }
+            } catch (err) {
+                showToast("Erro de Conexão", "Não foi possível comunicar com o servidor n8n.");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function handleSendMediaFile(inputEl) {
+            const file = inputEl.files[0];
+            if (!file || !activeChatId) return;
+
+            const chat = localChats.find(c => c.whatsapp === activeChatId || c.jid === activeChatId);
+            if (!chat) return;
+
+            showToast("Enviando Mídia...", `Processando ${file.name}...`);
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Data = e.target.result;
+                let mediaType = "document";
+                if (file.type.startsWith('image/')) mediaType = "image";
+                else if (file.type.startsWith('video/')) mediaType = "video";
+                else if (file.type.startsWith('audio/')) mediaType = "audio";
+
+                const agora = new Date();
+                const timestampStr = `${agora.getHours().toString().padStart(2, '0')}:${agora.getMinutes().toString().padStart(2, '0')}`;
+
+                const mensagemLocal = {
+                    id: `manual_media_${Date.now()}`,
+                    remetente: "humano",
+                    texto: "",
+                    mediaType: mediaType,
+                    mediaUrl: base64Data,
+                    fileName: file.name,
+                    timestamp: timestampStr,
+                    epoch: Date.now(),
+                    status: 'PENDING'
+                };
+
+                chat.mensagens.push(mensagemLocal);
+                chat.updatedAt = Date.now();
+                saveChatHistoryToLocalStorage(activeChatId, chat.mensagens);
+                renderChatMessages(true);
+                renderCRMContacts(true);
+
+                try {
+                    const targetNumber = chat.jid || `${activeChatId}@s.whatsapp.net`;
+                    const pureBase64 = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
+
+                    let endpoint = `${EVO_API_URL}/message/sendMedia/${EVO_INSTANCE}`;
+                    let payload = {
+                        number: targetNumber,
+                        media: pureBase64,
+                        mediatype: mediaType,
+                        mimetype: file.type || "image/jpeg",
+                        fileName: file.name,
+                        caption: ""
+                    };
+
+                    if (mediaType === 'audio') {
+                        endpoint = `${EVO_API_URL}/message/sendWhatsAppAudio/${EVO_INSTANCE}`;
+                        payload = {
+                            number: targetNumber,
+                            audio: pureBase64
+                        };
+                    }
+
+                    await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'apikey': EVO_APIKEY },
+                        body: JSON.stringify(payload)
+                    });
+
+                    showToast("Mídia Enviada", "Arquivo entregue com sucesso ao cliente!");
+                    setTimeout(() => silentRefreshMessages(activeChatId), 1200);
+                } catch(err) {
+                    console.error("Erro ao enviar mídia:", err);
+                    showToast("Modo Offline", "Mídia salva localmente.");
+                } finally {
+                    inputEl.value = "";
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openLightboxModal(srcUrl) {
+            document.getElementById('lightbox-img').src = srcUrl;
+            document.getElementById('lightbox-download-btn').href = srcUrl;
+            document.getElementById('modal-lightbox-media').classList.remove('hidden');
+        }
+
+        function closeLightboxModal() {
+            document.getElementById('modal-lightbox-media').classList.add('hidden');
+        }
+
+        function linkifyText(text) {
+            if (!text) return "";
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(urlRegex, (url) => {
+                    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline font-semibold break-all">${url}</a>`;
+                })
+                .replace(/\n/g, "<br>");
+        }
+
+        function escapeQuotes(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        }
+
+        function copyMessageText(text) {
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Copiado!", "Texto da mensagem copiado para a área de transferência.");
+            }).catch(() => {
+                showToast("Copiado!", "Texto copiado.");
+            });
+        }
+
+        function setReplyQuote(msgId, texto, remetenteName) {
+            currentReplyQuote = { id: msgId, texto: texto, remetente: remetenteName };
+            document.getElementById('reply-quote-text').innerText = `${remetenteName}: ${texto.substring(0, 80)}`;
+            document.getElementById('reply-quote-banner').classList.remove('hidden');
+            document.getElementById('chat-input-text').focus();
+        }
+
+        function cancelReplyQuote() {
+            currentReplyQuote = null;
+            document.getElementById('reply-quote-banner').classList.add('hidden');
+        }
+
+        async function reactToMessage(msgId, reactionEmoji) {
+            if (!activeChatId) return;
+
+            const chat = localChats.find(c => c.whatsapp === activeChatId || c.jid === activeChatId);
+            if (!chat) return;
+
+            try {
+                await fetch(`${EVO_API_URL}/message/sendReaction/${EVO_INSTANCE}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'apikey': EVO_APIKEY },
+                    body: JSON.stringify({
+                        reactionMessage: {
+                            key: {
+                                id: msgId,
+                                remoteJid: chat.jid || `${activeChatId}@s.whatsapp.net`
+                            },
+                            reaction: reactionEmoji
+                        }
+                    })
+                });
+                showToast("Reação Enviada", `Reagido com ${reactionEmoji}`);
+            } catch(err) {
+                console.warn("Erro ao enviar reação:", err);
+            }
+        }
+
+        function toggleEmojiPicker() {
+            const popup = document.getElementById('emoji-picker-popup');
+            popup.classList.toggle('hidden');
+        }
+
+        function insertEmoji(emoji) {
+            const input = document.getElementById('chat-input-text');
+            input.value += emoji;
+            handleChatInput();
+            document.getElementById('emoji-picker-popup').classList.add('hidden');
+            input.focus();
+        }
+
+        function playIFoodTrimSound() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
+                
+                // Primeiro Trim
+                for (let i = 0; i < 10; i++) {
+                    const timeOffset = i * 0.025;
+                    const osc1 = audioCtx.createOscillator();
+                    const osc2 = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(1250, now + timeOffset);
+                    
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(1450, now + timeOffset);
+                    
+                    gain.gain.setValueAtTime(0.15, now + timeOffset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.02);
+                    
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc1.start(now + timeOffset);
+                    osc1.stop(now + timeOffset + 0.02);
+                    osc2.start(now + timeOffset);
+                    osc2.stop(now + timeOffset + 0.02);
+                }
+
+                // Segundo Trim
+                const secondTrimDelay = 0.35;
+                for (let i = 0; i < 10; i++) {
+                    const timeOffset = secondTrimDelay + (i * 0.025);
+                    const osc1 = audioCtx.createOscillator();
+                    const osc2 = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(1250, now + timeOffset);
+                    
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(1450, now + timeOffset);
+                    
+                    gain.gain.setValueAtTime(0.15, now + timeOffset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.02);
+                    
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc1.start(now + timeOffset);
+                    osc1.stop(now + timeOffset + 0.02);
+                    osc2.start(now + timeOffset);
+                    osc2.stop(now + timeOffset + 0.02);
+                }
+            } catch(e) {
+                console.warn("Falha ao emitir áudio:", e);
+            }
+        }
+
+        document.addEventListener('click', () => {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                deselectActiveChat();
+            }
+        });
+
+        function deselectActiveChat() {
+            if (!activeChatId) return;
+
+            const currentInput = document.getElementById('chat-input-text').value;
+            if (currentInput.trim().length > 0) {
+                chatDrafts[activeChatId] = currentInput;
+            } else {
+                delete chatDrafts[activeChatId];
+            }
+            localStorage.setItem(`${COMPANY_ID}_crm_chat_drafts`, JSON.stringify(chatDrafts));
+
+            activeChatId = "";
+            lastActiveChatHash = "";
+
+            document.getElementById('active-chat-avatar').src = "https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/batatabeach/Logo_Batata-Beach.png";
+            document.getElementById('active-chat-name').innerText = "Selecione uma conversa";
+            document.getElementById('active-chat-phone').innerText = "Inicie o monitoramento do CRM";
+
+            document.getElementById('chat-messages-container').innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-batataTextDim space-y-2">
+                    <i class="fa-solid fa-comments text-4xl text-batataBorder"></i>
+                    <p class="text-sm">Selecione uma conversa para monitorar as mensagens.</p>
+                </div>
+            `;
+
+            document.getElementById('chat-input-text').value = "";
+            cancelReplyQuote();
+
+            renderCRMContacts(true);
+            showToast("Modo de Espera", "Nenhuma conversa selecionada.");
+        }
+
+        function updateSidebarBadge() {
+            const badge = document.getElementById('crm-badge');
+            if (!badge) return;
+
+            const totalUnread = localChats.reduce((sum, chat) => {
+                if (chat.isGroup) return sum;
+                const unreadCount = chat.naoLidas || (chat.temNaoLida ? 1 : 0);
+                return sum + unreadCount;
+            }, 0);
+
+            if (totalUnread > 0) {
+                badge.innerText = totalUnread > 99 ? '99+' : totalUnread;
+                badge.classList.remove('hidden');
+            } else {
+                badge.innerText = '0';
+                badge.classList.add('hidden');
+            }
+        }
+
+        function handleChatInput() {
+            if (!activeChatId) return;
+            const text = document.getElementById('chat-input-text').value;
+            if (text.trim().length > 0) {
+                chatDrafts[activeChatId] = text;
+            } else {
+                delete chatDrafts[activeChatId];
+            }
+            localStorage.setItem(`${COMPANY_ID}_crm_chat_drafts`, JSON.stringify(chatDrafts));
+            renderCRMContacts(false);
+        }
+
+        function isChatDeletedAndOld(c, realPhone, jid) {
+            const delTime = deletedChatTimestamps[realPhone] || deletedChatTimestamps[jid] || (c.remoteJidAlt && deletedChatTimestamps[c.remoteJidAlt]);
+            
+            if (!delTime) return false;
+
+            let chatTime = 0;
+            if (c.conversationTimestamp) {
+                chatTime = Number(c.conversationTimestamp) * 1000;
+                if (chatTime < 100000000000) chatTime *= 1000;
+            } else if (c.updatedAt) {
+                chatTime = new Date(c.updatedAt).getTime();
+            } else if (c.lastMessageRecvTimestamp) {
+                chatTime = Number(c.lastMessageRecvTimestamp) * 1000;
+            }
+
+            if (chatTime === 0 || chatTime <= delTime) {
+                return true;
+            }
+
+            delete deletedChatTimestamps[realPhone];
+            delete deletedChatTimestamps[jid];
+            if (c.remoteJidAlt) delete deletedChatTimestamps[c.remoteJidAlt];
+            localStorage.setItem(`${COMPANY_ID}_crm_deleted_timestamps`, JSON.stringify(deletedChatTimestamps));
+            return false;
+        }
+
+        async function deleteChat(whatsapp, event) {
+            if(event) event.stopPropagation();
+            
+            const chat = localChats.find(c => c.whatsapp === whatsapp || c.jid === whatsapp);
+            if(!chat) return;
+
+            if(!confirm(`Deseja EXCLUIR o histórico com "${chat.nome_cliente}"?`)) return;
+
+            const targetJid = chat.jid || `${whatsapp}@s.whatsapp.net`;
+            const nowEpoch = Date.now();
+
+            deletedChatTimestamps[whatsapp] = nowEpoch;
+            deletedChatTimestamps[targetJid] = nowEpoch;
+            localStorage.setItem(`${COMPANY_ID}_crm_deleted_timestamps`, JSON.stringify(deletedChatTimestamps));
+
+            delete chatDrafts[whatsapp];
+            delete chatDrafts[targetJid];
+            localStorage.setItem(`${COMPANY_ID}_crm_chat_drafts`, JSON.stringify(chatDrafts));
+
+            localChats = localChats.filter(c => c.whatsapp !== whatsapp && c.jid !== targetJid);
+            localStorage.removeItem(`${COMPANY_ID}_crm_history_${whatsapp}`);
+            localStorage.removeItem(`${COMPANY_ID}_crm_history_${chat.jid}`);
+
+            if (activeChatId === whatsapp || activeChatId === chat.jid) {
+                activeChatId = "";
+                document.getElementById('chat-messages-container').innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-batataTextDim space-y-2">
+                        <i class="fa-solid fa-comments text-4xl text-batataBorder"></i>
+                        <p class="text-sm">Selecione uma conversa para monitorar as mensagens.</p>
+                    </div>
+                `;
+                document.getElementById('active-chat-name').innerText = "Selecione uma conversa";
+                document.getElementById('active-chat-phone').innerText = "Inicie o monitoramento do CRM";
+                document.getElementById('chat-input-text').value = "";
+            }
+
+            renderCRMContacts(true);
+            showToast("Conversa Excluída", `Atendimento de ${chat.nome_cliente} apagado.`);
+
+            try {
+                await fetch(`${EVO_API_URL}/chat/deleteChat/${EVO_INSTANCE}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': EVO_APIKEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "where": { "remoteJid": targetJid } })
+                });
+            } catch (err) {}
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-950/40', 'text-batataGold', 'font-semibold', 'border', 'border-amber-500/20');
+                btn.classList.add('text-amber-100/70');
+            });
+            const activeBtn = document.getElementById(`btn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-amber-950/40', 'text-batataGold', 'font-semibold', 'border', 'border-amber-500/20');
+                activeBtn.classList.remove('text-amber-100/70');
+            }
+
+            if(tabName === 'crm') fetchEvolutionChats();
+            else if(tabName === 'pedidos') syncAllData();
+            else if(tabName === 'estoque') loadProductsData();
+        }
+
+        function showToast(title, body) {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-body').innerText = body;
+            
+            toast.classList.remove('translate-x-96');
+            setTimeout(() => toast.classList.add('translate-x-96'), 4500);
+        }
+
+        function playIncomingOrderAlarm(newOrder) {
+            if (newOrder) {
+                document.getElementById('new-order-alert-client').innerText = `O cliente ${newOrder.nome_cliente || ''} acabou de solicitar uma Batata Recheada!`;
+                document.getElementById('new-order-alert-items').innerHTML = formatOrderItemsHTML(newOrder.itens);
+            }
+
+            document.getElementById('modal-novo-pedido-alert').classList.remove('hidden');
+            document.getElementById('order-alarm-indicator').classList.remove('hidden');
+
+            if (alarmInterval) return;
+
+            alarmInterval = setInterval(() => {
+                playIFoodTrimSound();
+            }, 2000);
+        }
+
+        function stopIncomingOrderAlarm() {
+            if (alarmInterval) {
+                clearInterval(alarmInterval);
+                alarmInterval = null;
+            }
+            document.getElementById('modal-novo-pedido-alert').classList.add('hidden');
+            document.getElementById('order-alarm-indicator').classList.add('hidden');
+        }
+
+        // ============================================================
+        // FLUXO DE PEDIDOS & PRECIFICAÇÃO COM PIX & IMPRESSÃO TÉRMICA
+        // ============================================================
+
+        async function silentSyncOrders() {
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "get_active_orders" }))
+                });
+
+                if (!res.ok) return;
+
+                const data = await res.json();
+                const fetchedOrders = data.pedidos || [];
+                let newlyDiscoveredOrder = null;
+
+                fetchedOrders.forEach(p => {
+                    if (!knownOrderIds.has(p.id)) {
+                        if (initialOrderLoadDone && p.status === 'aguardando_precificacao') {
+                            newlyDiscoveredOrder = p;
+                        }
+                        knownOrderIds.add(p.id);
+                    }
+                });
+
+                if (!initialOrderLoadDone) {
+                    initialOrderLoadDone = true;
+                }
+
+                if (newlyDiscoveredOrder) {
+                    playIncomingOrderAlarm(newlyDiscoveredOrder);
+                    showToast("🚨 NOVO PEDIDO!", `O cliente ${newlyDiscoveredOrder.nome_cliente || ''} fez um pedido no WhatsApp!`);
+                }
+
+                localPedidos = fetchedOrders;
+                localVendas = data.vendas || [];
+
+                document.getElementById('stat-faturamento').innerText = `R$ ${(data.faturamento_hoje || 0).toFixed(2).replace('.', ',')}`;
+                document.getElementById('stat-vendas-mes').innerText = `R$ ${(data.faturamento_mes || 0).toFixed(2).replace('.', ',')}`;
+
+                const pedidosTab = document.getElementById('tab-pedidos');
+                if (pedidosTab && !pedidosTab.classList.contains('hidden')) {
+                    renderTablePedidos();
+                }
+
+                document.getElementById('sync-status-indicator').innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400"></span> Conectado`;
+
+            } catch (err) {
+                document.getElementById('sync-status-indicator').innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Reconectando...`;
+            }
+        }
+
+        async function syncAllData() {
+            showToast("Sincronizando...", "Buscando dados no Postgres...");
+            await silentSyncOrders();
+            renderTablePedidos();
+            showToast("Sincronizado", "Dados atualizados!");
+        }
+
+        function renderTablePedidos() {
+            const cols = {
+                'aguardando_precificacao': document.getElementById('col-aguardando_precificacao'),
+                'aguardando_pagamento': document.getElementById('col-aguardando_pagamento'),
+                'em_separacao': document.getElementById('col-em_separacao'),
+                'saiu_entrega': document.getElementById('col-saiu_entrega'),
+                'concluido': document.getElementById('col-concluido')
+            };
+
+            const counts = {
+                'aguardando_precificacao': 0,
+                'aguardando_pagamento': 0,
+                'em_separacao': 0,
+                'saiu_entrega': 0,
+                'concluido': 0
+            };
+
+            Object.keys(cols).forEach(key => {
+                if (cols[key]) cols[key].innerHTML = '';
+            });
+
+            localPedidos.forEach(p => {
+                const totalPedido = p.total ? parseFloat(p.total) : 0;
+                const fretePedido = p.frete ? parseFloat(p.frete) : 0;
+                const subtotalPedido = p.subtotal ? parseFloat(p.subtotal) : 0;
+                const totalGeral = totalPedido > 0 ? totalPedido : (subtotalPedido + fretePedido);
+
+                let currentStatus = p.status || 'aguardando_precificacao';
+                if (!cols[currentStatus]) currentStatus = 'aguardando_precificacao';
+
+                counts[currentStatus]++;
+
+                let cardActions = '';
+                let cardColorBorder = 'border-batataBorder';
+
+                if (currentStatus === 'aguardando_precificacao') {
+                    cardColorBorder = 'border-amber-500/40';
+                    cardActions = `
+                        <button onclick="openPrecificarModal(${p.id}, '${escapeQuotes(p.nome_cliente)}', '${escapeQuotes(p.itens)}', '${p.whatsapp}')" 
+                                class="w-full bg-batataGold hover:bg-batataGoldHover text-batataDark text-xs font-extrabold py-2 px-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-calculator"></i> Precificar & Gerar PIX
+                        </button>
+                    `;
+                } else if (currentStatus === 'aguardando_pagamento') {
+                    cardColorBorder = 'border-blue-500/40';
+                    cardActions = `
+                        <div class="flex gap-1.5">
+                            <button onclick="printOrderReceipt(${p.id})" class="flex-1 bg-batataInput hover:bg-batataBorderLight text-white text-[11px] font-bold py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-print"></i> Recibo
+                            </button>
+                            <button onclick="updateOrderStatus(${p.id}, 'em_separacao')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold py-1.5 px-2 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Confirmar e Cozinhar">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        </div>
+                    `;
+                } else if (currentStatus === 'em_separacao') {
+                    cardColorBorder = 'border-indigo-500/40';
+                    cardActions = `
+                        <div class="flex gap-1.5">
+                            <button onclick="printOrderReceipt(${p.id})" class="flex-1 bg-batataInput hover:bg-batataBorderLight text-white text-[11px] font-bold py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-print"></i> Recibo
+                            </button>
+                            <button onclick="updateOrderStatus(${p.id}, 'saiu_entrega')" class="bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold py-1.5 px-2 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Despachar Delivery">
+                                <i class="fa-solid fa-motorcycle"></i>
+                            </button>
+                        </div>
+                    `;
+                } else if (currentStatus === 'saiu_entrega') {
+                    cardColorBorder = 'border-purple-500/40';
+                    cardActions = `
+                        <div class="flex gap-1.5">
+                            <button onclick="printOrderReceipt(${p.id})" class="flex-1 bg-batataInput hover:bg-batataBorderLight text-white text-[11px] font-bold py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-print"></i> Recibo
+                            </button>
+                            <button onclick="updateOrderStatus(${p.id}, 'concluido')" class="bg-green-600 hover:bg-green-700 text-white text-[11px] font-bold py-1.5 px-2 rounded-lg transition-all flex items-center gap-1 cursor-pointer" title="Marcar como Entregue">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    cardColorBorder = 'border-green-500/40';
+                    cardActions = `
+                        <button onclick="printOrderReceipt(${p.id})" class="w-full bg-batataInput hover:bg-batataBorderLight text-amber-100/90 text-[11px] font-bold py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-print"></i> Imprimir Recibo
+                        </button>
+                    `;
+                }
+
+                const formattedPhone = formatPhoneNumber(p.whatsapp);
+
+                const cardHtml = `
+                    <div id="order-card-${p.id}" 
+                         draggable="true" 
+                         ondragstart="handleDragStart(event, ${p.id})" 
+                         ondragend="handleDragEnd(event)" 
+                         class="bg-batataCardDark border ${cardColorBorder} rounded-xl p-3.5 space-y-3 shadow-lg hover:border-batataGold transition-all cursor-grab active:cursor-grabbing group">
+                        
+                        <div class="flex items-center justify-between border-b border-batataBorder pb-2">
+                            <div class="flex items-center gap-1.5 min-w-0">
+                                <i class="fa-solid fa-grip-vertical text-batataTextDim group-hover:text-batataGold text-xs"></i>
+                                <span class="text-[10px] text-batataTextMuted font-mono font-bold">#${p.id}</span>
+                                <h5 class="font-bold text-white text-xs truncate">${p.nome_cliente}</h5>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button onclick="openEditOrderModal(${p.id})" class="text-amber-400 hover:text-white p-1 rounded transition-all text-xs" title="Editar">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="deleteOrderDirect(${p.id}, event)" class="text-red-400 hover:text-white p-1 rounded transition-all text-xs" title="Excluir">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 text-xs text-amber-100/90">
+                            <p class="text-[10px] text-batataTextMuted font-mono flex items-center gap-1 truncate">
+                                <i class="fa-brands fa-whatsapp text-green-400"></i> ${formattedPhone}
+                            </p>
+                            <p class="text-[10px] text-batataTextMuted truncate" title="${p.endereco_entrega || ''}">
+                                <i class="fa-solid fa-location-dot text-batataTextDim mr-1"></i>${p.endereco_entrega || 'Retirada na Loja'}
+                            </p>
+                            
+                            <div class="bg-batataInput/80 p-2.5 rounded-xl border border-batataBorder/80 max-h-36 overflow-y-auto">
+                                ${formatOrderItemsHTML(p.itens)}
+                            </div>
+                            
+                            <div class="pt-1 flex justify-between items-center font-bold text-xs border-t border-batataBorder/60">
+                                <span class="text-batataTextMuted text-[10px]">Total do Pedido:</span>
+                                <span class="text-green-400 font-mono">R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-1">${cardActions}</div>
+                    </div>
+                `;
+
+                if (cols[currentStatus]) {
+                    cols[currentStatus].innerHTML += cardHtml;
+                }
+            });
+
+            document.getElementById('badge-count-precificacao').innerText = counts['aguardando_precificacao'];
+            document.getElementById('badge-count-pagamento').innerText = counts['aguardando_pagamento'];
+            document.getElementById('badge-count-separacao').innerText = counts['em_separacao'];
+            document.getElementById('badge-count-entrega').innerText = counts['saiu_entrega'];
+            document.getElementById('badge-count-concluido').innerText = counts['concluido'];
+
+            Object.keys(cols).forEach(key => {
+                if (cols[key] && counts[key] === 0) {
+                    cols[key].innerHTML = `
+                        <div class="p-6 text-center text-batataTextDim text-xs border border-dashed border-batataBorder rounded-xl">
+                            Nenhum pedido nesta etapa
+                        </div>
+                    `;
+                }
+            });
+
+            // Sincroniza o dropdown de frete ao reconstruir o Kanban (Ajuste 3)
+            populateFreteOrdersDropdown();
+        }
+
+        // ============================================================
+        // CARDÁPIO & FILTROS AVANÇADOS
+        // ============================================================
+
+        async function loadProductsData() {
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "get_products" }))
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    localEstoque = (data.produtos || []).map(i => ({
+                        id: i.id,
+                        Codigo: i.codigo || i.Codigo || '',
+                        Produto: i.produto || i.Produto || '',
+                        Categoria: i.categoria || i.Categoria || i.marca || i.Marca || 'Geral',
+                        Descricao: i.descricao || i.Descricao || '',
+                        Preco_KG: i.preco_kg || i.Preco_KG || 0,
+                        Venda_Granel: i.venda_granel || i.Venda_Granel || 'Não',
+                        Estoque_Atual: i.estoque_atual || i.Estoque_Atual || 0,
+                        Marca: i.categoria || i.Categoria || i.marca || i.Marca || 'Geral',
+                        Validade: i.validade || i.Validade || '',
+                        Quilos: i.quilos || 0,
+                        Unidades: i.unidades || 1
+                    }));
+
+                    localEstoque.sort((a, b) => (a.Produto || '').localeCompare(b.Produto || '', 'pt-BR', { sensitivity: 'base' }));
+                }
+            } catch(e) {
+                localEstoque = [...DEFAULT_ESTOQUE];
+            }
+            populateMarcaDropdown();
+            renderTableEstoque();
+        }
+
+        function populateMarcaDropdown() {
+            const selectMarca = document.getElementById('filter-stock-marca');
+            if(!selectMarca) return;
+            selectMarca.innerHTML = '<option value="todas">Todas as Categorias</option>';
+
+            const marcas = [...new Set(localEstoque.map(item => item.Categoria || item.Marca).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+            marcas.forEach(marca => {
+                selectMarca.innerHTML += `<option value="${marca}">${marca}</option>`;
+            });
+        }
+
+        function filterEstoqueTable() {
+            const search = document.getElementById('search-estoque').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-stock-status').value;
+            const marcaFilter = document.getElementById('filter-stock-marca').value;
+
+            const filtered = localEstoque.filter(item => {
+                const nameMatch = (item.Produto || '').toLowerCase().includes(search);
+                const catMatch = (item.Categoria || item.Marca || '').toLowerCase().includes(search);
+                const descMatch = (item.Descricao || '').toLowerCase().includes(search);
+                const codMatch = (item.Codigo || '').toLowerCase().includes(search);
+                const matchesSearch = nameMatch || catMatch || descMatch || codMatch;
+                
+                let matchesStatus = true;
+                const stock = parseFloat(item.Estoque_Atual);
+                if (statusFilter === 'disponivel') matchesStatus = stock > 10;
+                else if (statusFilter === 'baixo') matchesStatus = stock > 0 && stock <= 10;
+                else if (statusFilter === 'esgotado') matchesStatus = stock <= 0;
+
+                let matchesMarca = true;
+                if (marcaFilter !== 'todas') matchesMarca = (item.Categoria === marcaFilter || item.Marca === marcaFilter);
+
+                return matchesSearch && matchesStatus && matchesMarca;
+            });
+
+            renderTableEstoque(filtered);
+        }
+
+        function renderTableEstoque(itemsToRender = localEstoque) {
+            const body = document.getElementById('estoque-table-body');
+            const selectCalc = document.getElementById('calc-racao');
+            if (!body) return;
+            body.innerHTML = '';
+            if(selectCalc) selectCalc.innerHTML = '<option value="0">Escolha um prato...</option>';
+
+            const itemsSorted = [...itemsToRender].sort((a, b) => (a.Produto || '').localeCompare(b.Produto || '', 'pt-BR', { sensitivity: 'base' }));
+
+            itemsSorted.forEach((e) => {
+                const permitsGranel = (e.Venda_Granel || '').toLowerCase() === 'sim';
+                const stockVal = parseFloat(e.Estoque_Atual || 0);
+                const statusColor = stockVal > 10 ? "text-green-400" : (stockVal > 0 ? "text-amber-400" : "text-red-400");
+                const formattedStock = Number.isInteger(stockVal) ? stockVal.toString() : stockVal.toFixed(2).replace('.', ',');
+
+                const codigoLabel = (e.Codigo || e.codigo) ? `#${e.Codigo || e.codigo} - ` : '';
+                const categoriaLabel = e.Categoria || e.categoria || e.Marca || 'Geral';
+                const descText = e.Descricao || e.descricao || '';
+
+                body.innerHTML += `
+                    <tr class="hover:bg-batataInput/30 transition-all text-amber-100/90 border-b border-batataBorder/40">
+                        <td class="p-4 max-w-md">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-white text-sm">${codigoLabel}${e.Produto}</span>
+                            </div>
+                            <span class="text-[10px] text-batataGold uppercase font-bold tracking-wider block mt-0.5">CATEGORIA: ${categoriaLabel}</span>
+                            ${descText ? `<p class="text-xs text-batataTextMuted line-clamp-2 mt-1 leading-relaxed">${descText}</p>` : ''}
+                        </td>
+                        <td class="p-4 font-mono font-bold whitespace-nowrap">R$ ${parseFloat(e.Preco_KG || 0).toFixed(2)}</td>
+                        <td class="p-4 whitespace-nowrap">
+                            <span class="px-2 py-0.5 rounded-md text-xs font-bold ${permitsGranel ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-batataInput text-batataTextMuted'}">
+                                ${permitsGranel ? 'Meio a Meio / Fracionado' : 'Unidade Inteira'}
+                            </span>
+                        </td>
+                        <td class="p-4 font-mono font-bold ${statusColor} whitespace-nowrap">${formattedStock} ${permitsGranel ? 'kg' : 'unid'}</td>
+                        <td class="p-4 whitespace-nowrap">
+                            <span class="text-xs font-bold ${stockVal > 0 ? 'text-green-500' : 'text-red-500'}">
+                                ${stockVal > 0 ? '● Ativo' : '○ Esgotado'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-right whitespace-nowrap">
+                            <div class="flex justify-end gap-2 items-center">
+                                <button onclick="editProduct(${e.id})" class="text-amber-400 hover:text-white transition-all p-1.5 rounded-lg hover:bg-batataInput cursor-pointer" title="Editar Prato">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="deleteProduct(${e.id})" class="text-red-400 hover:text-white transition-all p-1.5 rounded-lg hover:bg-batataInput cursor-pointer" title="Excluir Prato">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                if(selectCalc) selectCalc.innerHTML += `<option value="${e.Preco_KG}">${e.Produto}</option>`;
+            });
+        }
+
+        function openAddProductModal() { 
+            document.getElementById('product-id').value = '';
+            document.getElementById('product-codigo').value = '';
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-marca').value = '';
+            document.getElementById('product-price').value = '';
+            document.getElementById('product-descricao').value = '';
+            document.getElementById('product-granel').value = 'Não';
+            document.getElementById('product-stock').value = '';
+            document.getElementById('product-quilos').value = '';
+            document.getElementById('product-unidades').value = '';
+            document.getElementById('product-validade').value = '';
+            document.getElementById('product-modal-title').innerText = "Adicionar Novo Prato / Item";
+            document.getElementById('modal-produto').classList.remove('hidden'); 
+        }
+
+        // CORREÇÃO DECIMAIS GIGANTES (Ex: 69,90000 -> 69.90)
+        function editProduct(id) {
+            const p = localEstoque.find(item => item.id == id);
+            if (!p) return showToast("Erro", "Produto não encontrado.");
+
+            document.getElementById('product-id').value = p.id;
+            document.getElementById('product-codigo').value = p.Codigo || p.codigo || '';
+            document.getElementById('product-name').value = p.Produto || p.produto || '';
+            document.getElementById('product-marca').value = p.Categoria || p.categoria || p.Marca || '';
+            document.getElementById('product-price').value = p.Preco_KG ? parseFloat(p.Preco_KG).toFixed(2) : '';
+            document.getElementById('product-descricao').value = p.Descricao || p.descricao || '';
+            document.getElementById('product-granel').value = p.Venda_Granel || 'Não';
+            document.getElementById('product-stock').value = p.Estoque_Atual ? parseFloat(p.Estoque_Atual) : '';
+            document.getElementById('product-quilos').value = p.Quilos ? parseFloat(p.Quilos) : '';
+            document.getElementById('product-unidades').value = p.Unidades ? parseInt(p.Unidades) : '1';
+            
+            const cleanDateISO = (p.Validade || '').toString().split('T')[0];
+            document.getElementById('product-validade').value = cleanDateISO;
+            
+            document.getElementById('product-modal-title').innerText = `Editar: ${p.Produto}`;
+            document.getElementById('modal-produto').classList.remove('hidden');
+        }
+
+        function closeAddProductModal() { document.getElementById('modal-produto').classList.add('hidden'); }
+
+        async function submitProductForm() {
+            const productId = document.getElementById('product-id').value;
+            const isEdit = Boolean(productId);
+
+            const pData = { 
+                id: productId,
+                codigo: document.getElementById('product-codigo').value,
+                produto: document.getElementById('product-name').value, 
+                categoria: document.getElementById('product-marca').value,
+                descricao: document.getElementById('product-descricao').value,
+                preco_kg: parseFloat(document.getElementById('product-price').value || 0).toFixed(2), 
+                venda_granel: document.getElementById('product-granel').value, 
+                estoque_atual: document.getElementById('product-stock').value,
+                quilos: parseFloat(document.getElementById('product-quilos').value || 0),
+                unidades: parseInt(document.getElementById('product-unidades').value || 1),
+                validade: document.getElementById('product-validade').value,
+                // Garantia de chaves para retrocompatibilidade
+                Codigo: document.getElementById('product-codigo').value,
+                Produto: document.getElementById('product-name').value, 
+                Marca: document.getElementById('product-marca').value, 
+                Preco_KG: parseFloat(document.getElementById('product-price').value || 0).toFixed(2), 
+                Venda_Granel: document.getElementById('product-granel').value, 
+                Estoque_Atual: document.getElementById('product-stock').value
+            };
+
+            closeAddProductModal();
+            showToast(isEdit ? "Salvando Edição..." : "Cadastrando...", "Enviando dados para o banco...");
+
+            try {
+                await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: isEdit ? "edit_product" : "add_product", ...pData }))
+                });
+                showToast("Sucesso", isEdit ? "Prato atualizado com sucesso!" : "Prato cadastrado com sucesso!");
+                loadProductsData();
+            } catch(e) {
+                showToast("Offline", "Salvo na memória local.");
+            }
+        }
+
+        async function deleteProduct(id) {
+            if(!confirm("Excluir este produto?")) return;
+            try {
+                await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "delete_product", id }))
+                });
+                showToast("Sucesso", "Produto removido!");
+                loadProductsData();
+            } catch(e) {}
+        }
+
+        // ============================================================
+        // SISTEMA DE ROTEAMENTO INTEGRADO DE FRETE REAL (AJUSTE 1 & 3)
+        // ============================================================
+
+        function populateFreteOrdersDropdown() {
+            const select = document.getElementById('frete-pedido-select');
+            if (!select) return;
+
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Escolha um pedido para rotear...</option>';
+            
+            // Filtra os pedidos ativos da tela para rotear
+            const activeOrders = localPedidos.filter(p => p.status !== 'concluido' && p.status !== 'cancelado');
+            
+            activeOrders.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">Pedido #${p.id} - ${p.nome_cliente}</option>`;
+            });
+
+            if (currentValue && activeOrders.some(p => p.id == currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function autoFillAddressFromOrder() {
+            const orderId = document.getElementById('frete-pedido-select').value;
+            if (!orderId) {
+                document.getElementById('frete-destino').value = '';
+                return;
+            }
+            const p = localPedidos.find(item => item.id == orderId);
+            if (p) {
+                document.getElementById('frete-destino').value = p.endereco_entrega || '';
+            }
+        }
+
+        function saveOriginAddress() {
+            const addr = document.getElementById('frete-origem').value.trim();
+            localStorage.setItem(`${COMPANY_ID}_frete_origem`, addr);
+            showToast("Origem Salva", "Endereço de origem da loja atualizado com sucesso!");
+        }
+
+        function cleanAddressForGeocoding(address) {
+            if (!address) return "";
+            return address
+                .replace(/\bAv\.\b/gi, 'Avenida')
+                .replace(/\bR\.\b/gi, 'Rua')
+                .replace(/\bAl\.\b/gi, 'Alameda')
+                .replace(/\bBalneario\b/gi, 'Balneário')
+                .replace(/\s*-\s*/g, ', ')
+                .trim();
+        }
+
+        async function geocodeAddressWithFallbacks(rawAddress) {
+            const clean = cleanAddressForGeocoding(rawAddress);
+            
+            // Tentativa 1: Endereço limpo + Brasil
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(clean + ', Brasil')}`, {
+                    headers: { 'Accept-Language': 'pt-BR' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+                    }
+                }
+            } catch (e) {}
+
+            // Tentativa 2: Remove números e caracteres especiais, foca na Rua + Cidade + Estado
+            try {
+                const parts = rawAddress.split(',').map(p => p.trim());
+                const street = parts[0] ? parts[0].replace(/\d+/g, '').replace(/\bAv\.\b/gi, 'Avenida').replace(/\bR\.\b/gi, 'Rua').trim() : "";
+                const cityPart = parts.find(p => p.toLowerCase().includes('mongaguá') || p.toLowerCase().includes('sp')) || "Mongaguá, SP";
+                const fallbackQuery = `${street}, ${cityPart}, Brasil`;
+
+                const res2 = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(fallbackQuery)}`, {
+                    headers: { 'Accept-Language': 'pt-BR' }
+                });
+                if (res2.ok) {
+                    const data2 = await res2.json();
+                    if (data2 && data2.length > 0) {
+                        return { lat: parseFloat(data2[0].lat), lon: parseFloat(data2[0].lon) };
+                    }
+                }
+            } catch (e) {}
+
+            // Tentativa 3: Busca pela cidade inteira se tudo falhar
+            try {
+                const res3 = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent('Mongaguá, SP, Brasil')}`);
+                if (res3.ok) {
+                    const data3 = await res3.json();
+                    if (data3 && data3.length > 0) {
+                        return { lat: parseFloat(data3[0].lat), lon: parseFloat(data3[0].lon) };
+                    }
+                }
+            } catch (e) {}
+
+            throw new Error(`Não foi possível localizar o endereço "${rawAddress}".`);
+        }
+
+        function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Raio da Terra em KM
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // KM
+        }
+
+        // CÁLCULO DE ROTA REAL VIA NOMINATIM GEOCÓDIGO & OSRM DRIVING ROUTE
+        async function calcularRotaFrontend() {
+            const origem = document.getElementById('frete-origem').value.trim();
+            const destino = document.getElementById('frete-destino').value.trim();
+            
+            if (!origem) return showToast("Aviso", "Informe o endereço de origem da loja.");
+            if (!destino) return showToast("Aviso", "Informe o endereço de destino do cliente.");
+
+            const btn = document.getElementById('btn-calcular-rota');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Traçando Rota...`;
+
+            try {
+                showToast("Buscando Coordenadas...", "Localizando endereços no mapa...");
+
+                const coordsOrigem = await geocodeAddressWithFallbacks(origem);
+                const coordsDestino = await geocodeAddressWithFallbacks(destino);
+
+                let distanciaKm = 0;
+                let duracaoMin = 0;
+
+                // Tenta rota exata por OSRM
+                try {
+                    const resRoute = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordsOrigem.lon},${coordsOrigem.lat};${coordsDestino.lon},${coordsDestino.lat}?overview=false`);
+                    if (resRoute.ok) {
+                        const dataRoute = await resRoute.json();
+                        if (dataRoute.routes && dataRoute.routes.length > 0) {
+                            distanciaKm = dataRoute.routes[0].distance / 1000;
+                            duracaoMin = dataRoute.routes[0].duration / 60;
+                        }
+                    }
+                } catch (errRoute) {
+                    console.warn("OSRM indisponível, calculando por Haversine:", errRoute);
+                }
+
+                // Se a rota OSRM falhou ou deu 0, usa a fórmula de Haversine ajustada
+                if (distanciaKm <= 0) {
+                    distanciaKm = calculateHaversineDistance(coordsOrigem.lat, coordsOrigem.lon, coordsDestino.lat, coordsDestino.lon) * 1.25;
+                    duracaoMin = Math.max(1, (distanciaKm / 25) * 60);
+                }
+
+                let displayDistancia = distanciaKm < 1 ? `${(distanciaKm * 1000).toFixed(0)} m (${distanciaKm.toFixed(2)} KM)` : `${distanciaKm.toFixed(2)} KM`;
+                let displayTempo = `${Math.ceil(duracaoMin)} min`;
+
+                const custoKm = parseFloat(document.getElementById('frete-custo-km').value || 0);
+                const taxaFixa = parseFloat(document.getElementById('frete-taxa-fixa').value || 0);
+                const valorFinal = taxaFixa + (distanciaKm * custoKm);
+
+                document.getElementById('rota-distancia').innerText = displayDistancia;
+                document.getElementById('rota-tempo').innerText = displayTempo;
+                document.getElementById('rota-valor-frete').innerText = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+                document.getElementById('rota-valor-frete').dataset.val = valorFinal.toFixed(2);
+
+                document.getElementById('btn-aplicar-frete-pedido').removeAttribute('disabled');
+                showToast("Rota Real Calculada!", `Distância: ${displayDistancia} | Tempo: ${displayTempo}`);
+
+            } catch (error) {
+                console.error(error);
+                showToast("Erro de Rota", error.message || "Não foi possível localizar os endereços.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-route"></i> Traçar Rota de Entrega`;
+            }
+        }
+
+        // GRAVAÇÃO AUTOMÁTICA DE FRETE NO PEDIDO DO BANCO
+        async function adicionarFreteAoPedidoSelecionado() {
+            const orderId = document.getElementById('frete-pedido-select').value;
+            if (!orderId) {
+                return showToast("Aviso", "Por favor, selecione um pedido ativo primeiro.");
+            }
+
+            const p = localPedidos.find(item => item.id == orderId);
+            if (!p) {
+                return showToast("Erro", "Pedido não encontrado no cache.");
+            }
+
+            const freteVal = parseFloat(document.getElementById('rota-valor-frete').dataset.val || 0);
+            const subtotal = parseFloat(p.subtotal || 0);
+            const total = subtotal + freteVal;
+
+            const btn = document.getElementById('btn-aplicar-frete-pedido');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Gravando Frete...`;
+
+            const updatedData = {
+                id: p.id,
+                nome_cliente: p.nome_cliente,
+                whatsapp: p.whatsapp,
+                endereco_entrega: p.endereco_entrega || "Retirada no Balcão",
+                itens: p.itens,
+                subtotal: subtotal,
+                frete: freteVal,
+                total: total,
+                status: p.status
+            };
+
+            showToast("Gravando Frete...", `Gravando taxa de R$ ${freteVal.toFixed(2)} no Pedido #${p.id}...`);
+
+            try {
+                const res = await fetch(N8N_WEBHOOK_PAINEL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildMultiTenantPayload({ action: "edit_order", ...updatedData }))
+                });
+
+                if (!res.ok) throw new Error();
+                showToast("Sucesso!", `Frete de R$ ${freteVal.toFixed(2)} gravado com sucesso no Pedido #${p.id}!`);
+                await syncAllData();
+            } catch (err) {
+                showToast("Erro de Gravação", "Não foi possível sincronizar o frete com o banco de dados.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-circle-plus"></i> Gravar Frete no Banco`;
+            }
+        }
+
+        function filterChats() {
+            const query = document.getElementById('search-chat').value.toLowerCase();
+            const contacts = document.getElementById('crm-contact-list').children;
+            for(let i = 0; i < contacts.length; i++) {
+                const text = contacts[i].textContent.toLowerCase();
+                contacts[i].style.display = text.indexOf(query) > -1 ? "" : "none";
+            }
+        }
+
+        window.onload = function() {
+            // Inicializa endereço dinâmico da loja de forma isolada por inquilino
+            const savedOrigin = localStorage.getItem(`${COMPANY_ID}_frete_origem`) || "Av. Monteiro Lobato, 8730 - Balneario Jussara, Mongaguá - SP";
+            document.getElementById('frete-origem').value = savedOrigin;
+
+            loadProductsData();
+            fetchEvolutionChats();
+            syncAllData();
+            startRealTimePolling();
+        };
+
+        window.addEventListener('beforeunload', () => stopRealTimePolling());
+    </script>
+</body>
+</html>
