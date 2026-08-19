@@ -1167,25 +1167,27 @@
                 const card = document.createElement('div');
                 card.className = "glass-effect rounded-2xl overflow-hidden shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between border border-white/5 relative group";
 
-                // Unique tags/badges logic (Inline side-by-side with price)
+                // Unique tags/badges logic (Posicionadas abaixo do nome)
                 let badgeMarkup = '';
                 if (item.badge) {
-                    badgeMarkup = `<span class="bg-secondary text-darkBg text-xs font-black uppercase px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">${item.badge}</span>`;
+                    badgeMarkup = `<span class="bg-secondary text-darkBg text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">${item.badge}</span>`;
                 } else if (catId === 'batatas') {
-                    badgeMarkup = `<span class="bg-primary/80 border border-secondary/30 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full whitespace-nowrap">${currentPotatoMassa}</span>`;
+                    badgeMarkup = `<span class="bg-primary/80 border border-secondary/30 text-white text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full whitespace-nowrap">${currentPotatoMassa}</span>`;
                 } else if (item.tipo) {
-                    badgeMarkup = `<span class="bg-darkBg/90 border border-white/10 text-gray-300 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full whitespace-nowrap">${item.tipo}</span>`;
+                    badgeMarkup = `<span class="bg-darkBg/90 border border-white/10 text-gray-300 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full whitespace-nowrap">${item.tipo}</span>`;
                 }
 
                 // Layout building
                 card.innerHTML = `
                     <div class="p-6">
                         <div class="flex items-start justify-between gap-3 mb-4">
-                            <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors duration-300 flex-1 leading-tight">
-                                ${item.nome}
-                            </h3>
-                            <div class="flex items-center gap-2 shrink-0">
-                                ${badgeMarkup}
+                            <div class="flex flex-col flex-1 pr-2">
+                                <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors duration-300 leading-tight">
+                                    ${item.nome}
+                                </h3>
+                                ${badgeMarkup ? `<div class="mt-1.5 flex items-center">${badgeMarkup}</div>` : ''}
+                            </div>
+                            <div class="shrink-0 pt-0.5">
                                 <span class="text-lg font-black text-secondary whitespace-nowrap">
                                     R$ ${item.preco.toFixed(2).replace('.', ',')}
                                 </span>
