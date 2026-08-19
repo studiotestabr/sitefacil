@@ -1167,27 +1167,29 @@
                 const card = document.createElement('div');
                 card.className = "glass-effect rounded-2xl overflow-hidden shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between border border-white/5 relative group";
 
-                // Unique tags/badges logic
+                // Unique tags/badges logic (Inline side-by-side with price)
                 let badgeMarkup = '';
                 if (item.badge) {
-                    badgeMarkup = `<span class="absolute top-4 right-4 bg-secondary text-darkBg text-xs font-black uppercase px-3 py-1 rounded-full z-10 shadow-md">${item.badge}</span>`;
+                    badgeMarkup = `<span class="bg-secondary text-darkBg text-xs font-black uppercase px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">${item.badge}</span>`;
                 } else if (catId === 'batatas') {
-                    badgeMarkup = `<span class="absolute top-4 right-4 bg-primary/80 border border-secondary/30 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full z-10">${currentPotatoMassa}</span>`;
+                    badgeMarkup = `<span class="bg-primary/80 border border-secondary/30 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full whitespace-nowrap">${currentPotatoMassa}</span>`;
                 } else if (item.tipo) {
-                    badgeMarkup = `<span class="absolute top-4 right-4 bg-darkBg/90 border border-white/10 text-gray-300 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full z-10">${item.tipo}</span>`;
+                    badgeMarkup = `<span class="bg-darkBg/90 border border-white/10 text-gray-300 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full whitespace-nowrap">${item.tipo}</span>`;
                 }
 
                 // Layout building
                 card.innerHTML = `
-                    ${badgeMarkup}
                     <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors duration-300">
+                        <div class="flex items-start justify-between gap-3 mb-4">
+                            <h3 class="text-xl font-bold text-white group-hover:text-secondary transition-colors duration-300 flex-1 leading-tight">
                                 ${item.nome}
                             </h3>
-                            <span class="text-lg font-black text-secondary whitespace-nowrap">
-                                R$ ${item.preco.toFixed(2).replace('.', ',')}
-                            </span>
+                            <div class="flex items-center gap-2 shrink-0">
+                                ${badgeMarkup}
+                                <span class="text-lg font-black text-secondary whitespace-nowrap">
+                                    R$ ${item.preco.toFixed(2).replace('.', ',')}
+                                </span>
+                            </div>
                         </div>
                         <p class="text-gray-400 text-sm leading-relaxed mb-6">
                             ${item.descricao || 'Bebida premium refrescante e selecionada.'}
