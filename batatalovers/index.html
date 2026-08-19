@@ -160,7 +160,7 @@
     <!-- Main Content -->
     <main class="relative">
 
-        <!-- SEÇÃO HERO (Impacto e Promessa) -->
+        <!-- SEÇÃO HERO -->
         <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
             <div class="absolute inset-0">
                 <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/batatalovers/Gemini_Generated_Image_fq31oafq31oafq31.jpg" 
@@ -517,7 +517,7 @@
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163511922_0.jpg" 
                              alt="Equipe Batata Lovers servindo com paixão" 
                              class="relative rounded-3xl shadow-2xl object-cover w-full h-[500px]"
-                             loading="lazy" decoding="async" width="600" height="500">
+                             loading="lazy" width="600" height="500">
                     </div>
 
                     <div class="order-1 lg:order-2">
@@ -695,7 +695,7 @@
         </div>
     </footer>
 
-    <!-- BARRA FLUTUANTE INFERIOR DO CARRINHO (Aparece quando há itens) -->
+    <!-- BARRA FLUTUANTE INFERIOR DO CARRINHO -->
     <div id="floating-cart-bar" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-8 md:w-96 z-40 hidden transform transition-all duration-300">
         <button onclick="toggleCartDrawer(true)" class="w-full bg-gradient-to-r from-primary to-red-800 border-2 border-secondary text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between hover:scale-[1.02] transition-transform">
             <div class="flex items-center space-x-3">
@@ -714,7 +714,7 @@
         </button>
     </div>
 
-    <!-- MODAL DE PERSONALIZAÇÃO DO PRODUTO (ADICIONAIS + MASSA) -->
+    <!-- MODAL DE PERSONALIZAÇÃO DO PRODUTO -->
     <div id="product-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop overflow-y-auto">
         <div class="relative w-full max-w-lg bg-darkCard border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 text-left my-8">
             <button onclick="closeProductModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-xl p-2" aria-label="Fechar Modal">
@@ -729,7 +729,7 @@
             </div>
 
             <div class="mt-6 space-y-6">
-                <!-- Seletor de Massa (Apenas para Batatas) -->
+                <!-- Seletor de Massa -->
                 <div id="modal-massa-section" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Escolha a Massa:</label>
                     <div class="grid grid-cols-2 gap-3">
@@ -742,18 +742,18 @@
                     </div>
                 </div>
 
-                <!-- Adicionais Extras / Acompanhamentos (+ R$ 3,00 cada) -->
+                <!-- Adicionais Extras -->
                 <div id="modal-extras-section" class="hidden">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Acompanhamentos / Adicionais:</label>
                         <span class="text-xs text-secondary font-bold">+ R$ 3,00 cada</span>
                     </div>
                     <div id="modal-extras-list" class="grid grid-cols-2 gap-2">
-                        <!-- Botões de adicionais gerados aqui -->
+                        <!-- Gerado dinamicamente -->
                     </div>
                 </div>
 
-                <!-- Seletor de Borda (Apenas para Milkshakes) -->
+                <!-- Seletor de Borda -->
                 <div id="modal-borda-section" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Escolha a Borda da Taça:</label>
                     <div class="grid grid-cols-2 gap-3">
@@ -766,7 +766,7 @@
                     </div>
                 </div>
 
-                <!-- Seletor de Molhos Inclusos (Para Porções de Batata Frita) -->
+                <!-- Seletor de Molhos -->
                 <div id="modal-molhos-section" class="hidden">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Escolha até 3 Acompanhamentos:</label>
@@ -777,7 +777,7 @@
                     </div>
                 </div>
 
-                <!-- Observação específica do item -->
+                <!-- Observação do item -->
                 <div>
                     <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">Observações para este item:</label>
                     <input type="text" id="modal-item-obs" placeholder="Ex: sem cebola, bem douradinha, etc." class="w-full bg-darkBg border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-secondary">
@@ -811,9 +811,14 @@
                 <h3 class="text-xl font-bold text-white">Seu Pedido</h3>
                 <span id="drawer-cart-items-badge" class="text-xs bg-primary text-white font-bold px-2 py-0.5 rounded-full">0 itens</span>
             </div>
-            <button onclick="toggleCartDrawer(false)" class="text-gray-400 hover:text-white p-2 text-xl" aria-label="Fechar Carrinho">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            <div class="flex items-center space-x-3">
+                <button onclick="clearCart()" id="btn-clear-cart" class="text-xs text-gray-400 hover:text-red-400 transition-colors hidden" title="Limpar carrinho">
+                    <i class="fa-solid fa-trash-can mr-1"></i> Limpar
+                </button>
+                <button onclick="toggleCartDrawer(false)" class="text-gray-400 hover:text-white p-2 text-xl" aria-label="Fechar Carrinho">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Lista de Itens do Carrinho -->
@@ -972,7 +977,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCategory(currentCategory);
-            updateCartUI();
+            renderCartItems();
         });
 
         // Troca de Categorias
@@ -1153,7 +1158,6 @@
             document.getElementById('modal-item-obs').value = '';
             document.getElementById('modal-qty-display').textContent = '1';
 
-            // Configurar Seções Dinâmicas do Modal
             const massaSec = document.getElementById('modal-massa-section');
             const extrasSec = document.getElementById('modal-extras-section');
             const bordaSec = document.getElementById('modal-borda-section');
@@ -1214,7 +1218,6 @@
             }
         }
 
-        // Renderizar Adicionais com Botões Interativos (+ R$ 3,00)
         function renderModalExtras() {
             const container = document.getElementById('modal-extras-list');
             container.innerHTML = '';
@@ -1248,7 +1251,6 @@
             updateModalPrice();
         }
 
-        // Renderizar Molhos para Porções
         function renderModalMolhos(molhos) {
             const container = document.getElementById('modal-molhos-list');
             container.innerHTML = '';
@@ -1330,11 +1332,11 @@
 
             cart.push(cartItem);
             closeProductModal();
-            updateCartUI();
+            renderCartItems();
             toggleCartDrawer(true);
         }
 
-        // GERENCIAMENTO DA UI DO CARRINHO
+        // GERENCIAMENTO DO CARRINHO & CORREÇÃO DOS TOTAIS
         function toggleCartDrawer(open) {
             const drawer = document.getElementById('cart-drawer');
             const overlay = document.getElementById('cart-drawer-overlay');
@@ -1353,26 +1355,51 @@
             const totalPrice = cart.reduce((sum, item) => sum + (item.precoUnitario * item.quantidade), 0);
 
             // Atualizar Badges de navegação
-            document.getElementById('nav-cart-count').textContent = totalItems;
-            document.getElementById('mobile-cart-badge').textContent = totalItems;
-            document.getElementById('drawer-cart-items-badge').textContent = `${totalItems} itens`;
+            const navBadge = document.getElementById('nav-cart-count');
+            if (navBadge) navBadge.textContent = totalItems;
+
+            const mobBadge = document.getElementById('mobile-cart-badge');
+            if (mobBadge) mobBadge.textContent = totalItems;
+
+            const drawerBadge = document.getElementById('drawer-cart-items-badge');
+            if (drawerBadge) drawerBadge.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
+
+            const btnClear = document.getElementById('btn-clear-cart');
+            if (btnClear) {
+                if (totalItems > 0) {
+                    btnClear.classList.remove('hidden');
+                } else {
+                    btnClear.classList.add('hidden');
+                }
+            }
 
             // Atualizar Barra Flutuante
             const floatingBar = document.getElementById('floating-cart-bar');
-            if (totalItems > 0) {
-                floatingBar.classList.remove('hidden');
-                document.getElementById('floating-cart-items-count').textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'} no pedido`;
-                document.getElementById('floating-cart-total').textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
-            } else {
-                floatingBar.classList.add('hidden');
+            if (floatingBar) {
+                if (totalItems > 0) {
+                    floatingBar.classList.remove('hidden');
+                    document.getElementById('floating-cart-items-count').textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'} no pedido`;
+                    document.getElementById('floating-cart-total').textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+                } else {
+                    floatingBar.classList.add('hidden');
+                    document.getElementById('floating-cart-items-count').textContent = `0 itens no pedido`;
+                    document.getElementById('floating-cart-total').textContent = `R$ 0,00`;
+                }
             }
 
             // Atualizar Total do Drawer
-            document.getElementById('drawer-total-price').textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+            const drawerTotal = document.getElementById('drawer-total-price');
+            if (drawerTotal) {
+                drawerTotal.textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+            }
         }
 
         function renderCartItems() {
+            // Sincroniza sempre os totais e badges
+            updateCartUI();
+
             const container = document.getElementById('cart-items-container');
+            if (!container) return;
             container.innerHTML = '';
 
             if (cart.length === 0) {
@@ -1390,7 +1417,6 @@
                 const itemDiv = document.createElement('div');
                 itemDiv.className = "bg-darkBg rounded-2xl p-4 border border-white/5 relative flex flex-col justify-between";
 
-                // Detalhes / Customizações
                 let detailsMarkup = '';
                 if (item.massa) {
                     detailsMarkup += `<span class="inline-block text-[11px] bg-primary/40 text-secondary px-2 py-0.5 rounded-md font-bold mr-1">Massa ${item.massa}</span>`;
@@ -1433,8 +1459,6 @@
 
                 container.appendChild(itemDiv);
             });
-
-            updateCartUI();
         }
 
         function changeCartQty(id, delta) {
@@ -1449,6 +1473,12 @@
 
         function removeCartItem(id) {
             cart = cart.filter(i => i.id !== id);
+            renderCartItems();
+        }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            cart = [];
             renderCartItems();
         }
 
