@@ -61,7 +61,7 @@
         
         /* Glassmorphism utility */
         .glass-effect {
-            background: rgba(26, 6, 6, 0.75);
+            background: rgba(26, 6, 6, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(233, 188, 9, 0.1);
@@ -72,9 +72,15 @@
             color: #ffffff;
             border-color: #e9bc09;
         }
+
+        /* Modal backdrop animation */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(6px);
+        }
     </style>
 </head>
-<body class="bg-darkBg text-gray-100 font-sans overflow-x-hidden antialiased">
+<body class="bg-darkBg text-gray-100 font-sans overflow-x-hidden antialiased pb-16">
 
     <!-- Header & Navigation -->
     <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300 glass-effect shadow-xl border-b border-white/5">
@@ -104,20 +110,23 @@
                     <a href="#onde-estamos" class="text-gray-300 hover:text-secondary font-medium tracking-wide transition-colors duration-200">Contato</a>
                 </nav>
 
-                <!-- CTA Button Desktop -->
-                <div class="hidden lg:flex items-center">
-                    <a href="https://wa.me/551123626963?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20um%20pedido%20na%20Batata%20Lovers." 
-                       target="_blank" 
-                       rel="noopener"
-                       class="inline-flex items-center justify-center px-6 py-3 border-2 border-secondary bg-transparent hover:bg-secondary text-white hover:text-darkBg font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-secondary/20 hover:-translate-y-0.5"
-                       aria-label="Pedir pelo WhatsApp">
-                        <i class="fab fa-whatsapp text-lg mr-2"></i>
-                        <span>Peça Agora</span>
-                    </a>
+                <!-- CTA Button Desktop / Cart Trigger -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <button onclick="toggleCartDrawer(true)" 
+                            class="relative inline-flex items-center justify-center px-5 py-3 border-2 border-secondary bg-primary/40 hover:bg-secondary text-white hover:text-darkBg font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-secondary/20 hover:-translate-y-0.5"
+                            aria-label="Ver Carrinho de Pedidos">
+                        <i class="fa-solid fa-cart-shopping text-lg mr-2"></i>
+                        <span>Meu Pedido</span>
+                        <span id="nav-cart-count" class="ml-2 px-2 py-0.5 text-xs bg-secondary text-darkBg font-extrabold rounded-full">0</span>
+                    </button>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <div class="lg:hidden flex items-center">
+                <!-- Mobile Menu & Cart Button -->
+                <div class="lg:hidden flex items-center space-x-2">
+                    <button onclick="toggleCartDrawer(true)" class="relative p-2 text-secondary hover:text-white" aria-label="Abrir Carrinho">
+                        <i class="fa-solid fa-cart-shopping text-2xl"></i>
+                        <span id="mobile-cart-badge" class="absolute -top-1 -right-1 bg-secondary text-darkBg text-xs font-black rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </button>
                     <button id="mobile-menu-btn" 
                             class="text-gray-300 hover:text-secondary focus:outline-none focus:text-white p-2"
                             aria-expanded="false" 
@@ -138,25 +147,21 @@
                 <a href="#galeria" class="block px-4 py-3 rounded-lg text-base font-semibold text-gray-200 hover:bg-primary hover:text-white transition-all duration-200">Galeria</a>
                 <a href="#onde-estamos" class="block px-4 py-3 rounded-lg text-base font-semibold text-gray-200 hover:bg-primary hover:text-white transition-all duration-200">Contato</a>
                 <div class="pt-4 border-t border-white/10">
-                    <a href="https://wa.me/551123626963?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20um%20pedido%20na%20Batata%20Lovers." 
-                       target="_blank" 
-                       rel="noopener"
-                       class="w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-lg transition-all duration-300"
-                       aria-label="Pedir pelo WhatsApp">
-                        <i class="fab fa-whatsapp text-xl mr-3"></i>
-                        <span>Peça Agora</span>
-                    </a>
+                    <button onclick="toggleCartDrawer(true); document.getElementById('mobile-menu').classList.add('hidden');" 
+                            class="w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-lg transition-all duration-300">
+                        <i class="fa-solid fa-cart-shopping text-xl mr-3"></i>
+                        <span>Ver Meu Pedido</span>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content wrapper to push down sticky headers -->
+    <!-- Main Content -->
     <main class="relative">
 
         <!-- SEÇÃO HERO (Impacto e Promessa) -->
         <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-            <!-- Background Image with Overlay -->
             <div class="absolute inset-0">
                 <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/batatalovers/Gemini_Generated_Image_fq31oafq31oafq31.jpg" 
                      alt="Batata Suíça Dourada e Crocante da Batata Lovers" 
@@ -167,9 +172,7 @@
                 <div class="absolute inset-0 bg-black/50"></div>
             </div>
 
-            <!-- Content Container -->
             <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12 pb-16">
-                <!-- Badge Promotion -->
                 <div class="inline-flex items-center space-x-2 bg-primary/90 border border-secondary/30 px-4 py-1.5 rounded-full mb-8 animate-pulse shadow-lg">
                     <span class="flex h-2.5 w-2.5 relative">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
@@ -178,7 +181,6 @@
                     <span class="text-xs sm:text-sm font-bold text-white tracking-wider uppercase">Eleita a nº 1 do Tatuapé</span>
                 </div>
 
-                <!-- Main Headline -->
                 <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-tight font-serif mb-6 drop-shadow-lg">
                     A Irresistível e Inigualável <br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-yellow-400 to-secondary drop-shadow">
@@ -186,30 +188,25 @@
                     </span>
                 </h1>
 
-                <!-- Sub-headline -->
                 <p class="max-w-2xl mx-auto text-lg sm:text-xl md:text-2xl text-gray-200 mb-10 leading-relaxed font-light drop-shadow">
-                    Crocante por fora, absurdamente recheada e cremosa por dentro. Peça já ou venha viver essa experiência gastronômica no Tatuapé!
+                    Crocante por fora, absurdamente recheada e cremosa por dentro. Monte seu pedido online e receba no conforto da sua casa!
                 </p>
 
-                <!-- Call to Actions -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
                     <a href="#cardapio" 
                        class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-primary to-red-800 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-primary/40 transform hover:-translate-y-1 transition-all duration-300"
                        aria-label="Ver nosso cardápio">
                         <i class="fa-solid fa-utensils mr-3"></i>
-                        <span>Ver Cardápio</span>
+                        <span>Montar Pedido</span>
                     </a>
-                    <a href="https://wa.me/551123626963?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20um%20pedido%20na%20Batata%20Lovers." 
-                       target="_blank" 
-                       rel="noopener"
+                    <button onclick="toggleCartDrawer(true)" 
                        class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-secondary text-darkBg font-extrabold text-lg rounded-xl shadow-2xl hover:shadow-secondary/40 transform hover:-translate-y-1 transition-all duration-300"
-                       aria-label="Pedir pelo WhatsApp">
-                        <i class="fab fa-whatsapp mr-3 text-xl"></i>
-                        <span>Peça Delivery</span>
-                    </a>
+                       aria-label="Abrir Carrinho">
+                        <i class="fa-solid fa-cart-shopping mr-3 text-xl"></i>
+                        <span>Ver Carrinho</span>
+                    </button>
                 </div>
 
-                <!-- Google Rating Badge -->
                 <div class="mt-12 flex items-center justify-center space-x-3 text-gray-300">
                     <div class="flex text-secondary">
                         <i class="fa-solid fa-star"></i>
@@ -224,7 +221,6 @@
                 </div>
             </div>
             
-            <!-- Curve Bottom Transition -->
             <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180">
                 <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-12 fill-darkBg">
                     <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V120H0V56.44Z"></path>
@@ -232,7 +228,7 @@
             </div>
         </section>
 
-        <!-- SEÇÃO DE DOR E EMPATIA (O Problema) -->
+        <!-- SEÇÃO DE DOR E EMPATIA -->
         <section class="py-24 bg-darkBg relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center max-w-3xl mx-auto mb-16">
@@ -246,7 +242,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Card 1: Vento -->
                     <div class="glass-effect p-8 rounded-2xl border-l-4 border-primary shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-6">
                             <i class="fa-solid fa-face-frown text-primary text-2xl"></i>
@@ -257,7 +252,6 @@
                         </p>
                     </div>
 
-                    <!-- Card 2: Encharcado de Óleo -->
                     <div class="glass-effect p-8 rounded-2xl border-l-4 border-primary shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-6">
                             <i class="fa-solid fa-droplet-slash text-primary text-2xl"></i>
@@ -268,7 +262,6 @@
                         </p>
                     </div>
 
-                    <!-- Card 3: Demora Absurda -->
                     <div class="glass-effect p-8 rounded-2xl border-l-4 border-primary shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-6">
                             <i class="fa-solid fa-hourglass-half text-primary text-2xl"></i>
@@ -282,12 +275,10 @@
             </div>
         </section>
 
-        <!-- PROPOSTA ÚNICA DE VALOR (A Solução) -->
+        <!-- PROPOSTA ÚNICA DE VALOR -->
         <section id="solucao" class="py-24 bg-darkCard relative border-t border-b border-white/5">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    
-                    <!-- Lado Esquerdo - Copywriting de Impacto -->
                     <div>
                         <span class="text-secondary font-bold text-xs sm:text-sm tracking-widest uppercase block mb-3">
                             A Solução Definitiva
@@ -334,7 +325,6 @@
                         </div>
                     </div>
 
-                    <!-- Lado Direito - Imagem Detalhada de Destaque -->
                     <div class="relative group">
                         <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-3xl transform rotate-3 scale-102 opacity-20 group-hover:rotate-1 transition-transform duration-500"></div>
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163584432_16.jpg" 
@@ -353,22 +343,21 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO CARDÁPIO (Tabs Interativas e UI Premium) -->
+        <!-- SEÇÃO CARDÁPIO COM SISTEMA DE CARRINHO -->
         <section id="cardapio" class="py-24 bg-darkBg relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 <div class="text-center max-w-3xl mx-auto mb-16">
-                    <span class="text-secondary font-bold text-xs sm:text-sm tracking-widest uppercase block mb-3">Nossas Delícias</span>
+                    <span class="text-secondary font-bold text-xs sm:text-sm tracking-widest uppercase block mb-3">Monte Seu Pedido Online</span>
                     <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight font-serif">
-                        Explore o Nosso Cardápio
+                        Cardápio & Pedidos
                     </h2>
                     <p class="mt-4 text-gray-400 text-base sm:text-lg">
-                        Selecione as categorias abaixo e encontre sua próxima paixão gastronômica. Tudo preparado na hora e entregue quentinho!
+                        Adicione os itens ao carrinho, escolha acompanhamentos e envie o pedido completo direto para nosso WhatsApp!
                     </p>
                 </div>
 
@@ -388,9 +377,9 @@
                     </button>
                 </div>
 
-                <!-- Sub-Filtro de Massa para Batatas (Suíça x Inglesa) -->
+                <!-- Sub-Filtro de Massa para Batatas -->
                 <div id="massa-filter-container" class="flex items-center justify-center space-x-4 mb-12 animate-fade-in">
-                    <span class="text-sm font-semibold tracking-wider text-gray-300 uppercase">Escolha a Massa:</span>
+                    <span class="text-sm font-semibold tracking-wider text-gray-300 uppercase">Massa Padrão:</span>
                     <div class="inline-flex rounded-full bg-darkCard p-1 border border-white/10 shadow-inner">
                         <button onclick="switchPotatoMassa('Suíça')" id="massa-suica" class="px-6 py-2 rounded-full text-sm font-bold tracking-wide transition-all duration-300 bg-primary text-white">
                             Batata Suíça (Rosti)
@@ -409,19 +398,19 @@
                     </span>
                     <span class="hidden md:inline text-gray-500">|</span>
                     <span class="text-white bg-primary/40 px-3 py-1 rounded-full border border-primary/20" id="category-badge-text">
-                        Adicionais Extras (+ R$ 3,00)
+                        Adicionais Extras (+ R$ 3,00 cada)
                     </span>
                 </div>
 
                 <!-- Products Grid -->
                 <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto transition-all duration-500">
-                    <!-- Cards will be populated dynamically by JavaScript for high responsiveness -->
+                    <!-- Gerado dinamicamente -->
                 </div>
 
             </div>
         </section>
 
-        <!-- PROVA SOCIAL (Testemunhos de Sucesso) -->
+        <!-- PROVA SOCIAL -->
         <section id="depoimentos" class="py-24 bg-darkCard relative border-t border-b border-white/5 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="text-center max-w-3xl mx-auto mb-16">
@@ -434,9 +423,7 @@
                     </p>
                 </div>
 
-                <!-- Testimonials Grid Slider -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Depoimento 1 -->
                     <div class="glass-effect p-8 rounded-2xl border-t-2 border-secondary flex flex-col justify-between shadow-2xl">
                         <div>
                             <div class="flex items-center justify-between mb-6">
@@ -464,7 +451,6 @@
                         </div>
                     </div>
 
-                    <!-- Depoimento 2 -->
                     <div class="glass-effect p-8 rounded-2xl border-t-2 border-secondary flex flex-col justify-between shadow-2xl">
                         <div>
                             <div class="flex items-center justify-between mb-6">
@@ -492,7 +478,6 @@
                         </div>
                     </div>
 
-                    <!-- Depoimento 3 -->
                     <div class="glass-effect p-8 rounded-2xl border-t-2 border-secondary flex flex-col justify-between shadow-2xl">
                         <div>
                             <div class="flex items-center justify-between mb-6">
@@ -519,100 +504,14 @@
                             <span>Espera: até 10 minutos</span>
                         </div>
                     </div>
-
-                    <!-- Depoimento 4 -->
-                    <div class="glass-effect p-8 rounded-2xl border-t-2 border-secondary flex flex-col justify-between shadow-2xl">
-                        <div>
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">IF</div>
-                                    <div>
-                                        <h4 class="text-white font-bold text-sm">Isabella Fontes</h4>
-                                        <span class="text-xs text-gray-400 block">5 avaliações · 2 fotos</span>
-                                    </div>
-                                </div>
-                                <div class="flex text-secondary text-xs">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </div>
-                            </div>
-                            <p class="text-gray-300 text-sm italic leading-relaxed">
-                                "Ambiente aconchegante, luz baixa e música. Pedi a batata de filé mignon e estava incrível, carne de primeira qualidade, catupiry original e tempero perfeito. Milkshake de Kinder Bueno espetacular!"
-                            </p>
-                        </div>
-                        <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-400 font-semibold">
-                            <span>Comida: 5/5 | Atendimento: 5/5</span>
-                        </div>
-                    </div>
-
-                    <!-- Depoimento 5 -->
-                    <div class="glass-effect p-8 rounded-2xl border-t-2 border-secondary flex flex-col justify-between shadow-2xl">
-                        <div>
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">TD</div>
-                                    <div>
-                                        <h4 class="text-white font-bold text-sm">Tatiana Dotoli</h4>
-                                        <span class="text-xs text-gray-400 block">4 avaliações</span>
-                                    </div>
-                                </div>
-                                <div class="flex text-secondary text-xs">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </div>
-                            </div>
-                            <p class="text-gray-300 text-sm italic leading-relaxed">
-                                "Tive uma experiência maravilhosa! A batata suíça estava bem recheada, ingredientes de excelente qualidade. Equipe rápida e simpática. Com certeza voltarei!"
-                            </p>
-                        </div>
-                        <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-400 font-semibold">
-                            <span>Sabor e Cremosidade Incrível</span>
-                        </div>
-                    </div>
-
-                    <!-- Depoimento 6 -->
-                    <div class="glass-effect p-8 rounded-2xl border-t-2 border-secondary flex flex-col justify-between shadow-2xl">
-                        <div>
-                            <div class="flex items-center justify-between mb-6">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">NS</div>
-                                    <div>
-                                        <h4 class="text-white font-bold text-sm">Natália Saiury</h4>
-                                        <span class="text-xs text-gray-400 block">Local Guide · 443 avaliações</span>
-                                    </div>
-                                </div>
-                                <div class="flex text-secondary text-xs">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </div>
-                            </div>
-                            <p class="text-gray-300 text-sm italic leading-relaxed">
-                                "Batatas maravilhosas, tanto a baked recheada quanto as suíças são deliciosas. Preço justo, ambiente gostoso, atendimento ótimo também. Destaque para a suíça de mignon e a de catupiry com bacon."
-                            </p>
-                        </div>
-                        <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-400 font-semibold">
-                            <span>Sem espera para sentar</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO SOBRE NÓS HUMANIZADA -->
+        <!-- SEÇÃO SOBRE NÓS -->
         <section id="sobre" class="py-24 bg-darkBg relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    
-                    <!-- Lado Imagem -->
                     <div class="relative order-2 lg:order-1">
                         <div class="absolute inset-0 bg-secondary rounded-3xl transform -rotate-3 scale-102 opacity-10"></div>
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163511922_0.jpg" 
@@ -621,7 +520,6 @@
                              loading="lazy" decoding="async" width="600" height="500">
                     </div>
 
-                    <!-- Lado Texto -->
                     <div class="order-1 lg:order-2">
                         <span class="text-secondary font-bold text-xs sm:text-sm tracking-widest uppercase block mb-3">Nossa História</span>
                         <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white font-serif tracking-tight leading-tight">
@@ -634,12 +532,8 @@
                             <p>
                                 Mas o amor não para por aí! Também somos obcecados por aquela batata frita super crocante, sequinha e dourada e, claro, por criar os milkshakes mais robustos e cremosos para acompanhar a sua experiência.
                             </p>
-                            <p>
-                                Cada prato que sai da nossa cozinha reflete o nosso carinho pela culinária e o nosso respeito total por você, nosso cliente. Venha fazer parte dessa nossa família de "Lovers"!
-                            </p>
                         </div>
 
-                        <!-- Stats Callout -->
                         <div class="mt-10 grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
                             <div>
                                 <span class="block text-3xl font-extrabold text-secondary font-serif">500g</span>
@@ -655,200 +549,59 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </section>
 
-        <!-- ESTRUTURA DA LOJA (Galeria de Imagens) -->
+        <!-- ESTRUTURA DA LOJA (Galeria) -->
         <section id="galeria" class="py-24 bg-darkCard border-t border-b border-white/5 relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
                 <div class="text-center max-w-3xl mx-auto mb-16">
                     <span class="text-secondary font-bold text-xs sm:text-sm tracking-widest uppercase block mb-3">Galeria Imersiva</span>
                     <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-serif">
                         Um Espaço Aconchegante e Pratos Fantásticos
                     </h2>
-                    <p class="mt-4 text-gray-400 text-base sm:text-lg">
-                        Confira fotos reais dos nossos produtos, do nosso salão iluminado e de momentos inesquecíveis.
-                    </p>
                 </div>
 
-                <!-- Gallery Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="relative overflow-hidden rounded-2xl group shadow-lg">
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163546168_0.jpeg" 
                              alt="Batata Suíça Especial Recheada" 
                              class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Crocante por Fora</span>
-                        </div>
+                             loading="lazy" width="300" height="256">
                     </div>
-
                     <div class="relative overflow-hidden rounded-2xl group shadow-lg">
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163548235_1.jpeg" 
                              alt="Porção Batata Frita Lovers" 
                              class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Batatas Selecionadas</span>
-                        </div>
+                             loading="lazy" width="300" height="256">
                     </div>
-
                     <div class="relative overflow-hidden rounded-2xl group shadow-lg">
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163550666_2.jpeg" 
                              alt="Ambiente Interno e Aconchegante" 
                              class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Espaço Aconchegante</span>
-                        </div>
+                             loading="lazy" width="300" height="256">
                     </div>
-
                     <div class="relative overflow-hidden rounded-2xl group shadow-lg">
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163552774_3.jpeg" 
                              alt="Milkshake Cremoso Gourmet" 
                              class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Sobremesas Memoráveis</span>
-                        </div>
+                             loading="lazy" width="300" height="256">
                     </div>
-
-                    <div class="relative overflow-hidden rounded-2xl group shadow-lg">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163554572_4.jpeg" 
-                             alt="Molhos Especiais de Acompanhamento" 
-                             class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Maioneses da Casa</span>
-                        </div>
-                    </div>
-
-                    <div class="relative overflow-hidden rounded-2xl group shadow-lg">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163612814_28.jpeg" 
-                             alt="Filé Mignon com Catupiry" 
-                             class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Ingredientes Reais</span>
-                        </div>
-                    </div>
-
-                    <div class="relative overflow-hidden rounded-2xl group shadow-lg">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163589866_18.PNG" 
-                             alt="Opções Vegetarianas Deliciosas" 
-                             class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Para Todos os Gostos</span>
-                        </div>
-                    </div>
-
-                    <div class="relative overflow-hidden rounded-2xl group shadow-lg">
-                        <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/images/img_1787163591842_19.PNG" 
-                             alt="Clássico e Suculento" 
-                             class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                             loading="lazy" decoding="async" width="300" height="256">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                            <span class="text-sm font-bold text-white tracking-wide">Pratos Sempre Quentes</span>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO FAQ (Accordion) -->
-        <section class="py-24 bg-darkBg relative">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <div class="text-center mb-16">
-                    <span class="text-secondary font-bold text-xs sm:text-sm tracking-widest uppercase block mb-3">Dúvidas Frequentes</span>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-serif">
-                        Perguntas Frequentes dos Lovers
-                    </h2>
-                </div>
-
-                <!-- FAQ Items -->
-                <div class="space-y-4">
-                    
-                    <!-- Item 1 -->
-                    <div class="glass-effect rounded-2xl overflow-hidden shadow-md border border-white/5">
-                        <button onclick="toggleFaq(1)" class="w-full flex justify-between items-center px-6 py-5 text-left text-white font-bold text-base sm:text-lg focus:outline-none focus:text-secondary">
-                            <span>Qual a diferença entre a Batata Suíça e a Batata Inglesa?</span>
-                            <span class="text-secondary transform transition-transform duration-300" id="faq-arrow-1">
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </span>
-                        </button>
-                        <div id="faq-answer-1" class="hidden px-6 pb-5 text-gray-300 leading-relaxed text-sm sm:text-base">
-                            A Batata Suíça (Rosti) é preparada com batatas raladas que são douradas na frigideira, criando uma casquinha extremamente crocante e recheada por dentro. A Batata Inglesa (Baked) é assada inteira no forno, aberta ao meio e generosamente recheada com nossos cremes e proteínas premium.
-                        </div>
-                    </div>
-
-                    <!-- Item 2 -->
-                    <div class="glass-effect rounded-2xl overflow-hidden shadow-md border border-white/5">
-                        <button onclick="toggleFaq(2)" class="w-full flex justify-between items-center px-6 py-5 text-left text-white font-bold text-base sm:text-lg focus:outline-none focus:text-secondary">
-                            <span>Vocês têm opções vegetarianas no cardápio?</span>
-                            <span class="text-secondary transform transition-transform duration-300" id="faq-arrow-2">
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </span>
-                        </button>
-                        <div id="faq-answer-2" class="hidden px-6 pb-5 text-gray-300 leading-relaxed text-sm sm:text-base">
-                            Sim, com certeza! Temos diversas opções deliciosas para vegetarianos, incluindo recheios sensacionais como a "Brocolovers" (Brócolis com alho e Catupiry), a "Fourlovers" (Quatro Queijos nobres) e a "Funghilovers" (Champignon na manteiga e queijo brie).
-                        </div>
-                    </div>
-
-                    <!-- Item 3 -->
-                    <div class="glass-effect rounded-2xl overflow-hidden shadow-md border border-white/5">
-                        <button onclick="toggleFaq(3)" class="w-full flex justify-between items-center px-6 py-5 text-left text-white font-bold text-base sm:text-lg focus:outline-none focus:text-secondary">
-                            <span>Qual o tamanho/peso de cada batata?</span>
-                            <span class="text-secondary transform transition-transform duration-300" id="faq-arrow-3">
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </span>
-                        </button>
-                        <div id="faq-answer-3" class="hidden px-6 pb-5 text-gray-300 leading-relaxed text-sm sm:text-base">
-                            Todas as nossas Batatas Suíças e Inglesas são fartas e têm em média 500g de puro sabor e muito recheio, servindo perfeitamente bem uma refeição completa individual ou uma excelente opção para compartilhar.
-                        </div>
-                    </div>
-
-                    <!-- Item 4 -->
-                    <div class="glass-effect rounded-2xl overflow-hidden shadow-md border border-white/5">
-                        <button onclick="toggleFaq(4)" class="w-full flex justify-between items-center px-6 py-5 text-left text-white font-bold text-base sm:text-lg focus:outline-none focus:text-secondary">
-                            <span>Vocês abrem todos os dias?</span>
-                            <span class="text-secondary transform transition-transform duration-300" id="faq-arrow-4">
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </span>
-                        </button>
-                        <div id="faq-answer-4" class="hidden px-6 pb-5 text-gray-300 leading-relaxed text-sm sm:text-base">
-                            Nós funcionamos de Segunda a Sábado, das 11:00 às 22:00. Atenção: Aos Domingos nós não abrimos, para dar descanso merecido à nossa dedicada equipe!
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- ONDE ESTAMOS (Facilidade de Acesso & Contato) -->
-        <section id="onde-estamos" class="py-24 bg-darkCard relative border-t border-b border-white/5">
+        <!-- ONDE ESTAMOS -->
+        <section id="onde-estamos" class="py-24 bg-darkBg relative border-t border-b border-white/5">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    
-                    <!-- Lado Esquerdo - Detalhes e Horários -->
                     <div>
                         <span class="text-secondary font-bold text-xs sm:text-sm tracking-widest uppercase block mb-3">Como nos encontrar</span>
                         <h2 class="text-3xl sm:text-4xl font-extrabold text-white font-serif tracking-tight leading-tight">
                             Venha Visitar Nosso Salão no Tatuapé
                         </h2>
                         
-                        <p class="mt-6 text-gray-300 leading-relaxed text-base sm:text-lg">
-                            Estamos localizados em uma das ruas mais tradicionais e charmosas do Tatuapé. Venha desfrutar de um ambiente climatizado, música ambiente ideal e um atendimento acolhedor.
-                        </p>
-
-                        <!-- Endereço Detalhado -->
                         <div class="mt-8 flex items-start">
                             <div class="flex-shrink-0 mt-1">
                                 <i class="fa-solid fa-location-dot text-secondary text-2xl"></i>
@@ -859,7 +612,6 @@
                             </div>
                         </div>
 
-                        <!-- Tabela de Horários -->
                         <div class="mt-8">
                             <h4 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
                                 <i class="fa-regular fa-clock text-secondary"></i> Horários de Atendimento
@@ -879,21 +631,9 @@
                                 </table>
                             </div>
                         </div>
-
-                        <!-- Botão Como Chegar -->
-                        <div class="mt-10">
-                            <a href="https://maps.app.goo.gl/abeR9CZVoadeFyB7A" 
-                               target="_blank" 
-                               rel="noopener"
-                               class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold text-lg rounded-xl shadow-xl transition-all duration-300">
-                                <i class="fa-solid fa-map-location-dot mr-3 text-xl"></i>
-                                Como Chegar (Google Maps)
-                            </a>
-                        </div>
                     </div>
 
-                    <!-- Lado Direito - Google Maps Iframe -->
-                    <div class="relative w-full h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+                    <div class="relative w-full h-[350px] lg:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-white/10">
                         <iframe 
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3658.0776997784013!2d-46.568393524670494!3d-23.530349078824147!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce5e6308cfdb79%3A0x67db20448108be6e!2sR.%20Francisco%20Marengo%2C%201391%20-%20Tatuap%C3%A9%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2003313-000!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" 
                             width="100%" 
@@ -901,29 +641,25 @@
                             style="border:0;" 
                             allowfullscreen="" 
                             loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade"
                             title="Localização do Restaurante Batata Lovers no Tatuapé">
                         </iframe>
                     </div>
-
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER COMPLETO (Segurança Jurídica) -->
+    <!-- FOOTER -->
     <footer class="bg-darkBg text-gray-400 py-16 border-t border-white/5 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-                
-                <!-- Logo & Brand Description -->
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center space-x-3 mb-6">
                         <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/batatalovers/logo_1787162235738.png" 
                              alt="Batata Lovers Logo" 
                              class="w-12 h-12 object-contain" 
-                             loading="lazy" decoding="async" width="48" height="48">
+                             loading="lazy" width="48" height="48">
                         <div>
                             <span class="block text-xl font-extrabold text-white tracking-tight uppercase">
                                 Batata <span class="text-secondary">Lovers</span>
@@ -932,72 +668,217 @@
                         </div>
                     </div>
                     <p class="text-sm text-gray-400 leading-relaxed mb-6">
-                        Sua melhor escolha para batatas suíças generosas, porções douradas e milkshakes incomparáveis. Comprometidos com ingredientes premium e atendimento acolhedor desde o primeiro dia.
+                        Sua melhor escolha para batatas suíças generosas, porções douradas e milkshakes incomparáveis.
                     </p>
-                    <!-- Social Icons -->
-                    <div class="flex space-x-4">
-                        <a href="https://www.instagram.com/batatalovers.tatuape" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-darkCard border border-white/10 flex items-center justify-center text-gray-300 hover:text-secondary hover:border-secondary transition-all duration-300" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="https://www.facebook.com/" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-darkCard border border-white/10 flex items-center justify-center text-gray-300 hover:text-secondary hover:border-secondary transition-all duration-300" aria-label="Facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="mailto:contato@empresa.com.br" class="w-10 h-10 rounded-full bg-darkCard border border-white/10 flex items-center justify-center text-gray-300 hover:text-secondary hover:border-secondary transition-all duration-300" aria-label="Enviar E-mail">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-                    </div>
                 </div>
-
-                <!-- Links Rápidos -->
                 <div>
                     <h4 class="text-white font-bold text-lg mb-6">Links Rápidos</h4>
                     <ul class="space-y-3 text-sm">
-                        <li><a href="#solucao" class="hover:text-secondary transition-colors duration-200">Diferenciais</a></li>
-                        <li><a href="#cardapio" class="hover:text-secondary transition-colors duration-200">Menu Interativo</a></li>
+                        <li><a href="#cardapio" class="hover:text-secondary transition-colors duration-200">Fazer Pedido</a></li>
                         <li><a href="#sobre" class="hover:text-secondary transition-colors duration-200">Nossa História</a></li>
-                        <li><a href="#onde-estamos" class="hover:text-secondary transition-colors duration-200">Horários de Funcionamento</a></li>
+                        <li><a href="#onde-estamos" class="hover:text-secondary transition-colors duration-200">Localização</a></li>
                     </ul>
                 </div>
-
-                <!-- Legal / LGPD Compliance -->
                 <div>
-                    <h4 class="text-white font-bold text-lg mb-6">Legal</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li><a href="#" class="hover:text-secondary transition-colors duration-200">Política de Privacidade</a></li>
-                        <li><a href="#" class="hover:text-secondary transition-colors duration-200">Termos de Uso</a></li>
-                        <li class="pt-3 border-t border-white/5 text-xs text-gray-500">
-                            Razão Social: Batata Lovers LTDA<br>
-                            CNPJ: 36.887.148/0001-37<br>
-                            Endereço: R. Francisco Marengo, 1391
-                        </li>
-                    </ul>
+                    <h4 class="text-white font-bold text-lg mb-6">Contato</h4>
+                    <p class="text-sm text-gray-400">R. Francisco Marengo, 1391 - Tatuapé</p>
+                    <p class="text-sm text-gray-400 mt-2">WhatsApp: (11) 2362-6963</p>
                 </div>
-
             </div>
-
-            <!-- Divisória Final -->
             <div class="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
                 <p>&copy; 2024 Batata Lovers Tatuapé. Todos os direitos reservados.</p>
                 <p class="mt-4 md:mt-0">
-                    Site criado e mantido por 
-                    <a href="https://studiotesta.com.br/" target="_blank" rel="noopener" class="text-gray-400 hover:text-secondary font-bold transition-colors duration-200">STUDIOTESTA</a>
+                    Desenvolvido por 
+                    <a href="https://studiotesta.com.br/" target="_blank" rel="noopener" class="text-gray-400 hover:text-secondary font-bold">STUDIOTESTA</a>
                 </p>
             </div>
         </div>
     </footer>
 
-    <!-- Botão de WhatsApp Flutuante com Efeito Wave -->
-    <a href="https://wa.me/551123626963?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20um%20pedido%20da%20Batata%20Lovers." 
-       target="_blank" 
-       rel="noopener" 
-       class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-16 h-16 bg-[#25D366] rounded-full text-white shadow-2xl hover:scale-110 transition-transform duration-300 animate-bounce"
-       aria-label="Fale Conosco no WhatsApp">
-        <i class="fab fa-whatsapp text-3xl"></i>
-    </a>
+    <!-- BARRA FLUTUANTE INFERIOR DO CARRINHO (Aparece quando há itens) -->
+    <div id="floating-cart-bar" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-8 md:w-96 z-40 hidden transform transition-all duration-300">
+        <button onclick="toggleCartDrawer(true)" class="w-full bg-gradient-to-r from-primary to-red-800 border-2 border-secondary text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between hover:scale-[1.02] transition-transform">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-secondary text-darkBg flex items-center justify-center font-black">
+                    <i class="fa-solid fa-basket-shopping text-lg"></i>
+                </div>
+                <div class="text-left">
+                    <span id="floating-cart-items-count" class="block text-xs font-semibold text-gray-200">0 itens no pedido</span>
+                    <span id="floating-cart-total" class="block text-lg font-black text-secondary">R$ 0,00</span>
+                </div>
+            </div>
+            <div class="flex items-center text-sm font-bold text-white bg-white/10 px-3 py-1.5 rounded-xl">
+                <span>Ver Pedido</span>
+                <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+            </div>
+        </button>
+    </div>
 
-    <!-- JSON DATA & RESPONSIVE TABS ENGINE JAVASCRIPT -->
+    <!-- MODAL DE PERSONALIZAÇÃO DO PRODUTO (ADICIONAIS + MASSA) -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-backdrop overflow-y-auto">
+        <div class="relative w-full max-w-lg bg-darkCard border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 text-left my-8">
+            <button onclick="closeProductModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-xl p-2" aria-label="Fechar Modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Título e Preço Base -->
+            <div class="pr-8">
+                <h3 id="modal-product-title" class="text-2xl font-extrabold text-white">Nome do Produto</h3>
+                <p id="modal-product-desc" class="text-sm text-gray-400 mt-1">Descrição do prato...</p>
+                <div class="mt-2 text-xl font-black text-secondary" id="modal-product-base-price">R$ 0,00</div>
+            </div>
+
+            <div class="mt-6 space-y-6">
+                <!-- Seletor de Massa (Apenas para Batatas) -->
+                <div id="modal-massa-section" class="hidden">
+                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Escolha a Massa:</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="selectModalMassa('Suíça')" id="modal-btn-suica" class="py-2.5 px-3 rounded-xl border border-secondary text-sm font-bold bg-primary text-white text-center transition-all">
+                            Batata Suíça (Rosti)
+                        </button>
+                        <button type="button" onclick="selectModalMassa('Inglesa')" id="modal-btn-inglesa" class="py-2.5 px-3 rounded-xl border border-white/10 text-sm font-bold bg-darkBg text-gray-300 text-center hover:text-white transition-all">
+                            Batata Inglesa (Baked)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Adicionais Extras / Acompanhamentos (+ R$ 3,00 cada) -->
+                <div id="modal-extras-section" class="hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Acompanhamentos / Adicionais:</label>
+                        <span class="text-xs text-secondary font-bold">+ R$ 3,00 cada</span>
+                    </div>
+                    <div id="modal-extras-list" class="grid grid-cols-2 gap-2">
+                        <!-- Botões de adicionais gerados aqui -->
+                    </div>
+                </div>
+
+                <!-- Seletor de Borda (Apenas para Milkshakes) -->
+                <div id="modal-borda-section" class="hidden">
+                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Escolha a Borda da Taça:</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="selectModalBorda('Chocolate Belga')" id="modal-btn-borda-choc" class="py-2.5 px-3 rounded-xl border border-secondary text-sm font-bold bg-primary text-white text-center transition-all">
+                            Chocolate Belga
+                        </button>
+                        <button type="button" onclick="selectModalBorda('Doce de Leite Havanna')" id="modal-btn-borda-docedeleite" class="py-2.5 px-3 rounded-xl border border-white/10 text-sm font-bold bg-darkBg text-gray-300 text-center hover:text-white transition-all">
+                            Doce de Leite Havanna
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Seletor de Molhos Inclusos (Para Porções de Batata Frita) -->
+                <div id="modal-molhos-section" class="hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Escolha até 3 Acompanhamentos:</label>
+                        <span id="modal-molhos-counter" class="text-xs text-secondary font-bold">0 de 3</span>
+                    </div>
+                    <div id="modal-molhos-list" class="grid grid-cols-2 gap-2">
+                        <!-- Gerado dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Observação específica do item -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">Observações para este item:</label>
+                    <input type="text" id="modal-item-obs" placeholder="Ex: sem cebola, bem douradinha, etc." class="w-full bg-darkBg border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-secondary">
+                </div>
+
+                <!-- Quantidade e Botão Adicionar -->
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <div class="flex items-center space-x-3 bg-darkBg px-3 py-2 rounded-xl border border-white/10">
+                        <button onclick="adjustModalQty(-1)" class="w-8 h-8 rounded-lg bg-white/5 text-white hover:bg-primary font-bold flex items-center justify-center">-</button>
+                        <span id="modal-qty-display" class="font-black text-lg w-6 text-center text-white">1</span>
+                        <button onclick="adjustModalQty(1)" class="w-8 h-8 rounded-lg bg-white/5 text-white hover:bg-primary font-bold flex items-center justify-center">+</button>
+                    </div>
+
+                    <button onclick="confirmAddToCart()" class="flex-1 ml-4 py-3 px-6 bg-gradient-to-r from-primary to-secondary text-white font-black text-sm rounded-xl shadow-lg hover:shadow-secondary/20 transition-all flex items-center justify-between">
+                        <span>Adicionar</span>
+                        <span id="modal-total-btn-price">R$ 0,00</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAVETA LATERAL DO CARRINHO (DRAWER) -->
+    <div id="cart-drawer-overlay" onclick="toggleCartDrawer(false)" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-darkCard border-l border-white/10 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between shadow-2xl">
+        
+        <!-- Header Carrinho -->
+        <div class="p-6 border-b border-white/10 flex items-center justify-between bg-darkBg/60">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-basket-shopping text-secondary text-2xl"></i>
+                <h3 class="text-xl font-bold text-white">Seu Pedido</h3>
+                <span id="drawer-cart-items-badge" class="text-xs bg-primary text-white font-bold px-2 py-0.5 rounded-full">0 itens</span>
+            </div>
+            <button onclick="toggleCartDrawer(false)" class="text-gray-400 hover:text-white p-2 text-xl" aria-label="Fechar Carrinho">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Lista de Itens do Carrinho -->
+        <div id="cart-items-container" class="p-6 flex-1 overflow-y-auto space-y-4">
+            <!-- Renderizado dinamicamente pelo JS -->
+        </div>
+
+        <!-- Formulário de Finalização & Dados de Entrega -->
+        <div class="p-6 bg-darkBg border-t border-white/10 overflow-y-auto max-h-[50vh]">
+            <h4 class="text-sm font-extrabold text-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-truck-ramp-box"></i> Dados para Entrega / Retirada
+            </h4>
+            
+            <form id="order-form" onsubmit="event.preventDefault(); sendOrderToWhatsapp();" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Nome Completo *</label>
+                    <input type="text" id="cust-name" required placeholder="Digite seu nome completo" class="w-full bg-darkCard border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-secondary">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">CPF * (Para emissão da comanda)</label>
+                    <input type="text" id="cust-cpf" required placeholder="000.000.000-00" maxlength="14" oninput="formatCPFInput(this)" class="w-full bg-darkCard border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-secondary">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Endereço Completo de Entrega *</label>
+                    <textarea id="cust-address" required rows="2" placeholder="Rua, Número, Bairro, Apto/Bloco e Ponto de Referência" class="w-full bg-darkCard border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-secondary"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Forma de Pagamento *</label>
+                        <select id="cust-payment" class="w-full bg-darkCard border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary">
+                            <option value="Pix">Pix (Chave enviada no chat)</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Observações / Troco</label>
+                        <input type="text" id="cust-obs" placeholder="Ex: Troco para R$ 100" class="w-full bg-darkCard border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary">
+                    </div>
+                </div>
+
+                <!-- Subtotais e Botão Enviar Pedido -->
+                <div class="pt-4 mt-4 border-t border-white/10">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm font-bold text-gray-300">Total do Pedido:</span>
+                        <span id="drawer-total-price" class="text-2xl font-black text-secondary">R$ 0,00</span>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-[#25D366] hover:bg-[#1EBE5D] text-darkBg font-black text-base rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-2">
+                        <i class="fab fa-whatsapp text-2xl"></i>
+                        <span>Enviar Pedido para o WhatsApp</span>
+                    </button>
+                    <span class="block text-[11px] text-gray-500 text-center mt-2">Você será redirecionado com os dados preenchidos para confirmação da loja.</span>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DO CARDÁPIO & ENGINE DO CARRINHO -->
     <script>
-        // Real cardapio payload structured dynamically
         const cardapioData = {
           "categorias": [
             {
@@ -1025,7 +906,7 @@
                 {"nome": "Lombolovers", "descricao": "Batata de lombo desfiado com catupiry.", "preco": 35.90, "exclusivo": ""},
                 {"nome": "Mignonlovers", "descricao": "Batata de filé mignon com catupiry.", "preco": 39.90, "exclusivo": ""},
                 {"nome": "Caseirolovers", "descricao": "Batata de carne moída com azeitonas e catupiry.", "preco": 36.90, "exclusivo": ""},
-                {"nome": "Strogonoff", "descricao": "Batata recheada com strogonoff (Disponível SOMENTE na versão Inglesa).", "preco": 37.90, "badge": "Novo", "exclusivo": "Inglesa"}
+                {"nome": "Strogonoff", "descricao": "Batata recheada com strogonoff (SOMENTE na versão Inglesa).", "preco": 37.90, "badge": "Novo", "exclusivo": "Inglesa"}
               ]
             },
             {
@@ -1057,7 +938,6 @@
               "id": "bebidas",
               "nome": "Bebidas",
               "itens": [
-                // Merging nested items for unified robust grid presentation
                 {"nome": "Guaraná Antarctica 350ml", "preco": 7.90, "tipo": "Refrigerante"},
                 {"nome": "Guaraná Antarctica Zero 350ml", "preco": 7.90, "tipo": "Refrigerante"},
                 {"nome": "Coca-Cola 350ml", "preco": 7.90, "tipo": "Refrigerante"},
@@ -1077,18 +957,27 @@
           ]
         };
 
+        // Estado da Aplicação
         let currentCategory = 'batatas';
         let currentPotatoMassa = 'Suíça';
+        let cart = [];
 
-        // Initialize Cardapio view
+        // Estado do Item Aberto no Modal
+        let activeItem = null;
+        let modalQty = 1;
+        let modalSelectedMassa = 'Suíça';
+        let modalSelectedExtras = [];
+        let modalSelectedBorda = 'Chocolate Belga';
+        let modalSelectedMolhos = [];
+
         document.addEventListener('DOMContentLoaded', () => {
             renderCategory(currentCategory);
+            updateCartUI();
         });
 
+        // Troca de Categorias
         function switchCategory(catId) {
             currentCategory = catId;
-            
-            // Manage Tab classes
             const tabs = ['batatas', 'porcoes', 'milkshakes', 'bebidas'];
             tabs.forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
@@ -1099,9 +988,7 @@
                 }
             });
 
-            // Toggle sub-filters & info
             const filterBar = document.getElementById('massa-filter-container');
-            const infoBar = document.getElementById('category-info-bar');
             const obsText = document.getElementById('category-obs-text');
             const badgeText = document.getElementById('category-badge-text');
 
@@ -1109,10 +996,10 @@
                 filterBar.classList.remove('hidden');
                 obsText.textContent = "Todas as batatas suíças têm aproximadamente 500g.";
                 badgeText.classList.remove('hidden');
-                badgeText.innerHTML = "Adicionais Extras (+ R$ 3,00)";
+                badgeText.innerHTML = "Adicionais Extras (+ R$ 3,00 cada)";
             } else if (catId === 'porcoes') {
                 filterBar.classList.add('hidden');
-                obsText.textContent = "Escolha até 3 acompanhamentos para sua porção.";
+                obsText.textContent = "Escolha até 3 acompanhamentos inclusos para sua porção.";
                 badgeText.classList.remove('hidden');
                 badgeText.innerHTML = "Acompanhamentos Especiais inclusos";
             } else if (catId === 'milkshakes') {
@@ -1146,38 +1033,35 @@
             renderCategory('batatas');
         }
 
+        // Renderização dos Produtos no Cardápio
         function renderCategory(catId) {
             const grid = document.getElementById('products-grid');
-            grid.innerHTML = ''; // Clear grid
+            grid.innerHTML = '';
 
             const category = cardapioData.categorias.find(c => c.id === catId);
             if (!category) return;
 
             let itemsToRender = category.itens;
 
-            // Apply special filters for Potato Massa selection
             if (catId === 'batatas') {
                 if (currentPotatoMassa === 'Suíça') {
-                    // Filter out items that are only available for 'Inglesa' (e.g. Strogonoff)
                     itemsToRender = category.itens.filter(i => i.exclusivo !== 'Inglesa');
                 }
             }
 
-            itemsToRender.forEach(item => {
+            itemsToRender.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = "glass-effect rounded-2xl overflow-hidden shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between border border-white/5 relative group";
 
-                // Unique tags/badges logic (Posicionadas abaixo do nome)
                 let badgeMarkup = '';
                 if (item.badge) {
                     badgeMarkup = `<span class="bg-secondary text-darkBg text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">${item.badge}</span>`;
                 } else if (catId === 'batatas') {
-                    badgeMarkup = `<span class="bg-primary/80 border border-secondary/30 text-white text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full whitespace-nowrap">${currentPotatoMassa}</span>`;
+                    badgeMarkup = `<span class="bg-primary/80 border border-secondary/30 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full whitespace-nowrap">${currentPotatoMassa}</span>`;
                 } else if (item.tipo) {
-                    badgeMarkup = `<span class="bg-darkBg/90 border border-white/10 text-gray-300 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full whitespace-nowrap">${item.tipo}</span>`;
+                    badgeMarkup = `<span class="bg-darkBg/90 border border-white/10 text-gray-300 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full whitespace-nowrap">${item.tipo}</span>`;
                 }
 
-                // Layout building
                 card.innerHTML = `
                     <div class="p-6">
                         <div class="flex items-start justify-between gap-3 mb-4">
@@ -1199,13 +1083,11 @@
                         ${renderSpecialContext(catId)}
                     </div>
                     <div class="p-6 pt-0 border-t border-white/5 bg-black/10">
-                        <a href="https://wa.me/551123626963?text=Ol%C3%A1!%20Gostaria%20de%20pedir%20o%20item%20${encodeURIComponent(item.nome)}%20da%20categoria%20${encodeURIComponent(category.nome)}."
-                           target="_blank"
-                           rel="noopener"
-                           class="w-full inline-flex items-center justify-center py-3 bg-primary group-hover:bg-secondary text-white group-hover:text-darkBg font-bold text-sm rounded-xl transition-all duration-300 shadow-md">
-                            <i class="fab fa-whatsapp mr-2 text-base"></i>
-                            Pedir pelo WhatsApp
-                        </a>
+                        <button onclick="openProductModal('${catId}', ${index})"
+                                class="w-full inline-flex items-center justify-center py-3.5 bg-primary hover:bg-secondary text-white hover:text-darkBg font-bold text-sm rounded-xl transition-all duration-300 shadow-md">
+                            <i class="fa-solid fa-cart-plus mr-2 text-base"></i>
+                            Adicionar ao Pedido
+                        </button>
                     </div>
                 `;
 
@@ -1217,11 +1099,12 @@
             if (catId === 'batatas') {
                 return `
                     <div class="bg-darkBg/50 rounded-xl p-3 border border-white/5">
-                        <span class="block text-[10px] uppercase text-gray-500 font-extrabold tracking-wider mb-1">Adicionais Extras Sugeridos:</span>
+                        <span class="block text-[10px] uppercase text-gray-500 font-extrabold tracking-wider mb-1">Adicionais Extras Disponíveis (+ R$ 3,00):</span>
                         <div class="flex flex-wrap gap-1">
                             <span class="text-[9px] bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-gray-300">Cheddar</span>
                             <span class="text-[9px] bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-gray-300">Bacon</span>
                             <span class="text-[9px] bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-gray-300">Catupiry Original</span>
+                            <span class="text-[9px] bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-gray-300">Champignon</span>
                         </div>
                     </div>
                 `;
@@ -1229,21 +1112,416 @@
                 return `
                     <div class="bg-darkBg/50 rounded-xl p-3 border border-white/5">
                         <span class="block text-[10px] uppercase text-gray-500 font-extrabold tracking-wider mb-1">Inclusos no Prato:</span>
-                        <span class="text-[11px] text-gray-400 leading-tight block">Escolha até 3 molhos/coberturas (ex: Maionese da Casa, Cheddar Cremoso ou Bacon).</span>
+                        <span class="text-[11px] text-gray-400 leading-tight block">Escolha até 3 acompanhamentos gratuitos ao adicionar.</span>
                     </div>
                 `;
             } else if (catId === 'milkshakes') {
                 return `
                     <div class="bg-darkBg/50 rounded-xl p-3 border border-white/5">
                         <span class="block text-[10px] uppercase text-gray-500 font-extrabold tracking-wider mb-1">Escolha sua Borda:</span>
-                        <span class="text-[11px] text-gray-400 leading-tight block">Servido com Borda de Chocolate Belga ou Doce de Leite Havanna.</span>
+                        <span class="text-[11px] text-gray-400 leading-tight block">Chocolate Belga ou Doce de Leite Havanna.</span>
                     </div>
                 `;
             }
             return '';
         }
 
-        // Toggle Mobile Menu Open/Close
+        // MODAL DE PERSONALIZAÇÃO & ADIÇÃO
+        function openProductModal(catId, itemIndex) {
+            const category = cardapioData.categorias.find(c => c.id === catId);
+            if (!category) return;
+            
+            let item;
+            if (catId === 'batatas' && currentPotatoMassa === 'Suíça') {
+                const suicaList = category.itens.filter(i => i.exclusivo !== 'Inglesa');
+                item = suicaList[itemIndex];
+            } else {
+                item = category.itens[itemIndex];
+            }
+
+            activeItem = { ...item, categoriaId: catId };
+            modalQty = 1;
+            modalSelectedMassa = currentPotatoMassa;
+            if (item.exclusivo === 'Inglesa') modalSelectedMassa = 'Inglesa';
+            modalSelectedExtras = [];
+            modalSelectedBorda = 'Chocolate Belga';
+            modalSelectedMolhos = [];
+
+            document.getElementById('modal-product-title').textContent = item.nome;
+            document.getElementById('modal-product-desc').textContent = item.descricao || 'Item selecionado do cardápio';
+            document.getElementById('modal-product-base-price').textContent = `R$ ${item.preco.toFixed(2).replace('.', ',')}`;
+            document.getElementById('modal-item-obs').value = '';
+            document.getElementById('modal-qty-display').textContent = '1';
+
+            // Configurar Seções Dinâmicas do Modal
+            const massaSec = document.getElementById('modal-massa-section');
+            const extrasSec = document.getElementById('modal-extras-section');
+            const bordaSec = document.getElementById('modal-borda-section');
+            const molhosSec = document.getElementById('modal-molhos-section');
+
+            massaSec.classList.add('hidden');
+            extrasSec.classList.add('hidden');
+            bordaSec.classList.add('hidden');
+            molhosSec.classList.add('hidden');
+
+            if (catId === 'batatas') {
+                if (item.exclusivo !== 'Inglesa') {
+                    massaSec.classList.remove('hidden');
+                    selectModalMassa(modalSelectedMassa);
+                }
+                extrasSec.classList.remove('hidden');
+                renderModalExtras();
+            } else if (catId === 'milkshakes') {
+                bordaSec.classList.remove('hidden');
+                selectModalBorda('Chocolate Belga');
+            } else if (catId === 'porcoes') {
+                molhosSec.classList.remove('hidden');
+                renderModalMolhos(category.acompanhamentos_disponiveis);
+            }
+
+            updateModalPrice();
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+            activeItem = null;
+        }
+
+        function selectModalMassa(massa) {
+            modalSelectedMassa = massa;
+            const btnSuica = document.getElementById('modal-btn-suica');
+            const btnInglesa = document.getElementById('modal-btn-inglesa');
+            if (massa === 'Suíça') {
+                btnSuica.className = 'py-2.5 px-3 rounded-xl border border-secondary text-sm font-bold bg-primary text-white text-center transition-all';
+                btnInglesa.className = 'py-2.5 px-3 rounded-xl border border-white/10 text-sm font-bold bg-darkBg text-gray-300 text-center hover:text-white transition-all';
+            } else {
+                btnInglesa.className = 'py-2.5 px-3 rounded-xl border border-secondary text-sm font-bold bg-primary text-white text-center transition-all';
+                btnSuica.className = 'py-2.5 px-3 rounded-xl border border-white/10 text-sm font-bold bg-darkBg text-gray-300 text-center hover:text-white transition-all';
+            }
+        }
+
+        function selectModalBorda(borda) {
+            modalSelectedBorda = borda;
+            const btnChoc = document.getElementById('modal-btn-borda-choc');
+            const btnDoce = document.getElementById('modal-btn-borda-docedeleite');
+            if (borda.includes('Chocolate')) {
+                btnChoc.className = 'py-2.5 px-3 rounded-xl border border-secondary text-sm font-bold bg-primary text-white text-center transition-all';
+                btnDoce.className = 'py-2.5 px-3 rounded-xl border border-white/10 text-sm font-bold bg-darkBg text-gray-300 text-center hover:text-white transition-all';
+            } else {
+                btnDoce.className = 'py-2.5 px-3 rounded-xl border border-secondary text-sm font-bold bg-primary text-white text-center transition-all';
+                btnChoc.className = 'py-2.5 px-3 rounded-xl border border-white/10 text-sm font-bold bg-darkBg text-gray-300 text-center hover:text-white transition-all';
+            }
+        }
+
+        // Renderizar Adicionais com Botões Interativos (+ R$ 3,00)
+        function renderModalExtras() {
+            const container = document.getElementById('modal-extras-list');
+            container.innerHTML = '';
+            const batataCat = cardapioData.categorias.find(c => c.id === 'batatas');
+            const opcoes = batataCat.adicionais_extras.opcoes;
+
+            opcoes.forEach(opt => {
+                const isSelected = modalSelectedExtras.includes(opt);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => toggleModalExtra(opt);
+                btn.className = isSelected 
+                    ? 'py-2 px-3 rounded-xl border border-secondary bg-primary text-white text-xs font-bold flex items-center justify-between transition-all'
+                    : 'py-2 px-3 rounded-xl border border-white/10 bg-darkBg text-gray-300 hover:text-white text-xs font-medium flex items-center justify-between transition-all';
+                
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <span class="${isSelected ? 'text-secondary font-black' : 'text-gray-400'}">+ R$ 3</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function toggleModalExtra(extraName) {
+            if (modalSelectedExtras.includes(extraName)) {
+                modalSelectedExtras = modalSelectedExtras.filter(e => e !== extraName);
+            } else {
+                modalSelectedExtras.push(extraName);
+            }
+            renderModalExtras();
+            updateModalPrice();
+        }
+
+        // Renderizar Molhos para Porções
+        function renderModalMolhos(molhos) {
+            const container = document.getElementById('modal-molhos-list');
+            container.innerHTML = '';
+            document.getElementById('modal-molhos-counter').textContent = `${modalSelectedMolhos.length} de 3`;
+
+            molhos.forEach(m => {
+                const isSelected = modalSelectedMolhos.includes(m);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => toggleModalMolho(m);
+                btn.className = isSelected 
+                    ? 'py-2 px-3 rounded-xl border border-secondary bg-primary text-white text-xs font-bold flex items-center justify-between transition-all'
+                    : 'py-2 px-3 rounded-xl border border-white/10 bg-darkBg text-gray-300 hover:text-white text-xs font-medium flex items-center justify-between transition-all';
+                
+                btn.innerHTML = `
+                    <span>${m}</span>
+                    <i class="fa-solid ${isSelected ? 'fa-circle-check text-secondary' : 'fa-circle-plus text-gray-500'} text-sm"></i>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function toggleModalMolho(molhoName) {
+            if (modalSelectedMolhos.includes(molhoName)) {
+                modalSelectedMolhos = modalSelectedMolhos.filter(m => m !== molhoName);
+            } else {
+                if (modalSelectedMolhos.length < 3) {
+                    modalSelectedMolhos.push(molhoName);
+                } else {
+                    alert('Você pode selecionar no máximo 3 acompanhamentos inclusos para a porção.');
+                    return;
+                }
+            }
+            const catPorcoes = cardapioData.categorias.find(c => c.id === 'porcoes');
+            renderModalMolhos(catPorcoes.acompanhamentos_disponiveis);
+        }
+
+        function adjustModalQty(delta) {
+            modalQty += delta;
+            if (modalQty < 1) modalQty = 1;
+            document.getElementById('modal-qty-display').textContent = modalQty;
+            updateModalPrice();
+        }
+
+        function updateModalPrice() {
+            if (!activeItem) return;
+            let unitPrice = activeItem.preco;
+            if (activeItem.categoriaId === 'batatas') {
+                unitPrice += (modalSelectedExtras.length * 3.00);
+            }
+            const totalPrice = unitPrice * modalQty;
+            document.getElementById('modal-total-btn-price').textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+        }
+
+        // CONFIRMAR E ADICIONAR AO CARRINHO
+        function confirmAddToCart() {
+            if (!activeItem) return;
+
+            const obs = document.getElementById('modal-item-obs').value.trim();
+            let unitPrice = activeItem.preco;
+
+            if (activeItem.categoriaId === 'batatas') {
+                unitPrice += (modalSelectedExtras.length * 3.00);
+            }
+
+            const cartItem = {
+                id: Date.now() + Math.random(),
+                nome: activeItem.nome,
+                categoriaId: activeItem.categoriaId,
+                precoBase: activeItem.preco,
+                precoUnitario: unitPrice,
+                quantidade: modalQty,
+                massa: activeItem.categoriaId === 'batatas' ? modalSelectedMassa : null,
+                adicionais: [...modalSelectedExtras],
+                borda: activeItem.categoriaId === 'milkshakes' ? modalSelectedBorda : null,
+                molhos: activeItem.categoriaId === 'porcoes' ? [...modalSelectedMolhos] : null,
+                observacao: obs
+            };
+
+            cart.push(cartItem);
+            closeProductModal();
+            updateCartUI();
+            toggleCartDrawer(true);
+        }
+
+        // GERENCIAMENTO DA UI DO CARRINHO
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('cart-drawer-overlay');
+            if (open) {
+                renderCartItems();
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantidade, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.precoUnitario * item.quantidade), 0);
+
+            // Atualizar Badges de navegação
+            document.getElementById('nav-cart-count').textContent = totalItems;
+            document.getElementById('mobile-cart-badge').textContent = totalItems;
+            document.getElementById('drawer-cart-items-badge').textContent = `${totalItems} itens`;
+
+            // Atualizar Barra Flutuante
+            const floatingBar = document.getElementById('floating-cart-bar');
+            if (totalItems > 0) {
+                floatingBar.classList.remove('hidden');
+                document.getElementById('floating-cart-items-count').textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'} no pedido`;
+                document.getElementById('floating-cart-total').textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+            } else {
+                floatingBar.classList.add('hidden');
+            }
+
+            // Atualizar Total do Drawer
+            document.getElementById('drawer-total-price').textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <i class="fa-solid fa-basket-shopping text-5xl text-gray-600 mb-4 block"></i>
+                        <h4 class="text-white font-bold text-lg">Seu carrinho está vazio</h4>
+                        <p class="text-gray-400 text-sm mt-1">Escolha deliciosas batatas ou milkshakes no cardápio!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            cart.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-darkBg rounded-2xl p-4 border border-white/5 relative flex flex-col justify-between";
+
+                // Detalhes / Customizações
+                let detailsMarkup = '';
+                if (item.massa) {
+                    detailsMarkup += `<span class="inline-block text-[11px] bg-primary/40 text-secondary px-2 py-0.5 rounded-md font-bold mr-1">Massa ${item.massa}</span>`;
+                }
+                if (item.borda) {
+                    detailsMarkup += `<span class="inline-block text-[11px] bg-white/10 text-gray-300 px-2 py-0.5 rounded-md font-bold mr-1">Borda: ${item.borda}</span>`;
+                }
+                if (item.adicionais && item.adicionais.length > 0) {
+                    detailsMarkup += `<div class="text-[11px] text-gray-400 mt-1"><strong>Adicionais:</strong> ${item.adicionais.join(', ')} (+R$ ${(item.adicionais.length * 3).toFixed(2).replace('.', ',')})</div>`;
+                }
+                if (item.molhos && item.molhos.length > 0) {
+                    detailsMarkup += `<div class="text-[11px] text-gray-400 mt-1"><strong>Acompanhamentos:</strong> ${item.molhos.join(', ')}</div>`;
+                }
+                if (item.observacao) {
+                    detailsMarkup += `<div class="text-[11px] text-gray-400 italic mt-1"><strong>Obs:</strong> "${item.observacao}"</div>`;
+                }
+
+                itemDiv.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h5 class="text-white font-bold text-base leading-snug">${item.nome}</h5>
+                            <div class="mt-1">${detailsMarkup}</div>
+                        </div>
+                        <button onclick="removeCartItem(${item.id})" class="text-gray-500 hover:text-red-400 p-1 text-sm" title="Remover item">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-white/5">
+                        <div class="flex items-center space-x-2 bg-darkCard px-2 py-1 rounded-lg border border-white/5">
+                            <button onclick="changeCartQty(${item.id}, -1)" class="w-6 h-6 rounded bg-white/5 text-white hover:bg-primary text-xs font-bold flex items-center justify-center">-</button>
+                            <span class="text-xs font-black text-white px-1.5">${item.quantidade}</span>
+                            <button onclick="changeCartQty(${item.id}, 1)" class="w-6 h-6 rounded bg-white/5 text-white hover:bg-primary text-xs font-bold flex items-center justify-center">+</button>
+                        </div>
+                        <span class="text-base font-black text-secondary">
+                            R$ ${(item.precoUnitario * item.quantidade).toFixed(2).replace('.', ',')}
+                        </span>
+                    </div>
+                `;
+
+                container.appendChild(itemDiv);
+            });
+
+            updateCartUI();
+        }
+
+        function changeCartQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.quantidade += delta;
+            if (item.quantidade <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            }
+            renderCartItems();
+        }
+
+        function removeCartItem(id) {
+            cart = cart.filter(i => i.id !== id);
+            renderCartItems();
+        }
+
+        // Máscara de CPF
+        function formatCPFInput(input) {
+            let v = input.value.replace(/\D/g, "");
+            if (v.length > 11) v = v.substring(0, 11);
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            input.value = v;
+        }
+
+        // ENVIAR PEDIDO COMPLETO PARA O WHATSAPP
+        function sendOrderToWhatsapp() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio! Adicione ao menos um item antes de enviar.');
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim();
+            const cpf = document.getElementById('cust-cpf').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const payment = document.getElementById('cust-payment').value;
+            const obs = document.getElementById('cust-obs').value.trim();
+
+            if (!name || !cpf || !address) {
+                alert('Por favor, preencha Nome Completo, CPF e Endereço Completo para continuar.');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.precoUnitario * item.quantidade), 0);
+
+            // Montagem da mensagem estruturada
+            let msg = `*🥔 NOVO PEDIDO - BATATA LOVERS TATUAPÉ*\n`;
+            msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+            msg += `*👤 DADOS DO CLIENTE:*\n`;
+            msg += `• *Nome:* ${name}\n`;
+            msg += `• *CPF:* ${cpf}\n`;
+            msg += `• *Endereço:* ${address}\n`;
+            msg += `• *Forma de Pagamento:* ${payment}\n`;
+            if (obs) msg += `• *Obs / Troco:* ${obs}\n`;
+            msg += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            msg += `*🛒 ITENS DO PEDIDO:*\n\n`;
+
+            cart.forEach((item, index) => {
+                msg += `${index + 1}️⃣ *${item.quantidade}x ${item.nome}*`;
+                if (item.massa) msg += ` (${item.massa})`;
+                msg += `\n`;
+
+                if (item.borda) msg += `   • Borda: ${item.borda}\n`;
+                if (item.adicionais && item.adicionais.length > 0) {
+                    msg += `   • Adicionais (+R$ 3 cada): ${item.adicionais.join(', ')}\n`;
+                }
+                if (item.molhos && item.molhos.length > 0) {
+                    msg += `   • Acompanhamentos: ${item.molhos.join(', ')}\n`;
+                }
+                if (item.observacao) msg += `   • Obs: "${item.observacao}"\n`;
+
+                msg += `   • Subtotal: R$ ${(item.precoUnitario * item.quantidade).toFixed(2).replace('.', ',')}\n\n`;
+            });
+
+            msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+            msg += `*💰 VALOR TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n`;
+            msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+            msg += `_Pedido realizado através do cardápio online_`;
+
+            const phone = "551123626963";
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+        }
+
+        // Toggle Mobile Menu
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         const menuIcon = document.getElementById('menu-icon');
@@ -1252,35 +1530,20 @@
             const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
             mobileMenuBtn.setAttribute('aria-expanded', !isExpanded);
             mobileMenu.classList.toggle('hidden');
-            
-            if (isExpanded) {
-                menuIcon.className = "fa-solid fa-bars text-2xl";
-            } else {
-                menuIcon.className = "fa-solid fa-xmark text-2xl";
-            }
-        });
-
-        // Close Mobile Menu on Click Navigation
-        const mobileLinks = mobileMenu.querySelectorAll('a');
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-                menuIcon.className = "fa-solid fa-bars text-2xl";
-                mobileMenuBtn.setAttribute('aria-expanded', 'false');
-            });
+            menuIcon.className = isExpanded ? "fa-solid fa-bars text-2xl" : "fa-solid fa-xmark text-2xl";
         });
 
         // Toggle FAQ Accordion Handler
         function toggleFaq(index) {
             const answer = document.getElementById(`faq-answer-${index}`);
             const arrow = document.getElementById(`faq-arrow-${index}`);
-            
             const isOpen = !answer.classList.contains('hidden');
             
-            // Close all answers
             for (let i = 1; i <= 4; i++) {
-                document.getElementById(`faq-answer-${i}`).classList.add('hidden');
-                document.getElementById(`faq-arrow-${i}`).style.transform = 'rotate(0deg)';
+                const a = document.getElementById(`faq-answer-${i}`);
+                const ar = document.getElementById(`faq-arrow-${i}`);
+                if (a) a.classList.add('hidden');
+                if (ar) ar.style.transform = 'rotate(0deg)';
             }
 
             if (!isOpen) {
