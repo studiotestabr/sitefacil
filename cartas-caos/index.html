@@ -13,6 +13,7 @@
     <!-- Preloads -->
     <link rel="preload" as="image" href="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/cartas-caos/imagens/Hero_STE.jpg"/>
     <link rel="preload" as="image" href="https://raw.githubusercontent.com/studiotestabr/sitefacil/main/cartas-caos/logo_1787597231287.png"/>
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/cartas-caos/imagens/verso%20cartas.png"/>
     
     <!-- Meta Tags SEO -->
     <title>Cartas & Caos | Tarot, Magia e Trabalhos Espirituais em São Paulo</title>
@@ -75,7 +76,7 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* Animações 3D para o Tarot */
+        /* Animações 3D de virar carta */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
@@ -84,7 +85,7 @@
 </head>
 <body class="bg-black text-gray-100 font-sans selection:bg-mystic-gold selection:text-black">
 
-    <!-- 1. HEADER & NAVIGATION -->
+    <!-- ================= 1. HEADER & NAVIGATION ================= -->
     <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out glassmorphism border-b border-mystic/40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <a href="#" class="flex items-center space-x-3 group" aria-label="Cartas & Caos Home">
@@ -96,7 +97,7 @@
             </a>
             
             <!-- Desktop Nav -->
-            <nav class="hidden md:flex items-center space-x-7">
+            <nav class="hidden md:flex items-center space-x-6">
                 <a href="#tarot" class="text-sm tracking-wider uppercase text-mystic-gold font-semibold hover:text-white transition-all duration-300"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Tarot Grátis</a>
                 <a href="#mapa" class="text-sm tracking-wider uppercase text-mystic-gold font-semibold hover:text-white transition-all duration-300"><i class="fa-solid fa-compass mr-1"></i> Big 3 Astral</a>
                 <a href="#dor" class="text-sm tracking-wider uppercase text-gray-300 hover:text-mystic-gold transition-all duration-300">Incertezas</a>
@@ -137,7 +138,7 @@
 
     <main class="pt-20">
         
-        <!-- 2. SEÇÃO HERO -->
+        <!-- ================= 2. SEÇÃO HERO ================= -->
         <section class="relative min-h-[90vh] flex items-center justify-center bg-cover bg-center py-20 px-4" style="background-image: url('https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/cartas-caos/imagens/Hero_STE.jpg');">
             <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black"></div>
             <div class="relative z-10 max-w-5xl mx-auto text-center space-y-8">
@@ -154,7 +155,7 @@
                 <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="#tarot" 
                        class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-mystic-gold to-yellow-500 text-black font-bold text-lg uppercase tracking-wider hover:scale-105 transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-sparkles"></i>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
                         Tirar Carta do Dia Grátis
                     </a>
                     <a href="#mapa" 
@@ -171,9 +172,9 @@
             </div>
         </section>
 
-        <!-- ================= NOVO 1: TAROT INTERATIVO ================= -->
+        <!-- ================= 3. TAROT INTERATIVO COM CARTAS REAIS ================= -->
         <section id="tarot" class="py-24 px-4 bg-gradient-to-b from-black via-neutral-950 to-black border-y border-neutral-800 relative">
-            <div class="max-w-4xl mx-auto text-center">
+            <div class="max-w-6xl mx-auto text-center">
                 <span class="text-mystic-gold text-xs font-semibold uppercase tracking-[0.25em] block">Oráculo Digital</span>
                 <h2 class="font-serif text-3xl sm:text-5xl font-bold text-amber-50 mt-2 mb-4">Tiragem de 3 Cartas</h2>
                 <div class="w-24 h-1 bg-mystic-gold mx-auto rounded mb-4"></div>
@@ -182,81 +183,108 @@
                 </p>
 
                 <!-- Botão Embaralhar -->
-                <button id="btn-shuffle" onclick="tirarCartas()" class="mb-12 px-8 py-3 rounded-full bg-neutral-900 border border-mystic-gold/60 text-mystic-gold hover:bg-mystic-gold hover:text-black font-semibold text-sm uppercase tracking-wider transition-all duration-300 inline-flex items-center gap-3 shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:scale-105">
+                <button id="btn-shuffle" onclick="tirarCartas()" class="mb-12 px-8 py-3.5 rounded-full bg-gradient-to-r from-neutral-900 to-black border border-mystic-gold/80 text-mystic-gold hover:bg-gradient-to-r hover:from-mystic-gold hover:to-yellow-500 hover:text-black font-bold text-sm uppercase tracking-wider transition-all duration-300 inline-flex items-center gap-3 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:scale-105">
                     <i class="fa-solid fa-shuffle"></i> Embaralhar e Revelar
                 </button>
 
                 <!-- Mesa de Cartas (3 Slots) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-                    <!-- Carta 1 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
+                    
+                    <!-- SLOT 1: O MOMENTO ATUAL -->
                     <div class="flex flex-col items-center">
-                        <span class="text-xs uppercase tracking-wider text-gray-400 mb-3 font-semibold">1. O Momento Atual</span>
-                        <div id="card-0" class="w-52 h-80 perspective-1000 cursor-pointer" onclick="flipCard(0)">
-                            <div id="inner-0" class="w-full h-full relative transform-style-3d transition-transform duration-700 rounded-2xl border border-neutral-800 shadow-2xl bg-neutral-900 flex items-center justify-center p-4">
-                                <!-- Verso -->
-                                <div class="absolute inset-0 backface-hidden flex flex-col items-center justify-center bg-gradient-to-b from-neutral-900 to-black rounded-2xl border border-neutral-800 p-4">
-                                    <div class="w-12 h-12 rounded-full border border-mystic-gold/40 flex items-center justify-center mb-3 text-mystic-gold text-xl">
-                                        <i class="fa-solid fa-eye animate-pulse"></i>
-                                    </div>
-                                    <span class="text-xs font-serif text-amber-100 font-bold tracking-widest">CARTAS & CAOS</span>
+                        <span class="text-xs uppercase tracking-wider text-mystic-gold mb-3 font-semibold flex items-center gap-1.5">
+                            <i class="fa-solid fa-hourglass-half text-[10px]"></i> 1. O Momento Atual
+                        </span>
+                        <div id="card-0" class="w-56 h-[340px] perspective-1000 cursor-pointer group" onclick="flipCard(0)">
+                            <div id="inner-0" class="w-full h-full relative transform-style-3d transition-transform duration-700 rounded-2xl shadow-2xl">
+                                <!-- Verso Oficial -->
+                                <div class="absolute inset-0 backface-hidden rounded-2xl overflow-hidden border border-mystic-gold/40 shadow-[0_0_15px_rgba(0,0,0,0.8)] group-hover:border-mystic-gold transition-colors bg-neutral-950">
+                                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/cartas-caos/imagens/verso%20cartas.png" alt="Verso da Carta Cartas e Caos" class="w-full h-full object-cover">
                                 </div>
-                                <!-- Frente -->
-                                <div id="front-0" class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-b from-neutral-900 to-black rounded-2xl border border-mystic-gold/60 p-5 flex flex-col justify-between text-left shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                <!-- Frente Ilustrada -->
+                                <div id="front-0" class="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl overflow-hidden border border-mystic-gold shadow-[0_0_25px_rgba(212,175,55,0.3)] bg-neutral-900">
+                                    <img id="img-0" src="" alt="" class="w-full h-full object-cover">
                                 </div>
                             </div>
+                        </div>
+                        <!-- Legenda -->
+                        <div id="legenda-0" class="hidden mt-4 w-full p-4 rounded-2xl bg-neutral-900/80 border border-neutral-800 text-left shadow-lg">
+                            <div class="flex items-center justify-between border-b border-neutral-800 pb-2 mb-2">
+                                <span id="num-0" class="text-[10px] text-mystic-gold font-bold uppercase tracking-wider"></span>
+                                <h4 id="nome-0" class="font-serif text-base font-bold text-amber-100"></h4>
+                            </div>
+                            <p id="desc-0" class="text-xs text-gray-300 font-light leading-relaxed mb-2.5"></p>
+                            <div id="alerta-0" class="text-[11px] text-amber-300/90 font-medium bg-black/50 p-2 rounded-lg border border-neutral-800"></div>
                         </div>
                     </div>
 
-                    <!-- Carta 2 -->
+                    <!-- SLOT 2: A RAIZ DO CAOS -->
                     <div class="flex flex-col items-center">
-                        <span class="text-xs uppercase tracking-wider text-gray-400 mb-3 font-semibold">2. A Raiz do Caos</span>
-                        <div id="card-1" class="w-52 h-80 perspective-1000 cursor-pointer" onclick="flipCard(1)">
-                            <div id="inner-1" class="w-full h-full relative transform-style-3d transition-transform duration-700 rounded-2xl border border-neutral-800 shadow-2xl bg-neutral-900 flex items-center justify-center p-4">
-                                <div class="absolute inset-0 backface-hidden flex flex-col items-center justify-center bg-gradient-to-b from-neutral-900 to-black rounded-2xl border border-neutral-800 p-4">
-                                    <div class="w-12 h-12 rounded-full border border-mystic-gold/40 flex items-center justify-center mb-3 text-mystic-gold text-xl">
-                                        <i class="fa-solid fa-eye animate-pulse"></i>
-                                    </div>
-                                    <span class="text-xs font-serif text-amber-100 font-bold tracking-widest">CARTAS & CAOS</span>
+                        <span class="text-xs uppercase tracking-wider text-mystic-gold mb-3 font-semibold flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt text-[10px]"></i> 2. A Raiz do Caos
+                        </span>
+                        <div id="card-1" class="w-56 h-[340px] perspective-1000 cursor-pointer group" onclick="flipCard(1)">
+                            <div id="inner-1" class="w-full h-full relative transform-style-3d transition-transform duration-700 rounded-2xl shadow-2xl">
+                                <div class="absolute inset-0 backface-hidden rounded-2xl overflow-hidden border border-mystic-gold/40 shadow-[0_0_15px_rgba(0,0,0,0.8)] group-hover:border-mystic-gold transition-colors bg-neutral-950">
+                                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/cartas-caos/imagens/verso%20cartas.png" alt="Verso da Carta Cartas e Caos" class="w-full h-full object-cover">
                                 </div>
-                                <div id="front-1" class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-b from-neutral-900 to-black rounded-2xl border border-mystic-gold/60 p-5 flex flex-col justify-between text-left shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                <div id="front-1" class="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl overflow-hidden border border-mystic-gold shadow-[0_0_25px_rgba(212,175,55,0.3)] bg-neutral-900">
+                                    <img id="img-1" src="" alt="" class="w-full h-full object-cover">
                                 </div>
                             </div>
+                        </div>
+                        <div id="legenda-1" class="hidden mt-4 w-full p-4 rounded-2xl bg-neutral-900/80 border border-neutral-800 text-left shadow-lg">
+                            <div class="flex items-center justify-between border-b border-neutral-800 pb-2 mb-2">
+                                <span id="num-1" class="text-[10px] text-mystic-gold font-bold uppercase tracking-wider"></span>
+                                <h4 id="nome-1" class="font-serif text-base font-bold text-amber-100"></h4>
+                            </div>
+                            <p id="desc-1" class="text-xs text-gray-300 font-light leading-relaxed mb-2.5"></p>
+                            <div id="alerta-1" class="text-[11px] text-amber-300/90 font-medium bg-black/50 p-2 rounded-lg border border-neutral-800"></div>
                         </div>
                     </div>
 
-                    <!-- Carta 3 -->
+                    <!-- SLOT 3: O CONSELHO -->
                     <div class="flex flex-col items-center">
-                        <span class="text-xs uppercase tracking-wider text-gray-400 mb-3 font-semibold">3. O Conselho</span>
-                        <div id="card-2" class="w-52 h-80 perspective-1000 cursor-pointer" onclick="flipCard(2)">
-                            <div id="inner-2" class="w-full h-full relative transform-style-3d transition-transform duration-700 rounded-2xl border border-neutral-800 shadow-2xl bg-neutral-900 flex items-center justify-center p-4">
-                                <div class="absolute inset-0 backface-hidden flex flex-col items-center justify-center bg-gradient-to-b from-neutral-900 to-black rounded-2xl border border-neutral-800 p-4">
-                                    <div class="w-12 h-12 rounded-full border border-mystic-gold/40 flex items-center justify-center mb-3 text-mystic-gold text-xl">
-                                        <i class="fa-solid fa-eye animate-pulse"></i>
-                                    </div>
-                                    <span class="text-xs font-serif text-amber-100 font-bold tracking-widest">CARTAS & CAOS</span>
+                        <span class="text-xs uppercase tracking-wider text-mystic-gold mb-3 font-semibold flex items-center gap-1.5">
+                            <i class="fa-solid fa-compass text-[10px]"></i> 3. O Conselho
+                        </span>
+                        <div id="card-2" class="w-56 h-[340px] perspective-1000 cursor-pointer group" onclick="flipCard(2)">
+                            <div id="inner-2" class="w-full h-full relative transform-style-3d transition-transform duration-700 rounded-2xl shadow-2xl">
+                                <div class="absolute inset-0 backface-hidden rounded-2xl overflow-hidden border border-mystic-gold/40 shadow-[0_0_15px_rgba(0,0,0,0.8)] group-hover:border-mystic-gold transition-colors bg-neutral-950">
+                                    <img src="https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/cartas-caos/imagens/verso%20cartas.png" alt="Verso da Carta Cartas e Caos" class="w-full h-full object-cover">
                                 </div>
-                                <div id="front-2" class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-b from-neutral-900 to-black rounded-2xl border border-mystic-gold/60 p-5 flex flex-col justify-between text-left shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                <div id="front-2" class="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl overflow-hidden border border-mystic-gold shadow-[0_0_25px_rgba(212,175,55,0.3)] bg-neutral-900">
+                                    <img id="img-2" src="" alt="" class="w-full h-full object-cover">
                                 </div>
                             </div>
                         </div>
+                        <div id="legenda-2" class="hidden mt-4 w-full p-4 rounded-2xl bg-neutral-900/80 border border-neutral-800 text-left shadow-lg">
+                            <div class="flex items-center justify-between border-b border-neutral-800 pb-2 mb-2">
+                                <span id="num-2" class="text-[10px] text-mystic-gold font-bold uppercase tracking-wider"></span>
+                                <h4 id="nome-2" class="font-serif text-base font-bold text-amber-100"></h4>
+                            </div>
+                            <p id="desc-2" class="text-xs text-gray-300 font-light leading-relaxed mb-2.5"></p>
+                            <div id="alerta-2" class="text-[11px] text-amber-300/90 font-medium bg-black/50 p-2 rounded-lg border border-neutral-800"></div>
+                        </div>
                     </div>
+
                 </div>
 
-                <!-- Resumo Detalhado da Leitura -->
-                <div id="reading-summary" class="hidden mt-12 p-8 rounded-2xl bg-neutral-900/80 border border-neutral-800 max-w-2xl mx-auto text-left shadow-2xl">
+                <!-- Síntese Geral da Leitura -->
+                <div id="reading-summary" class="hidden mt-12 p-8 rounded-2xl bg-neutral-900/90 border border-neutral-800 max-w-3xl mx-auto text-left shadow-2xl">
                     <h3 class="font-serif text-xl font-bold text-mystic-gold mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-book-open"></i> Síntese da Sua Tiragem
                     </h3>
                     <p id="summary-text" class="text-gray-300 text-sm leading-relaxed mb-4 font-light"></p>
                     <div class="text-xs text-amber-200/90 bg-black/60 p-4 rounded-xl border border-mystic-gold/30 flex items-start gap-2">
                         <span class="text-base">💡</span>
-                        <div><strong>Dica da Ste:</strong> Anote esses conselhos e perceba como os acontecimentos das próximas 24h refletem essas energias.</div>
+                        <div><strong>Dica da Ste:</strong> Anote esses conselhos e observe como os acontecimentos das próximas 24h refletem essas energias.</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ================= NOVO 2: MAPA ASTRAL (BIG 3) ================= -->
+        <!-- ================= 4. MAPA ASTRAL (BIG 3) ================= -->
         <section id="mapa" class="py-24 px-4 bg-black relative">
             <div class="max-w-3xl mx-auto">
                 <div class="text-center mb-12">
@@ -330,7 +358,7 @@
             </div>
         </section>
 
-        <!-- 3. SEÇÃO DE DOR E EMPATIA -->
+        <!-- ================= 5. SEÇÃO DE DOR E EMPATIA ================= -->
         <section id="dor" class="py-24 px-4 bg-gradient-to-b from-black to-mystic-dark/30 relative">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -378,7 +406,7 @@
             </div>
         </section>
 
-        <!-- 4. PROPOSTA ÚNICA DE VALOR -->
+        <!-- ================= 6. PROPOSTA ÚNICA DE VALOR ================= -->
         <section id="diferenciais" class="py-24 px-4 bg-black relative">
             <div class="max-w-7xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -427,7 +455,7 @@
             </div>
         </section>
 
-        <!-- 5. APRESENTAÇÃO DE SERVIÇOS -->
+        <!-- ================= 7. APRESENTAÇÃO DE SERVIÇOS ================= -->
         <section id="servicos" class="py-24 px-4 bg-gradient-to-b from-black to-mystic-dark/20">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -550,7 +578,7 @@
             </div>
         </section>
 
-        <!-- ================= NOVO 3: CONSULTAS COM A STE ================= -->
+        <!-- ================= 8. CONSULTAS COM A STE ================= -->
         <section id="consultas-ste" class="py-24 px-4 bg-black border-t border-neutral-800">
             <div class="max-w-4xl mx-auto text-center">
                 <span class="text-mystic-gold text-xs font-semibold uppercase tracking-[0.25em] block">Atendimento 1:1</span>
@@ -601,7 +629,7 @@
             </div>
         </section>
 
-        <!-- 6. PROVA SOCIAL -->
+        <!-- ================= 9. PROVA SOCIAL (DEPOIMENTOS) ================= -->
         <section class="py-24 px-4 bg-black relative">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -730,7 +758,7 @@
             </div>
         </section>
 
-        <!-- 7. SEÇÃO SOBRE NÓS HUMANIZADA -->
+        <!-- ================= 10. SEÇÃO SOBRE NÓS HUMANIZADA ================= -->
         <section id="sobre" class="py-24 px-4 bg-gradient-to-b from-black to-neutral-950 relative">
             <div class="max-w-7xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -778,7 +806,7 @@
             </div>
         </section>
 
-        <!-- 8. ESTRUTURA DA LOJA (Galeria Imersiva) -->
+        <!-- ================= 11. ESTRUTURA DA LOJA (GALERIA) ================= -->
         <section class="py-24 px-4 bg-black">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -853,7 +881,7 @@
             </div>
         </section>
 
-        <!-- 9. SEÇÃO FAQ -->
+        <!-- ================= 12. SEÇÃO FAQ ================= -->
         <section id="faq" class="py-24 px-4 bg-gradient-to-b from-black to-mystic-dark/20">
             <div class="max-w-4xl mx-auto">
                 <div class="text-center mb-16 space-y-4">
@@ -910,8 +938,8 @@
             </div>
         </section>
 
-        <!-- 10. ONDE ESTAMOS (Facilidade de Acesso) -->
-        <section class="py-24 px-4 bg-black">
+        <!-- ================= 13. ONDE ESTAMOS ================= -->
+        <section id="onde-estamos" class="py-24 px-4 bg-black">
             <div class="max-w-7xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div class="space-y-6">
@@ -968,7 +996,7 @@
 
     </main>
 
-    <!-- 11. FOOTER COMPLETO -->
+    <!-- ================= 14. FOOTER COMPLETO ================= -->
     <footer class="bg-black border-t border-mystic/30 text-gray-400 pt-16 pb-8 px-4">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div class="space-y-4">
@@ -1038,16 +1066,16 @@
         </div>
     </footer>
 
-    <!-- Botão de WhatsApp Flutuante -->
+    <!-- ================= 15. BOTÃO DE WHATSAPP FLUTUANTE ================= -->
     <a href="https://wa.me/5511932153971?text=Ol%C3%A1,%20gostaria%20de%20agendar%20uma%20consulta%20de%20Tarot%20e%20direcionamento%20espiritual." 
        class="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-green-500 text-white flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:scale-110 transition-all duration-300 animate-bounce"
        target="_blank" rel="noopener noreferrer" aria-label="Iniciar atendimento por WhatsApp">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
-    <!-- Vanilla Javascript Logic -->
+    <!-- ================= 16. SCRIPTS E TODA A LÓGICA JAVASCRIPT ================= -->
     <script>
-        // Toggle mobile menu
+        // Menu Mobile
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
 
@@ -1057,7 +1085,7 @@
 
         mobileMenuBtn.addEventListener('click', toggleMenu);
 
-        // Sticky Header scroll styling
+        // Header Scroll
         window.addEventListener('scroll', () => {
             const header = document.querySelector('header');
             if (window.scrollY > 50) {
@@ -1069,7 +1097,7 @@
             }
         });
 
-        // FAQ accordion logic
+        // FAQ Accordion
         const faqBtns = document.querySelectorAll('.faq-btn');
         faqBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1097,22 +1125,32 @@
             });
         });
 
-        // ================= LÓGICA DO TAROT INTERATIVO =================
+        // ================= LÓGICA DO TAROT COM LINKS CORRIGIDOS DO GITHUB =================
+        const BASE_CARTAS_URL = "https://raw.githubusercontent.com/studiotestabr/sitefacil/refs/heads/main/cartas-caos/cartas/";
+
         const DECK = [
-            { name: "O Louco", num: "0", desc: "Novos começos, saltos de fé e coragem para abraçar o desconhecido.", alert: "Cuidado com a ingenuidade cega." },
-            { name: "O Mago", num: "I", desc: "Você tem todas as ferramentas e poder para transformar o caos em criação.", alert: "Não tente manipular quem está ao seu redor." },
-            { name: "A Sacerdotisa", num: "II", desc: "Intuição afiada, segredos e o silêncio necessário antes de agir.", alert: "Pare de ignorar o que sua intuição já gritou." },
-            { name: "A Imperatriz", num: "III", desc: "Abundância, fertilidade criativa e prazer de viver o momento.", alert: "Cuidado com o apego excessivo ou comodismo." },
-            { name: "O Imperador", num: "IV", desc: "Estrutura, autoridade, disciplina e limites firmes.", alert: "Rigidez excessiva quebra em vez de proteger." },
-            { name: "Os Enamorados", num: "VI", desc: "Escolhas cruciais, alinhamento de valores e conexões magnéticas.", alert: "Indecisão prolongada é também uma escolha ruim." },
-            { name: "O Carro", num: "VII", desc: "Determinação inabalável, vitória e autocontrole diante dos obstáculos.", alert: "Cuidado com a arrogância ao acelerar demais." },
-            { name: "A Força", num: "VIII", desc: "Domínio suave das próprias paixões, resiliência e maturidade.", alert: "Não confunda força com teimosia destrutiva." },
-            { name: "A Roda da Fortuna", num: "X", desc: "Ciclos mudando, reviravoltas do destino e movimento inevitável.", alert: "Adapte-se ao movimento das marés cósmicas." },
-            { name: "A Morte", num: "XIII", desc: "Fim inevitável de um ciclo para o nascimento do novo. Desapego total.", alert: "Não tente reviver o que já cumpriu seu papel." },
-            { name: "A Torre", num: "XVI", desc: "Ruptura brusca de ilusões. O caos que destrói para libertar.", alert: "Deixe cair o que não tem base sólida." },
-            { name: "A Estrela", num: "XVII", desc: "Esperança renovada, cura após a tempestade e clareza.", alert: "Mantenha a fé com os pés no chão." },
-            { name: "O Sol", num: "XIX", desc: "Sucesso, verdade exposta, vitalidade e alegria genuína.", alert: "Aproveite a luz sem queimar as pontes." },
-            { name: "O Mundo", num: "XXI", desc: "Conclusão triunfante, integração total e fechamento com chave de ouro.", alert: "Celebre o ciclo encerrado antes de começar o próximo." }
+            { name: "O Louco", num: "0", img: BASE_CARTAS_URL + "0%20o-louco.jpg", desc: "Novos começos, saltos de fé e coragem para abraçar o desconhecido.", alert: "Cuidado com a ingenuidade cega." },
+            { name: "O Mago", num: "I", img: BASE_CARTAS_URL + "1%20o-mago.jpg", desc: "Você tem todas as ferramentas e poder para transformar o caos em criação.", alert: "Não tente manipular quem está ao seu redor." },
+            { name: "A Sacerdotisa", num: "II", img: BASE_CARTAS_URL + "2%20a-sacerdotisa.jpg", desc: "Intuição afiada, segredos e o silêncio necessário antes de agir.", alert: "Pare de ignorar o que sua intuição já gritou." },
+            { name: "A Imperatriz", num: "III", img: BASE_CARTAS_URL + "3%20a-imperatriz.jpg", desc: "Abundância, fertilidade criativa e prazer de viver o momento.", alert: "Cuidado com o apego excessivo ou comodismo." },
+            { name: "O Imperador", num: "IV", img: BASE_CARTAS_URL + "4%20o-imperador.jpg", desc: "Estrutura, autoridade, disciplina e limites firmes.", alert: "Rigidez excessiva quebra em vez de proteger." },
+            { name: "O Papa", num: "V", img: BASE_CARTAS_URL + "5%20o-papa.jpg", desc: "Sabedoria ancestral, conselhos confiáveis e alinhamento ético.", alert: "Cuidado com dogmas ultrapassados." },
+            { name: "Os Enamorados", num: "VI", img: BASE_CARTAS_URL + "6%20os-enamorados.jpg", desc: "Escolhas cruciais, alinhamento de valores e conexões magnéticas.", alert: "Indecisão prolongada é também uma escolha ruim." },
+            { name: "O Carro", num: "VII", img: BASE_CARTAS_URL + "7%20o-carro.jpg", desc: "Determinação inabalável, vitória e autocontrole diante dos obstáculos.", alert: "Cuidado com a velocidade sem freio." },
+            { name: "A Justiça", num: "VIII", img: BASE_CARTAS_URL + "8%20a-forca.jpg", desc: "Colheita do que foi plantado, equilíbrio e clareza racional.", alert: "Assuma a responsabilidade pelos seus atos." },
+            { name: "O Eremita", num: "IX", img: BASE_CARTAS_URL + "9%20o-eremita.jpg", desc: "Introspecção necessária, busca pela luz interna e paciência.", alert: "Não confunda solitude com isolamento destrutivo." },
+            { name: "A Roda da Fortuna", num: "X", img: BASE_CARTAS_URL + "10%20a-roda-da-fortuna.jpg", desc: "Ciclos mudando, reviravoltas do destino e movimento inevitável.", alert: "Adapte-se ao movimento das marés cósmicas." },
+            { name: "A Força", num: "XI", img: BASE_CARTAS_URL + "11%20a-justica.jpg", desc: "Domínio suave das próprias paixões, resiliência e maturidade emocional.", alert: "Não confunda força com teimosia destrutiva." },
+            { name: "O Enforcado", num: "XII", img: BASE_CARTAS_URL + "12%20o-enforcado.jpg", desc: "Nova perspectiva necessária, pausa estratégica e rendição.", alert: "Pare de insistir no que não está sob seu controle." },
+            { name: "A Morte", num: "XIII", img: BASE_CARTAS_URL + "13%20a-morte.jpg", desc: "Fim inevitável de um ciclo para o nascimento do novo. Desapego total.", alert: "Não tente reviver o que já cumpriu seu papel." },
+            { name: "A Temperança", num: "XIV", img: BASE_CARTAS_URL + "14%20a-temperanca.jpg", desc: "Alquimia da alma, cura gradual, paciência e moderação.", alert: "Evite extremos que drenam sua vitalidade." },
+            { name: "O Diabo", num: "XV", img: BASE_CARTAS_URL + "15%20o-diabo.jpg", desc: "Sombra exposta, desejos intensos e padrões que aprisionam.", alert: "Cuidado com vícios e obsessões mentais." },
+            { name: "A Torre", num: "XVI", img: BASE_CARTAS_URL + "16%20a-torre.jpg", desc: "Ruptura brusca de ilusões. O caos que destrói para libertar.", alert: "Deixe cair o que não tem base sólida." },
+            { name: "A Estrela", num: "XVII", img: BASE_CARTAS_URL + "17%20a-estrela.jpg", desc: "Esperança renovada, cura após a tempestade e clareza divina.", alert: "Mantenha a fé com os pés no chão." },
+            { name: "A Lua", num: "XVIII", img: BASE_CARTAS_URL + "18%20a-lua.jpg", desc: "Profundezas emocionais, ilusões e intuição que desvenda o oculto.", alert: "Não tome decisões baseadas no medo." },
+            { name: "O Sol", num: "XIX", img: BASE_CARTAS_URL + "19%20o-sol.jpg", desc: "Sucesso, verdade exposta, vitalidade radiante e alegria pura.", alert: "Aproveite a luz sem queimar as pontes." },
+            { name: "O Julgamento", num: "XX", img: BASE_CARTAS_URL + "20%20o-julgamento.jpg", desc: "Despertar espiritual, chamado para renascer e redenção.", alert: "Ouça o chamado para mudar de fase." },
+            { name: "O Mundo", num: "XXI", img: BASE_CARTAS_URL + "21%20o-mundo.jpg", desc: "Conclusão triunfante, integração total e fechamento com chave de ouro.", alert: "Celebre a vitória antes de iniciar o próximo ciclo." }
         ];
 
         let cartasSorteadas = [];
@@ -1125,29 +1163,39 @@
                 const inner = document.getElementById(`inner-${i}`);
                 inner.classList.remove('rotate-y-180');
 
-                const front = document.getElementById(`front-${i}`);
-                front.innerHTML = `
-                    <div>
-                        <span class="text-[10px] text-mystic-gold font-bold uppercase tracking-wider">Arcano ${cartasSorteadas[i].num}</span>
-                        <h4 class="font-serif text-base font-bold text-amber-100 mt-0.5">${cartasSorteadas[i].name}</h4>
-                    </div>
-                    <p class="text-[11px] text-gray-300 font-light leading-relaxed">${cartasSorteadas[i].desc}</p>
-                    <div class="text-[10px] text-amber-300 font-medium border-t border-neutral-800 pt-2">
-                        ⚠️ ${cartasSorteadas[i].alert}
-                    </div>
-                `;
+                document.getElementById(`legenda-${i}`).classList.add('hidden');
+
+                const img = document.getElementById(`img-${i}`);
+                img.src = cartasSorteadas[i].img;
+                img.alt = cartasSorteadas[i].name;
+
+                document.getElementById(`num-${i}`).innerText = `Arcano ${cartasSorteadas[i].num}`;
+                document.getElementById(`nome-${i}`).innerText = cartasSorteadas[i].name;
+                document.getElementById(`desc-${i}`).innerText = cartasSorteadas[i].desc;
+                document.getElementById(`alerta-${i}`).innerHTML = `⚠️ <strong>Alerta do Caos:</strong> ${cartasSorteadas[i].alert}`;
             }
 
-            setTimeout(() => { flipCard(0); }, 300);
-            setTimeout(() => { flipCard(1); }, 600);
-            setTimeout(() => { flipCard(2); }, 900);
+            setTimeout(() => { 
+                flipCard(0); 
+                document.getElementById('legenda-0').classList.remove('hidden'); 
+            }, 400);
+
+            setTimeout(() => { 
+                flipCard(1); 
+                document.getElementById('legenda-1').classList.remove('hidden'); 
+            }, 800);
+
+            setTimeout(() => { 
+                flipCard(2); 
+                document.getElementById('legenda-2').classList.remove('hidden'); 
+            }, 1200);
 
             setTimeout(() => {
                 const summary = document.getElementById('reading-summary');
                 const summaryText = document.getElementById('summary-text');
-                summaryText.innerHTML = `No seu <strong>momento presente</strong>, a presença de <em>${cartasSorteadas[0].name}</em> indica que a energia está em movimento. A raiz da sua turbulência vem de <em>${cartasSorteadas[1].name}</em>, exigindo atenção. Como <strong>direcionamento</strong>, <em>${cartasSorteadas[2].name}</em> aconselha: ${cartasSorteadas[2].desc}`;
+                summaryText.innerHTML = `No seu <strong>momento presente</strong>, a carta <em>${cartasSorteadas[0].name}</em> indica que as energias estão ativas. A raiz da turbulência vem de <em>${cartasSorteadas[1].name}</em>, que traz à tona questões profundas. Como <strong>direcionamento</strong>, <em>${cartasSorteadas[2].name}</em> aconselha: ${cartasSorteadas[2].desc}`;
                 summary.classList.remove('hidden');
-            }, 1200);
+            }, 1500);
         }
 
         function flipCard(index) {
