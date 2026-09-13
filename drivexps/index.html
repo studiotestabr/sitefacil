@@ -9,36 +9,91 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-900 text-white font-sans pb-20" x-data="entregaApp()">
+<body class="bg-gray-900 text-white font-sans pb-24" x-data="entregaApp()">
 
   <!-- Cabeçalho -->
-  <header class="bg-orange-600 p-4 sticky top-0 z-50 flex justify-between items-center shadow-md">
+  <header class="bg-orange-600 p-4 sticky top-0 z-40 flex justify-between items-center shadow-md">
     <div>
       <h1 class="font-black text-lg">DriveXPS <span class="text-xs bg-black px-2 py-0.5 rounded">Shopee</span></h1>
       <p class="text-xs opacity-80" x-text="`Restantes: ${pendentes.length} de ${entregas.length}`"></p>
     </div>
-    <div class="flex gap-2">
+    <div class="flex items-center gap-2">
+      <button @click="modalImportar = true" class="bg-white text-orange-600 px-3 py-1 text-xs font-black rounded shadow">
+        + Importar
+      </button>
       <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-3 py-1 text-xs font-bold rounded">📦 Carga</button>
       <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white' : 'bg-orange-700'" class="px-3 py-1 text-xs font-bold rounded">🚗 Rua</button>
     </div>
   </header>
 
-  <!-- Banner de Erro/Diagnóstico (Só aparece se o Directus falhar) -->
-  <div x-show="erroMsg" class="bg-red-600 p-3 text-sm text-center font-bold" x-text="erroMsg"></div>
+  <!-- Banner de Erro -->
+  <div x-show="erroMsg" class="bg-red-600 p-2.5 text-xs text-center font-bold" x-text="erroMsg"></div>
+
+  <!-- MODAL DE IMPORTAÇÃO (Estilo MotorRota) -->
+  <div x-show="modalImportar" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" x-cloak>
+    <div class="bg-gray-800 rounded-2xl w-full max-w-lg border border-gray-700 p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+        <div>
+          <h2 class="font-black text-lg text-orange-500">MANDA SUAS PARADAS</h2>
+          <p class="text-xs text-gray-400">Importador Inteligente de Romaneios</p>
+        </div>
+        <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
+      </div>
+
+      <!-- Configuração de Cidade / CD -->
+      <div class="space-y-2 bg-gray-900/60 p-3 rounded-xl border border-gray-700/60">
+        <label class="text-xs font-bold text-gray-300">Cidade de Entrega (Trava de Região):</label>
+        <input type="text" x-model="cidadePadrao" placeholder="Ex: Mongaguá, SP" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-sm text-white focus:outline-none focus:border-orange-500">
+      </div>
+
+      <!-- Abas de Importação: Prints vs Texto -->
+      <div class="flex border-b border-gray-700 text-sm font-bold">
+        <button @click="tipoEnvio = 'prints'" :class="tipoEnvio === 'prints' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📸 Prints / Fotos
+        </button>
+        <button @click="tipoEnvio = 'texto'" :class="tipoEnvio === 'texto' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📄 Colar Texto
+        </button>
+      </div>
+
+      <!-- Formulário: Prints -->
+      <div x-show="tipoEnvio === 'prints'" class="space-y-3">
+        <label class="block border-2 border-dashed border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-orange-500 transition">
+          <span class="text-3xl block mb-2">📸</span>
+          <span class="text-sm font-bold block text-gray-200">Selecionar Prints do SPX Driver</span>
+          <span class="text-xs text-gray-400 block mt-1">Pode enviar até 15 fotos de uma vez</span>
+          <input type="file" multiple accept="image/*" @change="arquivosFotos = $event.target.files" class="hidden">
+        </label>
+        <p x-show="arquivosFotos.length > 0" class="text-xs text-green-400 font-bold text-center" x-text="`${arquivosFotos.length} imagem(ns) selecionada(s)`"></p>
+      </div>
+
+      <!-- Formulário: Colar Texto -->
+      <div x-show="tipoEnvio === 'texto'" class="space-y-2">
+        <textarea x-model="textoRomaneio" rows="6" placeholder="Cole aqui o texto copiado do app da Shopee ou do grupo do CDD..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-orange-500 font-mono"></textarea>
+      </div>
+
+      <!-- Botão Disparar Processamento -->
+      <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg disabled:opacity-50">
+        <span x-show="!carregandoProcesso">🚀 Otimizar Rota com IA</span>
+        <span x-show="carregandoProcesso">⏳ Lendo Prints e Traçando Rota...</span>
+      </button>
+    </div>
+  </div>
 
   <!-- MODO 1: CARREGAMENTO (Canetão & Organização no Uno) -->
   <main x-show="modo === 'carregamento'" class="p-4 space-y-3">
-    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-xs text-yellow-400">
-      ✍️ <strong>Regra do Canetão:</strong> Escreva o número grande no pacote e coloque no setor indicado antes de sair do CDD.
+    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-xs text-yellow-400 flex justify-between items-center">
+      <span>✍️ <strong>Regra do Canetão:</strong> Marque o número no pacote antes de sair do CDD.</span>
     </div>
 
     <template x-for="item in entregas" :key="item.id">
-      <div class="bg-gray-800 p-3 rounded-lg flex items-center justify-between border-l-4"
+      <div class="bg-gray-800 p-3 rounded-lg flex items-center justify-between border-l-4 transition-all"
            :class="{
-             'border-green-500': item.setor_uno === 'FRENTE',
-             'border-blue-500': item.setor_uno === 'BANCO_TRAS',
-             'border-purple-500': item.setor_uno === 'MALA_FRENTE',
-             'border-red-500': item.setor_uno === 'MALA_FUNDO'
+             'opacity-40 line-through bg-gray-950 border-gray-600': item.status === 'entregue',
+             'border-green-500': item.status !== 'entregue' && item.setor_uno === 'FRENTE',
+             'border-blue-500': item.status !== 'entregue' && item.setor_uno === 'BANCO_TRAS',
+             'border-purple-500': item.status !== 'entregue' && item.setor_uno === 'MALA_FRENTE',
+             'border-red-500': item.status !== 'entregue' && item.setor_uno === 'MALA_FUNDO'
            }">
         <div class="flex items-center gap-3">
           <span class="text-2xl font-black bg-gray-700 px-2.5 py-1 rounded" x-text="`#${item.ordem_entrega}`"></span>
@@ -49,23 +104,17 @@
           </div>
         </div>
         <div class="text-right">
-          <span class="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider"
-                :class="{
-                  'bg-green-900 text-green-300': item.setor_uno === 'FRENTE',
-                  'bg-blue-900 text-blue-300': item.setor_uno === 'BANCO_TRAS',
-                  'bg-purple-900 text-purple-300': item.setor_uno === 'MALA_FRENTE',
-                  'bg-red-900 text-red-300': item.setor_uno === 'MALA_FUNDO'
-                }" x-text="(item.setor_uno || 'GERAL').replace('_', ' ')"></span>
+          <span x-show="item.status === 'entregue'" class="text-xs font-black text-green-400">ENTREGUE</span>
+          <span x-show="item.status !== 'entregue'" class="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider bg-gray-700 text-gray-300" x-text="(item.setor_uno || 'FRENTE').replace('_', ' ')"></span>
         </div>
       </div>
     </template>
   </main>
 
-  <!-- MODO 2: RUA (Cockpit de Navegação Rápida) -->
+  <!-- MODO 2: RUA (Cockpit) -->
   <main x-show="modo === 'rua'" class="p-4">
     <template x-if="entregaAtual">
       <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 space-y-4 shadow-xl">
-        <!-- Indicador de Posição -->
         <div class="flex justify-between items-center border-b border-gray-700 pb-3">
           <div class="flex items-center gap-2">
             <span class="bg-orange-600 text-white font-black text-xl px-3 py-1 rounded-lg" x-text="`#${entregaAtual.ordem_entrega}`"></span>
@@ -74,35 +123,32 @@
           <span class="text-xs bg-yellow-500/20 text-yellow-400 font-bold px-2 py-1 rounded" x-text="entregaAtual.codigo_rastreio"></span>
         </div>
 
-        <!-- Dados do Destinatário -->
         <div>
           <h2 class="text-xl font-black text-white" x-text="entregaAtual.destinatario"></h2>
           <p class="text-base text-gray-300 font-medium" x-text="`${entregaAtual.endereco}, ${entregaAtual.numero}`"></p>
           <p class="text-sm text-gray-400" x-text="`${entregaAtual.bairro || ''} - ${entregaAtual.cidade || ''}`"></p>
         </div>
 
-        <!-- Botões de Ação Externa (Waze, Maps, Whats) -->
         <div class="grid grid-cols-3 gap-2 pt-2">
           <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
-             class="bg-blue-600 hover:bg-blue-700 text-center py-3 rounded-lg font-bold text-sm flex flex-col items-center justify-center">
+             class="bg-blue-600 text-center py-3 rounded-lg font-bold text-sm flex flex-col items-center justify-center">
             🚗 Waze
           </a>
           <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" 
-             class="bg-emerald-600 hover:bg-emerald-700 text-center py-3 rounded-lg font-bold text-sm flex flex-col items-center justify-center">
+             class="bg-emerald-600 text-center py-3 rounded-lg font-bold text-sm flex flex-col items-center justify-center">
             🗺️ Maps
           </a>
-          <a :href="`https://wa.me/55${entregaAtual.telefone}?text=Olá! Sou o entregador da Shopee e estou chegando com a sua encomenda.`" 
-             class="bg-green-600 hover:bg-green-700 text-center py-3 rounded-lg font-bold text-sm flex flex-col items-center justify-center">
+          <a :href="`https://wa.me/55${entregaAtual.telefone}?text=Olá! Sou o entregador da Shopee e estou com sua encomenda.`" 
+             class="bg-green-600 text-center py-3 rounded-lg font-bold text-sm flex flex-col items-center justify-center">
             💬 Whats
           </a>
         </div>
 
-        <!-- Status de Conclusão -->
         <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-700">
-          <button @click="atualizarStatus(entregaAtual.id, 'ausente')" class="bg-gray-700 hover:bg-gray-600 text-yellow-400 py-3.5 rounded-lg font-bold text-sm">
+          <button @click="atualizarStatus(entregaAtual.id, 'ausente')" class="bg-gray-700 text-yellow-400 py-3.5 rounded-lg font-bold text-sm">
             ⚠️ Ausente / Pular
           </button>
-          <button @click="atualizarStatus(entregaAtual.id, 'entregue')" class="bg-orange-600 hover:bg-orange-500 text-white py-3.5 rounded-lg font-black text-base shadow-lg shadow-orange-600/30">
+          <button @click="atualizarStatus(entregaAtual.id, 'entregue')" class="bg-orange-600 text-white py-3.5 rounded-lg font-black text-base shadow-lg shadow-orange-600/30">
             ✅ Entregue
           </button>
         </div>
@@ -121,35 +167,31 @@
   <script>
     function entregaApp() {
       return {
-        modo: 'carregamento', // Inicia no modo carga para conferência
+        modo: 'rua',
+        modalImportar: false,
+        tipoEnvio: 'prints',
+        cidadePadrao: localStorage.getItem('cidade_padrao') || 'Mongaguá, SP',
+        textoRomaneio: '',
+        arquivosFotos: [],
+        carregandoProcesso: false,
         entregas: [],
         erroMsg: null,
-        DIRECTUS_URL: 'https://banco.studiotesta.com.br', // Sem barra no final!
+        DIRECTUS_URL: 'https://banco.studiotesta.com.br',
+        N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
 
         async init() {
-          try {
-            // Busca entregas sem filtro restritivo de início
-            const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?sort=ordem_entrega`);
-            
-            if (!res.ok) {
-              if (res.status === 403) {
-                this.erroMsg = 'Erro 403 (Permissão): Vá no Directus > Roles > Public e libere a leitura de "entregas".';
-              } else if (res.status === 404) {
-                this.erroMsg = 'Erro 404: Coleção "entregas" não encontrada na API.';
-              } else {
-                this.erroMsg = `Erro ${res.status} ao conectar com Directus.`;
-              }
-              return;
-            }
+          this.carregarEntregas();
+        },
 
-            const data = await res.json();
-            this.entregas = data.data || [];
-            
-            if (this.entregas.length === 0) {
-              this.erroMsg = 'Conexão OK, mas a tabela entregas retornou 0 itens.';
+        async carregarEntregas() {
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?sort=ordem_entrega`);
+            if (res.ok) {
+              const data = await res.json();
+              this.entregas = data.data || [];
             }
-          } catch (err) {
-            this.erroMsg = `Erro de Conexão ou CORS: O navegador bloqueou o acesso ao Directus. (${err.message})`;
+          } catch (e) {
+            console.error(e);
           }
         },
 
@@ -165,14 +207,47 @@
           const idx = this.entregas.findIndex(e => e.id === id);
           if (idx !== -1) this.entregas[idx].status = novoStatus;
 
+          await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: novoStatus })
+          });
+        },
+
+        async enviarParaN8N() {
+          this.carregandoProcesso = true;
+          localStorage.setItem('cidade_padrao', this.cidadePadrao);
+
+          const formData = new FormData();
+          formData.append('cidade', this.cidadePadrao);
+          formData.append('tipo', this.tipoEnvio);
+
+          if (this.tipoEnvio === 'texto') {
+            formData.append('texto', this.textoRomaneio);
+          } else {
+            for (let i = 0; i < this.arquivosFotos.length; i++) {
+              formData.append('arquivos', this.arquivosFotos[i]);
+            }
+          }
+
           try {
-            await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ status: novoStatus })
+            const res = await fetch(this.N8N_WEBHOOK_URL, {
+              method: 'POST',
+              body: formData
             });
-          } catch (e) {
-            console.error('Falha ao sincronizar status:', e);
+            if (res.ok) {
+              this.modalImportar = false;
+              this.textoRomaneio = '';
+              this.arquivosFotos = [];
+              await this.carregarEntregas();
+              this.modo = 'carregamento';
+            } else {
+              alert('Erro ao processar no n8n. Verifique os logs.');
+            }
+          } catch (err) {
+            alert('Falha na conexão com n8n: ' + err.message);
+          } finally {
+            this.carregandoProcesso = false;
           }
         }
       }
