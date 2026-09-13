@@ -1,336 +1,450 @@
-{
-  "name": "DriveXPS - MotorRota Completo (Imagens + Texto + CORS)",
-  "nodes": [
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "importar-shopee",
-        "responseMode": "responseNode",
-        "options": {
-          "allowedOrigins": "*"
-        }
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [-100, 0],
-      "id": "ced42f2a-7a86-4229-9f27-5652d18266a1",
-      "name": "Webhook Shopee"
-    },
-    {
-      "parameters": {
-        "jsCode": "const binary = $input.first().binary || {};\nconst body = $input.first().json.body || {};\nconst cidade = body.cidade || 'Mongaguá, SP';\nconst cd_lat = parseFloat(body.cd_lat || -24.1085);\nconst cd_lng = parseFloat(body.cd_lng || -46.6432);\nconst casa_lat = parseFloat(body.casa_lat || -24.0915);\nconst casa_lng = parseFloat(body.casa_lng || -46.6190);\n\n// Se veio curl direto com JSON\nif (body.entregas && Array.isArray(body.entregas)) {\n  return body.entregas.map(e => ({\n    json: { ...e, cd_lat, cd_lng, casa_lat, casa_lng, tipo: 'direto' }\n  }));\n}\n\nconst items = [];\nconst binaryKeys = Object.keys(binary);\n\nif (binaryKeys.length > 0) {\n  for (const k of binaryKeys) {\n    items.push({\n      json: { tipo: 'imagem', cidade, cd_lat, cd_lng, casa_lat, casa_lng },\n      binary: { data: binary[k] }\n    });\n  }\n} else if (body.texto && body.texto.trim().length > 0) {\n  items.push({\n    json: { tipo: 'texto', texto: body.texto, cidade, cd_lat, cd_lng, casa_lat, casa_lng }\n  });\n}\n\nreturn items;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [120, 0],
-      "id": "dbae6d2d-aec5-4341-bc5a-06d06ee516f3",
-      "name": "Preparar Entradas"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{ $json.tipo }}",
-              "value2": "imagem"
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DriveXPS StudioTesta</title>
+  
+  <!-- Configurações PWA Mobile (Android e iOS) -->
+  <meta name="theme-color" content="#EA580C">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DriveXPS">
+  
+  <!-- Ícones e Manifesto -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Tailwind, Alpine.js e Leitor de Código de Barras -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <!-- Registro do Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ServiceWorker ativo!', reg.scope))
+          .catch(err => console.error('Erro no ServiceWorker:', err));
+      });
+    }
+  </script>
+</head>
+<body class="bg-gray-900 text-white font-sans pb-24 select-none" x-data="entregaApp()">
+
+  <!-- Cabeçalho -->
+  <header class="bg-orange-600 p-3.5 sticky top-0 z-40 shadow-md flex justify-between items-center">
+    <div>
+      <h1 class="font-black text-lg leading-tight">DriveXPS <span class="text-xs bg-black px-2 py-0.5 rounded" x-text="rotaAtivaId ? `Rota #${rotaAtivaId}` : 'Shopee'"></span></h1>
+      <p class="text-xs opacity-80" x-text="`Restantes: ${pendentes.length} de ${entregas.length}`"></p>
+    </div>
+    <div class="flex items-center gap-1.5 overflow-x-auto">
+      <button @click="abrirScanner()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1.5 text-xs font-black rounded-lg flex items-center gap-1 shadow">
+        📷 Bipar
+      </button>
+      <button @click="modalImportar = true" class="bg-white text-orange-600 px-2.5 py-1.5 text-xs font-black rounded-lg shadow">
+        + Rota
+      </button>
+      <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">📦 Carga</button>
+      <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">🚗 Rua</button>
+      <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">📜 Histórico</button>
+    </div>
+  </header>
+
+  <!-- Barra de Pontos GPS -->
+  <div class="bg-gray-800/80 px-4 py-1.5 border-b border-gray-700 flex justify-between text-[11px] text-gray-300">
+    <button @click="modalCD = true" class="hover:underline flex items-center gap-1">
+      🏭 CD: <span :class="cd.lat ? 'text-green-400 font-bold' : 'text-yellow-400 font-bold'" x-text="cd.lat ? 'Definido' : 'Pendente'"></span>
+    </button>
+    <button @click="modalCD = true" class="hover:underline flex items-center gap-1">
+      🏠 Casa: <span :class="casa.lat ? 'text-green-400 font-bold' : 'text-yellow-400 font-bold'" x-text="casa.lat ? 'Definida' : 'Pendente'"></span>
+    </button>
+  </div>
+
+  <!-- MODO 1: CARREGAMENTO -->
+  <main x-show="modo === 'carregamento'" class="p-4 space-y-3">
+    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-xs text-yellow-400 flex justify-between items-center">
+      <span>✍️ <strong>Regra do Canetão:</strong> Marque o número no pacote antes de sair do CD.</span>
+    </div>
+
+    <template x-for="item in entregas" :key="item.id">
+      <div class="bg-gray-800 p-3 rounded-lg flex items-center justify-between border-l-4"
+           :class="{
+             'opacity-30 line-through bg-gray-950 border-gray-600': item.status === 'entregue',
+             'border-green-500': item.status !== 'entregue' && item.setor_uno === 'FRENTE',
+             'border-blue-500': item.status !== 'entregue' && item.setor_uno === 'BANCO_TRAS',
+             'border-purple-500': item.status !== 'entregue' && item.setor_uno === 'MALA_FRENTE',
+             'border-red-500': item.status !== 'entregue' && item.setor_uno === 'MALA_FUNDO'
+           }">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl font-black bg-gray-700 px-2.5 py-1 rounded" x-text="`#${item.ordem_entrega}`"></span>
+          <div>
+            <p class="font-bold text-sm" x-text="item.destinatario"></p>
+            <p class="text-xs text-gray-400" x-text="`${item.endereco}, ${item.numero}`"></p>
+            <p class="text-[10px] text-gray-500 font-mono" x-text="item.codigo_rastreio"></p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span x-show="item.status === 'entregue'" class="text-xs font-black text-green-400">ENTREGUE</span>
+          <span x-show="item.status !== 'entregue'" class="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider bg-gray-700 text-gray-300" x-text="(item.setor_uno || 'FRENTE').replace('_', ' ')"></span>
+        </div>
+      </div>
+    </template>
+  </main>
+
+  <!-- MODO 2: RUA -->
+  <main x-show="modo === 'rua'" class="p-4">
+    <template x-if="entregaAtual">
+      <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 space-y-4 shadow-xl">
+        <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="bg-orange-600 text-white font-black text-xl px-3 py-1 rounded-lg" x-text="`#${entregaAtual.ordem_entrega}`"></span>
+            <span class="text-xs text-gray-400 uppercase font-bold" x-text="`Setor: ${entregaAtual.setor_uno || 'GERAL'}`"></span>
+          </div>
+          <span class="text-xs bg-yellow-500/20 text-yellow-400 font-bold px-2 py-1 rounded font-mono" x-text="entregaAtual.codigo_rastreio"></span>
+        </div>
+
+        <div>
+          <h2 class="text-xl font-black text-white" x-text="entregaAtual.destinatario"></h2>
+          <p class="text-base text-gray-300 font-medium" x-text="`${entregaAtual.endereco}, ${entregaAtual.numero}`"></p>
+          <p class="text-sm text-gray-400" x-text="`${entregaAtual.bairro || ''} - ${entregaAtual.cidade || ''}`"></p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-2">
+          <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 text-center py-3 rounded-lg font-bold text-sm flex items-center justify-center">🚗 Waze</a>
+          <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 text-center py-3 rounded-lg font-bold text-sm flex items-center justify-center">🗺️ Maps</a>
+          <a :href="`https://wa.me/55${entregaAtual.telefone}?text=Olá! Sou o entregador da Shopee.`" class="bg-green-600 text-center py-3 rounded-lg font-bold text-sm flex items-center justify-center">💬 Whats</a>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-700">
+          <button @click="atualizarStatus(entregaAtual.id, 'ausente')" class="bg-gray-700 text-yellow-400 py-3.5 rounded-lg font-bold text-sm">⚠️ Ausente / Pular</button>
+          <button @click="atualizarStatus(entregaAtual.id, 'entregue')" class="bg-orange-600 text-white py-3.5 rounded-lg font-black text-base shadow-lg">✅ Entregue</button>
+        </div>
+      </div>
+    </template>
+
+    <template x-if="!entregaAtual && entregas.length > 0">
+      <div class="text-center py-16 space-y-3">
+        <span class="text-5xl">🎉</span>
+        <h2 class="text-2xl font-bold" x-text="`Rota #${rotaAtivaId || ''} Concluída!`"></h2>
+        <p class="text-gray-400 text-sm">Todos os pacotes de hoje foram processados.</p>
+      </div>
+    </template>
+  </main>
+
+  <!-- MODO 3: HISTÓRICO -->
+  <main x-show="modo === 'historico'" class="p-4 space-y-4">
+    <h2 class="text-lg font-black text-orange-500">📜 Histórico de Rotas Entregues</h2>
+    <div class="space-y-3">
+      <template x-for="r in rotasHistorico" :key="r.id">
+        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 space-y-2">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-sm font-black text-white" x-text="`Rota #${r.id}`"></span>
+              <p class="text-xs text-gray-400" x-text="`Data: ${r.data ? new Date(r.data).toLocaleDateString('pt-BR') : 'Hoje'}`"></p>
+            </div>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2.5 py-1 rounded-full font-bold" x-text="`${r.total_pacotes || 0} pacotes`"></span>
+          </div>
+          <button @click="selecionarRotaHistorico(r.id)" class="w-full bg-gray-700 hover:bg-gray-600 text-xs py-2 rounded-lg font-bold text-orange-300">
+            Ver Detalhes dos Pacotes
+          </button>
+        </div>
+      </template>
+    </div>
+  </main>
+
+  <!-- MODAL: BIPAR PACOTE (Leitor de Código de Barras / QR Code) -->
+  <div x-show="modalScanner" class="fixed inset-0 bg-black/90 z-50 flex flex-col p-4" x-cloak>
+    <div class="flex justify-between items-center mb-3">
+      <div>
+        <h2 class="font-black text-base text-orange-500">LEITOR DE ETIQUETAS SPX</h2>
+        <p class="text-xs text-gray-400">Aponte para o código de barras ou QR</p>
+      </div>
+      <button @click="fecharScanner()" class="text-gray-400 text-3xl font-bold">&times;</button>
+    </div>
+
+    <!-- Área da Câmera -->
+    <div class="flex-1 flex flex-col items-center justify-center">
+      <div id="reader" class="w-full max-w-sm rounded-xl overflow-hidden border-2 border-orange-500 bg-black"></div>
+    </div>
+
+    <!-- Card de Pacote Encontrado -->
+    <div x-show="pacoteEscaneado" class="bg-gray-800 p-4 rounded-xl border border-green-500 mt-3 space-y-2 animate-bounce">
+      <div class="flex justify-between items-center">
+        <span class="text-2xl font-black text-orange-500" x-text="`#${pacoteEscaneado?.ordem_entrega}`"></span>
+        <span class="text-xs bg-green-900 text-green-300 font-bold px-2 py-1 rounded" x-text="`Setor: ${pacoteEscaneado?.setor_uno}`"></span>
+      </div>
+      <p class="font-bold text-sm text-white" x-text="pacoteEscaneado?.destinatario"></p>
+      <p class="text-xs text-gray-300" x-text="`${pacoteEscaneado?.endereco}, ${pacoteEscaneado?.numero}`"></p>
+      <div class="flex gap-2 pt-2">
+        <button @click="fecharScanner(); modo = 'rua'" class="flex-1 bg-orange-600 text-white font-bold py-2 rounded-lg text-xs">
+          Ir para Entrega
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: IMPORTAR ROTA (Com Abas de Prints e Colar Texto) -->
+  <div x-show="modalImportar" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" x-cloak>
+    <div class="bg-gray-800 rounded-2xl w-full max-w-lg border border-gray-700 p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+        <div>
+          <h2 class="font-black text-lg text-orange-500">MANDA SUAS PARADAS</h2>
+          <p class="text-xs text-gray-400">Importador Inteligente Shopee</p>
+        </div>
+        <button @click="modalImportar = false" class="text-gray-400 text-2xl">&times;</button>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-gray-300">Cidade Trava (Mongaguá, Praia Grande, etc.):</label>
+        <input type="text" x-model="cidadePadrao" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white">
+      </div>
+
+      <!-- Abas: Prints vs Colar Texto -->
+      <div class="flex border-b border-gray-700 text-sm font-bold">
+        <button @click="tipoEnvio = 'prints'" :class="tipoEnvio === 'prints' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📸 Subir Prints
+        </button>
+        <button @click="tipoEnvio = 'texto'" :class="tipoEnvio === 'texto' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📄 Colar Texto
+        </button>
+      </div>
+
+      <!-- ABA 1: PRINTS -->
+      <div x-show="tipoEnvio === 'prints'" class="space-y-2">
+        <label class="block border-2 border-dashed border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-orange-500">
+          <span class="text-3xl block mb-2">📸</span>
+          <span class="text-sm font-bold block text-gray-200">Selecionar Prints do SPX</span>
+          <span class="text-xs text-gray-400 block mt-1">Pode selecionar múltiplos prints da lista</span>
+          <input type="file" multiple accept="image/*" @change="arquivosFotos = $event.target.files" class="hidden">
+        </label>
+        <p x-show="arquivosFotos.length > 0" class="text-xs text-green-400 font-bold text-center" x-text="`${arquivosFotos.length} imagem(ns) selecionada(s)`"></p>
+      </div>
+
+      <!-- ABA 2: COLAR TEXTO -->
+      <div x-show="tipoEnvio === 'texto'" class="space-y-2">
+        <textarea x-model="textoRomaneio" rows="6" placeholder="Cole aqui a lista de endereços copiada do app da Shopee ou WhatsApp do CD..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-white font-mono"></textarea>
+      </div>
+
+      <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 text-white font-black py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg disabled:opacity-50">
+        <span x-show="!carregandoProcesso">🚀 Otimizar Rota Partindo do CD</span>
+        <span x-show="carregandoProcesso">⏳ Otimizando Trajeto...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIGURAR CD E CASA -->
+  <div x-show="modalCD" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" x-cloak>
+    <div class="bg-gray-800 rounded-2xl w-full max-w-md border border-gray-700 p-5 space-y-4">
+      <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+        <h2 class="font-black text-base text-orange-500">CONFIGURAR PONTOS GPS</h2>
+        <button @click="modalCD = false" class="text-gray-400 text-2xl">&times;</button>
+      </div>
+
+      <div class="space-y-2 bg-gray-900/60 p-3 rounded-xl border border-gray-700">
+        <label class="text-xs font-bold text-orange-400">🏭 CD - SAÍDA (Ponto de Partida)</label>
+        <button @click="capturarLocalizacao('cd')" class="w-full bg-gray-700 hover:bg-gray-600 text-xs py-2.5 rounded font-bold text-green-400">
+          📍 Gravar GPS Atual como CD
+        </button>
+        <p x-show="cd.lat" class="text-[10px] text-gray-400" x-text="`Coords: ${cd.lat}, ${cd.lng}`"></p>
+      </div>
+
+      <div class="space-y-2 bg-gray-900/60 p-3 rounded-xl border border-gray-700">
+        <label class="text-xs font-bold text-green-400">🏠 CASA - CHEGADA (Ponto Final)</label>
+        <button @click="capturarLocalizacao('casa')" class="w-full bg-gray-700 hover:bg-gray-600 text-xs py-2.5 rounded font-bold text-green-400">
+          📍 Gravar GPS Atual como Casa
+        </button>
+        <p x-show="casa.lat" class="text-[10px] text-gray-400" x-text="`Coords: ${casa.lat}, ${casa.lng}`"></p>
+      </div>
+
+      <button @click="salvarLocais()" class="w-full bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs">
+        Salvar Coordenadas
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function entregaApp() {
+      return {
+        modo: 'rua',
+        modalImportar: false,
+        modalCD: false,
+        modalScanner: false,
+        tipoEnvio: 'prints',
+        textoRomaneio: '',
+        cidadePadrao: localStorage.getItem('cidade_padrao') || 'Mongaguá, SP',
+        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1085,"lng":-46.6432}'),
+        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.0915,"lng":-46.6190}'),
+        arquivosFotos: [],
+        carregandoProcesso: false,
+        entregas: [],
+        rotasHistorico: [],
+        rotaAtivaId: null,
+        html5Scanner: null,
+        pacoteEscaneado: null,
+        audioCtx: null,
+
+        DIRECTUS_URL: 'https://banco.studiotesta.com.br',
+        N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
+
+        async init() {
+          await this.carregarUltimaRota();
+        },
+
+        tocarBeep() {
+          try {
+            if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, this.audioCtx.currentTime); // 880Hz (Lá agudo)
+            gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
+            osc.start();
+            osc.stop(this.audioCtx.currentTime + 0.12);
+          } catch(e) {}
+        },
+
+        abrirScanner() {
+          this.pacoteEscaneado = null;
+          this.modalScanner = true;
+          this.$nextTick(() => {
+            this.html5Scanner = new Html5Qrcode("reader");
+            this.html5Scanner.start(
+              { facingMode: "environment" },
+              { fps: 10, qrbox: { width: 250, height: 150 } },
+              (decodedText) => {
+                this.tocarBeep();
+                const termo = decodedText.trim().toUpperCase();
+                const encontrado = this.entregas.find(e => 
+                  e.codigo_rastreio?.toUpperCase().includes(termo) || 
+                  termo.includes(e.codigo_rastreio?.toUpperCase())
+                );
+                if (encontrado) {
+                  this.pacoteEscaneado = encontrado;
+                } else {
+                  alert(`Código lido: ${decodedText}\nPacote não encontrado nesta rota.`);
+                }
+              },
+              (errorMessage) => {}
+            ).catch(err => alert("Erro ao abrir câmera: " + err));
+          });
+        },
+
+        fecharScanner() {
+          if (this.html5Scanner) {
+            this.html5Scanner.stop().then(() => {
+              this.html5Scanner.clear();
+              this.modalScanner = false;
+            }).catch(() => { this.modalScanner = false; });
+          } else {
+            this.modalScanner = false;
+          }
+        },
+
+        async carregarUltimaRota() {
+          try {
+            const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=1`);
+            const dataRota = await resRota.json();
+            if (dataRota.data && dataRota.data.length > 0) {
+              this.rotaAtivaId = dataRota.data[0].id;
+              const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${this.rotaAtivaId}&sort=ordem_entrega`);
+              const data = await res.json();
+              this.entregas = data.data || [];
             }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [340, 0],
-      "id": "e4f5a6b7-1c2d-3e4f-5a6b-7c8d9e0f1a2b",
-      "name": "É Imagem?"
-    },
-    {
-      "parameters": {
-        "resource": "image",
-        "operation": "analyze",
-        "modelId": {
-          "__rl": true,
-          "value": "models/gemini-2.5-flash",
-          "mode": "list",
-          "cachedResultName": "models/gemini-2.5-flash"
+          } catch(e) {
+            console.error('Erro ao carregar rota:', e);
+          }
         },
-        "text": "=Você é um extrator logístico de romaneios da Shopee Express (SPX) no Brasil.\nAnalise o print e extraia todas as entregas.\nCidade de entrega: {{ $json.cidade }}.\n\nRetorne EXCLUSIVAMENTE um array JSON puro (sem explicações, sem markdown, sem ```) com formato:\n[\n  {\n    \"codigo_rastreio\": \"SPXBR...\",\n    \"destinatario\": \"Nome\",\n    \"telefone\": \"13999999999\",\n    \"endereco\": \"Rua / Avenida\",\n    \"numero\": \"123\",\n    \"bairro\": \"Bairro\",\n    \"cidade\": \"{{ $json.cidade.split(',')[0].trim() }}\",\n    \"cep\": \"11730000\"\n  }\n]",
-        "inputType": "binary",
-        "binaryPropertyName": "data",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
-      "typeVersion": 1.1,
-      "position": [560, -100],
-      "id": "24cf2f24-5801-49eb-81d4-1790e52efd58",
-      "name": "Analisa Imagem SPX",
-      "retryOnFail": true,
-      "maxTries": 3,
-      "credentials": {
-        "googlePalmApi": {
-          "id": "ZcZXnHCFEGa3Vme5",
-          "name": "Google Gemini_BeatrizLume_1"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Parser de Texto Colado (WhatsApp ou Romaneio SPX)\nconst inputData = $input.first().json;\nconst rawText = inputData.texto || '';\nconst cidadePadrao = inputData.cidade || 'Mongaguá, SP';\nconst config = {\n  cd_lat: inputData.cd_lat,\n  cd_lng: inputData.cd_lng,\n  casa_lat: inputData.casa_lat,\n  casa_lng: inputData.casa_lng\n};\n\nconst lines = rawText.split('\\n').map(l => l.trim()).filter(l => l.length > 5);\nconst entregas = [];\n\nfor (let i = 0; i < lines.length; i++) {\n  const line = lines[i];\n  let parts = [];\n  if (line.includes(' - ')) parts = line.split(' - ').map(p => p.trim());\n  else if (line.includes(' | ')) parts = line.split(' | ').map(p => p.trim());\n  else if (line.includes(';')) parts = line.split(';').map(p => p.trim());\n\n  let codigo_rastreio = `SPXBR-${i+1}`;\n  let destinatario = `Cliente ${i+1}`;\n  let endereco = '';\n  let numero = 'S/N';\n  let bairro = 'Centro';\n  let cidade = cidadePadrao.split(',')[0].trim();\n  let telefone = '13999999999';\n\n  if (parts.length >= 3) {\n    const trackIdx = parts.findIndex(p => /SPX|BR\\d/i.test(p));\n    if (trackIdx !== -1) {\n      const match = parts[trackIdx].match(/(SPX[A-Z0-9]+|BR[0-9]+[A-Z0-9]*)/i);\n      if (match) codigo_rastreio = match[0];\n      parts.splice(trackIdx, 1);\n    }\n\n    const telIdx = parts.findIndex(p => /tel:|whatsapp|\\d{8,11}/i.test(p));\n    if (telIdx !== -1) {\n      telefone = parts[telIdx].replace(/\\D/g, '');\n      parts.splice(telIdx, 1);\n    }\n\n    if (parts.length > 0) destinatario = parts.shift().replace(/^\\d+[\\.\\)\\-]\\s*/, '').trim();\n    if (parts.length > 0) endereco = parts.shift().trim();\n    if (parts.length > 0) bairro = parts.shift().trim();\n  } else {\n    endereco = line;\n  }\n\n  const numMatch = endereco.match(/,\\s*(\\d+|S\\/?N)/i) || endereco.match(/\\s+(\\d+)$/);\n  if (numMatch) {\n    numero = numMatch[1];\n    endereco = endereco.replace(numMatch[0], '').trim();\n  }\n\n  entregas.push({\n    codigo_rastreio,\n    destinatario,\n    telefone,\n    endereco,\n    numero,\n    bairro,\n    cidade,\n    cep: '11730000',\n    latitude: 0,\n    longitude: 0,\n    ...config\n  });\n}\n\nreturn entregas.map(e => ({ json: e }));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [560, 100],
-      "id": "a9b8c7d6-e5f4-4a3b-2c1d-0e9f8a7b6c5d",
-      "name": "Processar Texto Romaneio"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Consolida resultados tanto de Imagens quanto de Texto\nconst allItems = $input.all();\nconst config = $items('Preparar Entradas')[0].json;\nlet entregas = [];\n\nfor (const item of allItems) {\n  if (item.json.tipo === 'direto' || item.json.codigo_rastreio) {\n    entregas.push(item.json);\n    continue;\n  }\n\n  let raw = '';\n  if (item.json.content?.parts?.[0]?.text) raw = item.json.content.parts[0].text;\n  else if (item.json.text) raw = item.json.text;\n  else if (typeof item.json === 'string') raw = item.json;\n\n  if (raw) {\n    const match = raw.match(/\\[\\s*\\{[\\s\\S]*\\}\\s*\\]/);\n    if (match) {\n      try {\n        const parsed = JSON.parse(match[0]);\n        entregas.push(...parsed);\n      } catch(e) {}\n    }\n  }\n}\n\nif (entregas.length === 0) {\n  throw new Error('Nenhuma entrega pôde ser lida.');\n}\n\nconst vistos = new Set();\nconst unicos = [];\n\nfor (const e of entregas) {\n  const chave = e.codigo_rastreio || `${e.endereco}_${e.numero}`;\n  if (!vistos.has(chave)) {\n    vistos.add(chave);\n    unicos.push({\n      codigo_rastreio: e.codigo_rastreio || 'SPXBR-PEND',\n      destinatario: e.destinatario || 'Cliente',\n      telefone: (e.telefone || '').replace(/\\D/g, '') || '13999999999',\n      endereco: e.endereco || '',\n      numero: e.numero || 'S/N',\n      bairro: e.bairro || '',\n      cidade: e.cidade || 'Mongaguá',\n      cep: (e.cep || '').replace(/\\D/g, '') || '11730000',\n      latitude: parseFloat(e.latitude || 0),\n      longitude: parseFloat(e.longitude || 0),\n      cd_lat: config.cd_lat,\n      cd_lng: config.cd_lng,\n      casa_lat: config.casa_lat,\n      casa_lng: config.casa_lng\n    });\n  }\n}\n\nreturn unicos.map(u => ({ json: u }));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [780, 0],
-      "id": "b2c3d4e5-f6a1-4b2c-9d3e-4f5a6b7c8d9e",
-      "name": "Consolidar Pacotes"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Geocodificação real: Busca primeiro rua + bairro no OpenStreetMap\nconst items = $input.all().map(i => i.json);\n\nfor (let i = 0; i < items.length; i++) {\n  let item = items[i];\n  if (!item.latitude || item.latitude === 0) {\n    try {\n      const ruaLimpa = item.endereco.replace(/^(Av\\.?|Avenida|Rua|R\\.?|Alameda|Travessa)\\s+/i, '');\n      const busca = encodeURIComponent(`${ruaLimpa}, ${item.bairro}, ${item.cidade}, Brasil`);\n      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${busca}&format=json&limit=1`, {\n        headers: { 'User-Agent': 'DriveXPS-App-Mongagua' }\n      });\n      if (res.ok) {\n        const data = await res.json();\n        if (data && data.length > 0) {\n          item.latitude = parseFloat(data[0].lat);\n          item.longitude = parseFloat(data[0].lon);\n        }\n      }\n    } catch(e) {}\n\n    if (!item.latitude || item.latitude === 0) {\n      try {\n        const buscaBairro = encodeURIComponent(`${item.bairro}, ${item.cidade}, Brasil`);\n        const res2 = await fetch(`https://nominatim.openstreetmap.org/search?q=${buscaBairro}&format=json&limit=1`, {\n          headers: { 'User-Agent': 'DriveXPS-App-Mongagua' }\n        });\n        if (res2.ok) {\n          const data2 = await res2.json();\n          if (data2 && data2.length > 0) {\n            item.latitude = parseFloat(data2[0].lat);\n            item.longitude = parseFloat(data2[0].lon);\n          }\n        }\n      } catch(e) {}\n    }\n\n    if (!item.latitude || item.latitude === 0) {\n      item.latitude = item.cd_lat;\n      item.longitude = item.cd_lng;\n    }\n  }\n}\n\nreturn items.map(item => ({ json: item }));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1000, 0],
-      "id": "d4e5f6a1-b2c3-4d4e-bf5a-6b7c8d9e0f1a",
-      "name": "Geocodificar Endereços"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Algoritmo 2-Opt: Trajeto mais curto de CD até a Casa\nfunction getDistance(lat1, lon1, lat2, lon2) {\n  const R = 6371;\n  const dLat = (lat2 - lat1) * Math.PI / 180;\n  const dLon = (lon2 - lon1) * Math.PI / 180;\n  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +\n            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *\n            Math.sin(dLon/2) * Math.sin(dLon/2);\n  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));\n}\n\nlet stops = $input.all().map(item => item.json);\nconst cd = { latitude: stops[0].cd_lat, longitude: stops[0].cd_lng };\n\nlet tour = [];\nlet current = cd;\nlet unvisited = [...stops];\n\nwhile (unvisited.length > 0) {\n  let nearestIdx = 0;\n  let minD = Infinity;\n  for (let i = 0; i < unvisited.length; i++) {\n    let d = getDistance(current.latitude, current.longitude, unvisited[i].latitude, unvisited[i].longitude);\n    if (d < minD) {\n      minD = d;\n      nearestIdx = i;\n    }\n  }\n  current = unvisited.splice(nearestIdx, 1)[0];\n  tour.push(current);\n}\n\nlet improved = true;\nlet count = 0;\nwhile (improved && count < 50) {\n  improved = false;\n  count++;\n  for (let i = 0; i < tour.length - 1; i++) {\n    for (let k = i + 1; k < tour.length; k++) {\n      let pA = i === 0 ? cd : tour[i - 1];\n      let pB = tour[i];\n      let pC = tour[k];\n      let pD = k + 1 < tour.length ? tour[k + 1] : cd;\n\n      let currentDist = getDistance(pA.latitude, pA.longitude, pB.latitude, pB.longitude) +\n                         getDistance(pC.latitude, pC.longitude, pD.latitude, pD.longitude);\n      let newDist = getDistance(pA.latitude, pA.longitude, pC.latitude, pC.longitude) +\n                     getDistance(pB.latitude, pB.longitude, pD.latitude, pD.longitude);\n\n      if (newDist < currentDist) {\n        let reversed = tour.slice(i, k + 1).reverse();\n        tour.splice(i, reversed.length, ...reversed);\n        improved = true;\n      }\n    }\n  }\n}\n\nconst total = tour.length;\nreturn tour.map((stop, index) => {\n  const ordemEntrega = index + 1;\n  const ordemCarregamento = total - index;\n\n  let setor = \"MALA_FUNDO\";\n  if (ordemEntrega <= 30) setor = \"FRENTE\";\n  else if (ordemEntrega <= 65) setor = \"BANCO_TRAS\";\n  else if (ordemEntrega <= 95) setor = \"MALA_FRENTE\";\n\n  return {\n    json: {\n      ...stop,\n      ordem_entrega: ordemEntrega,\n      ordem_carregamento: ordemCarregamento,\n      setor_uno: setor,\n      status: 'pendente'\n    }\n  };\n});"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1220, 0],
-      "id": "7dde20e2-39d9-4937-8ea9-96508d3559d9",
-      "name": "Otimizar Rota pelo CD"
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "INSERT INTO rotas (data, total_pacotes, status)\nVALUES (CURRENT_DATE, {{ $input.all().length }}, 'em_rota')\nRETURNING id;",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.6,
-      "position": [1440, 0],
-      "id": "c7ebbe7a-e497-48df-9abe-116b275ab29b",
-      "name": "Criar Rota no Postgres",
-      "executeOnce": true,
-      "credentials": {
-        "postgres": {
-          "id": "ujon4Frjlo3S9PeW",
-          "name": "Postgres account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const rotaId = $items('Criar Rota no Postgres')[0].json.id;\nconst paradas = $items('Otimizar Rota pelo CD');\n\nreturn paradas.map(p => ({\n  json: {\n    rota_id: rotaId,\n    ordem_entrega: p.json.ordem_entrega,\n    ordem_carregamento: p.json.ordem_carregamento,\n    setor_uno: p.json.setor_uno,\n    codigo_rastreio: p.json.codigo_rastreio,\n    destinatario: p.json.destinatario,\n    telefone: p.json.telefone,\n    endereco: p.json.endereco,\n    numero: p.json.numero,\n    bairro: p.json.bairro,\n    cidade: p.json.cidade,\n    cep: p.json.cep,\n    latitude: p.json.latitude,\n    longitude: p.json.longitude,\n    status: 'pendente'\n  }\n}));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1660, 0],
-      "id": "c392cf06-c518-4e54-95bd-478eaa63dff1",
-      "name": "Vincular Rota ID"
-    },
-    {
-      "parameters": {
-        "schema": {
-          "__rl": true,
-          "value": "public",
-          "mode": "list"
+
+        async abrirHistorico() {
+          this.modo = 'historico';
+          const res = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id`);
+          const data = await res.json();
+          this.rotasHistorico = data.data || [];
         },
-        "table": {
-          "__rl": true,
-          "value": "entregas",
-          "mode": "list"
+
+        async selecionarRotaHistorico(rotaId) {
+          this.rotaAtivaId = rotaId;
+          const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega`);
+          const data = await res.json();
+          this.entregas = data.data || [];
+          this.modo = 'carregamento';
         },
-        "columns": {
-          "mappingMode": "autoMapInputData",
-          "value": {},
-          "matchingColumns": ["id"],
-          "schema": []
+
+        capturarLocalizacao(tipo) {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+              this[tipo].lat = pos.coords.latitude;
+              this[tipo].lng = pos.coords.longitude;
+              alert(`Coordenadas de ${tipo.toUpperCase()} salvas!`);
+            }, err => alert('Erro GPS: ' + err.message));
+          }
         },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.6,
-      "position": [1880, 0],
-      "id": "2e4dd05f-925b-4e6f-a074-7abb563fa54d",
-      "name": "Inserir Entregas Batch",
-      "credentials": {
-        "postgres": {
-          "id": "ujon4Frjlo3S9PeW",
-          "name": "Postgres account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={\n  \"sucesso\": true,\n  \"mensagem\": \"Rota processada com sucesso!\",\n  \"rota_id\": {{ $items('Criar Rota no Postgres')[0].json.id }},\n  \"total_paradas\": {{ $items('Otimizar Rota pelo CD').length }}\n}",
-        "options": {
-          "responseHeaders": {
-            "entries": [
-              {
-                "name": "Access-Control-Allow-Origin",
-                "value": "*"
-              },
-              {
-                "name": "Access-Control-Allow-Methods",
-                "value": "GET, POST, OPTIONS"
-              },
-              {
-                "name": "Access-Control-Allow-Headers",
-                "value": "*"
-              }
-            ]
+
+        salvarLocais() {
+          localStorage.setItem('local_cd', JSON.stringify(this.cd));
+          localStorage.setItem('local_casa', JSON.stringify(this.casa));
+          this.modalCD = false;
+        },
+
+        get pendentes() {
+          return this.entregas.filter(e => !e.status || e.status === 'pendente');
+        },
+
+        get entregaAtual() {
+          return this.pendentes[0] || null;
+        },
+
+        async atualizarStatus(id, novoStatus) {
+          const idx = this.entregas.findIndex(e => e.id === id);
+          if (idx !== -1) this.entregas[idx].status = novoStatus;
+
+          await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: novoStatus })
+          });
+        },
+
+        async enviarParaN8N() {
+          this.carregandoProcesso = true;
+          const formData = new FormData();
+          formData.append('cidade', this.cidadePadrao);
+          formData.append('cd_lat', this.cd.lat);
+          formData.append('cd_lng', this.cd.lng);
+          formData.append('casa_lat', this.casa.lat);
+          formData.append('casa_lng', this.casa.lng);
+
+          if (this.tipoEnvio === 'texto') {
+            formData.append('texto', this.textoRomaneio);
+          } else {
+            for (let i = 0; i < this.arquivosFotos.length; i++) {
+              formData.append('arquivos', this.arquivosFotos[i]);
+            }
+          }
+
+          try {
+            const res = await fetch(this.N8N_WEBHOOK_URL, { method: 'POST', body: formData });
+            if (res.ok) {
+              this.modalImportar = false;
+              this.textoRomaneio = '';
+              this.arquivosFotos = [];
+              await this.carregarUltimaRota();
+              this.modo = 'carregamento';
+            }
+          } catch(e) {
+            alert('Falha: ' + e.message);
+          } finally {
+            this.carregandoProcesso = false;
           }
         }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [2100, 0],
-      "id": "b35a7a8b-fca9-4924-a6f1-c5c767ade9ab",
-      "name": "Respond to Webhook"
+      }
     }
-  ],
-  "connections": {
-    "Webhook Shopee": {
-      "main": [
-        [
-          {
-            "node": "Preparar Entradas",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Preparar Entradas": {
-      "main": [
-        [
-          {
-            "node": "É Imagem?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "É Imagem?": {
-      "main": [
-        [
-          {
-            "node": "Analisa Imagem SPX",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Processar Texto Romaneio",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analisa Imagem SPX": {
-      "main": [
-        [
-          {
-            "node": "Consolidar Pacotes",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Processar Texto Romaneio": {
-      "main": [
-        [
-          {
-            "node": "Consolidar Pacotes",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Consolidar Pacotes": {
-      "main": [
-        [
-          {
-            "node": "Geocodificar Endereços",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Geocodificar Endereços": {
-      "main": [
-        [
-          {
-            "node": "Otimizar Rota pelo CD",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Otimizar Rota pelo CD": {
-      "main": [
-        [
-          {
-            "node": "Criar Rota no Postgres",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Criar Rota no Postgres": {
-      "main": [
-        [
-          {
-            "node": "Vincular Rota ID",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Vincular Rota ID": {
-      "main": [
-        [
-          {
-            "node": "Inserir Entregas Batch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Inserir Entregas Batch": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  }
-}
+  </script>
+</body>
+</html>
