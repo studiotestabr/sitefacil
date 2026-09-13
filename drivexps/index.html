@@ -2,14 +2,37 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DriveXPS StudioTesta</title>
-  <meta name="theme-color" content="#FF5722">
-  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Configurações PWA Mobile (Android e iOS) -->
+  <meta name="theme-color" content="#EA580C">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DriveXPS">
+  
+  <!-- Ícones e Manifesto -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Tailwind e Alpine.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Registro do Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ServiceWorker ativo!', reg.scope))
+          .catch(err => console.error('Erro no ServiceWorker:', err));
+      });
+    }
+  </script>
 </head>
-<body class="bg-gray-900 text-white font-sans pb-24" x-data="entregaApp()">
+<body class="bg-gray-900 text-white font-sans pb-24 select-none" x-data="entregaApp()">
 
   <!-- Cabeçalho -->
   <header class="bg-orange-600 p-4 sticky top-0 z-40 shadow-md flex justify-between items-center">
@@ -24,9 +47,9 @@
       <button @click="modalImportar = true" class="bg-white text-orange-600 px-2.5 py-1.5 text-xs font-black rounded-lg shadow">
         + Rota
       </button>
-      <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">📦 Carga</button>
-      <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">🚗 Rua</button>
-      <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">📜 Histórico</button>
+      <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">📦 Carga</button>
+      <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">🚗 Rua</button>
+      <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">📜 Histórico</button>
     </div>
   </header>
 
@@ -203,12 +226,10 @@
 
         async carregarUltimaRota() {
           try {
-            // Busca apenas a última rota criada
             const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=1`);
             const dataRota = await resRota.json();
             if (dataRota.data && dataRota.data.length > 0) {
               this.rotaAtivaId = dataRota.data[0].id;
-              // Carrega somente os pacotes pertencentes a essa rota específica
               const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${this.rotaAtivaId}&sort=ordem_entrega`);
               const data = await res.json();
               this.entregas = data.data || [];
