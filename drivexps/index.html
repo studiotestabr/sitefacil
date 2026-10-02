@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DriveXPS - Roteirizador Shopee</title>
+  <title>DriveXPS - Rotas Shopee</title>
   
   <meta name="theme-color" content="#EA580C">
   <meta name="mobile-web-app-capable" content="yes">
@@ -15,10 +15,10 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
 
-  <!-- Tailwind, Alpine.js e Leitor Nativo de Excel (SheetJS) -->
+  <!-- Tailwind, Alpine.js e SheetJS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
@@ -32,95 +32,88 @@
 </head>
 <body class="bg-gray-950 text-white font-sans pb-24 select-none" x-data="entregaApp()">
 
-  <!-- Cabeçalho Cockpit -->
+  <!-- Cabeçalho -->
   <header class="bg-orange-600 p-3.5 sticky top-0 z-40 shadow-lg flex justify-between items-center">
     <div>
       <h1 class="font-black text-lg leading-tight">DriveXPS <span class="text-xs bg-black px-2 py-0.5 rounded font-mono" x-text="rotaAtivaId ? `Rota #${rotaAtivaId}` : 'Shopee Pro'"></span></h1>
       <p class="text-xs opacity-90 font-medium" x-text="`Restantes: ${pendentes.length} de ${entregas.length} pacotes`"></p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1.5">
       <button @click="modalImportar = true" class="bg-white text-orange-600 px-3 py-1.5 text-xs font-black rounded-lg shadow active:scale-95 transition">
-        + Carregar Rota
+        + Rota
       </button>
-      <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">📦 Carga</button>
+      <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">📦 Sacolas</button>
       <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">🚗 Rua</button>
       <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">📜</button>
     </div>
   </header>
 
-  <!-- Barra de Navegação GPS Base -->
+  <!-- Barra de Configuração GPS -->
   <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between text-[11px] text-gray-300">
     <button @click="modalCD = true" class="hover:underline flex items-center gap-1">
       🏭 CD Saída: <span :class="cd.lat ? 'text-green-400 font-bold' : 'text-yellow-400 font-bold'" x-text="cd.lat ? 'Configurado' : 'Pendente'"></span>
     </button>
     <button @click="modalCD = true" class="hover:underline flex items-center gap-1">
-      🏠 Casa Fim: <span :class="casa.lat ? 'text-green-400 font-bold' : 'text-yellow-400 font-bold'" x-text="casa.lat ? 'Configurada' : 'Pendente'"></span>
+      🏠 Casa Chegada: <span :class="casa.lat ? 'text-green-400 font-bold' : 'text-yellow-400 font-bold'" x-text="casa.lat ? 'Configurada' : 'Pendente'"></span>
     </button>
   </div>
 
-  <!-- MODO 1: CARREGAMENTO (Organização Física no Uno) -->
-  <main x-show="modo === 'carregamento'" class="p-4 space-y-3">
-    <div class="bg-gray-900 p-3.5 rounded-xl border border-yellow-500/30 text-xs text-yellow-400 space-y-1">
-      <p class="font-bold flex items-center gap-1">✍️ REGRA DO CANETÃO NO CDD:</p>
-      <p class="text-gray-300 text-[11px]">Numerar os pacotes de <strong>#1 até #<span x-text="entregas.length"></span></strong> conforme a lista abaixo antes de colocar no Uno.</p>
+  <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 -->
+  <main x-show="modo === 'carregamento'" class="p-4 space-y-4">
+    <div class="bg-gray-900 p-3.5 rounded-xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1">
+      <p class="font-bold flex items-center gap-1">👜 MÉTODO DAS SACOLAS NUMERADAS (10 em 10):</p>
+      <p class="text-gray-300 text-[11px]">Marque com canetão o número do pacote (<strong>#1 a #<span x-text="entregas.length"></span></strong>) e guarde direto na Sacola correspondente antes de fechar o Uno.</p>
     </div>
 
-    <template x-for="item in entregas" :key="item.id">
-      <div class="bg-gray-900 p-3.5 rounded-xl flex items-center justify-between border-l-4 transition-all"
-           :class="{
-             'opacity-25 line-through bg-black border-gray-700': item.status === 'entregue',
-             'border-green-500': item.status !== 'entregue' && item.setor_uno === 'CABINE_FRENTE',
-             'border-blue-500': item.status !== 'entregue' && item.setor_uno === 'BANCO_TRAS',
-             'border-purple-500': item.status !== 'entregue' && item.setor_uno === 'MALA_FRENTE',
-             'border-red-500': item.status !== 'entregue' && item.setor_uno === 'MALA_FUNDO'
-           }">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl font-black bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700" x-text="`#${item.ordem_entrega}`"></span>
-          <div>
-            <div class="flex items-center gap-2">
-              <p class="font-bold text-sm text-white" x-text="item.endereco"></p>
-              <span x-show="item.total_no_local > 1" class="text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-1.5 py-0.2 rounded font-black" x-text="`${item.total_no_local} PACOTES`"></span>
+    <!-- Lista de Entregas -->
+    <div class="space-y-2.5">
+      <template x-for="item in entregas" :key="item.id">
+        <div class="bg-gray-900 p-3.5 rounded-xl flex items-center justify-between border-l-4 transition-all"
+             :class="{
+               'opacity-25 line-through bg-black border-gray-700': item.status === 'entregue',
+               'border-orange-500': item.status !== 'entregue'
+             }">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl font-black bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700 font-mono" x-text="`#${item.ordem_entrega}`"></span>
+            <div>
+              <div class="flex items-center gap-2">
+                <p class="font-bold text-sm text-white" x-text="item.endereco"></p>
+                <span x-show="item.total_no_local > 1" class="text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-1.5 py-0.2 rounded font-black" x-text="`${item.total_no_local} PACOTES`"></span>
+              </div>
+              <p class="text-xs text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
+              <p class="text-[10px] text-orange-400 font-mono mt-0.5" x-text="item.codigo_rastreio"></p>
             </div>
-            <p class="text-xs text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
-            <p class="text-[10px] text-orange-400 font-mono mt-0.5" x-text="item.codigo_rastreio"></p>
+          </div>
+          <div class="text-right flex flex-col items-end gap-1">
+            <span class="text-[10px] font-black px-2 py-0.5 rounded bg-orange-600/20 text-orange-400 border border-orange-500/30 uppercase tracking-wider" x-text="`Sacola ${Math.ceil(item.ordem_entrega / 10)}`"></span>
+            <span class="text-[9px] font-bold text-gray-400 uppercase" x-text="item.setor_uno ? item.setor_uno.replace('_', ' ') : 'MALA'"></span>
           </div>
         </div>
-        <div class="text-right">
-          <span x-show="item.status === 'entregue'" class="text-xs font-black text-green-400">ENTREGUE</span>
-          <span x-show="item.status !== 'entregue'" class="text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider"
-                :class="{
-                  'bg-green-950 text-green-300 border border-green-800': item.setor_uno === 'CABINE_FRENTE',
-                  'bg-blue-950 text-blue-300 border border-blue-800': item.setor_uno === 'BANCO_TRAS',
-                  'bg-purple-950 text-purple-300 border border-purple-800': item.setor_uno === 'MALA_FRENTE',
-                  'bg-red-950 text-red-300 border border-red-800': item.setor_uno === 'MALA_FUNDO'
-                }" x-text="(item.setor_uno || 'CABINE_FRENTE').replace('_', ' ')"></span>
-        </div>
-      </div>
-    </template>
+      </template>
+    </div>
   </main>
 
-  <!-- MODO 2: RUA (Cockpit de Alta Performance) -->
+  <!-- MODO 2: RUA (Cockpit de Alta Precisão) -->
   <main x-show="modo === 'rua'" class="p-4">
     <template x-if="entregaAtual">
       <div class="bg-gray-900 rounded-2xl p-5 border border-gray-800 space-y-4 shadow-2xl">
-        <!-- Barra do Topo -->
+        <!-- Barra de Topo -->
         <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-          <div class="flex items-center gap-2">
-            <span class="bg-orange-600 text-white font-black text-2xl px-3.5 py-1 rounded-xl shadow-md" x-text="`#${entregaAtual.ordem_entrega}`"></span>
+          <div class="flex items-center gap-3">
+            <span class="bg-orange-600 text-white font-black text-3xl px-3.5 py-1 rounded-xl shadow-md font-mono" x-text="`#${entregaAtual.ordem_entrega}`"></span>
             <div>
-              <span class="text-[10px] text-gray-400 block font-bold uppercase">Setor no Uno:</span>
-              <span class="text-xs font-black text-orange-400 uppercase tracking-wide" x-text="(entregaAtual.setor_uno || 'CABINE FRENTE').replace('_', ' ')"></span>
+              <span class="text-xs font-black text-yellow-400 bg-yellow-500/20 px-2 py-0.5 rounded border border-yellow-500/30 inline-block uppercase" x-text="`👜 SACOLA #${Math.ceil(entregaAtual.ordem_entrega / 10)}`"></span>
+              <span class="text-[10px] text-gray-400 block mt-0.5 uppercase font-bold" x-text="`Local: ${entregaAtual.setor_uno ? entregaAtual.setor_uno.replace('_', ' ') : 'MALA'}`"></span>
             </div>
           </div>
-          <span class="text-xs bg-gray-800 text-orange-400 border border-gray-700 font-mono font-bold px-2.5 py-1 rounded" x-text="entregaAtual.codigo_rastreio"></span>
+          <span class="text-xs bg-gray-800 text-orange-400 border border-gray-700 font-mono font-bold px-2 py-1 rounded" x-text="entregaAtual.codigo_rastreio"></span>
         </div>
 
         <!-- Alerta de Parada com Múltiplos Pacotes -->
         <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-xl p-3 space-y-1">
           <p class="text-xs font-black text-yellow-400 flex items-center gap-1">
-            ⚠️ ATENÇÃO: HÁ <span x-text="pacotesMesmoLocal.length"></span> PACOTES PARA ESTE LOCAL!
+            ⚠️ ATENÇÃO: HÁ <span x-text="pacotesMesmoLocal.length"></span> PACOTES NESTE LOCAL!
           </p>
-          <p class="text-[11px] text-gray-300">Entregue todos juntos para não ter que voltar:</p>
           <div class="flex flex-wrap gap-1 pt-1">
             <template x-for="p in pacotesMesmoLocal" :key="p.id">
               <span class="bg-yellow-500/20 text-yellow-300 text-[10px] font-mono px-2 py-0.5 rounded border border-yellow-500/30" x-text="`#${p.ordem_entrega} (${p.codigo_rastreio})`"></span>
@@ -128,14 +121,14 @@
           </div>
         </div>
 
-        <!-- Dados do Endereço -->
+        <!-- Endereço -->
         <div class="space-y-1">
           <h2 class="text-2xl font-black text-white leading-tight" x-text="entregaAtual.endereco"></h2>
           <p class="text-base text-gray-300 font-semibold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
           <p class="text-xs text-gray-400 font-mono" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
         </div>
 
-        <!-- Navegação com 1 Toque -->
+        <!-- Botões Waze e Google Maps -->
         <div class="grid grid-cols-2 gap-3 pt-2">
           <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
              class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-xl font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 active:scale-95 transition">
@@ -147,7 +140,7 @@
           </a>
         </div>
 
-        <!-- Botões de Ação na Entrega -->
+        <!-- Conclusão -->
         <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
           <button @click="atualizarStatus(entregaAtual.id, 'ausente')" class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-xl font-bold text-sm border border-gray-700 active:scale-95 transition">
             ⚠️ Ausente / Pular
@@ -163,14 +156,14 @@
       <div class="text-center py-20 space-y-4">
         <span class="text-6xl block">🏁</span>
         <h2 class="text-2xl font-black text-white" x-text="`Rota #${rotaAtivaId || ''} Finalizada!`"></h2>
-        <p class="text-gray-400 text-sm max-w-xs mx-auto">Parabéns! Todos os pacotes da carga foram entregues no menor tempo possível.</p>
+        <p class="text-gray-400 text-sm max-w-xs mx-auto">Parabéns! Todas as sacolas foram esvaziadas com sucesso.</p>
       </div>
     </template>
   </main>
 
   <!-- MODO 3: HISTÓRICO -->
   <main x-show="modo === 'historico'" class="p-4 space-y-4">
-    <h2 class="text-lg font-black text-orange-500">📜 Histórico de Desempenho</h2>
+    <h2 class="text-lg font-black text-orange-500">📜 Histórico de Rotas</h2>
     <div class="space-y-3">
       <template x-for="r in rotasHistorico" :key="r.id">
         <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 space-y-2">
@@ -189,34 +182,54 @@
     </div>
   </main>
 
-  <!-- MODAL: IMPORTAR PLANILHA XLSX DA SHOPEE -->
+  <!-- MODAL: IMPORTAR ROMANEIO DA SHOPEE -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4" x-cloak>
     <div class="bg-gray-900 rounded-2xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <div>
-          <h2 class="font-black text-lg text-orange-500">CARREGAR ROMANEIO SHOPEE</h2>
-          <p class="text-xs text-gray-400">Importação oficial de alta precisão (até 300 pacotes)</p>
+          <h2 class="font-black text-lg text-orange-500">IMPORTAR ROMANEIO SHOPEE</h2>
+          <p class="text-xs text-gray-400">Até 300 pacotes organizados em sacolas</p>
         </div>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
 
-      <!-- Upload XLSX Direto -->
-      <div class="space-y-3">
+      <!-- Abas de Importação -->
+      <div class="flex border-b border-gray-800 text-xs font-bold">
+        <button @click="abaImport = 'arquivo'" :class="abaImport === 'arquivo' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📑 Subir Arquivo (.xlsx / .csv)
+        </button>
+        <button @click="abaImport = 'texto'" :class="abaImport === 'texto' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📄 Colar Texto do Romaneio
+        </button>
+      </div>
+
+      <!-- Opção 1: Selecionar Arquivo -->
+      <div x-show="abaImport === 'arquivo'" class="space-y-3">
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
-          <span class="text-4xl block mb-2">📑</span>
-          <span class="text-sm font-black block text-white">Selecionar arquivo .XLSX ou .CSV</span>
-          <span class="text-xs text-gray-400 block mt-1">Exportado diretamente do aplicativo SPX</span>
+          <span class="text-4xl block mb-2">📊</span>
+          <span class="text-sm font-black block text-white">Selecionar arquivo baixado da Shopee</span>
+          <span class="text-xs text-gray-400 block mt-1">Formatos aceitos: .XLSX ou .CSV</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
         </label>
-        
-        <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-center">
-          <p class="text-xs text-green-400 font-bold" x-text="`✅ ${pacotesExtraidos.length} pacotes lidos com sucesso da planilha!`"></p>
-        </div>
+      </div>
+
+      <!-- Opção 2: Colar Texto Diretamente -->
+      <div x-show="abaImport === 'texto'" class="space-y-2">
+        <textarea x-model="textoColado" rows="6" placeholder="Copie as linhas da planilha ou lista da Shopee e cole aqui..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white font-mono focus:border-orange-500 focus:outline-none"></textarea>
+        <button @click="processarTextoColado()" class="w-full bg-gray-800 hover:bg-gray-700 text-orange-400 font-bold py-2 rounded-lg text-xs border border-gray-700">
+          Converter Texto
+        </button>
+      </div>
+
+      <!-- Status do Reconhecimento -->
+      <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-center">
+        <p class="text-xs text-green-400 font-bold" x-text="`✅ ${pacotesExtraidos.length} pacotes reconhecidos com GPS da Shopee!`"></p>
+        <p class="text-[11px] text-gray-400 mt-0.5" x-text="`Serão geradas aproximadamente ${Math.ceil(pacotesExtraidos.length / 10)} sacolas de 10 pacotes.`"></p>
       </div>
 
       <button @click="enviarParaN8N()" :disabled="carregandoProcesso || pacotesExtraidos.length === 0" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-xl shadow-orange-600/30 disabled:opacity-40 transition">
-        <span x-show="!carregandoProcesso" x-text="`🚀 Otimizar Sequência Mais Rápida (${pacotesExtraidos.length} pacotes)`"></span>
-        <span x-show="carregandoProcesso">⏳ Calculando Rota Perfeita Sem Nós...</span>
+        <span x-show="!carregandoProcesso" x-text="`🚀 Otimizar Rota Partindo do CD (${pacotesExtraidos.length} pacotes)`"></span>
+        <span x-show="carregandoProcesso">⏳ Otimizando Rota em Sacolas no Servidor...</span>
       </button>
     </div>
   </div>
@@ -257,6 +270,8 @@
         modo: 'rua',
         modalImportar: false,
         modalCD: false,
+        abaImport: 'arquivo',
+        textoColado: '',
         cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
         casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.1739,"lng":-46.7816}'),
         pacotesExtraidos: [],
@@ -272,7 +287,44 @@
           await this.carregarUltimaRota();
         },
 
-        // Processador Nativo de XLSX com SheetJS (Lê direto no celular em milissegundos)
+        // Parser Universal de Planilhas da Shopee (Lida com qualquer variação de cabeçalho)
+        parseJsonShopee(jsonRows) {
+          return jsonRows.map((row, idx) => {
+            // Busca campos ignorando maiúsculas/minúsculas
+            const keys = Object.keys(row);
+            const getVal = (pattern) => {
+              const k = keys.find(k => pattern.test(k));
+              return k ? row[k] : '';
+            };
+
+            const tn = getVal(/SPX\s*TN|Tracking/i) || `SPX-${idx+1}`;
+            const addr = getVal(/Destination\s*Address|Endere[çc]o/i) || '';
+            const bairro = getVal(/Bairro/i) || '';
+            const city = getVal(/City|Cidade/i) || 'Itanhaém';
+            const cep = getVal(/Zipcode|Postal|CEP/i) || '';
+            const lat = parseFloat(getVal(/Latitude|Lat/i) || 0);
+            const lng = parseFloat(getVal(/Longitude|Lng|Long/i) || 0);
+            const stop = getVal(/Stop|Parada/i) || (idx + 1);
+
+            let numero = 'S/N';
+            const numMatch = String(addr).match(/,\s*(\d+|S\/?N)/i);
+            if (numMatch) numero = numMatch[1];
+
+            return {
+              codigo_rastreio: String(tn).trim(),
+              destinatario: `Parada #${stop}`,
+              telefone: '13999999999',
+              endereco: String(addr).trim(),
+              numero: numero,
+              bairro: String(bairro).trim(),
+              cidade: String(city).trim(),
+              cep: String(cep).trim(),
+              latitude: lat,
+              longitude: lng
+            };
+          }).filter(p => p.latitude !== 0 && p.longitude !== 0 && !isNaN(p.latitude));
+        },
+
         processarArquivoExcel(event) {
           const file = event.target.files[0];
           if (!file) return;
@@ -284,45 +336,33 @@
               const workbook = XLSX.read(data, { type: 'array' });
               const sheetName = workbook.SheetNames[0];
               const worksheet = workbook.Sheets[sheetName];
-              const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+              const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-              if (jsonRows.length === 0) {
-                alert('A planilha está vazia!');
-                return;
+              this.pacotesExtraidos = this.parseJsonShopee(jsonRows);
+              if (this.pacotesExtraidos.length === 0) {
+                alert('Não foi possível identificar as coordenadas na planilha. Verifique se o arquivo possui as colunas Latitude e Longitude.');
               }
-
-              // Mapeia as colunas oficiais do romaneio da Shopee
-              this.pacotesExtraidos = jsonRows.map((row, idx) => {
-                const tn = row['SPX TN'] || row['Tracking Number'] || `SPX-${idx+1}`;
-                const addr = row['Destination Address'] || row['Address'] || '';
-                const stop = row['Stop'] && row['Stop'] !== '-' ? row['Stop'] : (idx + 1);
-                const lat = parseFloat(row['Latitude'] || 0);
-                const lng = parseFloat(row['Longitude'] || 0);
-
-                let numero = 'S/N';
-                const numMatch = addr.match(/,\s*(\d+|S\/?N)/i);
-                if (numMatch) numero = numMatch[1];
-
-                return {
-                  codigo_rastreio: String(tn).trim(),
-                  destinatario: `Parada #${stop}`,
-                  telefone: '13999999999',
-                  endereco: addr,
-                  numero: numero,
-                  bairro: String(row['Bairro'] || '').trim(),
-                  cidade: String(row['City'] || 'Itanhaém').trim(),
-                  cep: String(row['Zipcode/Postal code'] || row['CEP'] || '').trim(),
-                  latitude: lat,
-                  longitude: lng,
-                  stop_shopee: stop
-                };
-              }).filter(p => p.latitude !== 0 && p.longitude !== 0);
-
             } catch (err) {
-              alert('Erro ao ler planilha: ' + err.message);
+              alert('Erro ao ler arquivo: ' + err.message);
             }
           };
           reader.readAsArrayBuffer(file);
+        },
+
+        processarTextoColado() {
+          if (!this.textoColado.trim()) return;
+          try {
+            // Converte texto em planilha virtual via SheetJS
+            const workbook = XLSX.read(this.textoColado, { type: 'string' });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+            this.pacotesExtraidos = this.parseJsonShopee(jsonRows);
+            if (this.pacotesExtraidos.length === 0) {
+              alert('Nenhum pacote com coordenadas válidas encontrado no texto.');
+            }
+          } catch(e) {
+            alert('Falha ao processar texto: ' + e.message);
+          }
         },
 
         async carregarUltimaRota() {
@@ -331,7 +371,6 @@
             const dataRota = await resRota.json();
             if (dataRota.data && dataRota.data.length > 0) {
               this.rotaAtivaId = dataRota.data[0].id;
-              // Carrega até 300 entregas da rota ativa
               const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${this.rotaAtivaId}&sort=ordem_entrega&limit=300`);
               const data = await res.json();
               this.entregas = data.data || [];
@@ -361,7 +400,7 @@
             navigator.geolocation.getCurrentPosition(pos => {
               this[tipo].lat = pos.coords.latitude;
               this[tipo].lng = pos.coords.longitude;
-              alert(`GPS de ${tipo.toUpperCase()} capturado com precisão!`);
+              alert(`GPS de ${tipo.toUpperCase()} salvo com sucesso!`);
             }, err => alert('Erro GPS: ' + err.message));
           }
         },
@@ -380,21 +419,19 @@
           return this.pendentes[0] || null;
         },
 
-        // Agrupamento: Identifica pacotes com mesmo endereço ou coordenadas
         get pacotesMesmoLocal() {
           if (!this.entregaAtual) return [];
           const cur = this.entregaAtual;
           return this.pendentes.filter(e => 
-            (e.latitude === cur.latitude && e.longitude === cur.longitude) ||
+            (Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001) ||
             (e.endereco === cur.endereco && e.numero === cur.numero)
           );
         },
 
         async concluirEntrega(entrega) {
-          // Se houver mais de um pacote no mesmo local, pergunta se quer marcar todos
           const mesmoLocal = this.pacotesMesmoLocal;
           if (mesmoLocal.length > 1) {
-            const conf = confirm(`Há ${mesmoLocal.length} pacotes neste endereço. Deseja marcar TODOS como entregues de uma vez?`);
+            const conf = confirm(`Há ${mesmoLocal.length} pacotes neste endereço. Marcar TODOS como entregues?`);
             if (conf) {
               for (const p of mesmoLocal) {
                 await this.atualizarStatus(p.id, 'entregue');
@@ -436,13 +473,14 @@
             if (res.ok) {
               this.modalImportar = false;
               this.pacotesExtraidos = [];
+              this.textoColado = '';
               await this.carregarUltimaRota();
               this.modo = 'carregamento';
             } else {
-              alert('Erro no n8n.');
+              alert('Erro na resposta do n8n.');
             }
           } catch(e) {
-            alert('Falha: ' + e.message);
+            alert('Falha na comunicação: ' + e.message);
           } finally {
             this.carregandoProcesso = false;
           }
