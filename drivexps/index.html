@@ -32,7 +32,7 @@
 </head>
 <body class="bg-gray-950 text-white font-sans pb-28 select-none" x-data="entregaApp()">
 
-  <!-- TELA DE LOGIN (Exibida se o motorista não estiver autenticado) -->
+  <!-- TELA DE LOGIN (Exibida se não autenticado) -->
   <div x-show="!usuarioLogado" class="fixed inset-0 bg-gray-950 z-50 flex items-center justify-center p-4">
     <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-6 space-y-5 shadow-2xl">
       <div class="text-center space-y-2">
@@ -43,7 +43,6 @@
         <p class="text-xs text-gray-400">Acesse para visualizar suas rotas da Shopee</p>
       </div>
 
-      <!-- Erro de Login -->
       <div x-show="erroLogin" class="bg-red-500/20 border border-red-500/50 p-3 rounded-xl text-xs text-red-200 font-bold text-center" x-text="erroLogin"></div>
 
       <!-- Botão Google Login -->
@@ -59,7 +58,7 @@
         <div class="flex-1 border-t border-gray-800"></div>
       </div>
 
-      <!-- Formulário de Login Tradicional -->
+      <!-- Login Tradicional -->
       <form @submit.prevent="loginEmailSenha()" class="space-y-3">
         <input type="email" x-model="loginForm.email" placeholder="Seu e-mail cadastrado" required class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-orange-500 focus:outline-none">
         <input type="password" x-model="loginForm.senha" placeholder="Sua senha" required class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-orange-500 focus:outline-none">
@@ -101,9 +100,7 @@
 
   <!-- APLICAÇÃO PRINCIPAL (SÓ APARECE APÓS LOGIN) -->
   <div x-show="usuarioLogado">
-    <!-- CABEÇALHO EM 3 LINHAS -->
     <header class="bg-orange-600 px-4 pt-3 pb-3 sticky top-0 z-40 shadow-xl space-y-2.5">
-      <!-- Linha 1: Título Centralizado com Botão de Sair -->
       <div class="text-center flex justify-between items-center">
         <button @click="deslogar()" class="text-[10px] bg-black/40 text-orange-200 px-2 py-1 rounded-md font-bold hover:bg-black/60">
           Sair
@@ -115,7 +112,6 @@
         <div x-show="!deferredPrompt || isStandalone" class="w-8"></div>
       </div>
 
-      <!-- Linha 2: Rota à esquerda / Restantes à direita -->
       <div class="flex justify-between items-center text-xs font-bold px-1 border-t border-orange-500/60 pt-2">
         <div class="flex items-center gap-1.5">
           <span class="bg-black/80 text-orange-400 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" 
@@ -126,7 +122,6 @@
         </div>
       </div>
 
-      <!-- Linha 3: Grade com 4 Botões Principais -->
       <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
         <button @click="modalImportar = true" class="bg-white hover:bg-orange-50 text-orange-600 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center shadow-md active:scale-95 transition">
           <span class="text-sm leading-none">+</span>
@@ -147,7 +142,7 @@
       </nav>
     </header>
 
-    <!-- BOTÕES DE CONFIGURAÇÃO DE GPS (CD e CASA) -->
+    <!-- CONFIGURAÇÃO GPS (CD e CASA) -->
     <section class="bg-gray-900/90 px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5">
       <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
         <div class="truncate pr-1">
@@ -170,7 +165,7 @@
       </button>
     </section>
 
-    <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 (FOTO 1 REFORMULADA) -->
+    <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 -->
     <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5">
       <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
         <p class="font-black text-sm flex items-center gap-1.5">
@@ -181,7 +176,6 @@
         </p>
       </div>
 
-      <!-- Lista de Cards Reestruturada com Espaço Total para o Endereço -->
       <div class="space-y-3">
         <template x-for="item in entregas" :key="item.id">
           <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-md space-y-2.5 transition-all"
@@ -189,81 +183,55 @@
                  'opacity-20 line-through bg-black border-gray-900': item.status === 'entregue',
                  'border-l-4 border-l-orange-500': item.status !== 'entregue'
                }">
-            
-            <!-- Linha 1 do Card: Número à esquerda + Sacola e Faixa de Pacotes à direita -->
             <div class="flex items-center justify-between border-b border-gray-800/80 pb-2.5">
               <div class="flex items-center gap-2">
-                <span class="text-3xl font-black text-orange-500 font-mono tracking-tight" 
-                      x-text="`#${item.ordem_entrega}`"></span>
-                <span x-show="item.total_no_local > 1" 
-                      class="text-[11px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-0.5 rounded-md font-black" 
-                      x-text="`${item.total_no_local} PACOTES NESTE LOCAL`"></span>
+                <span class="text-3xl font-black text-orange-500 font-mono tracking-tight" x-text="`#${item.ordem_entrega}`"></span>
+                <span x-show="item.total_no_local > 1" class="text-[11px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-0.5 rounded-md font-black" x-text="`${item.total_no_local} PACOTES NESTE LOCAL`"></span>
               </div>
-              
-              <!-- Badge da Sacola com Faixa de Pacotes -->
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-orange-600/25 text-orange-400 border border-orange-500/40 uppercase tracking-wide font-mono" 
-                      x-text="`SACOLA ${Math.ceil(item.ordem_entrega / 10)}`"></span>
-                <span class="text-xs font-bold text-gray-300 bg-gray-800 px-2.5 py-1 rounded-lg border border-gray-700/80 font-mono" 
-                      x-text="getFaixaPacotes(item.ordem_entrega)"></span>
+                <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-orange-600/25 text-orange-400 border border-orange-500/40 uppercase tracking-wide font-mono" x-text="`SACOLA ${Math.ceil(item.ordem_entrega / 10)}`"></span>
+                <span class="text-xs font-bold text-gray-300 bg-gray-800 px-2.5 py-1 rounded-lg border border-gray-700/80 font-mono" x-text="getFaixaPacotes(item.ordem_entrega)"></span>
               </div>
             </div>
 
-            <!-- Linha 2 do Card: Endereço Completo em Largura Total -->
             <div class="space-y-0.5">
               <h3 class="font-black text-lg text-white leading-snug break-words" x-text="item.endereco"></h3>
               <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
             </div>
 
-            <!-- Linha 3 do Card: Código de Rastreio em Destaque -->
             <div class="flex items-center justify-between pt-1 border-t border-gray-800/50 text-xs">
               <span class="text-gray-500 font-medium">Código Rastreio SPX:</span>
-              <span class="font-mono font-black text-sm text-orange-400 bg-gray-950 px-3 py-1 rounded-md border border-gray-800 tracking-wider" 
-                    x-text="item.codigo_rastreio"></span>
+              <span class="font-mono font-black text-sm text-orange-400 bg-gray-950 px-3 py-1 rounded-md border border-gray-800 tracking-wider" x-text="item.codigo_rastreio"></span>
             </div>
           </div>
         </template>
       </div>
     </main>
 
-    <!-- MODO 2: RUA - COCKPIT DESPOLUÍDO E INTUITIVO (FOTO 2 ATUALIZADA) -->
+    <!-- MODO 2: RUA (Cockpit) -->
     <main x-show="modo === 'rua'" class="p-4">
       <template x-if="entregaAtual">
         <div class="bg-gray-900 rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
-          
-          <!-- Bloco 1: Número da Entrega e Sacola com Faixa de Pacotes -->
           <div class="flex items-center justify-between border-b border-gray-800 pb-3">
             <div class="flex items-center gap-3">
-              <span class="bg-orange-600 text-white font-black text-4xl px-4 py-1.5 rounded-2xl shadow-lg font-mono" 
-                    x-text="`#${entregaAtual.ordem_entrega}`"></span>
-              
+              <span class="bg-orange-600 text-white font-black text-4xl px-4 py-1.5 rounded-2xl shadow-lg font-mono" x-text="`#${entregaAtual.ordem_entrega}`"></span>
               <div class="space-y-0.5">
-                <span class="text-base font-black text-yellow-400 bg-yellow-500/20 px-3 py-1 rounded-lg border border-yellow-500/40 inline-block uppercase tracking-wide" 
-                      x-text="`👜 SACOLA #${Math.ceil(entregaAtual.ordem_entrega / 10)}`"></span>
-                <span class="text-xs text-gray-300 block font-bold font-mono pl-0.5" 
-                      x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
+                <span class="text-base font-black text-yellow-400 bg-yellow-500/20 px-3 py-1 rounded-lg border border-yellow-500/40 inline-block uppercase tracking-wide" x-text="`👜 SACOLA #${Math.ceil(entregaAtual.ordem_entrega / 10)}`"></span>
+                <span class="text-xs text-gray-300 block font-bold font-mono pl-0.5" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
               </div>
             </div>
           </div>
 
-          <!-- Bloco 2: Código de Rastreio em Linha Própria com Máxima Visibilidade -->
           <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">CÓDIGO DE RASTREIO SPX:</span>
-            <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" 
-                  x-text="entregaAtual.codigo_rastreio"></span>
+            <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" x-text="entregaAtual.codigo_rastreio"></span>
           </div>
 
-          <!-- Bloco 3: Caixa Amarela Despoluída (Uma Linha por Frase) -->
-          <div x-show="pacotesMesmoLocal.length > 1" 
-               class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
+          <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
             <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
               <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTE LOCAL!
             </p>
-            <p class="text-xs text-gray-300 font-medium leading-none">
-              Entregue todos juntos nesta mesma parada:
-            </p>
-            
-            <!-- Lista de Pacotes (Um por linha) -->
+            <p class="text-xs text-gray-300 font-medium leading-none">Entregue todos juntos nesta mesma parada:</p>
             <div class="space-y-1.5 pt-1">
               <template x-for="p in pacotesMesmoLocal" :key="p.id">
                 <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl px-3 py-2 flex items-center justify-between font-mono text-xs font-bold">
@@ -274,33 +242,26 @@
             </div>
           </div>
 
-          <!-- Bloco 4: Endereço com Alta Legibilidade -->
           <div class="space-y-1 pt-1">
             <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
             <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
             <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
           </div>
 
-          <!-- Bloco 5: Botões Grandes de GPS -->
           <div class="grid grid-cols-2 gap-3 pt-1">
-            <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
-               class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
+            <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
               🚗 Abrir Waze
             </a>
-            <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" 
-               class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">
+            <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">
               🗺️ Google Maps
             </a>
           </div>
 
-          <!-- Bloco 6: Botões de Ação Final -->
           <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
-            <button @click="atualizarStatus(entregaAtual.id, 'ausente')" 
-                    class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
+            <button @click="atualizarStatus(entregaAtual.id, 'ausente')" class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
               ⚠️ Ausente / Pular
             </button>
-            <button @click="concluirEntrega(entregaAtual)" 
-                    class="bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 active:scale-95 transition">
+            <button @click="concluirEntrega(entregaAtual)" class="bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 active:scale-95 transition">
               ✅ Entregue
             </button>
           </div>
@@ -350,7 +311,6 @@
 
         <div x-show="msgErro" class="bg-red-500/20 border border-red-500 p-3 rounded-xl text-xs text-red-200 font-bold" x-text="msgErro"></div>
 
-        <!-- Abas de Importação -->
         <div class="flex border-b border-gray-800 text-xs font-bold">
           <button @click="abaImport = 'arquivo'" :class="abaImport === 'arquivo' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2.5 text-center">
             📑 Subir Arquivo (.xlsx / .csv)
@@ -360,7 +320,6 @@
           </button>
         </div>
 
-        <!-- Aba 1: Arquivo -->
         <div x-show="abaImport === 'arquivo'" class="space-y-3">
           <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
             <span class="text-4xl block mb-2">📊</span>
@@ -371,12 +330,10 @@
           <p x-show="nomeArquivo" class="text-xs text-orange-400 font-bold text-center" x-text="`Arquivo: ${nomeArquivo}`"></p>
         </div>
 
-        <!-- Aba 2: Colar Texto -->
         <div x-show="abaImport === 'texto'" class="space-y-2">
           <textarea x-model="textoColado" @input="processarTextoAoDigitar()" rows="7" placeholder="Cole aqui o texto do romaneio da Shopee..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white font-mono focus:border-orange-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- Status de Reconhecimento -->
         <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/15 border border-green-500/40 rounded-2xl p-3.5 text-center space-y-1">
           <p class="text-sm text-green-400 font-black" x-text="`✅ ${pacotesExtraidos.length} PACOTES COM GPS DA SHOPEE!`"></p>
           <p class="text-xs text-gray-300 font-medium" x-text="`Carga dividida em ${Math.ceil(pacotesExtraidos.length / 10)} sacolas de 10 pacotes.`"></p>
@@ -391,7 +348,7 @@
       </div>
     </div>
 
-    <!-- MODAL: CONFIGURAR PONTOS CD E CASA -->
+    <!-- CONFIGURAR CD E CASA -->
     <div x-show="modalCD" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4" x-cloak>
       <div class="bg-gray-900 rounded-3xl w-full max-w-md border border-gray-800 p-5 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -476,7 +433,7 @@
         },
 
         async verificarAutenticacao() {
-          // 1. Se já tem token salvo no celular, valida
+          // 1. Tenta validar via Token Bearer se houver
           if (this.tokenAcesso) {
             try {
               const res = await fetch(`${this.DIRECTUS_URL}/users/me`, {
@@ -492,14 +449,32 @@
             } catch(e) {}
           }
 
-          // 2. Se voltou do Google, resgata a sessão oficial via Cookie seguro
+          // 2. Tenta autenticar diretamente pela Sessão do Cookie (Fluxo Google Seamless)
+          try {
+            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, {
+              credentials: 'include'
+            });
+
+            if (resSession.ok) {
+              const userData = await resSession.json();
+              if (userData && userData.data && userData.data.id) {
+                this.usuarioId = userData.data.id;
+                localStorage.setItem('directus_user_id', this.usuarioId);
+                this.usuarioLogado = true;
+                return;
+              }
+            }
+          } catch(e) {
+            console.log('Sem sessão ativa via cookie');
+          }
+
+          // 3. Fallback: tenta recuperar via refresh token em cookie
           try {
             const resRefresh = await fetch(`${this.DIRECTUS_URL}/auth/refresh`, {
               method: 'POST',
               credentials: 'include',
               headers: { 'Content-Type': 'application/json' }
             });
-
             if (resRefresh.ok) {
               const data = await resRefresh.json();
               if (data.data && data.data.access_token) {
@@ -507,20 +482,19 @@
                 localStorage.setItem('directus_token', this.tokenAcesso);
                 
                 const resUser = await fetch(`${this.DIRECTUS_URL}/users/me`, {
-                  headers: { 'Authorization': `Bearer ${this.tokenAcesso}` }
+                  headers: { 'Authorization': `Bearer ${this.tokenAcesso}` },
+                  credentials: 'include'
                 });
                 if (resUser.ok) {
-                  const userData = await resUser.json();
-                  this.usuarioId = userData.data.id;
+                  const uData = await resUser.json();
+                  this.usuarioId = uData.data.id;
                   localStorage.setItem('directus_user_id', this.usuarioId);
                   this.usuarioLogado = true;
                   return;
                 }
               }
             }
-          } catch(e) {
-            console.log('Nenhuma sessão anterior encontrada.');
-          }
+          } catch(e) {}
 
           this.usuarioLogado = false;
         },
@@ -537,6 +511,7 @@
             const res = await fetch(`${this.DIRECTUS_URL}/auth/login`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({
                 email: this.loginForm.email,
                 password: this.loginForm.senha
@@ -553,13 +528,20 @@
               this.erroLogin = 'E-mail ou senha incorretos.';
             }
           } catch(e) {
-            this.erroLogin = 'Falha ao conectar com o servidor: ' + e.message;
+            this.erroLogin = 'Falha ao conectar: ' + e.message;
           } finally {
             this.carregandoLogin = false;
           }
         },
 
-        deslogar() {
+        async deslogar() {
+          try {
+            await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
+              method: 'POST',
+              credentials: 'include'
+            });
+          } catch(e) {}
+
           localStorage.removeItem('directus_token');
           localStorage.removeItem('directus_user_id');
           this.tokenAcesso = null;
@@ -744,16 +726,20 @@
         },
 
         async carregarUltimaRota() {
-          if (!this.tokenAcesso) return;
           try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
             const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=1`, {
-              headers: { 'Authorization': `Bearer ${this.tokenAcesso}` }
+              headers,
+              credentials: 'include'
             });
             const dataRota = await resRota.json();
             if (dataRota.data && dataRota.data.length > 0) {
               this.rotaAtivaId = dataRota.data[0].id;
               const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${this.rotaAtivaId}&sort=ordem_entrega&limit=300`, {
-                headers: { 'Authorization': `Bearer ${this.tokenAcesso}` }
+                headers,
+                credentials: 'include'
               });
               const data = await res.json();
               this.entregas = data.data || [];
@@ -769,8 +755,12 @@
         async abrirHistorico() {
           this.modo = 'historico';
           try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
             const res = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, {
-              headers: { 'Authorization': `Bearer ${this.tokenAcesso}` }
+              headers,
+              credentials: 'include'
             });
             const data = await res.json();
             this.rotasHistorico = data.data || [];
@@ -779,8 +769,12 @@
 
         async selecionarRotaHistorico(rotaId) {
           this.rotaAtivaId = rotaId;
+          const headers = {};
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
           const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`, {
-            headers: { 'Authorization': `Bearer ${this.tokenAcesso}` }
+            headers,
+            credentials: 'include'
           });
           const data = await res.json();
           this.entregas = data.data || [];
@@ -838,12 +832,13 @@
           const idx = this.entregas.findIndex(e => e.id === id);
           if (idx !== -1) this.entregas[idx].status = novoStatus;
 
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
           await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
             method: 'PATCH',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${this.tokenAcesso}`
-            },
+            headers,
+            credentials: 'include',
             body: JSON.stringify({ status: novoStatus })
           });
         },
