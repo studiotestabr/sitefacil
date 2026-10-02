@@ -32,12 +32,65 @@
 </head>
 <body class="bg-gray-950 text-white font-sans pb-28 select-none" x-data="entregaApp()">
 
+  <!-- POPUP AUTOMÁTICO DE INSTALAÇÃO DO APP (CONVERSÃO SAAS) -->
+  <div x-show="mostrarPopupInstalar" 
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0 translate-y-10 scale-95"
+       x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100 translate-y-0"
+       x-transition:leave-end="opacity-0 translate-y-10"
+       class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
+    
+    <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
+      <!-- Ícone do App no topo do Card -->
+      <div class="flex justify-center">
+        <img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700">
+      </div>
+
+      <div class="space-y-1.5">
+        <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Instale o aplicativo no seu celular para usar a tela cheia no Uno, abrir rotas em 1 toque e não gastar internet na rua.
+        </p>
+      </div>
+
+      <!-- Modo Android / Chrome (Botão Nativo) -->
+      <div x-show="!isIOS" class="space-y-2 pt-1">
+        <button @click="instalarPWA()" 
+                class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl shadow-orange-600/40 active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📲</span> Instalar Aplicativo Agora
+        </button>
+        <button @click="fecharPopupInstalar()" class="text-xs text-gray-400 hover:text-white font-bold py-1">
+          Continuar no navegador por enquanto
+        </button>
+      </div>
+
+      <!-- Modo iPhone / iOS (Passo a passo visual) -->
+      <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-gray-300">
+        <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
+        <p class="flex items-center gap-2">1. Toque no botão <strong>Compartilhar ⎋</strong> do Safari.</p>
+        <p class="flex items-center gap-2">2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
+        <button @click="fecharPopupInstalar()" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- CABEÇALHO REFORMULADO EM 3 LINHAS -->
   <header class="bg-orange-600 px-4 pt-3 pb-3 sticky top-0 z-40 shadow-xl space-y-2.5">
     
     <!-- Linha 1: Nome do App Centralizado -->
-    <div class="text-center">
+    <div class="text-center flex justify-between items-center">
+      <div class="w-6"></div> <!-- Balanceador de espaço -->
       <h1 class="font-black text-2xl tracking-wider text-white drop-shadow-sm">DriveXPS</h1>
+      
+      <!-- Botão discreto caso queira reinstalar depois -->
+      <button x-show="deferredPrompt && !isStandalone" @click="mostrarPopupInstalar = true" class="text-xs bg-black/40 text-white px-2 py-0.5 rounded-md font-bold text-[10px]">
+        📲 App
+      </button>
+      <div x-show="!deferredPrompt || isStandalone" class="w-6"></div>
     </div>
 
     <!-- Linha 2: Rota à esquerda / Pacotes Restantes à direita -->
@@ -107,9 +160,8 @@
     </button>
   </section>
 
-  <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 (FOTO 2 REFORMULADA) -->
+  <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 -->
   <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5">
-    <!-- Instrução -->
     <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
       <p class="font-black text-sm flex items-center gap-1.5">
         <span>👜</span> MÉTODO DAS SACOLAS (10 EM 10)
@@ -119,7 +171,7 @@
       </p>
     </div>
 
-    <!-- Lista de Cards com Tipografia Maior -->
+    <!-- Lista de Cards -->
     <div class="space-y-3">
       <template x-for="item in entregas" :key="item.id">
         <div class="bg-gray-900 p-4 rounded-2xl flex items-center justify-between border-l-4 shadow-md transition-all"
@@ -128,7 +180,6 @@
                'border-orange-500 hover:border-orange-400': item.status !== 'entregue'
              }">
           
-          <!-- Lado Esquerdo: Número e Endereço Ampliados -->
           <div class="flex items-center gap-3.5 flex-1 pr-2">
             <span class="text-3xl font-black bg-gray-800 px-3.5 py-2 rounded-xl border border-gray-700 font-mono text-orange-400 shrink-0" 
                   x-text="`#${item.ordem_entrega}`"></span>
@@ -146,7 +197,6 @@
             </div>
           </div>
 
-          <!-- Lado Direito: Badge da Sacola e Setor -->
           <div class="text-right flex flex-col items-end gap-1 shrink-0 pl-1">
             <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-orange-600/25 text-orange-400 border border-orange-500/40 uppercase tracking-wide font-mono" 
                   x-text="`SACOLA ${Math.ceil(item.ordem_entrega / 10)}`"></span>
@@ -158,12 +208,11 @@
     </div>
   </main>
 
-  <!-- MODO 2: RUA - COCKPIT DE ALTO CONFORTO VISUAL (FOTO 3 REFORMULADA) -->
+  <!-- MODO 2: RUA - COCKPIT -->
   <main x-show="modo === 'rua'" class="p-4">
     <template x-if="entregaAtual">
       <div class="bg-gray-900 rounded-3xl p-5 border border-gray-800 space-y-5 shadow-2xl">
         
-        <!-- Topo do Card: Número, Sacola e Código de Rastreio em Destaque -->
         <div class="flex justify-between items-start border-b border-gray-800 pb-4 gap-2">
           <div class="flex items-center gap-3">
             <span class="bg-orange-600 text-white font-black text-4xl px-4 py-1.5 rounded-2xl shadow-lg font-mono" 
@@ -177,7 +226,6 @@
             </div>
           </div>
           
-          <!-- Código de Rastreio com Fonte Maior para Conferência Rápida -->
           <div class="text-right">
             <span class="text-xs text-gray-400 font-bold block uppercase tracking-wider text-[10px]">Rastreio SPX:</span>
             <span class="text-sm bg-gray-800 text-orange-400 border border-gray-700 font-mono font-black px-2.5 py-1 rounded-lg tracking-wider inline-block mt-0.5" 
@@ -185,13 +233,12 @@
           </div>
         </div>
 
-        <!-- Alerta de Parada com Múltiplos Pacotes (Texto Ampliado) -->
+        <!-- Alerta de Parada com Múltiplos Pacotes -->
         <div x-show="pacotesMesmoLocal.length > 1" 
              class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2">
           <p class="text-sm font-black text-yellow-400 flex items-center gap-2">
             <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="underline text-base" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTE LOCAL!
           </p>
-          <p class="text-xs text-gray-300 font-medium">Bipe/entregue todos de uma vez antes de sair:</p>
           <div class="flex flex-wrap gap-1.5 pt-1">
             <template x-for="p in pacotesMesmoLocal" :key="p.id">
               <span class="bg-yellow-500/20 text-yellow-300 text-xs font-mono font-bold px-2.5 py-1 rounded-lg border border-yellow-500/40" 
@@ -200,14 +247,14 @@
           </div>
         </div>
 
-        <!-- Endereço com Máxima Legibilidade -->
+        <!-- Endereço -->
         <div class="space-y-1.5">
           <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
           <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
           <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
         </div>
 
-        <!-- Botões Gigantes de Waze e Google Maps -->
+        <!-- Botões Waze e Google Maps -->
         <div class="grid grid-cols-2 gap-3 pt-2">
           <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
              class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
@@ -219,7 +266,7 @@
           </a>
         </div>
 
-        <!-- Botões de Ação Final da Parada -->
+        <!-- Botões de Ação -->
         <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
           <button @click="atualizarStatus(entregaAtual.id, 'ausente')" 
                   class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
@@ -365,11 +412,18 @@
         rotasHistorico: [],
         rotaAtivaId: null,
 
+        // Variáveis do Instalador PWA
+        mostrarPopupInstalar: false,
+        deferredPrompt: null,
+        isStandalone: false,
+        isIOS: false,
+
         DIRECTUS_URL: 'https://banco.studiotesta.com.br',
         N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
 
         async init() {
           await this.carregarUltimaRota();
+          this.checarInstalacaoPWA();
 
           // SUPORTE AO "ABRIR COM DRIVE XPS" DO ANDROID
           if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
@@ -381,6 +435,53 @@
               this.processarArquivoDireto(file);
             });
           }
+        },
+
+        checarInstalacaoPWA() {
+          // Detecta se já está rodando em modo aplicativo instalado (Tela Cheia)
+          this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+          
+          // Detecta se é iOS
+          const userAgent = window.navigator.userAgent.toLowerCase();
+          this.isIOS = /iphone|ipad|ipod/.test(userAgent);
+
+          // Se já está instalado, não incomoda o motorista
+          if (this.isStandalone) {
+            this.mostrarPopupInstalar = false;
+            return;
+          }
+
+          // Se for Android/Chrome, escuta o evento de instalação
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            this.deferredPrompt = e;
+            // Se o motorista não fechou o aviso antes, exibe o popup
+            if (!localStorage.getItem('pwa_prompt_dispensado')) {
+              this.mostrarPopupInstalar = true;
+            }
+          });
+
+          // Se for iOS e não estiver instalado, sugere após 2 segundos
+          if (this.isIOS && !this.isStandalone && !localStorage.getItem('pwa_prompt_dispensado')) {
+            setTimeout(() => { this.mostrarPopupInstalar = true; }, 2000);
+          }
+        },
+
+        async instalarPWA() {
+          if (!this.deferredPrompt) return;
+          this.deferredPrompt.prompt();
+          const { outcome } = await this.deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            console.log('Motorista instalou o DriveXPS com sucesso!');
+          }
+          this.deferredPrompt = null;
+          this.mostrarPopupInstalar = false;
+        },
+
+        fecharPopupInstalar() {
+          this.mostrarPopupInstalar = false;
+          // Lembra que foi dispensado por 24 horas para não ser chato
+          localStorage.setItem('pwa_prompt_dispensado', 'true');
         },
 
         parseLinhasShopee(linhasMatriz) {
