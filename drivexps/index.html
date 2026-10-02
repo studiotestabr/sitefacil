@@ -5,24 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DriveXPS StudioTesta</title>
   
-  <!-- Configurações PWA Mobile (Android e iOS) -->
   <meta name="theme-color" content="#EA580C">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
   
-  <!-- Ícones e Manifesto -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
 
-  <!-- Tailwind, Alpine.js e Leitor de Código de Barras -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
 
-  <!-- Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -48,9 +44,9 @@
       <button @click="modalImportar = true" class="bg-white text-orange-600 px-2.5 py-1.5 text-xs font-black rounded-lg shadow">
         + Rota
       </button>
-      <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">📦 Carga</button>
-      <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">🚗 Rua</button>
-      <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2 py-1.5 text-xs font-bold rounded-lg">📜 Histórico</button>
+      <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">📦 Carga</button>
+      <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">🚗 Rua</button>
+      <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white' : 'bg-orange-700'" class="px-2.5 py-1.5 text-xs font-bold rounded-lg">📜</button>
     </div>
   </header>
 
@@ -82,9 +78,10 @@
         <div class="flex items-center gap-3">
           <span class="text-2xl font-black bg-gray-700 px-2.5 py-1 rounded" x-text="`#${item.ordem_entrega}`"></span>
           <div>
-            <p class="font-bold text-sm" x-text="item.destinatario"></p>
-            <p class="text-xs text-gray-400" x-text="`${item.endereco}, ${item.numero}`"></p>
-            <p class="text-[10px] text-gray-500 font-mono" x-text="item.codigo_rastreio"></p>
+            <p class="font-bold text-sm text-white" x-text="item.destinatario"></p>
+            <p class="text-xs text-gray-300" x-text="`${item.endereco}, ${item.numero}`"></p>
+            <p class="text-[11px] text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
+            <p class="text-[10px] text-orange-400 font-mono mt-0.5" x-text="item.codigo_rastreio"></p>
           </div>
         </div>
         <div class="text-right">
@@ -109,8 +106,8 @@
 
         <div>
           <h2 class="text-xl font-black text-white" x-text="entregaAtual.destinatario"></h2>
-          <p class="text-base text-gray-300 font-medium" x-text="`${entregaAtual.endereco}, ${entregaAtual.numero}`"></p>
-          <p class="text-sm text-gray-400" x-text="`${entregaAtual.bairro || ''} - ${entregaAtual.cidade || ''}`"></p>
+          <p class="text-base text-gray-200 font-medium" x-text="`${entregaAtual.endereco}, ${entregaAtual.numero}`"></p>
+          <p class="text-sm text-gray-400" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade} (${entregaAtual.cep || ''})`"></p>
         </div>
 
         <div class="grid grid-cols-3 gap-2 pt-2">
@@ -130,14 +127,14 @@
       <div class="text-center py-16 space-y-3">
         <span class="text-5xl">🎉</span>
         <h2 class="text-2xl font-bold" x-text="`Rota #${rotaAtivaId || ''} Concluída!`"></h2>
-        <p class="text-gray-400 text-sm">Todos os pacotes de hoje foram processados.</p>
+        <p class="text-gray-400 text-sm">Todos os pacotes foram entregues com sucesso.</p>
       </div>
     </template>
   </main>
 
   <!-- MODO 3: HISTÓRICO -->
   <main x-show="modo === 'historico'" class="p-4 space-y-4">
-    <h2 class="text-lg font-black text-orange-500">📜 Histórico de Rotas Entregues</h2>
+    <h2 class="text-lg font-black text-orange-500">📜 Histórico de Rotas</h2>
     <div class="space-y-3">
       <template x-for="r in rotasHistorico" :key="r.id">
         <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 space-y-2">
@@ -156,7 +153,7 @@
     </div>
   </main>
 
-  <!-- MODAL: BIPAR PACOTE (Leitor de Código de Barras / QR Code) -->
+  <!-- MODAL: BIPAR PACOTE -->
   <div x-show="modalScanner" class="fixed inset-0 bg-black/90 z-50 flex flex-col p-4" x-cloak>
     <div class="flex justify-between items-center mb-3">
       <div>
@@ -166,12 +163,10 @@
       <button @click="fecharScanner()" class="text-gray-400 text-3xl font-bold">&times;</button>
     </div>
 
-    <!-- Área da Câmera -->
     <div class="flex-1 flex flex-col items-center justify-center">
       <div id="reader" class="w-full max-w-sm rounded-xl overflow-hidden border-2 border-orange-500 bg-black"></div>
     </div>
 
-    <!-- Card de Pacote Encontrado -->
     <div x-show="pacoteEscaneado" class="bg-gray-800 p-4 rounded-xl border border-green-500 mt-3 space-y-2 animate-bounce">
       <div class="flex justify-between items-center">
         <span class="text-2xl font-black text-orange-500" x-text="`#${pacoteEscaneado?.ordem_entrega}`"></span>
@@ -187,51 +182,59 @@
     </div>
   </div>
 
-  <!-- MODAL: IMPORTAR ROTA (Com Abas de Prints e Colar Texto) -->
+  <!-- MODAL: IMPORTAR ROTA (PLANILHA CSV / PRINTS / TEXTO) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" x-cloak>
     <div class="bg-gray-800 rounded-2xl w-full max-w-lg border border-gray-700 p-5 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-700 pb-3">
         <div>
           <h2 class="font-black text-lg text-orange-500">MANDA SUAS PARADAS</h2>
-          <p class="text-xs text-gray-400">Importador Inteligente Shopee</p>
+          <p class="text-xs text-gray-400">Importador de Romaneios Shopee</p>
         </div>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl">&times;</button>
       </div>
 
-      <div class="space-y-1.5">
-        <label class="text-xs font-bold text-gray-300">Cidade Trava (Mongaguá, Praia Grande, etc.):</label>
-        <input type="text" x-model="cidadePadrao" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs text-white">
-      </div>
-
-      <!-- Abas: Prints vs Colar Texto -->
-      <div class="flex border-b border-gray-700 text-sm font-bold">
-        <button @click="tipoEnvio = 'prints'" :class="tipoEnvio === 'prints' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
-          📸 Subir Prints
+      <!-- Abas de Importação -->
+      <div class="flex border-b border-gray-700 text-xs font-bold">
+        <button @click="tipoEnvio = 'csv'" :class="tipoEnvio === 'csv' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📊 Planilha CSV
         </button>
         <button @click="tipoEnvio = 'texto'" :class="tipoEnvio === 'texto' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
-          📄 Colar Texto
+          📄 Colar Texto/CSV
+        </button>
+        <button @click="tipoEnvio = 'prints'" :class="tipoEnvio === 'prints' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2 text-center">
+          📸 Prints
         </button>
       </div>
 
-      <!-- ABA 1: PRINTS -->
+      <!-- ABA 1: ARQUIVO CSV DA SHOPEE -->
+      <div x-show="tipoEnvio === 'csv'" class="space-y-3">
+        <label class="block border-2 border-dashed border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-orange-500">
+          <span class="text-3xl block mb-2">📊</span>
+          <span class="text-sm font-bold block text-gray-200">Selecionar arquivo CSV da Shopee</span>
+          <span class="text-xs text-gray-400 block mt-1">Carrega todas as paradas com GPS exato</span>
+          <input type="file" accept=".csv, .txt" @change="arquivoCSV = $event.target.files[0]" class="hidden">
+        </label>
+        <p x-show="arquivoCSV" class="text-xs text-green-400 font-bold text-center" x-text="`Arquivo selecionado: ${arquivoCSV?.name}`"></p>
+      </div>
+
+      <!-- ABA 2: COLAR TEXTO / CSV -->
+      <div x-show="tipoEnvio === 'texto'" class="space-y-2">
+        <textarea x-model="textoRomaneio" rows="7" placeholder="Cole aqui o conteúdo da planilha CSV da Shopee ou a lista do WhatsApp..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-white font-mono"></textarea>
+      </div>
+
+      <!-- ABA 3: PRINTS -->
       <div x-show="tipoEnvio === 'prints'" class="space-y-2">
         <label class="block border-2 border-dashed border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-orange-500">
           <span class="text-3xl block mb-2">📸</span>
-          <span class="text-sm font-bold block text-gray-200">Selecionar Prints do SPX</span>
-          <span class="text-xs text-gray-400 block mt-1">Pode selecionar múltiplos prints da lista</span>
+          <span class="text-sm font-bold block text-gray-200">Selecionar Prints do SPX Driver</span>
           <input type="file" multiple accept="image/*" @change="arquivosFotos = $event.target.files" class="hidden">
         </label>
         <p x-show="arquivosFotos.length > 0" class="text-xs text-green-400 font-bold text-center" x-text="`${arquivosFotos.length} imagem(ns) selecionada(s)`"></p>
       </div>
 
-      <!-- ABA 2: COLAR TEXTO -->
-      <div x-show="tipoEnvio === 'texto'" class="space-y-2">
-        <textarea x-model="textoRomaneio" rows="6" placeholder="Cole aqui a lista de endereços copiada do app da Shopee ou WhatsApp do CD..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-white font-mono"></textarea>
-      </div>
-
       <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 text-white font-black py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg disabled:opacity-50">
         <span x-show="!carregandoProcesso">🚀 Otimizar Rota Partindo do CD</span>
-        <span x-show="carregandoProcesso">⏳ Otimizando Trajeto...</span>
+        <span x-show="carregandoProcesso">⏳ Processando Rota...</span>
       </button>
     </div>
   </div>
@@ -273,11 +276,11 @@
         modalImportar: false,
         modalCD: false,
         modalScanner: false,
-        tipoEnvio: 'prints',
+        tipoEnvio: 'csv',
         textoRomaneio: '',
-        cidadePadrao: localStorage.getItem('cidade_padrao') || 'Mongaguá, SP',
-        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1085,"lng":-46.6432}'),
-        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.0915,"lng":-46.6190}'),
+        arquivoCSV: null,
+        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
+        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.1739,"lng":-46.7816}'),
         arquivosFotos: [],
         carregandoProcesso: false,
         entregas: [],
@@ -302,7 +305,7 @@
             osc.connect(gain);
             gain.connect(this.audioCtx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, this.audioCtx.currentTime); // 880Hz (Lá agudo)
+            osc.frequency.setValueAtTime(880, this.audioCtx.currentTime);
             gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
             osc.start();
             osc.stop(this.audioCtx.currentTime + 0.12);
@@ -414,15 +417,19 @@
         async enviarParaN8N() {
           this.carregandoProcesso = true;
           const formData = new FormData();
-          formData.append('cidade', this.cidadePadrao);
           formData.append('cd_lat', this.cd.lat);
           formData.append('cd_lng', this.cd.lng);
           formData.append('casa_lat', this.casa.lat);
           formData.append('casa_lng', this.casa.lng);
 
-          if (this.tipoEnvio === 'texto') {
+          if (this.tipoEnvio === 'csv' && this.arquivoCSV) {
+            formData.append('tipo', 'csv');
+            formData.append('arquivo_csv', this.arquivoCSV);
+          } else if (this.tipoEnvio === 'texto') {
+            formData.append('tipo', 'texto');
             formData.append('texto', this.textoRomaneio);
           } else {
+            formData.append('tipo', 'prints');
             for (let i = 0; i < this.arquivosFotos.length; i++) {
               formData.append('arquivos', this.arquivosFotos[i]);
             }
@@ -433,9 +440,12 @@
             if (res.ok) {
               this.modalImportar = false;
               this.textoRomaneio = '';
+              this.arquivoCSV = null;
               this.arquivosFotos = [];
               await this.carregarUltimaRota();
               this.modo = 'carregamento';
+            } else {
+              alert('Erro no n8n.');
             }
           } catch(e) {
             alert('Falha: ' + e.message);
