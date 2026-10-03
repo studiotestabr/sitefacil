@@ -20,7 +20,15 @@
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+  <!-- Captura Global do Evento de Instalação PWA (Sem perder o timing) -->
   <script>
+    window.pwaDeferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.pwaDeferredPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-pronto-para-instalar'));
+    });
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
@@ -90,7 +98,7 @@
   </div>
 
   <!-- POPUP DE INSTALAÇÃO DO APP (MODAL PWA) -->
-  <div x-show="mostrarPopupInstalar && usuarioLogado" 
+  <div x-show="mostrarPopupInstalar" 
        x-transition:enter="transition ease-out duration-300"
        x-transition:enter-start="opacity-0 translate-y-10 scale-95"
        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -103,14 +111,14 @@
       <div class="space-y-1.5">
         <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Instale o app para ter tela cheia no Uno e navegação rápida sem barras de navegador.
+          Instale o app para ter tela cheia no Uno e resposta mais rápida no trânsito.
         </p>
       </div>
       <div class="space-y-2 pt-1">
         <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition">
           📲 Instalar Aplicativo Agora
         </button>
-        <button @click="fecharPopupInstalar()" class="text-xs text-gray-400 font-bold py-1">
+        <button @click="mostrarPopupInstalar = false" class="text-xs text-gray-400 font-bold py-1">
           Continuar no navegador
         </button>
       </div>
@@ -127,10 +135,10 @@
             🚪 Sair
           </button>
           <h1 class="font-black text-2xl tracking-wider text-white drop-shadow-sm">DriveXPS</h1>
-          <button x-show="deferredPrompt && !isStandalone" @click="mostrarPopupInstalar = true" class="text-xs bg-black/40 text-white px-2 py-0.5 rounded-md font-bold text-[10px]">
-            📲 App
+          <button x-show="temPromptInstalacao && !isStandalone" @click="mostrarPopupInstalar = true" class="text-xs bg-black/40 text-white px-2 py-0.5 rounded-md font-bold text-[10px]">
+            📲 Instalar
           </button>
-          <div x-show="!deferredPrompt || isStandalone" class="w-8"></div>
+          <div x-show="!temPromptInstalacao || isStandalone" class="w-8"></div>
         </div>
 
         <div class="flex justify-between items-center text-xs font-bold px-1 border-t border-orange-500/60 pt-2">
@@ -354,6 +362,7 @@
         </button>
       </div>
 
+      <!-- Aba 1: Arquivo -->
       <div x-show="abaImport === 'arquivo'" class="space-y-3">
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
           <span class="text-4xl block mb-2">📊</span>
@@ -364,10 +373,12 @@
         <p x-show="nomeArquivo" class="text-xs text-orange-400 font-bold text-center" x-text="`Arquivo: ${nomeArquivo}`"></p>
       </div>
 
+      <!-- Aba 2: Colar Texto -->
       <div x-show="abaImport === 'texto'" class="space-y-2">
         <textarea x-model="textoColado" @input="processarTextoAoDigitar()" rows="7" placeholder="Cole aqui o texto do romaneio da Shopee..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white font-mono focus:border-orange-500 focus:outline-none"></textarea>
       </div>
 
+      <!-- Status de Reconhecimento -->
       <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/15 border border-green-500/40 rounded-2xl p-3.5 text-center space-y-1">
         <p class="text-sm text-green-400 font-black" x-text="`✅ ${pacotesExtraidos.length} PACOTES COM GPS DA SHOPEE!`"></p>
         <p class="text-xs text-gray-300 font-medium" x-text="`Carga dividida em ${Math.ceil(pacotesExtraidos.length / 10)} sacolas de 10 pacotes.`"></p>
@@ -436,7 +447,7 @@
         usuarioId: localStorage.getItem('directus_user_id') || null,
 
         mostrarPopupInstalar: false,
-        deferredPrompt: null,
+        temPromptInstalacao: false,
         isStandalone: false,
         isIOS: false,
 
@@ -445,10 +456,10 @@
 
         async init() {
           await this.verificarAutenticacao();
+          this.checarInstalacaoPWA();
 
           if (this.usuarioLogado) {
             await this.carregarUltimaRota();
-            this.checarInstalacaoPWA();
 
             if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
               launchQueue.setConsumer(async (launchParams) => {
@@ -463,7 +474,6 @@
         },
 
         async verificarAutenticacao() {
-          // SE O MOTORISTA CLICOU EM SAIR, NUNCA AUTOLOGA SOZINHO!
           if (localStorage.getItem('usuario_deslogado') === 'true') {
             this.usuarioLogado = false;
             return;
@@ -473,7 +483,6 @@
             window.history.replaceState({}, document.title, window.location.pathname);
           }
 
-          // 1. Valida Token local se houver
           if (this.tokenAcesso) {
             try {
               const res = await fetch(`${this.DIRECTUS_URL}/users/me`, {
@@ -489,7 +498,6 @@
             } catch(e) {}
           }
 
-          // 2. Valida Sessão do Cookie (Google SSO)
           try {
             const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, {
               credentials: 'include'
@@ -510,27 +518,22 @@
         },
 
         loginGoogle() {
-          // Libera a trava de logout ao clicar intencionalmente para entrar
           localStorage.removeItem('usuario_deslogado');
           const urlLimpa = window.location.origin + window.location.pathname;
           window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
         },
 
-        // LOGOUT DEFINITIVO (SEM RECARREGAMENTO E SEM LOOP)
         async deslogar() {
-          // 1. Marca imediatamente a trava de logout
           localStorage.setItem('usuario_deslogado', 'true');
           localStorage.removeItem('directus_token');
           localStorage.removeItem('directus_user_id');
 
-          // 2. Limpa o estado da tela instantaneamente
           this.tokenAcesso = null;
           this.usuarioId = null;
           this.usuarioLogado = false;
           this.entregas = [];
           this.rotaAtivaId = null;
 
-          // 3. Avisa o Directus para matar a sessão
           try {
             await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
               method: 'POST',
@@ -540,7 +543,6 @@
             });
           } catch(e) {}
 
-          // 4. Força expiração dos cookies
           document.cookie = "directus_session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=studiotesta.com.br;";
           document.cookie = "directus_session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         },
@@ -562,26 +564,24 @@
             return;
           }
 
-          window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            this.deferredPrompt = e;
-            if (!localStorage.getItem('pwa_prompt_dispensado')) {
-              this.mostrarPopupInstalar = true;
-            }
+          if (window.pwaDeferredPrompt) {
+            this.temPromptInstalacao = true;
+          }
+
+          window.addEventListener('pwa-pronto-para-instalar', () => {
+            this.temPromptInstalacao = true;
+            this.mostrarPopupInstalar = true;
           });
         },
 
         async instalarPWA() {
-          if (!this.deferredPrompt) return;
-          this.deferredPrompt.prompt();
-          await this.deferredPrompt.userChoice;
-          this.deferredPrompt = null;
+          const prompt = window.pwaDeferredPrompt;
+          if (!prompt) return;
+          prompt.prompt();
+          await prompt.userChoice;
+          window.pwaDeferredPrompt = null;
+          this.temPromptInstalacao = false;
           this.mostrarPopupInstalar = false;
-        },
-
-        fecharPopupInstalar() {
-          this.mostrarPopupInstalar = false;
-          localStorage.setItem('pwa_prompt_dispensado', 'true');
         },
 
         parseLinhasShopee(linhasMatriz) {
@@ -719,6 +719,7 @@
           this.pacotesExtraidos = this.parseLinhasShopee(linhas);
         },
 
+        // Carrega a rota garantindo a identificação do dono
         async carregarUltimaRota() {
           try {
             const headers = {};
@@ -729,20 +730,32 @@
               credentials: 'include'
             });
             const dataRota = await resRota.json();
+            
             if (dataRota.data && dataRota.data.length > 0) {
               this.rotaAtivaId = dataRota.data[0].id;
-              const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${this.rotaAtivaId}&sort=ordem_entrega&limit=300`, {
-                headers,
-                credentials: 'include'
-              });
-              const data = await res.json();
-              this.entregas = data.data || [];
+              await this.carregarEntregasPorId(this.rotaAtivaId);
             } else {
               this.entregas = [];
               this.rotaAtivaId = null;
             }
           } catch(e) {
             console.error('Erro ao carregar rota:', e);
+          }
+        },
+
+        async carregarEntregasPorId(rotaId) {
+          try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+            const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`, {
+              headers,
+              credentials: 'include'
+            });
+            const data = await res.json();
+            this.entregas = data.data || [];
+          } catch(e) {
+            console.error('Erro ao buscar entregas:', e);
           }
         },
 
@@ -756,22 +769,14 @@
               headers,
               credentials: 'include'
             });
-            const dataRota = await resRota.json();
-            this.rotasHistorico = dataRota.data || [];
+            const data = await resRota.json();
+            this.rotasHistorico = data.data || [];
           } catch(e) {}
         },
 
         async selecionarRotaHistorico(rotaId) {
           this.rotaAtivaId = rotaId;
-          const headers = {};
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-
-          const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`, {
-            headers,
-            credentials: 'include'
-          });
-          const data = await res.json();
-          this.entregas = data.data || [];
+          await this.carregarEntregasPorId(rotaId);
           this.modo = 'carregamento';
         },
 
@@ -840,9 +845,19 @@
         async enviarParaN8N() {
           this.carregandoProcesso = true;
           try {
+            // Garante que o ID do motorista logado seja capturado antes do envio
+            if (!this.usuarioId) {
+              const u = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
+              const ud = await u.json();
+              if (ud?.data?.id) {
+                this.usuarioId = ud.data.id;
+                localStorage.setItem('directus_user_id', this.usuarioId);
+              }
+            }
+
             const payload = {
               entregas: this.pacotesExtraidos,
-              user_id: this.usuarioId,
+              user_id: this.usuarioId, // Amarra a rota ao motorista logado!
               cd_lat: this.cd.lat,
               cd_lng: this.cd.lng,
               casa_lat: this.casa.lat,
@@ -856,14 +871,23 @@
             });
 
             if (res.ok) {
+              const resJson = await res.json();
               this.modalImportar = false;
               this.pacotesExtraidos = [];
               this.textoColado = '';
               this.nomeArquivo = '';
-              await this.carregarUltimaRota();
+
+              // Se o n8n devolveu o ID da rota gerada, busca direto por ele!
+              if (resJson && resJson.rota_id) {
+                this.rotaAtivaId = resJson.rota_id;
+                await this.carregarEntregasPorId(this.rotaAtivaId);
+              } else {
+                await this.carregarUltimaRota();
+              }
+
               this.modo = 'carregamento';
             } else {
-              alert('Erro no n8n.');
+              alert('Erro no n8n ao gerar rota.');
             }
           } catch(e) {
             alert('Falha na comunicação: ' + e.message);
