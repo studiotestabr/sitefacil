@@ -32,10 +32,11 @@
 </head>
 <body class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between" x-data="entregaApp()">
 
-  <!-- TELA DE LOGIN MINIMALISTA SAAS -->
+  <!-- TELA DE LOGIN MINIMALISTA SAAS (100% GOOGLE) -->
   <div x-show="!usuarioLogado" class="fixed inset-0 bg-gray-950 z-50 flex flex-col items-center justify-between p-6">
     <div class="w-full"></div>
 
+    <!-- Card Central de Login -->
     <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center">
       <div class="flex justify-center">
         <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
@@ -354,6 +355,7 @@
         </button>
       </div>
 
+      <!-- Aba 1: Arquivo -->
       <div x-show="abaImport === 'arquivo'" class="space-y-3">
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
           <span class="text-4xl block mb-2">📊</span>
@@ -364,10 +366,12 @@
         <p x-show="nomeArquivo" class="text-xs text-orange-400 font-bold text-center" x-text="`Arquivo: ${nomeArquivo}`"></p>
       </div>
 
+      <!-- Aba 2: Colar Texto -->
       <div x-show="abaImport === 'texto'" class="space-y-2">
         <textarea x-model="textoColado" @input="processarTextoAoDigitar()" rows="7" placeholder="Cole aqui o texto do romaneio da Shopee..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white font-mono focus:border-orange-500 focus:outline-none"></textarea>
       </div>
 
+      <!-- Status de Reconhecimento -->
       <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/15 border border-green-500/40 rounded-2xl p-3.5 text-center space-y-1">
         <p class="text-sm text-green-400 font-black" x-text="`✅ ${pacotesExtraidos.length} PACOTES COM GPS DA SHOPEE!`"></p>
         <p class="text-xs text-gray-300 font-medium" x-text="`Carga dividida em ${Math.ceil(pacotesExtraidos.length / 10)} sacolas de 10 pacotes.`"></p>
@@ -463,6 +467,11 @@
         },
 
         async verificarAutenticacao() {
+          // Limpa qualquer erro antigo grudado na barra de endereço
+          if (window.location.search) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
           // 1. Valida Token local se houver
           if (this.tokenAcesso) {
             try {
@@ -494,7 +503,9 @@
                 return;
               }
             }
-          } catch(e) {}
+          } catch(e) {
+            console.log('Sem sessão ativa via cookie');
+          }
 
           // 3. Fallback refresh
           try {
@@ -527,15 +538,15 @@
           this.usuarioLogado = false;
         },
 
+        // Redireciona sempre para URL 100% limpa (sem erros antigos grudados)
         loginGoogle() {
-          const redirectUrl = encodeURIComponent(window.location.href);
-          window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${redirectUrl}`;
+          const urlLimpa = window.location.origin + window.location.pathname;
+          window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
         },
 
-        // LOGOUT REAL E DEFINITIVO (DESTROI A SESSÃO NO SERVIDOR E NO NAVEGADOR)
+        // LOGOUT REAL E DEFINITIVO
         async deslogar() {
           try {
-            // 1. Destrói a sessão oficial no Directus
             await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
               method: 'POST',
               credentials: 'include',
@@ -545,7 +556,6 @@
             console.log('Logout efetuado');
           }
 
-          // 2. Limpa todos os dados armazenados
           localStorage.removeItem('directus_token');
           localStorage.removeItem('directus_user_id');
           this.tokenAcesso = null;
@@ -554,12 +564,10 @@
           this.entregas = [];
           this.rotaAtivaId = null;
 
-          // 3. Força a expiração dos cookies no navegador
           document.cookie = "directus_session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=studiotesta.com.br;";
           document.cookie = "directus_session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-          // 4. Recarrega a página limpa
-          window.location.href = window.location.pathname;
+          window.location.href = window.location.origin + window.location.pathname;
         },
 
         getFaixaPacotes(ordem) {
