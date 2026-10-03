@@ -20,7 +20,6 @@
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- Captura Global do Evento de Instalação PWA (Sem perder o timing) -->
   <script>
     window.pwaDeferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -308,12 +307,12 @@
         </template>
       </main>
 
-      <!-- MODO 3: HISTÓRICO -->
+      <!-- MODO 3: HISTÓRICO COM BOTÃO DE EXCLUIR DEFINITIVO -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4">
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
           <template x-for="r in rotasHistorico" :key="r.id">
-            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 space-y-2.5">
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 space-y-3 shadow-md">
               <div class="flex justify-between items-center">
                 <div>
                   <span class="text-base font-black text-white" x-text="`Rota #${r.id}`"></span>
@@ -321,9 +320,18 @@
                 </div>
                 <span class="text-xs bg-orange-600/20 text-orange-400 border border-orange-500/30 px-3 py-1 rounded-full font-bold" x-text="`${r.total_pacotes || 0} pacotes`"></span>
               </div>
-              <button @click="selecionarRotaHistorico(r.id)" class="w-full bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700">
-                Reabrir Detalhes Desta Rota
-              </button>
+              
+              <!-- Linha de Ações: Reabrir Rota + Lixeira Vermelha -->
+              <div class="flex items-center gap-2 pt-1">
+                <button @click="selecionarRotaHistorico(r.id)" class="flex-1 bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700 active:scale-95 transition">
+                  Reabrir Detalhes Desta Rota
+                </button>
+                <button @click="apagarRota(r.id)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 p-3 rounded-xl active:scale-95 transition flex items-center justify-center shrink-0" title="Apagar Rota e Pacotes do Banco">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </template>
         </div>
@@ -719,7 +727,6 @@
           this.pacotesExtraidos = this.parseLinhasShopee(linhas);
         },
 
-        // Carrega a rota garantindo a identificação do dono
         async carregarUltimaRota() {
           try {
             const headers = {};
@@ -778,6 +785,43 @@
           this.rotaAtivaId = rotaId;
           await this.carregarEntregasPorId(rotaId);
           this.modo = 'carregamento';
+        },
+
+        // DELEÇÃO DEFINITIVA NO BANCO (ROTAS + ENTREGAS VIA CASCADE)
+        async apagarRota(rotaId) {
+          if (!confirm(`Deseja realmente apagar a Rota #${rotaId} e todos os seus pacotes do banco de dados? Esta ação não pode ser desfeita.`)) {
+            return;
+          }
+
+          try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+            const res = await fetch(`${this.DIRECTUS_URL}/items/rotas/${rotaId}`, {
+              method: 'DELETE',
+              headers,
+              credentials: 'include'
+            });
+
+            if (res.ok || res.status === 204) {
+              // 1. Remove visualmente da lista do histórico
+              this.rotasHistorico = this.rotasHistorico.filter(r => r.id !== rotaId);
+
+              // 2. Se a rota apagada for a que estava aberta na tela, limpa tudo
+              if (this.rotaAtivaId === rotaId) {
+                this.rotaAtivaId = null;
+                this.entregas = [];
+                await this.carregarUltimaRota();
+              }
+
+              alert(`Rota #${rotaId} e todos os pacotes foram apagados do banco de dados com sucesso!`);
+            } else {
+              const errData = await res.json().catch(() => ({}));
+              alert('Erro ao apagar rota: ' + (errData?.errors?.[0]?.message || 'Verifique as permissões de Delete no Directus.'));
+            }
+          } catch(e) {
+            alert('Falha na comunicação: ' + e.message);
+          }
         },
 
         capturarLocalizacao(tipo) {
@@ -845,7 +889,6 @@
         async enviarParaN8N() {
           this.carregandoProcesso = true;
           try {
-            // Garante que o ID do motorista logado seja capturado antes do envio
             if (!this.usuarioId) {
               const u = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
               const ud = await u.json();
@@ -857,7 +900,7 @@
 
             const payload = {
               entregas: this.pacotesExtraidos,
-              user_id: this.usuarioId, // Amarra a rota ao motorista logado!
+              user_id: this.usuarioId,
               cd_lat: this.cd.lat,
               cd_lng: this.cd.lng,
               casa_lat: this.casa.lat,
@@ -877,7 +920,6 @@
               this.textoColado = '';
               this.nomeArquivo = '';
 
-              // Se o n8n devolveu o ID da rota gerada, busca direto por ele!
               if (resJson && resJson.rota_id) {
                 this.rotaAtivaId = resJson.rota_id;
                 await this.carregarEntregasPorId(this.rotaAtivaId);
