@@ -51,14 +51,14 @@
       <div class="space-y-1.5">
         <h2 class="text-3xl font-black text-white tracking-wide">DriveXPS</h2>
         <p class="text-xs text-gray-400 font-medium leading-relaxed">
-          Roteirizador de alta precisão para entregadores Shopee Express.
+          Roteirizador contínuo fiel às etiquetas oficiais da Shopee Express.
         </p>
       </div>
 
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
         <div class="flex items-center gap-2">
-          <span class="text-orange-500">⚡</span>
-          <span>Roteirização com GPS oficial da Shopee</span>
+          <span class="text-orange-500">🏷️</span>
+          <span>Identificação por <strong>Ordem</strong> e <strong>Parada</strong> da caixa</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="text-orange-500">👜</span>
@@ -66,12 +66,12 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="text-orange-500">🚗</span>
-          <span>Menos tempo na rua e economia de gasolina</span>
+          <span>Rota contínua: sem ziguezague e economia de combustível</span>
         </div>
       </div>
 
       <button @click="loginGoogle()" 
-              class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl shadow-white/5 active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
+              class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
         <svg class="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -86,41 +86,13 @@
       </p>
     </div>
 
-    <!-- Assinatura StudioTesta no Rodapé da Tela de Login -->
+    <!-- Assinatura StudioTesta -->
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" 
          class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">
         STUDIOTESTA
       </a>
-    </div>
-  </div>
-
-  <!-- POPUP DE INSTALAÇÃO DO APP (MODAL PWA) -->
-  <div x-show="mostrarPopupInstalar" 
-       x-transition:enter="transition ease-out duration-300"
-       x-transition:enter-start="opacity-0 translate-y-10 scale-95"
-       x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-       class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
-    
-    <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
-      <div class="flex justify-center">
-        <img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700">
-      </div>
-      <div class="space-y-1.5">
-        <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">
-          Instale o app para ter tela cheia no Uno e resposta mais rápida no trânsito.
-        </p>
-      </div>
-      <div class="space-y-2 pt-1">
-        <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition">
-          📲 Instalar Aplicativo Agora
-        </button>
-        <button @click="mostrarPopupInstalar = false" class="text-xs text-gray-400 font-bold py-1">
-          Continuar no navegador
-        </button>
-      </div>
     </div>
   </div>
 
@@ -134,7 +106,7 @@
             🚪 Sair
           </button>
           <h1 class="font-black text-2xl tracking-wider text-white drop-shadow-sm">DriveXPS</h1>
-          <button x-show="temPromptInstalacao && !isStandalone" @click="mostrarPopupInstalar = true" class="text-xs bg-black/40 text-white px-2 py-0.5 rounded-md font-bold text-[10px]">
+          <button x-show="temPromptInstalacao && !isStandalone" @click="instalarPWA()" class="text-xs bg-black/40 text-white px-2 py-0.5 rounded-md font-bold text-[10px]">
             📲 Instalar
           </button>
           <div x-show="!temPromptInstalacao || isStandalone" class="w-8"></div>
@@ -193,105 +165,145 @@
         </button>
       </section>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 -->
+      <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 (CLIQUE PARA IR À RUA) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5">
-            <span>👜</span> MÉTODO DAS SACOLAS (10 EM 10)
+            <span>👜</span> GUIA DE SACOLAS (ORDEM E PARADA DA ETIQUETA)
           </p>
           <p class="text-gray-300 text-xs leading-relaxed">
-            Marque o número grande no pacote com canetão (<strong>#1 a #<span x-text="entregas.length"></span></strong>) e guarde direto na Sacola correspondente.
+            Localize a caixa pela <strong>Ordem</strong> ou <strong>Parada</strong> impressa na etiqueta física. <em>(Toque em qualquer card para navegar direto no Waze).</em>
           </p>
         </div>
 
         <div class="space-y-3">
           <template x-for="item in entregas" :key="item.id">
-            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-md space-y-2.5 transition-all"
+            <!-- Ao tocar no card, abre a entrega na tela da Rua imediatamente -->
+            <div @click="irParaEntregaDireta(item)"
+                 class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-md space-y-2.5 transition-all cursor-pointer active:scale-98"
                  :class="{
                    'opacity-20 line-through bg-black border-gray-900': item.status === 'entregue',
-                   'border-l-4 border-l-orange-500': item.status !== 'entregue'
+                   'border-l-4 border-l-orange-500 hover:border-orange-400': item.status !== 'entregue'
                  }">
               
+              <!-- Linha 1: Dados Oficiais da Etiqueta Física (Parada e Ordem) -->
               <div class="flex items-center justify-between border-b border-gray-800/80 pb-2.5">
                 <div class="flex items-center gap-2">
-                  <span class="text-3xl font-black text-orange-500 font-mono tracking-tight" x-text="`#${item.ordem_entrega}`"></span>
-                  <span x-show="item.total_no_local > 1" class="text-[11px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-0.5 rounded-md font-black" x-text="`${item.total_no_local} PACOTES NESTE LOCAL`"></span>
+                  <div class="bg-orange-600/20 border border-orange-500/40 px-2.5 py-1 rounded-xl text-center">
+                    <span class="text-[10px] text-orange-400 uppercase font-bold block leading-none">Parada</span>
+                    <span class="text-xl font-black text-orange-400 font-mono leading-tight" x-text="item.parada_shopee || item.ordem_entrega"></span>
+                  </div>
+                  <div class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-xl text-center">
+                    <span class="text-[10px] text-gray-400 uppercase font-bold block leading-none">Ordem</span>
+                    <span class="text-xl font-black text-white font-mono leading-tight" x-text="item.ordem_shopee || item.ordem_entrega"></span>
+                  </div>
+                  <span x-show="item.total_no_local > 1" 
+                        class="text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded-lg font-black" 
+                        x-text="`${item.total_no_local} PACOTES`"></span>
                 </div>
                 
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-orange-600/25 text-orange-400 border border-orange-500/40 uppercase tracking-wide font-mono" x-text="`SACOLA ${Math.ceil(item.ordem_entrega / 10)}`"></span>
-                  <span class="text-xs font-bold text-gray-300 bg-gray-800 px-2.5 py-1 rounded-lg border border-gray-700/80 font-mono" x-text="getFaixaPacotes(item.ordem_entrega)"></span>
+                <!-- Sacola correspondente (10 em 10) -->
+                <div class="text-right">
+                  <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-orange-600/25 text-orange-400 border border-orange-500/40 uppercase tracking-wide font-mono block" 
+                        x-text="`SACOLA ${Math.ceil(item.ordem_entrega / 10)}`"></span>
+                  <span class="text-[10px] text-gray-400 font-mono" x-text="getFaixaPacotes(item.ordem_entrega)"></span>
                 </div>
               </div>
 
+              <!-- Linha 2: Endereço Completo -->
               <div class="space-y-0.5">
-                <h3 class="font-black text-lg text-white leading-snug break-words" x-text="item.endereco"></h3>
+                <h3 class="font-black text-base text-white leading-snug break-words" x-text="item.endereco"></h3>
                 <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
               </div>
 
+              <!-- Linha 3: Código de Rastreio -->
               <div class="flex items-center justify-between pt-1 border-t border-gray-800/50 text-xs">
-                <span class="text-gray-500 font-medium">Código Rastreio SPX:</span>
-                <span class="font-mono font-black text-sm text-orange-400 bg-gray-950 px-3 py-1 rounded-md border border-gray-800 tracking-wider" x-text="item.codigo_rastreio"></span>
+                <span class="text-gray-500 font-medium">Rastreio SPX:</span>
+                <span class="font-mono font-black text-xs text-orange-400 bg-gray-950 px-2.5 py-0.5 rounded border border-gray-800 tracking-wider" 
+                      x-text="item.codigo_rastreio"></span>
               </div>
             </div>
           </template>
         </div>
       </main>
 
-      <!-- MODO 2: RUA (Cockpit) -->
+      <!-- MODO 2: RUA (Cockpit Fiel à Etiqueta com Waze) -->
       <main x-show="modo === 'rua'" class="p-4">
         <template x-if="entregaAtual">
           <div class="bg-gray-900 rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-              <div class="flex items-center gap-3">
-                <span class="bg-orange-600 text-white font-black text-4xl px-4 py-1.5 rounded-2xl shadow-lg font-mono" x-text="`#${entregaAtual.ordem_entrega}`"></span>
-                <div class="space-y-0.5">
-                  <span class="text-base font-black text-yellow-400 bg-yellow-500/20 px-3 py-1 rounded-lg border border-yellow-500/40 inline-block uppercase tracking-wide" x-text="`👜 SACOLA #${Math.ceil(entregaAtual.ordem_entrega / 10)}`"></span>
-                  <span class="text-xs text-gray-300 block font-bold font-mono pl-0.5" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
-                </div>
+            
+            <!-- Linha 1: Dados em Destaque da Etiqueta Física da Caixa -->
+            <div class="grid grid-cols-3 gap-2 border-b border-gray-800 pb-3 text-center">
+              <div class="bg-orange-600 text-white rounded-2xl p-2.5 shadow-md">
+                <span class="text-[10px] uppercase font-bold tracking-wider block opacity-90">PARADA</span>
+                <span class="text-3xl font-black font-mono leading-none" x-text="entregaAtual.parada_shopee || entregaAtual.ordem_entrega"></span>
+              </div>
+
+              <div class="bg-gray-800 border border-gray-700 rounded-2xl p-2.5">
+                <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider block">ORDEM</span>
+                <span class="text-3xl font-black text-white font-mono leading-none" x-text="entregaAtual.ordem_shopee || entregaAtual.ordem_entrega"></span>
+              </div>
+
+              <div class="bg-yellow-500/20 border border-yellow-500/40 rounded-2xl p-2.5 flex flex-col justify-center">
+                <span class="text-[10px] text-yellow-400 uppercase font-black block">SACOLA</span>
+                <span class="text-2xl font-black text-yellow-300 font-mono leading-none" x-text="`#${Math.ceil(entregaAtual.ordem_entrega / 10)}`"></span>
               </div>
             </div>
 
+            <!-- Linha 2: Código de Rastreio Oficial -->
             <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
               <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">CÓDIGO DE RASTREIO SPX:</span>
-              <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" x-text="entregaAtual.codigo_rastreio"></span>
+              <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" 
+                    x-text="entregaAtual.codigo_rastreio"></span>
             </div>
 
-            <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
+            <!-- Alerta de Parada com Múltiplos Pacotes -->
+            <div x-show="pacotesMesmoLocal.length > 1" 
+                 class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
-                <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTE LOCAL!
+                <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
               </p>
-              <p class="text-xs text-gray-300 font-medium leading-none">Entregue todos juntos nesta mesma parada:</p>
+              <p class="text-xs text-gray-300 font-medium leading-none">
+                Confira todas as caixas antes de descer do Uno:
+              </p>
+              
               <div class="space-y-1.5 pt-1">
                 <template x-for="p in pacotesMesmoLocal" :key="p.id">
                   <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl px-3 py-2 flex items-center justify-between font-mono text-xs font-bold">
-                    <span class="text-white text-sm" x-text="`Parada #${p.ordem_entrega}`"></span>
+                    <span class="text-white text-sm" x-text="`Ordem #${p.ordem_shopee || p.ordem_entrega}`"></span>
                     <span class="tracking-wider text-xs" x-text="p.codigo_rastreio"></span>
                   </div>
                 </template>
               </div>
             </div>
 
+            <!-- Endereço com Legibilidade Máxima -->
             <div class="space-y-1 pt-1">
               <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
               <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
+            <!-- Botões Gigantes de GPS -->
             <div class="grid grid-cols-2 gap-3 pt-1">
-              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
-                🚗 Abrir Waze
+              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
+                 class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
+                🚗 Iniciar Waze
               </a>
-              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">
+              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" 
+                 class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">
                 🗺️ Google Maps
               </a>
             </div>
 
+            <!-- Botões de Ação na Entrega -->
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
-              <button @click="atualizarStatus(entregaAtual.id, 'ausente')" class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
+              <button @click="atualizarStatus(entregaAtual.id, 'ausente')" 
+                      class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
                 ⚠️ Ausente / Pular
               </button>
-              <button @click="concluirEntrega(entregaAtual)" class="bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 active:scale-95 transition">
+              <button @click="concluirEntrega(entregaAtual)" 
+                      class="bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 active:scale-95 transition">
                 ✅ Entregue
               </button>
             </div>
@@ -307,7 +319,7 @@
         </template>
       </main>
 
-      <!-- MODO 3: HISTÓRICO COM BOTÃO DE EXCLUIR DEFINITIVO -->
+      <!-- MODO 3: HISTÓRICO -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4">
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
@@ -321,7 +333,6 @@
                 <span class="text-xs bg-orange-600/20 text-orange-400 border border-orange-500/30 px-3 py-1 rounded-full font-bold" x-text="`${r.total_pacotes || 0} pacotes`"></span>
               </div>
               
-              <!-- Linha de Ações: Reabrir Rota + Lixeira Vermelha -->
               <div class="flex items-center gap-2 pt-1">
                 <button @click="selecionarRotaHistorico(r.id)" class="flex-1 bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700 active:scale-95 transition">
                   Reabrir Detalhes Desta Rota
@@ -338,7 +349,7 @@
       </main>
     </div>
 
-    <!-- Assinatura StudioTesta no Rodapé da Área Interna -->
+    <!-- Assinatura StudioTesta -->
     <footer class="py-6 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" 
@@ -353,50 +364,34 @@
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <div>
-          <h2 class="font-black text-lg text-orange-500">IMPORTAR ROMANEIO SHOPEE</h2>
-          <p class="text-xs text-gray-400">Até 300 pacotes organizados em sacolas</p>
+          <h2 class="font-black text-lg text-orange-500">IMPORTAR PLANILHA SHOPEE</h2>
+          <p class="text-xs text-gray-400">Extrai Ordem, Parada e GPS oficial</p>
         </div>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
 
       <div x-show="msgErro" class="bg-red-500/20 border border-red-500 p-3 rounded-xl text-xs text-red-200 font-bold" x-text="msgErro"></div>
 
-      <div class="flex border-b border-gray-800 text-xs font-bold">
-        <button @click="abaImport = 'arquivo'" :class="abaImport === 'arquivo' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2.5 text-center">
-          📑 Subir Arquivo (.xlsx / .csv)
-        </button>
-        <button @click="abaImport = 'texto'" :class="abaImport === 'texto' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-gray-400'" class="flex-1 py-2.5 text-center">
-          📄 Colar Texto do Romaneio
-        </button>
-      </div>
-
-      <!-- Aba 1: Arquivo -->
-      <div x-show="abaImport === 'arquivo'" class="space-y-3">
+      <div class="space-y-3">
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
           <span class="text-4xl block mb-2">📊</span>
-          <span class="text-sm font-black block text-white">Toque para escolher o arquivo</span>
-          <span class="text-xs text-gray-400 block mt-1">Aceita o .XLSX baixado da Shopee</span>
+          <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
+          <span class="text-xs text-gray-400 block mt-1">Planilha oficial baixada no aplicativo SPX</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
         </label>
         <p x-show="nomeArquivo" class="text-xs text-orange-400 font-bold text-center" x-text="`Arquivo: ${nomeArquivo}`"></p>
       </div>
 
-      <!-- Aba 2: Colar Texto -->
-      <div x-show="abaImport === 'texto'" class="space-y-2">
-        <textarea x-model="textoColado" @input="processarTextoAoDigitar()" rows="7" placeholder="Cole aqui o texto do romaneio da Shopee..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white font-mono focus:border-orange-500 focus:outline-none"></textarea>
-      </div>
-
-      <!-- Status de Reconhecimento -->
       <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/15 border border-green-500/40 rounded-2xl p-3.5 text-center space-y-1">
-        <p class="text-sm text-green-400 font-black" x-text="`✅ ${pacotesExtraidos.length} PACOTES COM GPS DA SHOPEE!`"></p>
+        <p class="text-sm text-green-400 font-black" x-text="`✅ ${pacotesExtraidos.length} PACOTES RECONHECIDOS!`"></p>
         <p class="text-xs text-gray-300 font-medium" x-text="`Carga dividida em ${Math.ceil(pacotesExtraidos.length / 10)} sacolas de 10 pacotes.`"></p>
       </div>
 
       <button @click="enviarParaN8N()" :disabled="carregandoProcesso || pacotesExtraidos.length === 0" 
               class="w-full py-4 rounded-2xl text-sm font-black flex items-center justify-center gap-2 shadow-xl transition"
               :class="pacotesExtraidos.length > 0 && !carregandoProcesso ? 'bg-orange-600 hover:bg-orange-500 text-white cursor-pointer shadow-orange-600/40' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700'">
-        <span x-show="!carregandoProcesso" x-text="pacotesExtraidos.length > 0 ? `🚀 Otimizar Rota Partindo do CD (${pacotesExtraidos.length} pacotes)` : 'Aguardando Planilha...'"></span>
-        <span x-show="carregandoProcesso">⏳ Otimizando Trajeto no Servidor...</span>
+        <span x-show="!carregandoProcesso" x-text="pacotesExtraidos.length > 0 ? `🚀 Gerar Rota Contínua (${pacotesExtraidos.length} pacotes)` : 'Aguardando Arquivo...'"></span>
+        <span x-show="carregandoProcesso">⏳ Otimizando Trajeto Contínuo no Servidor...</span>
       </button>
     </div>
   </div>
@@ -437,8 +432,6 @@
         modo: 'rua',
         modalImportar: false,
         modalCD: false,
-        abaImport: 'arquivo',
-        textoColado: '',
         nomeArquivo: '',
         msgErro: null,
         cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
@@ -449,15 +442,12 @@
         rotasHistorico: [],
         rotaAtivaId: null,
 
-        // Autenticação & Usuário
         usuarioLogado: false,
         tokenAcesso: localStorage.getItem('directus_token') || null,
         usuarioId: localStorage.getItem('directus_user_id') || null,
 
-        mostrarPopupInstalar: false,
         temPromptInstalacao: false,
         isStandalone: false,
-        isIOS: false,
 
         DIRECTUS_URL: 'https://banco.studiotesta.com.br',
         N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
@@ -479,6 +469,17 @@
               });
             }
           }
+        },
+
+        // Pula diretamente da aba Sacolas para a aba Rua com a entrega selecionada
+        irParaEntregaDireta(item) {
+          const idx = this.entregas.findIndex(e => e.id === item.id);
+          if (idx !== -1) {
+            // Reordena o array para que o item clicado seja o primeiro da fila
+            const escolhido = this.entregas.splice(idx, 1)[0];
+            this.entregas.unshift(escolhido);
+          }
+          this.modo = 'rua';
         },
 
         async verificarAutenticacao() {
@@ -564,21 +565,11 @@
 
         checarInstalacaoPWA() {
           this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-          const userAgent = window.navigator.userAgent.toLowerCase();
-          this.isIOS = /iphone|ipad|ipod/.test(userAgent);
-
-          if (this.isStandalone) {
-            this.mostrarPopupInstalar = false;
-            return;
-          }
-
           if (window.pwaDeferredPrompt) {
             this.temPromptInstalacao = true;
           }
-
           window.addEventListener('pwa-pronto-para-instalar', () => {
             this.temPromptInstalacao = true;
-            this.mostrarPopupInstalar = true;
           });
         },
 
@@ -589,9 +580,9 @@
           await prompt.userChoice;
           window.pwaDeferredPrompt = null;
           this.temPromptInstalacao = false;
-          this.mostrarPopupInstalar = false;
         },
 
+        // PARSER FIEL ÀS COLUNAS EXATAS DA PLANILHA DA SHOPEE
         parseLinhasShopee(linhasMatriz) {
           this.msgErro = null;
           if (!linhasMatriz || linhasMatriz.length < 2) {
@@ -609,26 +600,22 @@
           }
 
           if (idxCabecalho === -1) {
-            this.msgErro = 'Colunas "Latitude", "Destination Address" ou "SPX TN" não encontradas.';
+            this.msgErro = 'Colunas oficiais da Shopee não foram encontradas na planilha.';
             return [];
           }
 
           const cabecalho = linhasMatriz[idxCabecalho].map(c => String(c || '').trim().toLowerCase());
-          const acharIdx = (termos) => cabecalho.findIndex(h => termos.some(t => h.includes(t)));
+          const acharIdx = (termos) => cabecalho.findIndex(h => termos.some(t => h === t || h.includes(t)));
 
+          const iSequence = acharIdx(['sequence', 'ordem']);
+          const iStop = acharIdx(['stop', 'parada']);
           const iTN = acharIdx(['spx tn', 'tracking', 'rastreio']);
           const iAddr = acharIdx(['destination address', 'endereço', 'endereco', 'address']);
           const iBairro = acharIdx(['bairro', 'neighborhood']);
           const iCity = acharIdx(['city', 'cidade']);
-          const iCep = acharIdx(['zipcode', 'postal', 'cep']);
+          const iCep = acharIdx(['zipcode/postal code', 'zipcode', 'postal', 'cep']);
           const iLat = acharIdx(['latitude', 'lat']);
           const iLng = acharIdx(['longitude', 'lng', 'long']);
-          const iStop = acharIdx(['stop', 'parada']);
-
-          if (iLat === -1 || iLng === -1 || iAddr === -1) {
-            this.msgErro = 'Colunas de Latitude, Longitude ou Endereço ausentes.';
-            return [];
-          }
 
           const lista = [];
           for (let r = idxCabecalho + 1; r < linhasMatriz.length; r++) {
@@ -643,15 +630,18 @@
             if (!lat || !lng || isNaN(lat) || isNaN(lng) || lat === 0) continue;
 
             const addr = String(cols[iAddr] || '').trim();
-            const stopNum = iStop !== -1 && cols[iStop] ? cols[iStop] : (lista.length + 1);
+            const seq = iSequence !== -1 && cols[iSequence] && cols[iSequence] !== '-' ? cols[iSequence] : (lista.length + 1);
+            const stp = iStop !== -1 && cols[iStop] && cols[iStop] !== '-' ? cols[iStop] : (lista.length + 1);
 
             let numero = 'S/N';
             const numMatch = addr.match(/,\s*(\d+|S\/?N)/i);
             if (numMatch) numero = numMatch[1];
 
             lista.push({
+              ordem_shopee: parseInt(seq) || (lista.length + 1),
+              parada_shopee: parseInt(stp) || (lista.length + 1),
               codigo_rastreio: iTN !== -1 && cols[iTN] ? String(cols[iTN]).trim() : `SPX-${lista.length + 1}`,
-              destinatario: `Parada #${stopNum}`,
+              destinatario: `Parada #${stp}`,
               telefone: '13999999999',
               endereco: addr,
               numero: numero,
@@ -701,30 +691,6 @@
         processarArquivoExcel(event) {
           const file = event.target.files[0];
           if (file) this.processarArquivoDireto(file);
-        },
-
-        processarTextoAoDigitar() {
-          if (!this.textoColado.trim()) {
-            this.pacotesExtraidos = [];
-            return;
-          }
-
-          const linhas = this.textoColado.trim().split(/\r?\n/).map(l => {
-            if (l.includes('\t')) return l.split('\t');
-            const re = /(?:,|\n|^)("(?:(?:"")*[^"]*)*"|[^",\n]*|(?:\n|$))/g;
-            const row = [];
-            let m;
-            while ((m = re.exec(l)) !== null) {
-              let val = m[1];
-              if (val === undefined) break;
-              if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1).replace(/""/g, '"');
-              row.push(val.trim());
-              if (re.lastIndex >= l.length) break;
-            }
-            return row;
-          });
-
-          this.pacotesExtraidos = this.parseLinhasShopee(linhas);
         },
 
         async carregarUltimaRota() {
@@ -787,7 +753,6 @@
           this.modo = 'carregamento';
         },
 
-        // DELEÇÃO DEFINITIVA NO BANCO (ROTAS + ENTREGAS VIA CASCADE)
         async apagarRota(rotaId) {
           if (!confirm(`Deseja realmente apagar a Rota #${rotaId} e todos os seus pacotes do banco de dados? Esta ação não pode ser desfeita.`)) {
             return;
@@ -804,20 +769,15 @@
             });
 
             if (res.ok || res.status === 204) {
-              // 1. Remove visualmente da lista do histórico
               this.rotasHistorico = this.rotasHistorico.filter(r => r.id !== rotaId);
-
-              // 2. Se a rota apagada for a que estava aberta na tela, limpa tudo
               if (this.rotaAtivaId === rotaId) {
                 this.rotaAtivaId = null;
                 this.entregas = [];
                 await this.carregarUltimaRota();
               }
-
-              alert(`Rota #${rotaId} e todos os pacotes foram apagados do banco de dados com sucesso!`);
+              alert(`Rota #${rotaId} apagada com sucesso!`);
             } else {
-              const errData = await res.json().catch(() => ({}));
-              alert('Erro ao apagar rota: ' + (errData?.errors?.[0]?.message || 'Verifique as permissões de Delete no Directus.'));
+              alert('Erro ao apagar rota no Directus.');
             }
           } catch(e) {
             alert('Falha na comunicação: ' + e.message);
@@ -852,6 +812,7 @@
           if (!this.entregaAtual) return [];
           const cur = this.entregaAtual;
           return this.pendentes.filter(e => 
+            (e.parada_shopee && e.parada_shopee === cur.parada_shopee) ||
             (Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001) ||
             (e.endereco === cur.endereco && e.numero === cur.numero)
           );
@@ -860,7 +821,7 @@
         async concluirEntrega(entrega) {
           const mesmoLocal = this.pacotesMesmoLocal;
           if (mesmoLocal.length > 1) {
-            const conf = confirm(`Há ${mesmoLocal.length} pacotes neste local. Deseja marcar TODOS como entregues?`);
+            const conf = confirm(`Há ${mesmoLocal.length} pacotes nesta Parada. Deseja marcar TODOS como entregues?`);
             if (conf) {
               for (const p of mesmoLocal) {
                 await this.atualizarStatus(p.id, 'entregue');
@@ -917,7 +878,6 @@
               const resJson = await res.json();
               this.modalImportar = false;
               this.pacotesExtraidos = [];
-              this.textoColado = '';
               this.nomeArquivo = '';
 
               if (resJson && resJson.rota_id) {
