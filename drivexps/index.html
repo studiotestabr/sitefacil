@@ -165,27 +165,26 @@
         </button>
       </section>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 (CLIQUE NO CARD PULA DIRETO PRA RUA) -->
-      <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5">
+      <!-- MODO 1: CARREGAMENTO EM SACOLAS DE 10 EM 10 -->
+      <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5">
-            <span>👜</span> GUIA DE SACOLAS (VARREDURA POR RUA)
+            <span>👜</span> ROTA POR CORREDOR DE RUA (ETIQUETA OFICIAL)
           </p>
           <p class="text-gray-300 text-xs leading-relaxed">
-            Todas as casas da mesma rua são entregues juntas. <em>(Toque em qualquer card para abrir direto na Rua e navegar).</em>
+            As casas da mesma rua estão agrupadas em ordem sequencial. <em>(Toque em qualquer card para navegar até ele imediatamente).</em>
           </p>
         </div>
 
         <div class="space-y-3">
           <template x-for="item in entregas" :key="item.id">
             <div @click="irParaEntregaDireta(item)"
-                 class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-md space-y-2.5 transition-all cursor-pointer active:scale-98"
+                 class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-md space-y-2.5 transition-all cursor-pointer active:scale-98 hover:border-orange-500/60"
                  :class="{
                    'opacity-20 line-through bg-black border-gray-900': item.status === 'entregue',
-                   'border-l-4 border-l-orange-500 hover:border-orange-400': item.status !== 'entregue'
+                   'border-l-4 border-l-orange-500': item.status !== 'entregue'
                  }">
               
-              <!-- Linha 1: Dados da Etiqueta Física (Parada e Ordem) -->
               <div class="flex items-center justify-between border-b border-gray-800/80 pb-2.5">
                 <div class="flex items-center gap-2">
                   <div class="bg-orange-600/20 border border-orange-500/40 px-3 py-1 rounded-xl text-center">
@@ -208,16 +207,16 @@
                 </div>
               </div>
 
-              <!-- Linha 2: Endereço Completo -->
+              <!-- Endereço com Largura Total -->
               <div class="space-y-0.5">
-                <h3 class="font-black text-base text-white leading-snug break-words" x-text="item.endereco"></h3>
+                <h3 class="font-black text-lg text-white leading-snug break-words" x-text="item.endereco"></h3>
                 <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
               </div>
 
-              <!-- Linha 3: Código de Rastreio com Fallback (Nunca fica em branco) -->
+              <!-- Rastreio SPX com Visibilidade Garantida -->
               <div class="flex items-center justify-between pt-1 border-t border-gray-800/50 text-xs">
                 <span class="text-gray-500 font-medium">Rastreio SPX:</span>
-                <span class="font-mono font-black text-xs text-orange-400 bg-gray-950 px-2.5 py-1 rounded border border-gray-800 tracking-wider" 
+                <span class="font-mono font-black text-xs text-orange-400 bg-gray-950 px-2.5 py-1 rounded-md border border-gray-800 tracking-wider" 
                       x-text="item.codigo_rastreio || 'SPX-REGISTRADO'"></span>
               </div>
             </div>
@@ -226,7 +225,7 @@
       </main>
 
       <!-- MODO 2: RUA (Cockpit) -->
-      <main x-show="modo === 'rua'" class="p-4">
+      <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full">
         <template x-if="entregaAtual">
           <div class="bg-gray-900 rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
             
@@ -254,6 +253,12 @@
                     x-text="entregaAtual.codigo_rastreio || 'SPX-REGISTRADO'"></span>
             </div>
 
+            <!-- Alerta de Mesma Rua (Não precisa abrir Waze!) -->
+            <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
+              <span class="text-lg">🚶</span>
+              <span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
+            </div>
+
             <!-- Alerta de Parada com Múltiplos Pacotes -->
             <div x-show="pacotesMesmoLocal.length > 1" 
                  class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
@@ -261,7 +266,7 @@
                 <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
               </p>
               <p class="text-xs text-gray-300 font-medium leading-none">
-                Confira todas as caixas antes de descer do Uno:
+                Entregue todos juntos nesta mesma casa:
               </p>
               
               <div class="space-y-1.5 pt-1">
@@ -281,7 +286,7 @@
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- Botões de GPS -->
+            <!-- Botões de Navegação -->
             <div class="grid grid-cols-2 gap-3 pt-1">
               <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
                  class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
@@ -317,7 +322,7 @@
       </main>
 
       <!-- MODO 3: HISTÓRICO -->
-      <main x-show="modo === 'historico'" class="p-4 space-y-4">
+      <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full">
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
           <template x-for="r in rotasHistorico" :key="r.id">
@@ -362,7 +367,7 @@
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <div>
           <h2 class="font-black text-lg text-orange-500">IMPORTAR PLANILHA SHOPEE</h2>
-          <p class="text-xs text-gray-400">Varredura contínua por rua</p>
+          <p class="text-xs text-gray-400">Varredura contínua por corredor de rua</p>
         </div>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
@@ -438,6 +443,7 @@
         entregas: [],
         rotasHistorico: [],
         rotaAtivaId: null,
+        entregaSelecionadaId: null,
 
         usuarioLogado: false,
         tokenAcesso: localStorage.getItem('directus_token') || null,
@@ -468,12 +474,9 @@
           }
         },
 
+        // Pula diretamente da aba Sacolas para a aba Rua com o item selecionado
         irParaEntregaDireta(item) {
-          const idx = this.entregas.findIndex(e => e.id === item.id);
-          if (idx !== -1) {
-            const escolhido = this.entregas.splice(idx, 1)[0];
-            this.entregas.unshift(escolhido);
-          }
+          this.entregaSelecionadaId = item.id;
           this.modo = 'rua';
         },
 
@@ -577,7 +580,7 @@
           this.temPromptInstalacao = false;
         },
 
-        // PARSER DA PLANILHA (GARANTE MAPEAMENTO DO RASTREIO DA COLUNA D)
+        // PARSER DA PLANILHA (Mapeia Sequence, Stop, SPX TN da coluna D)
         parseLinhasShopee(linhasMatriz) {
           this.msgErro = null;
           if (!linhasMatriz || linhasMatriz.length < 2) {
@@ -605,9 +608,8 @@
           const iSequence = acharIdx(['sequence', 'ordem']);
           const iStop = acharIdx(['stop', 'parada']);
           
-          // Mapeia especificamente a Coluna D (SPX TN)
           let iTN = acharIdx(['spx tn', 'tracking', 'rastreio']);
-          if (iTN === -1 && cabecalho.length > 3) iTN = 3; // Fallback seguro para Coluna D
+          if (iTN === -1 && cabecalho.length > 3) iTN = 3;
 
           const iAddr = acharIdx(['destination address', 'endereço', 'endereco', 'address']);
           const iBairro = acharIdx(['bairro', 'neighborhood']);
@@ -632,7 +634,6 @@
             const seq = iSequence !== -1 && cols[iSequence] && cols[iSequence] !== '-' ? cols[iSequence] : (lista.length + 1);
             const stp = iStop !== -1 && cols[iStop] && cols[iStop] !== '-' ? cols[iStop] : (lista.length + 1);
             
-            // Garante captura do rastreio
             const rawTN = (iTN !== -1 && cols[iTN]) ? String(cols[iTN]).trim() : '';
             const rastreioFinal = (rawTN && rawTN !== '-') ? rawTN : `BR${Math.floor(100000000000 + Math.random() * 900000000000)}S`;
 
@@ -649,7 +650,7 @@
               endereco: addr,
               numero: numero,
               bairro: iBairro !== -1 && cols[iBairro] ? String(cols[iBairro]).trim() : '',
-              cidade: iCity !== -1 && cols[iCity] ? String(cols[iCity]).trim() : 'Mongaguá',
+              cidade: iCity !== -1 && cols[iCity] ? String(cols[iCity]).trim() : 'Itanhaém',
               cep: iCep !== -1 && cols[iCep] ? String(cols[iCep]).trim() : '',
               latitude: lat,
               longitude: lng
@@ -816,7 +817,21 @@
         },
 
         get entregaAtual() {
+          if (this.entregaSelecionadaId) {
+            const sel = this.pendentes.find(e => e.id === this.entregaSelecionadaId);
+            if (sel) return sel;
+          }
           return this.pendentes[0] || null;
+        },
+
+        get ehMesmaRuaQueAnterior() {
+          if (!this.entregaAtual) return false;
+          const idx = this.entregas.findIndex(e => e.id === this.entregaAtual.id);
+          if (idx <= 0) return false;
+          const anterior = this.entregas[idx - 1];
+          const ruaAtual = (this.entregaAtual.endereco || '').split(',')[0].toLowerCase().trim();
+          const ruaAnterior = (anterior.endereco || '').split(',')[0].toLowerCase().trim();
+          return ruaAtual === ruaAnterior;
         },
 
         get pacotesMesmoLocal() {
@@ -837,9 +852,11 @@
               for (const p of mesmoLocal) {
                 await this.atualizarStatus(p.id, 'entregue');
               }
+              this.entregaSelecionadaId = null;
               return;
             }
           }
+          this.entregaSelecionadaId = null;
           await this.atualizarStatus(entrega.id, 'entregue');
         },
 
