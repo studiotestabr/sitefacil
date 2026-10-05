@@ -20,6 +20,7 @@
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+  <!-- Captura Global do Evento de Instalação PWA -->
   <script>
     window.pwaDeferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -39,11 +40,51 @@
 </head>
 <body class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between" x-data="entregaApp()">
 
+  <!-- POPUP DE INSTALAÇÃO DO APP (MODAL PWA ATIVO) -->
+  <div x-show="mostrarPopupInstalar" 
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0 translate-y-10 scale-95"
+       x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+       class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
+    
+    <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
+      <div class="flex justify-center">
+        <img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700">
+      </div>
+      <div class="space-y-1.5">
+        <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Instale o app no celular para ter tela cheia no Uno, resposta rápida no trânsito e abrir rotas em 1 toque.
+        </p>
+      </div>
+      
+      <!-- Android / Chrome -->
+      <div x-show="!isIOS" class="space-y-2 pt-1">
+        <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition">
+          📲 Instalar Aplicativo Agora
+        </button>
+        <button @click="fecharPopupInstalar()" class="text-xs text-gray-400 font-bold py-1">
+          Continuar no navegador
+        </button>
+      </div>
+
+      <!-- iPhone / Safari -->
+      <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-gray-300">
+        <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
+        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> no Safari.</p>
+        <p>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
+        <button @click="fecharPopupInstalar()" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TELA DE LOGIN MINIMALISTA SAAS (100% GOOGLE) -->
-  <div x-show="!usuarioLogado" class="fixed inset-0 bg-gray-950 z-50 flex flex-col items-center justify-between p-6">
+  <div x-show="!usuarioLogado" class="fixed inset-0 bg-gray-950 z-40 flex flex-col items-center justify-between p-6 overflow-y-auto">
     <div class="w-full"></div>
 
-    <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center">
+    <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
       <div class="flex justify-center">
         <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
       </div>
@@ -51,14 +92,14 @@
       <div class="space-y-1.5">
         <h2 class="text-3xl font-black text-white tracking-wide">DriveXPS</h2>
         <p class="text-xs text-gray-400 font-medium leading-relaxed">
-          Roteirizador de alta precisão fiel às etiquetas oficiais da Shopee Express.
+          Roteirizador contínuo e organizador de carga para a Shopee Express.
         </p>
       </div>
 
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
         <div class="flex items-center gap-2">
-          <span class="text-orange-500">🏷️</span>
-          <span>Números grandes: <strong>Canetão</strong>, <strong>Parada</strong> e <strong>Ordem</strong></span>
+          <span class="text-orange-500">✍️</span>
+          <span>Numeração contínua para marcar no <strong>Canetão</strong></span>
         </div>
         <div class="flex items-center gap-2">
           <span class="text-orange-500">👜</span>
@@ -70,16 +111,25 @@
         </div>
       </div>
 
-      <button @click="loginGoogle()" 
-              class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
-        <svg class="w-5 h-5" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-        Continuar com o Google
-      </button>
+      <div class="space-y-3">
+        <!-- Botão Google -->
+        <button @click="loginGoogle()" 
+                class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          Continuar com o Google
+        </button>
+
+        <!-- Botão de Instalação já visível na Tela de Login -->
+        <button x-show="!isStandalone" @click="acionarInstalacaoManual()" 
+                class="w-full bg-gray-800 hover:bg-gray-700 text-orange-400 border border-orange-500/40 font-bold py-3 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+          <span>📲</span> Instalar Aplicativo no Celular
+        </button>
+      </div>
 
       <p class="text-[10px] text-gray-500 font-medium">
         Cadastro automático e seguro com sua conta Google.
@@ -100,16 +150,16 @@
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between">
     <div>
       <!-- CABEÇALHO EM 3 LINHAS -->
-      <header class="bg-orange-600 px-4 pt-3 pb-3 sticky top-0 z-40 shadow-xl space-y-2.5">
+      <header class="bg-orange-600 px-4 pt-3 pb-3 sticky top-0 z-30 shadow-xl space-y-2.5">
         <div class="text-center flex justify-between items-center">
           <button @click="deslogar()" class="text-[10px] bg-black/50 text-orange-200 hover:text-white px-2.5 py-1 rounded-lg font-bold border border-orange-400/30 active:scale-95 transition cursor-pointer">
             🚪 Sair
           </button>
           <h1 class="font-black text-2xl tracking-wider text-white drop-shadow-sm">DriveXPS</h1>
-          <button x-show="temPromptInstalacao && !isStandalone" @click="instalarPWA()" class="text-xs bg-black/40 text-white px-2 py-0.5 rounded-md font-bold text-[10px]">
+          <button x-show="!isStandalone" @click="acionarInstalacaoManual()" class="text-xs bg-black/40 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] border border-white/20 active:scale-95 transition">
             📲 Instalar
           </button>
-          <div x-show="!temPromptInstalacao || isStandalone" class="w-8"></div>
+          <div x-show="isStandalone" class="w-8"></div>
         </div>
 
         <div class="flex justify-between items-center text-xs font-bold px-1 border-t border-orange-500/60 pt-2">
@@ -165,14 +215,14 @@
         </button>
       </section>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS (TRIO GIGANTE: CANETÃO + PARADA + ORDEM) -->
+      <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5">
             <span>✍️</span> CONFERÊNCIA GIGANTE (CANETÃO, PARADA E ORDEM)
           </p>
           <p class="text-gray-300 text-xs leading-relaxed">
-            Todos os 3 números em destaque para você enxergar com clareza sem forçar a vista.
+            Todos os 3 números em destaque para conferir com facilidade de relance.
           </p>
         </div>
 
@@ -185,31 +235,25 @@
                    'border-l-4 border-l-orange-500': item.status !== 'entregue'
                  }">
               
-              <!-- LINHA 1: TRIO DE MESMO TAMANHO GIGANTE + SACOLA -->
+              <!-- LINHA 1: TRIO GIGANTE + SACOLA -->
               <div class="flex items-center justify-between border-b border-gray-800/80 pb-3 gap-2">
-                
-                <!-- Os 3 Blocos de Mesma Importância e Tamanho -->
                 <div class="grid grid-cols-3 gap-2 flex-1 max-w-sm">
-                  <!-- Bloco 1: Canetão -->
                   <div class="bg-orange-600/25 border-2 border-orange-500/80 px-2 py-1.5 rounded-xl text-center shadow-inner">
                     <span class="text-[9px] text-orange-400 font-black uppercase tracking-wider block leading-none">CANETÃO</span>
                     <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono leading-tight" x-text="`#${item.ordem_entrega}`"></span>
                   </div>
 
-                  <!-- Bloco 2: Parada Shopee (Mesmo Tamanho) -->
                   <div class="bg-gray-800 border-2 border-gray-700 px-2 py-1.5 rounded-xl text-center">
                     <span class="text-[9px] text-gray-400 font-black uppercase tracking-wider block leading-none">PARADA</span>
                     <span class="text-2xl sm:text-3xl font-black text-white font-mono leading-tight" x-text="item.parada_shopee || '-'"></span>
                   </div>
 
-                  <!-- Bloco 3: Ordem Shopee (Mesmo Tamanho) -->
                   <div class="bg-gray-800 border-2 border-gray-700 px-2 py-1.5 rounded-xl text-center">
                     <span class="text-[9px] text-gray-400 font-black uppercase tracking-wider block leading-none">ORDEM</span>
                     <span class="text-2xl sm:text-3xl font-black text-white font-mono leading-tight" x-text="item.ordem_shopee || '-'"></span>
                   </div>
                 </div>
 
-                <!-- Sacola correspondente no canto direito -->
                 <div class="text-right shrink-0">
                   <span class="text-xs font-black px-2.5 py-1.5 rounded-xl bg-orange-600/25 text-orange-400 border border-orange-500/40 uppercase tracking-wide font-mono block" 
                         x-text="`SACOLA ${Math.ceil(item.ordem_entrega / 10)}`"></span>
@@ -220,13 +264,13 @@
                 </div>
               </div>
 
-              <!-- Linha 2: Endereço Completo em Letra Grande e Nítida -->
+              <!-- Endereço -->
               <div class="space-y-1">
                 <h3 class="font-black text-lg text-white leading-snug break-words" x-text="item.endereco"></h3>
                 <p class="text-sm font-semibold text-gray-300" x-text="`${item.bairro} - ${item.cidade}`"></p>
               </div>
 
-              <!-- Linha 3: Rastreio SPX -->
+              <!-- Rastreio -->
               <div class="flex items-center justify-between pt-1 border-t border-gray-800/50 text-xs">
                 <span class="text-gray-500 font-medium">Rastreio SPX:</span>
                 <span class="font-mono font-black text-xs text-orange-400 bg-gray-950 px-2.5 py-0.5 rounded border border-gray-800 tracking-wider" 
@@ -237,34 +281,29 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT COM NÚMEROS GIGANTES PARA DIREÇÃO) -->
+      <!-- MODO 2: RUA (Cockpit) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full">
         <template x-if="entregaAtual">
           <div class="bg-gray-900 rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
             
-            <!-- LINHA 1: OS 3 NÚMEROS GIGANTES LADO A LADO DO MESMO TAMANHO -->
             <div class="grid grid-cols-3 gap-2.5 border-b border-gray-800 pb-3 text-center">
-              
-              <!-- Canetão -->
               <div class="bg-orange-600 text-white rounded-2xl p-3 shadow-lg border-2 border-orange-500">
                 <span class="text-[10px] uppercase font-black tracking-wider block opacity-90 leading-none">CANETÃO</span>
                 <span class="text-3xl sm:text-4xl font-black font-mono leading-tight block mt-1" x-text="`#${entregaAtual.ordem_entrega}`"></span>
               </div>
 
-              <!-- Parada Shopee -->
               <div class="bg-gray-800 border-2 border-gray-700 rounded-2xl p-3">
                 <span class="text-[10px] text-gray-400 uppercase font-black tracking-wider block leading-none">PARADA</span>
                 <span class="text-3xl sm:text-4xl font-black text-white font-mono leading-tight block mt-1" x-text="entregaAtual.parada_shopee || '-'"></span>
               </div>
 
-              <!-- Ordem Shopee -->
               <div class="bg-gray-800 border-2 border-gray-700 rounded-2xl p-3">
                 <span class="text-[10px] text-gray-400 uppercase font-black tracking-wider block leading-none">ORDEM</span>
                 <span class="text-3xl sm:text-4xl font-black text-white font-mono leading-tight block mt-1" x-text="entregaAtual.ordem_shopee || '-'"></span>
               </div>
             </div>
 
-            <!-- Faixa da Sacola em Destaque Amarelo -->
+            <!-- Sacola -->
             <div class="flex items-center justify-between bg-yellow-500/15 border border-yellow-500/40 rounded-2xl p-3 font-mono">
               <span class="text-sm font-black text-yellow-400 uppercase tracking-wide flex items-center gap-1.5">
                 <span>👜</span> SACOLA #<span x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span>
@@ -272,20 +311,20 @@
               <span class="text-xs font-bold text-yellow-300" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
             </div>
 
-            <!-- Código de Rastreio com Alta Visibilidade -->
+            <!-- Rastreio -->
             <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
               <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">CÓDIGO DE RASTREIO SPX:</span>
               <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" 
                     x-text="entregaAtual.codigo_rastreio || 'SPX-REGISTRADO'"></span>
             </div>
 
-            <!-- Alerta de Mesma Rua (Não precisa abrir Waze!) -->
+            <!-- Mesma Rua -->
             <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
               <span class="text-lg">🚶</span>
               <span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
             </div>
 
-            <!-- Alerta de Parada com Múltiplos Pacotes (Blindado por Rua e Cidade) -->
+            <!-- Parada Múltipla -->
             <div x-show="pacotesMesmoLocal.length > 1" 
                  class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
@@ -308,14 +347,14 @@
               </div>
             </div>
 
-            <!-- Endereço em Letra Grande -->
+            <!-- Endereço -->
             <div class="space-y-1 pt-1">
               <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
               <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- Botões de Navegação -->
+            <!-- Botões GPS -->
             <div class="grid grid-cols-2 gap-3 pt-1">
               <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
                  class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
@@ -327,7 +366,7 @@
               </a>
             </div>
 
-            <!-- Botões de Ação na Entrega -->
+            <!-- Ações -->
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
               <button @click="atualizarStatus(entregaAtual.id, 'ausente')" 
                       class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
@@ -478,8 +517,9 @@
         tokenAcesso: localStorage.getItem('directus_token') || null,
         usuarioId: localStorage.getItem('directus_user_id') || null,
 
-        temPromptInstalacao: false,
+        mostrarPopupInstalar: false,
         isStandalone: false,
+        isIOS: false,
 
         DIRECTUS_URL: 'https://banco.studiotesta.com.br',
         N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
@@ -591,24 +631,51 @@
 
         checarInstalacaoPWA() {
           this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-          if (window.pwaDeferredPrompt) {
-            this.temPromptInstalacao = true;
+          const userAgent = window.navigator.userAgent.toLowerCase();
+          this.isIOS = /iphone|ipad|ipod/.test(userAgent);
+
+          if (this.isStandalone) {
+            this.mostrarPopupInstalar = false;
+            return;
           }
+
+          // Se o evento foi capturado globalmente, abre o popup
+          if (window.pwaDeferredPrompt && !localStorage.getItem('pwa_prompt_dispensado')) {
+            this.mostrarPopupInstalar = true;
+          }
+
           window.addEventListener('pwa-pronto-para-instalar', () => {
-            this.temPromptInstalacao = true;
+            if (!localStorage.getItem('pwa_prompt_dispensado')) {
+              this.mostrarPopupInstalar = true;
+            }
           });
+        },
+
+        acionarInstalacaoManual() {
+          if (window.pwaDeferredPrompt) {
+            this.instalarPWA();
+          } else {
+            this.mostrarPopupInstalar = true;
+          }
         },
 
         async instalarPWA() {
           const prompt = window.pwaDeferredPrompt;
-          if (!prompt) return;
+          if (!prompt) {
+            alert('Para instalar: abra o menu do Chrome (3 pontinhos) e toque em "Adicionar à tela inicial" ou "Instalar aplicativo".');
+            return;
+          }
           prompt.prompt();
           await prompt.userChoice;
           window.pwaDeferredPrompt = null;
-          this.temPromptInstalacao = false;
+          this.mostrarPopupInstalar = false;
         },
 
-        // PARSER DA PLANILHA (BLINDADO CONTRA LINHAS VAZIAS OU TRAÇOS '-')
+        fecharPopupInstalar() {
+          this.mostrarPopupInstalar = false;
+          localStorage.setItem('pwa_prompt_dispensado', 'true');
+        },
+
         parseLinhasShopee(linhasMatriz) {
           this.msgErro = null;
           if (!linhasMatriz || linhasMatriz.length < 2) {
@@ -660,7 +727,6 @@
 
             const addr = String(cols[iAddr] || '').trim();
             
-            // Tratamento estrito: se vier '-', não confunde com número 1!
             const rawSeq = iSequence !== -1 ? String(cols[iSequence] || '').trim() : '';
             const rawStop = iStop !== -1 ? String(cols[iStop] || '').trim() : '';
             
@@ -690,7 +756,7 @@
             });
           }
 
-          // Agrupamento estrito por Parada + Rua + Cidade
+          // Agrupamento estrito por Cidade + Rua + Parada (Nunca junta bairros ou cidades diferentes!)
           const contagemParadas = {};
           for (const item of lista) {
             if (item.parada_shopee) {
@@ -796,8 +862,8 @@
               headers,
               credentials: 'include'
             });
-            const data = await resRota.json();
-            this.rotasHistorico = data.data || [];
+            const dataRota = await resRota.json();
+            this.rotasHistorico = dataRota.data || [];
           } catch(e) {}
         },
 
@@ -876,14 +942,14 @@
           return ruaAtual === ruaAnterior;
         },
 
-        // Agrupamento estrito por Parada E Cidade/Rua (Nunca junta cidades diferentes!)
+        // Agrupamento estrito por Parada, Rua e Cidade (Nunca mistura Peruíbe com Itanhaém!)
         get pacotesMesmoLocal() {
           if (!this.entregaAtual) return [];
           const cur = this.entregaAtual;
           const mesmaRua = (e) => (e.endereco || '').split(',')[0].toLowerCase().trim() === (cur.endereco || '').split(',')[0].toLowerCase().trim();
           return this.pendentes.filter(e => 
             (e.cidade === cur.cidade && e.parada_shopee && cur.parada_shopee && e.parada_shopee === cur.parada_shopee && mesmaRua(e)) ||
-            (Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001)
+            (e.cidade === cur.cidade && mesmaRua(e) && Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001)
           );
         },
 
