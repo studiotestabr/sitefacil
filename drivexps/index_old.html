@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DriveXPS - Rotas Shopee</title>
+  
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DriveXPS">
+  
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Tailwind, Alpine.js e SheetJS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Captura do PWA -->
+  <script>
+    window.pwaDeferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.pwaDeferredPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-pronto-para-instalar'));
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ServiceWorker ativo!', reg.scope))
+          .catch(err => console.error('Erro no ServiceWorker:', err));
+      });
+    }
+  </script>
+</head>
+<body class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between" x-data="entregaApp()">
+
+  <!-- 1. SPLASH SCREEN COM TEMPORIZADOR INFALÍVEL (NUNCA TRAVA) -->
+  <div id="splashScreen" 
+       class="fixed inset-0 z-[100] bg-black flex flex-col justify-end items-center pb-12 select-none transition-all duration-500 ease-out"
+       style="background-image: url('./splash.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+
+    <div class="w-full max-w-xs px-6 space-y-2 text-center">
+      <p id="splashTexto" class="text-[11px] font-black text-amber-400 tracking-widest uppercase font-mono animate-pulse">
+        INICIANDO SISTEMA...
+      </p>
+
+      <div class="w-full bg-black/80 border border-orange-500/60 rounded-full h-3.5 p-0.5 shadow-2xl overflow-hidden backdrop-blur-sm">
+        <div id="splashBarra" 
+             class="h-full bg-gradient-to-r from-orange-600 via-amber-400 to-yellow-300 rounded-full shadow-[0_0_12px_rgba(245,158,11,0.9)] transition-all duration-500 ease-out"
+             style="width: 25%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT INFALÍVEL: DESTROI O SPLASH EM 1.5S MESMO SEM REDE -->
+  <script>
+    setTimeout(() => {
+      const b = document.getElementById('splashBarra');
+      const t = document.getElementById('splashTexto');
+      if (b) b.style.width = '75%';
+      if (t) t.innerText = 'CARREGANDO ROTAS...';
+    }, 500);
+
+    setTimeout(() => {
+      const b = document.getElementById('splashBarra');
+      const t = document.getElementById('splashTexto');
+      if (b) b.style.width = '100%';
+      if (t) t.innerText = 'SISTEMA PRONTO!';
+    }, 1100);
+
+    setTimeout(() => {
+      const s = document.getElementById('splashScreen');
+      if (s) {
+        s.style.opacity = '0';
+        s.style.pointerEvents = 'none';
+        setTimeout(() => s.remove(), 500);
+      }
+    }, 1500);
+  </script>
+
+  <!-- 2. TELA DE LOGIN MINIMALISTA SAAS (100% GOOGLE) -->
+  <div x-show="!usuarioLogado" class="fixed inset-0 bg-gray-950 z-40 flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
+    <div class="w-full"></div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
+      <div class="flex justify-center">
+        <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
+      </div>
+
+      <div class="space-y-1.5">
+        <h2 class="text-3xl font-black text-white tracking-wide">DriveXPS</h2>
+        <p class="text-xs text-gray-400 font-medium leading-relaxed">
+          Roteirizador contínuo e organizador de carga para a Shopee Express.
+        </p>
+      </div>
+
+      <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
+        <div class="flex items-center gap-2">
+          <span class="text-orange-500">✍️</span>
+          <span>Numeração contínua para marcar no <strong>Canetão</strong></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-orange-500">👜</span>
+          <span>Separação em sacolas numeradas de 10 em 10</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-orange-500">🚗</span>
+          <span>Varredura por rua: sem ziguezague e economia de combustível</span>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <button @click="loginGoogle()" 
+                class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          Continuar com o Google
+        </button>
+
+        <button x-show="!isStandalone" @click="acionarInstalacaoManual()" 
+                class="w-full bg-gray-800 hover:bg-gray-700 text-orange-400 border border-orange-500/40 font-bold py-3 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+          <span>📲</span> Instalar Aplicativo no Celular
+        </button>
+      </div>
+
+      <p class="text-[10px] text-gray-500 font-medium">
+        Cadastro automático e seguro com sua conta Google.
+      </p>
+    </div>
+
+    <div class="pt-6 pb-2 text-center text-xs select-text">
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
+      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" 
+         class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">
+        STUDIOTESTA
+      </a>
+    </div>
+  </div>
+
+  <!-- 3. POPUP DE INSTALAÇÃO DO APP (MODAL PWA) -->
+  <div x-show="mostrarPopupInstalar" 
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0 translate-y-10 scale-95"
+       x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+       class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
+    
+    <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
+      <div class="flex justify-center">
+        <img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700">
+      </div>
+      <div class="space-y-1.5">
+        <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Instale o app para ter tela cheia no Uno e resposta rápida no trânsito.
+        </p>
+      </div>
+      
+      <div x-show="!isIOS" class="space-y-2 pt-1">
+        <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition">
+          📲 Instalar Aplicativo Agora
+        </button>
+        <button @click="mostrarPopupInstalar = false" class="text-xs text-gray-400 font-bold py-1">
+          Continuar no navegador
+        </button>
+      </div>
+
+      <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-gray-300">
+        <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
+        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> no Safari.</p>
+        <p>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
+        <button @click="mostrarPopupInstalar = false" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. APLICAÇÃO PRINCIPAL -->
+  <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
+    <div>
+      <!-- CABEÇALHO EM 3 LINHAS -->
+      <header class="bg-orange-600 px-4 pt-3 pb-3 sticky top-0 z-30 shadow-xl space-y-2.5">
+        <div class="text-center flex justify-between items-center">
+          <button @click="deslogar()" class="text-[10px] bg-black/50 text-orange-200 hover:text-white px-2.5 py-1 rounded-lg font-bold border border-orange-400/30 active:scale-95 transition cursor-pointer">
+            🚪 Sair
+          </button>
+          <h1 class="font-black text-2xl tracking-wider text-white drop-shadow-sm">DriveXPS</h1>
+          <button x-show="!isStandalone" @click="acionarInstalacaoManual()" class="text-xs bg-black/40 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] border border-white/20 active:scale-95 transition">
+            📲 Instalar
+          </button>
+          <div x-show="isStandalone" class="w-8"></div>
+        </div>
+
+        <div class="flex justify-between items-center text-xs font-bold px-1 border-t border-orange-500/60 pt-2">
+          <div class="flex items-center gap-1.5">
+            <span class="bg-black/80 text-orange-400 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" 
+                  x-text="rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA'"></span>
+          </div>
+          <div class="text-orange-100 font-semibold text-xs">
+            Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span>
+          </div>
+        </div>
+
+        <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
+          <button @click="modalImportar = true" class="bg-white hover:bg-orange-50 text-orange-600 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center shadow-md active:scale-95 transition">
+            <span class="text-sm leading-none">+</span>
+            <span class="leading-none mt-0.5">Rota</span>
+          </button>
+          <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition">
+            <span class="text-sm leading-none">📦</span>
+            <span class="leading-none mt-0.5">Sacolas</span>
+          </button>
+          <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition">
+            <span class="text-sm leading-none">🚗</span>
+            <span class="leading-none mt-0.5">Rua</span>
+          </button>
+          <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition">
+            <span class="text-sm leading-none">📜</span>
+            <span class="leading-none mt-0.5">Histórico</span>
+          </button>
+        </nav>
+      </header>
+
+      <!-- CONFIGURAÇÃO GPS (CD e CASA) -->
+      <section class="bg-gray-900/90 px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5">
+        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
+          <div class="truncate pr-1">
+            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Partida:</span>
+            <span class="text-xs font-bold text-white truncate block">🏭 CD Saída</span>
+          </div>
+          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border"
+                :class="cd.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'"
+                x-text="cd.lat ? 'Configurado' : 'Pendente'"></span>
+        </button>
+
+        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
+          <div class="truncate pr-1">
+            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Final:</span>
+            <span class="text-xs font-bold text-white truncate block">🏠 Casa Chegada</span>
+          </div>
+          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border"
+                :class="casa.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'"
+                x-text="casa.lat ? 'Configurada' : 'Pendente'"></span>
+        </button>
+      </section>
+
+      <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
+      <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
+        <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
+          <p class="font-black text-sm flex items-center gap-1.5">
+            <span>✍️</span> CONFERÊNCIA GIGANTE (CANETÃO, PARADA, ORDEM E SACOLA)
+          </p>
+          <p class="text-gray-300 text-xs leading-relaxed">
+            Layout padronizado. <em>(Toque em qualquer card para navegar no Waze).</em>
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <template x-for="item in entregas" :key="item.id">
+            <div @click="irParaEntregaDireta(item)"
+                 class="bg-[#121824] rounded-2xl border border-gray-800/90 shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99] border-l-[6px] border-l-orange-500 hover:border-orange-500/60"
+                 :class="{
+                   'opacity-20 line-through bg-black border-gray-900': item.status === 'entregue',
+                   'border-yellow-500/70 bg-yellow-500/5': item.status === 'ausente'
+                 }">
+              
+              <!-- LINHA 1: OS 4 BLOCOS DO SEU DESENHO -->
+              <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                  <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
+                </div>
+
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
+                  <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="item.parada_shopee || '-'"></span>
+                </div>
+
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
+                  <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="item.ordem_shopee || '-'"></span>
+                </div>
+
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+                  <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
+                </div>
+              </div>
+
+              <!-- SUB-LINHA: PACOTES DO X AO Y -->
+              <div class="flex justify-between items-center text-xs px-0.5">
+                <div>
+                  <span x-show="item.total_no_local > 1" 
+                        class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[11px]" 
+                        x-text="`⚠️ ${item.total_no_local} PACOTES NESTA PARADA`"></span>
+                </div>
+                <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(item.ordem_entrega)"></span>
+              </div>
+
+              <!-- ENDEREÇO -->
+              <div class="space-y-0.5 pt-0.5">
+                <h3 class="font-black text-lg sm:text-xl text-white leading-snug break-words" x-text="item.endereco"></h3>
+                <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
+              </div>
+
+              <!-- RASTREIO -->
+              <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs">
+                <span class="text-gray-400 font-medium">Rastreio SPX:</span>
+                <span class="font-mono font-black text-xs sm:text-sm text-orange-400 bg-black/90 px-3 py-1 rounded-xl border border-gray-800 tracking-wider shadow-inner" 
+                      x-text="item.codigo_rastreio || 'SPX-REGISTRADO'"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </main>
+
+      <!-- MODO 2: RUA (COCKPIT) -->
+      <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full">
+        <template x-if="entregaAtual">
+          <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
+            
+            <div x-show="entregaAtual.status === 'ausente'" class="bg-yellow-500/20 border-2 border-yellow-500 p-2.5 rounded-2xl text-center">
+              <span class="text-xs font-black text-yellow-300 uppercase tracking-wider">⚠️ RE-TENTATIVA DE PACOTE PULADO ANTERIORMENTE</span>
+            </div>
+
+            <!-- 4 BLOCOS NO TOPO DA RUA -->
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
+              </div>
+
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
+                <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="entregaAtual.parada_shopee || '-'"></span>
+              </div>
+
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
+                <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="entregaAtual.ordem_shopee || '-'"></span>
+              </div>
+
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+                <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span>
+              </div>
+            </div>
+
+            <div class="flex justify-end text-xs pr-1">
+              <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
+            </div>
+
+            <!-- Código de Rastreio -->
+            <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
+              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">CÓDIGO DE RASTREIO SPX:</span>
+              <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" 
+                    x-text="entregaAtual.codigo_rastreio || 'SPX-REGISTRADO'"></span>
+            </div>
+
+            <!-- Alerta de Mesma Rua -->
+            <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
+              <span class="text-lg">🚶</span>
+              <span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
+            </div>
+
+            <!-- Alerta de Parada com Múltiplos Pacotes -->
+            <div x-show="pacotesMesmoLocal.length > 1" 
+                 class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
+              <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
+                <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
+              </p>
+              <p class="text-xs text-gray-300 font-medium leading-none">
+                Confira todas as caixas antes de descer do Uno:
+              </p>
+              
+              <div class="space-y-2 pt-1">
+                <template x-for="p in pacotesMesmoLocal" :key="p.id">
+                  <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
+                    <div class="space-x-2">
+                      <span class="text-orange-400 font-black text-sm" x-text="`Canetão #${p.ordem_entrega}`"></span>
+                      <span class="text-white text-xs" x-text="`Ordem SPX ${p.ordem_shopee || '-'}`"></span>
+                    </div>
+                    <span class="tracking-wider text-xs" x-text="p.codigo_rastreio"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Endereço -->
+            <div class="space-y-1 pt-1">
+              <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
+              <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
+              <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
+            </div>
+
+            <!-- Botões GPS -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
+                 class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
+                🚗 Iniciar Waze
+              </a>
+              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" 
+                 class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">
+                🗺️ Google Maps
+              </a>
+            </div>
+
+            <!-- Botões de Ação na Entrega -->
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
+              <button @click="pularEntrega(entregaAtual)" 
+                      class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
+                ⚠️ Ausente / Pular
+              </button>
+              <button @click="concluirEntrega(entregaAtual)" 
+                      class="bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 active:scale-95 transition">
+                ✅ Entregue
+              </button>
+            </div>
+          </div>
+        </template>
+
+        <template x-if="!entregaAtual && entregas.length > 0 && naoEntregues.length === 0">
+          <div class="text-center py-24 space-y-4">
+            <span class="text-7xl block">🏁</span>
+            <h2 class="text-3xl font-black text-white" x-text="`Rota #${rotaAtivaId || ''} 100% Concluída!`"></h2>
+            <p class="text-gray-400 text-sm max-w-xs mx-auto">Parabéns! Todos os pacotes da carga foram entregues com sucesso.</p>
+          </div>
+        </template>
+      </main>
+
+      <!-- MODO 3: HISTÓRICO -->
+      <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full">
+        <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
+        <div class="space-y-3">
+          <template x-for="r in rotasHistorico" :key="r.id">
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 space-y-3 shadow-md">
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="text-base font-black text-white" x-text="`Rota #${r.id}`"></span>
+                  <p class="text-xs text-gray-400" x-text="`Data: ${r.data ? new Date(r.data).toLocaleDateString('pt-BR') : 'Hoje'}`"></p>
+                </div>
+                <span class="text-xs bg-orange-600/20 text-orange-400 border border-orange-500/30 px-3 py-1 rounded-full font-bold" x-text="`${r.total_pacotes || 0} pacotes`"></span>
+              </div>
+              
+              <div class="flex items-center gap-2 pt-1">
+                <button @click="selecionarRotaHistorico(r.id)" class="flex-1 bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700 active:scale-95 transition">
+                  Reabrir Detalhes Desta Rota
+                </button>
+                <button @click="apagarRota(r.id)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 p-3 rounded-xl active:scale-95 transition flex items-center justify-center shrink-0" title="Apagar Rota e Pacotes do Banco">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </main>
+    </div>
+
+    <!-- Assinatura StudioTesta -->
+    <footer class="py-6 text-center text-xs select-text">
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
+      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" 
+         class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">
+        STUDIOTESTA
+      </a>
+    </footer>
+  </div>
+
+  <!-- MODAL: IMPORTAR PLANILHA SHOPEE -->
+  <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4" x-cloak>
+    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <div>
+          <h2 class="font-black text-lg text-orange-500">IMPORTAR PLANILHA SHOPEE</h2>
+          <p class="text-xs text-gray-400">Varredura contínua por corredor de rua</p>
+        </div>
+        <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
+      </div>
+
+      <div x-show="msgErro" class="bg-red-500/20 border border-red-500 p-3 rounded-xl text-xs text-red-200 font-bold" x-text="msgErro"></div>
+
+      <div class="space-y-3">
+        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
+          <span class="text-4xl block mb-2">📊</span>
+          <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
+          <span class="text-xs text-gray-400 block mt-1">Planilha oficial baixada no aplicativo SPX</span>
+          <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
+        </label>
+        <p x-show="nomeArquivo" class="text-xs text-orange-400 font-bold text-center" x-text="`Arquivo: ${nomeArquivo}`"></p>
+      </div>
+
+      <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/15 border border-green-500/40 rounded-2xl p-3.5 text-center space-y-1">
+        <p class="text-sm text-green-400 font-black" x-text="`✅ ${pacotesExtraidos.length} PACOTES RECONHECIDOS!`"></p>
+        <p class="text-xs text-gray-300 font-medium" x-text="`Carga dividida em ${Math.ceil(pacotesExtraidos.length / 10)} sacolas de 10 pacotes.`"></p>
+      </div>
+
+      <button @click="enviarParaN8N()" :disabled="carregandoProcesso || pacotesExtraidos.length === 0" 
+              class="w-full py-4 rounded-2xl text-sm font-black flex items-center justify-center gap-2 shadow-xl transition"
+              :class="pacotesExtraidos.length > 0 && !carregandoProcesso ? 'bg-orange-600 hover:bg-orange-500 text-white cursor-pointer shadow-orange-600/40' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700'">
+        <span x-show="!carregandoProcesso" x-text="pacotesExtraidos.length > 0 ? `🚀 Gerar Rota Contínua (${pacotesExtraidos.length} pacotes)` : 'Aguardando Arquivo...'"></span>
+        <span x-show="carregandoProcesso">⏳ Otimizando Varredura de Ruas...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CONFIGURAR CD E CASA -->
+  <div x-show="modalCD" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4" x-cloak>
+    <div class="bg-gray-900 rounded-3xl w-full max-w-md border border-gray-800 p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <h2 class="font-black text-base text-orange-500">PONTOS DE PARTIDA E CHEGADA</h2>
+        <button @click="modalCD = false" class="text-gray-400 text-2xl">&times;</button>
+      </div>
+
+      <div class="space-y-2 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
+        <label class="text-xs font-bold text-orange-400">🏭 CD SHOPEE (Partida da Rota)</label>
+        <button @click="capturarLocalizacao('cd')" class="w-full bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-green-400 border border-gray-700">
+          📍 Gravar Meu GPS Atual como CD
+        </button>
+        <p x-show="cd.lat" class="text-[10px] text-gray-400 font-mono" x-text="`Lat: ${cd.lat.toFixed(5)}, Lng: ${cd.lng.toFixed(5)}`"></p>
+      </div>
+
+      <div class="space-y-2 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
+        <label class="text-xs font-bold text-green-400">🏠 SUA CASA (Término da Rota)</label>
+        <button @click="capturarLocalizacao('casa')" class="w-full bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-green-400 border border-gray-700">
+          📍 Gravar Meu GPS Atual como Casa
+        </button>
+        <p x-show="casa.lat" class="text-[10px] text-gray-400 font-mono" x-text="`Lat: ${casa.lat.toFixed(5)}, Lng: ${casa.lng.toFixed(5)}`"></p>
+      </div>
+
+      <button @click="salvarLocais()" class="w-full bg-orange-600 text-white font-bold py-3.5 rounded-2xl text-xs">
+        Salvar Coordenadas
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function entregaApp() {
+      return {
+        modo: 'rua',
+        modalImportar: false,
+        modalCD: false,
+        nomeArquivo: '',
+        msgErro: null,
+        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
+        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.1739,"lng":-46.7816}'),
+        pacotesExtraidos: [],
+        carregandoProcesso: false,
+        entregas: [],
+        rotasHistorico: [],
+        rotaAtivaId: null,
+        entregaSelecionadaId: null,
+
+        usuarioLogado: false,
+        tokenAcesso: localStorage.getItem('directus_token') || null,
+        usuarioId: localStorage.getItem('directus_user_id') || null,
+
+        mostrarPopupInstalar: false,
+        temPromptInstalacao: false,
+        isStandalone: false,
+        isIOS: false,
+
+        DIRECTUS_URL: 'https://banco.studiotesta.com.br',
+        N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
+
+        async init() {
+          try {
+            await this.verificarAutenticacao();
+            this.checarInstalacaoPWA();
+
+            if (this.usuarioLogado) {
+              await this.carregarUltimaRota();
+
+              if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
+                launchQueue.setConsumer(async (launchParams) => {
+                  if (!launchParams.files.length) return;
+                  const fileHandle = launchParams.files[0];
+                  const file = await fileHandle.getFile();
+                  this.modalImportar = true;
+                  this.processarArquivoDirecto(file);
+                });
+              }
+            }
+          } catch(e) {
+            console.error('Erro na inicialização:', e);
+          }
+        },
+
+        irParaEntregaDireta(item) {
+          this.entregaSelecionadaId = item.id;
+          this.modo = 'rua';
+        },
+
+        async verificarAutenticacao() {
+          if (localStorage.getItem('usuario_deslogado') === 'true') {
+            this.usuarioLogado = false;
+            return;
+          }
+
+          if (window.location.search) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
+          if (this.tokenAcesso) {
+            try {
+              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, {
+                headers: { 'Authorization': `Bearer ${this.tokenAcesso}` }
+              });
+              if (res.ok) {
+                const data = await res.json();
+                this.usuarioId = data.data.id;
+                localStorage.setItem('directus_user_id', this.usuarioId);
+                this.usuarioLogado = true;
+                return;
+              }
+            } catch(e) {}
+          }
+
+          try {
+            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, {
+              credentials: 'include'
+            });
+
+            if (resSession.ok) {
+              const userData = await resSession.json();
+              if (userData && userData.data && userData.data.id) {
+                this.usuarioId = userData.data.id;
+                localStorage.setItem('directus_user_id', this.usuarioId);
+                this.usuarioLogado = true;
+                return;
+              }
+            }
+          } catch(e) {}
+
+          this.usuarioLogado = false;
+        },
+
+        loginGoogle() {
+          localStorage.removeItem('usuario_deslogado');
+          const urlLimpa = window.location.origin + window.location.pathname;
+          window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
+        },
+
+        async deslogar() {
+          localStorage.setItem('usuario_deslogado', 'true');
+          localStorage.removeItem('directus_token');
+          localStorage.removeItem('directus_user_id');
+
+          this.tokenAcesso = null;
+          this.usuarioId = null;
+          this.usuarioLogado = false;
+          this.entregas = [];
+          this.rotaAtivaId = null;
+
+          try {
+            await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ mode: 'session' })
+            });
+          } catch(e) {}
+
+          document.cookie = "directus_session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=studiotesta.com.br;";
+          document.cookie = "directus_session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        },
+
+        getFaixaPacotes(ordem) {
+          const sacola = Math.ceil(ordem / 10);
+          const inicio = (sacola - 1) * 10 + 1;
+          const fim = sacola * 10;
+          return `Pacotes do ${inicio} ao ${fim}`;
+        },
+
+        checarInstalacaoPWA() {
+          this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+          const userAgent = window.navigator.userAgent.toLowerCase();
+          this.isIOS = /iphone|ipad|ipod/.test(userAgent);
+
+          if (this.isStandalone) {
+            this.mostrarPopupInstalar = false;
+            return;
+          }
+
+          if (window.pwaDeferredPrompt) {
+            this.temPromptInstalacao = true;
+          }
+
+          window.addEventListener('pwa-pronto-para-instalar', () => {
+            this.temPromptInstalacao = true;
+          });
+        },
+
+        acionarInstalacaoManual() {
+          if (window.pwaDeferredPrompt) {
+            this.instalarPWA();
+          } else {
+            this.mostrarPopupInstalar = true;
+          }
+        },
+
+        async instalarPWA() {
+          const prompt = window.pwaDeferredPrompt;
+          if (!prompt) {
+            alert('Para instalar: abra o menu do Chrome (3 pontinhos) e toque em "Adicionar à tela inicial" ou "Instalar aplicativo".');
+            return;
+          }
+          prompt.prompt();
+          await prompt.userChoice;
+          window.pwaDeferredPrompt = null;
+          this.mostrarPopupInstalar = false;
+        },
+
+        parseLinhasShopee(linhasMatriz) {
+          this.msgErro = null;
+          if (!linhasMatriz || linhasMatriz.length < 2) {
+            this.msgErro = 'Planilha com poucas linhas.';
+            return [];
+          }
+
+          let idxCabecalho = -1;
+          for (let i = 0; i < Math.min(linhasMatriz.length, 10); i++) {
+            const rowStr = (linhasMatriz[i] || []).join(' ').toLowerCase();
+            if (rowStr.includes('latitude') || rowStr.includes('spx tn') || rowStr.includes('destination address')) {
+              idxCabecalho = i;
+              break;
+            }
+          }
+
+          if (idxCabecalho === -1) {
+            this.msgErro = 'Colunas oficiais da Shopee não foram encontradas na planilha.';
+            return [];
+          }
+
+          const cabecalho = linhasMatriz[idxCabecalho].map(c => String(c || '').trim().toLowerCase());
+          const acharIdx = (termos) => cabecalho.findIndex(h => termos.some(t => h === t || h.includes(t)));
+
+          const iSequence = acharIdx(['sequence', 'ordem']);
+          const iStop = acharIdx(['stop', 'parada']);
+          
+          let iTN = acharIdx(['spx tn', 'tracking', 'rastreio']);
+          if (iTN === -1 && cabecalho.length > 3) iTN = 3;
+
+          const iAddr = acharIdx(['destination address', 'endereço', 'endereco', 'address']);
+          const iBairro = acharIdx(['bairro', 'neighborhood']);
+          const iCity = acharIdx(['city', 'cidade']);
+          const iCep = acharIdx(['zipcode/postal code', 'zipcode', 'postal', 'cep']);
+          const iLat = acharIdx(['latitude', 'lat']);
+          const iLng = acharIdx(['longitude', 'lng', 'long']);
+
+          const lista = [];
+          for (let r = idxCabecalho + 1; r < linhasMatriz.length; r++) {
+            const cols = linhasMatriz[r];
+            if (!cols || cols.length <= Math.max(iLat, iLng)) continue;
+
+            const rawLat = String(cols[iLat] || '').replace(',', '.').trim();
+            const rawLng = String(cols[iLng] || '').replace(',', '.').trim();
+            const lat = parseFloat(rawLat);
+            const lng = parseFloat(rawLng);
+
+            if (!lat || !lng || isNaN(lat) || isNaN(lng) || lat === 0) continue;
+
+            const addr = String(cols[iAddr] || '').trim();
+            const rawSeq = iSequence !== -1 ? String(cols[iSequence] || '').trim() : '';
+            const rawStop = iStop !== -1 ? String(cols[iStop] || '').trim() : '';
+            
+            const seq = (rawSeq && rawSeq !== '-') ? parseInt(rawSeq) : null;
+            const stp = (rawStop && rawStop !== '-') ? parseInt(rawStop) : null;
+            
+            const rawTN = (iTN !== -1 && cols[iTN]) ? String(cols[iTN]).trim() : '';
+            const rastreioFinal = (rawTN && rawTN !== '-') ? rawTN : `BR${Math.floor(100000000000 + Math.random() * 900000000000)}S`;
+
+            let numero = 'S/N';
+            const numMatch = addr.match(/,\s*(\d+|S\/?N)/i);
+            if (numMatch) numero = numMatch[1];
+
+            lista.push({
+              ordem_shopee: seq,
+              parada_shopee: stp,
+              codigo_rastreio: rastreioFinal,
+              destinatario: stp ? `Parada #${stp}` : 'Destinatário',
+              telefone: '13999999999',
+              endereco: addr,
+              numero: numero,
+              bairro: iBairro !== -1 && cols[iBairro] ? String(cols[iBairro]).trim() : '',
+              cidade: iCity !== -1 && cols[iCity] ? String(cols[iCity]).trim() : 'Mongaguá',
+              cep: iCep !== -1 && cols[iCep] ? String(cols[iCep]).trim() : '',
+              latitude: lat,
+              longitude: lng
+            });
+          }
+
+          const contagemParadas = {};
+          for (const item of lista) {
+            if (item.parada_shopee) {
+              const chave = `${item.cidade}_${item.endereco.split(',')[0].toLowerCase().trim()}_${item.parada_shopee}`;
+              contagemParadas[chave] = (contagemParadas[chave] || 0) + 1;
+            }
+          }
+          for (const item of lista) {
+            if (item.parada_shopee) {
+              const chave = `${item.cidade}_${item.endereco.split(',')[0].toLowerCase().trim()}_${item.parada_shopee}`;
+              item.total_no_local = contagemParadas[chave] || 1;
+            } else {
+              item.total_no_local = 1;
+            }
+          }
+
+          return lista;
+        },
+
+        processarArquivoDirecto(file) {
+          this.nomeArquivo = file.name;
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const wb = XLSX.read(data, { type: 'array' });
+
+              let entregasAparecidas = [];
+              for (const sheetName of wb.SheetNames) {
+                const ws = wb.Sheets[sheetName];
+                const matriz = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+                const res = this.parseLinhasShopee(matriz);
+                if (res.length > 0) {
+                  entregasAparecidas = res;
+                  break;
+                }
+              }
+
+              this.pacotesExtraidos = entregasAparecidas;
+              if (this.pacotesExtraidos.length === 0 && !this.msgErro) {
+                this.msgErro = 'Nenhum pacote com Latitude e Longitude válidas nesta planilha.';
+              }
+            } catch (err) {
+              this.msgErro = 'Erro ao processar: ' + err.message;
+            }
+          };
+
+          reader.readAsArrayBuffer(file);
+        },
+
+        processarArquivoExcel(event) {
+          const file = event.target.files[0];
+          if (file) this.processarArquivoDirecto(file);
+        },
+
+        async carregarUltimaRota() {
+          try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+            const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=1`, {
+              headers,
+              credentials: 'include'
+            });
+            const dataRota = await resRota.json();
+            
+            if (dataRota.data && dataRota.data.length > 0) {
+              this.rotaAtivaId = dataRota.data[0].id;
+              await this.carregarEntregasPorId(this.rotaAtivaId);
+            } else {
+              this.entregas = [];
+              this.rotaAtivaId = null;
+            }
+          } catch(e) {
+            console.error('Erro ao carregar rota:', e);
+          }
+        },
+
+        async carregarEntregasPorId(rotaId) {
+          try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+            const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`, {
+              headers,
+              credentials: 'include'
+            });
+            const data = await res.json();
+            this.entregas = data.data || [];
+          } catch(e) {
+            console.error('Erro ao buscar entregas:', e);
+          }
+        },
+
+        async abrirHistorico() {
+          this.modo = 'historico';
+          try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+            const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, {
+              headers,
+              credentials: 'include'
+            });
+            const dataRota = await resRota.json();
+            this.rotasHistorico = dataRota.data || [];
+          } catch(e) {}
+        },
+
+        async selecionarRotaHistorico(rotaId) {
+          this.rotaAtivaId = rotaId;
+          await this.carregarEntregasPorId(rotaId);
+          this.modo = 'carregamento';
+        },
+
+        async apagarRota(rotaId) {
+          if (!confirm(`Deseja realmente apagar a Rota #${rotaId} e todos os seus pacotes do banco de dados? Esta ação não pode ser desfeita.`)) {
+            return;
+          }
+
+          try {
+            const headers = {};
+            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+            const res = await fetch(`${this.DIRECTUS_URL}/items/rotas/${rotaId}`, {
+              method: 'DELETE',
+              headers,
+              credentials: 'include'
+            });
+
+            if (res.ok || res.status === 204) {
+              this.rotasHistorico = this.rotasHistorico.filter(r => r.id !== rotaId);
+              if (this.rotaAtivaId === rotaId) {
+                this.rotaAtivaId = null;
+                this.entregas = [];
+                await this.carregarUltimaRota();
+              }
+              alert(`Rota #${rotaId} apagada com sucesso!`);
+            } else {
+              alert('Erro ao apagar rota no Directus.');
+            }
+          } catch(e) {
+            alert('Falha na comunicação: ' + e.message);
+          }
+        },
+
+        capturarLocalizacao(tipo) {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+              this[tipo].lat = pos.coords.latitude;
+              this[tipo].lng = pos.coords.longitude;
+              alert(`GPS de ${tipo.toUpperCase()} salvo!`);
+            }, err => alert('Erro GPS: ' + err.message));
+          }
+        },
+
+        salvarLocais() {
+          localStorage.setItem('local_cd', JSON.stringify(this.cd));
+          localStorage.setItem('local_casa', JSON.stringify(this.casa));
+          this.modalCD = false;
+        },
+
+        get naoEntregues() {
+          return this.entregas.filter(e => e.status !== 'entregue');
+        },
+
+        get entregaAtual() {
+          if (this.entregaSelecionadaId) {
+            const sel = this.entregas.find(e => e.id === this.entregaSelecionadaId);
+            if (sel && sel.status !== 'entregue') return sel;
+          }
+          
+          const primeiroPendente = this.entregas.find(e => e.status === 'pendente');
+          if (primeiroPendente) return primeiroPendente;
+
+          const primeiroPulado = this.entregas.find(e => e.status === 'ausente');
+          if (primeiroPulado) return primeiroPulado;
+
+          return null;
+        },
+
+        get ehMesmaRuaQueAnterior() {
+          if (!this.entregaAtual) return false;
+          const idx = this.entregas.findIndex(e => e.id === this.entregaAtual.id);
+          if (idx <= 0) return false;
+          const anterior = this.entregas[idx - 1];
+          const ruaAtual = (this.entregaAtual.endereco || '').split(',')[0].toLowerCase().trim();
+          const ruaAnterior = (anterior.endereco || '').split(',')[0].toLowerCase().trim();
+          return ruaAtual === ruaAnterior;
+        },
+
+        get pacotesMesmoLocal() {
+          if (!this.entregaAtual) return [];
+          const cur = this.entregaAtual;
+          const mesmaRua = (e) => (e.endereco || '').split(',')[0].toLowerCase().trim() === (cur.endereco || '').split(',')[0].toLowerCase().trim();
+          return this.naoEntregues.filter(e => 
+            (e.cidade === cur.cidade && e.parada_shopee && cur.parada_shopee && e.parada_shopee === cur.parada_shopee && mesmaRua(e)) ||
+            (e.cidade === cur.cidade && mesmaRua(e) && Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001)
+          );
+        },
+
+        async pularEntrega(entrega) {
+          await this.atualizarStatus(entrega.id, 'ausente');
+          this.entregaSelecionadaId = null;
+        },
+
+        async concluirEntrega(entrega) {
+          const mesmoLocal = this.pacotesMesmoLocal;
+          if (mesmoLocal.length > 1) {
+            const conf = confirm(`Há ${mesmoLocal.length} pacotes nesta Parada. Deseja marcar TODOS como entregues?`);
+            if (conf) {
+              for (const p of mesmoLocal) {
+                await this.atualizarStatus(p.id, 'entregue');
+              }
+              this.entregaSelecionadaId = null;
+              return;
+            }
+          }
+          this.entregaSelecionadaId = null;
+          await this.atualizarStatus(entrega.id, 'entregue');
+        },
+
+        async atualizarStatus(id, novoStatus) {
+          const idx = this.entregas.findIndex(e => e.id === id);
+          if (idx !== -1) this.entregas[idx].status = novoStatus;
+
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+          await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
+            method: 'PATCH',
+            headers,
+            credentials: 'include',
+            body: JSON.stringify({ status: novoStatus })
+          });
+        },
+
+        async enviarParaN8N() {
+          this.carregandoProcesso = true;
+          try {
+            if (!this.usuarioId) {
+              const u = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
+              const ud = await u.json();
+              if (ud?.data?.id) {
+                this.usuarioId = ud.data.id;
+                localStorage.setItem('directus_user_id', this.usuarioId);
+              }
+            }
+
+            const payload = {
+              entregas: this.pacotesExtraidos,
+              user_id: this.usuarioId,
+              cd_lat: this.cd.lat,
+              cd_lng: this.cd.lng,
+              casa_lat: this.casa.lat,
+              casa_lng: this.casa.lng
+            };
+
+            const res = await fetch(this.N8N_WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+              const resJson = await res.json();
+              this.modalImportar = false;
+              this.pacotesExtraidos = [];
+              this.nomeArquivo = '';
+
+              if (resJson && resJson.rota_id) {
+                this.rotaAtivaId = resJson.rota_id;
+                await this.carregarEntregasPorId(this.rotaAtivaId);
+              } else {
+                await this.carregarUltimaRota();
+              }
+
+              this.modo = 'carregamento';
+            } else {
+              alert('Erro no n8n ao gerar rota.');
+            }
+          } catch(e) {
+            alert('Falha na comunicação: ' + e.message);
+          } finally {
+            this.carregandoProcesso = false;
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

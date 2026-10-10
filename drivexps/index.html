@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DriveXPS - Rotas Shopee</title>
+  <title>DriveXPS - Rotas Inteligentes</title>
   
   <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
@@ -40,7 +40,7 @@
 </head>
 <body class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between" x-data="entregaApp()">
 
-  <!-- 1. SPLASH SCREEN COM TEMPORIZADOR INFALÍVEL (NUNCA TRAVA) -->
+  <!-- 1. SPLASH SCREEN (NUNCA TRAVA) -->
   <div id="splashScreen" 
        class="fixed inset-0 z-[100] bg-black flex flex-col justify-end items-center pb-12 select-none transition-all duration-500 ease-out"
        style="background-image: url('./splash.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -58,7 +58,6 @@
     </div>
   </div>
 
-  <!-- SCRIPT INFALÍVEL: DESTROI O SPLASH EM 1.5S MESMO SEM REDE -->
   <script>
     setTimeout(() => {
       const b = document.getElementById('splashBarra');
@@ -96,7 +95,7 @@
       <div class="space-y-1.5">
         <h2 class="text-3xl font-black text-white tracking-wide">DriveXPS</h2>
         <p class="text-xs text-gray-400 font-medium leading-relaxed">
-          Roteirizador contínuo e organizador de carga para a Shopee Express.
+          Roteirizador contínuo e organizador de carga profissional.
         </p>
       </div>
 
@@ -111,7 +110,11 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="text-orange-500">🚗</span>
-          <span>Varredura por rua: sem ziguezague e economia de combustível</span>
+          <span>Varredura por rua: sem ziguezague e economia real de combustível</span>
+        </div>
+        <div class="flex items-center gap-2 pt-1 border-t border-gray-800">
+          <span class="text-emerald-400">🎁</span>
+          <span class="text-emerald-400 font-bold">7 Dias de Teste Grátis ao entrar!</span>
         </div>
       </div>
 
@@ -161,7 +164,7 @@
       <div class="space-y-1.5">
         <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Instale o app para ter tela cheia no Uno e resposta rápida no trânsito.
+          Instale o app para ter navegação fluida em tela cheia e resposta ultra rápida no trânsito.
         </p>
       </div>
       
@@ -185,10 +188,21 @@
     </div>
   </div>
 
-  <!-- 4. APLICAÇÃO PRINCIPAL -->
+  <!-- 4. BANNER DO PERÍODO DE TESTE (SAAS) -->
+  <div x-show="usuarioLogado && diasRestantesTrial > 0 && diasRestantesTrial <= 7 && statusAssinatura !== 'ativo'" 
+       class="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex justify-between items-center text-xs" x-cloak>
+    <span class="text-amber-400 font-bold flex items-center gap-1.5">
+      <span>⏳</span> Período de Teste: <strong x-text="`${diasRestantesTrial} dia(s) restante(s)`"></strong>
+    </span>
+    <button @click="modalAssinatura = true" class="bg-amber-500 hover:bg-amber-400 text-black font-black text-[11px] px-3 py-1 rounded-full transition active:scale-95 shadow-md">
+      Garantir Acesso Ilimitado
+    </button>
+  </div>
+
+  <!-- 5. APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     <div>
-      <!-- CABEÇALHO EM 3 LINHAS -->
+      <!-- CABEÇALHO -->
       <header class="bg-orange-600 px-4 pt-3 pb-3 sticky top-0 z-30 shadow-xl space-y-2.5">
         <div class="text-center flex justify-between items-center">
           <button @click="deslogar()" class="text-[10px] bg-black/50 text-orange-200 hover:text-white px-2.5 py-1 rounded-lg font-bold border border-orange-400/30 active:scale-95 transition cursor-pointer">
@@ -212,7 +226,7 @@
         </div>
 
         <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
-          <button @click="modalImportar = true" class="bg-white hover:bg-orange-50 text-orange-600 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center shadow-md active:scale-95 transition">
+          <button @click="abrirModalImportar()" class="bg-white hover:bg-orange-50 text-orange-600 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center shadow-md active:scale-95 transition">
             <span class="text-sm leading-none">+</span>
             <span class="leading-none mt-0.5">Rota</span>
           </button>
@@ -258,10 +272,10 @@
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5">
-            <span>✍️</span> CONFERÊNCIA GIGANTE (CANETÃO, PARADA, ORDEM E SACOLA)
+            <span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO
           </p>
           <p class="text-gray-300 text-xs leading-relaxed">
-            Layout padronizado. <em>(Toque em qualquer card para navegar no Waze).</em>
+            Layout universal otimizado para qualquer veículo. <em>(Toque no card para abrir no Waze).</em>
           </p>
         </div>
 
@@ -274,7 +288,7 @@
                    'border-yellow-500/70 bg-yellow-500/5': item.status === 'ausente'
                  }">
               
-              <!-- LINHA 1: OS 4 BLOCOS DO SEU DESENHO -->
+              <!-- 4 BLOCOS UNIVERSAIS -->
               <div class="grid grid-cols-4 gap-2 text-center">
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
                   <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
@@ -380,7 +394,7 @@
                 <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
               </p>
               <p class="text-xs text-gray-300 font-medium leading-none">
-                Confira todas as caixas antes de descer do Uno:
+                Confira todas as caixas antes de desembarcar:
               </p>
               
               <div class="space-y-2 pt-1">
@@ -478,6 +492,77 @@
     </footer>
   </div>
 
+  <!-- MODAL DE ASSINATURA / PAYWALL APÓS 7 DIAS (SAAS) -->
+  <div x-show="modalAssinatura" 
+       class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
+      
+      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
+        ⚡
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-xl font-black text-white">DriveXPS Ilimitado</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong> eliminando ziguezagues.
+        </p>
+      </div>
+
+      <!-- SELETOR DE PLANOS -->
+      <div class="space-y-2.5 text-left">
+        <div @click="planoEscolhido = 'semanal'" 
+             class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center"
+             :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
+          <div>
+            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Popular</span>
+            <span class="text-sm font-black text-white">Plano Semanal</span>
+            <span class="text-[11px] text-gray-400 block">Menos que 2L de combustível</span>
+          </div>
+          <div class="text-right">
+            <span class="text-lg font-black text-orange-400">R$ 9,90</span>
+            <span class="text-[10px] text-gray-500 block">por semana</span>
+          </div>
+        </div>
+
+        <div @click="planoEscolhido = 'mensal'" 
+             class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center"
+             :class="planoEscolhido === 'mensal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
+          <div>
+            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span>
+            <span class="text-sm font-black text-white">Plano Mensal</span>
+            <span class="text-[11px] text-gray-400 block">Acesso liberado o mês todo</span>
+          </div>
+          <div class="text-right">
+            <span class="text-lg font-black text-white">R$ 29,90</span>
+            <span class="text-[10px] text-gray-500 block">por mês</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÁREA DE PIX -->
+      <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
+        <button @click="gerarPixAssinatura()" :disabled="carregandoPix"
+                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
+          <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span>
+          <span x-show="carregandoPix">⏳ Gerando Chave PIX...</span>
+        </button>
+
+        <button x-show="assinaturaValida" @click="modalAssinatura = false" class="text-xs text-gray-400 hover:text-white pt-1 font-bold">
+          Continuar no período de teste
+        </button>
+      </div>
+
+      <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-left bg-black/60 p-4 rounded-2xl border border-gray-800">
+        <p class="text-xs font-bold text-emerald-400 text-center">✅ Código PIX Gerado com Sucesso!</p>
+        <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all" x-text="codigoPixGerado"></div>
+        <button @click="copiarCodigoPix()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl text-xs active:scale-95 transition">
+          📋 Copiar Código PIX
+        </button>
+        <p class="text-[10px] text-gray-400 text-center">Assim que o pagamento for concluído, sua conta é ativada em segundos.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: IMPORTAR PLANILHA SHOPEE -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
@@ -551,6 +636,11 @@
         modo: 'rua',
         modalImportar: false,
         modalCD: false,
+        modalAssinatura: false,
+        planoEscolhido: 'semanal',
+        carregandoPix: false,
+        codigoPixGerado: '',
+        
         nomeArquivo: '',
         msgErro: null,
         cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
@@ -563,8 +653,14 @@
         entregaSelecionadaId: null,
 
         usuarioLogado: false,
+        usuarioEmail: '',
         tokenAcesso: localStorage.getItem('directus_token') || null,
         usuarioId: localStorage.getItem('directus_user_id') || null,
+        
+        // Controle SaaS
+        diasRestantesTrial: 7,
+        statusAssinatura: 'trial',
+        assinaturaValida: true,
 
         mostrarPopupInstalar: false,
         temPromptInstalacao: false,
@@ -580,6 +676,7 @@
             this.checarInstalacaoPWA();
 
             if (this.usuarioLogado) {
+              await this.sincronizarAssinaturaSaaS();
               await this.carregarUltimaRota();
 
               if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
@@ -587,7 +684,7 @@
                   if (!launchParams.files.length) return;
                   const fileHandle = launchParams.files[0];
                   const file = await fileHandle.getFile();
-                  this.modalImportar = true;
+                  this.abrirModalImportar();
                   this.processarArquivoDirecto(file);
                 });
               }
@@ -595,6 +692,14 @@
           } catch(e) {
             console.error('Erro na inicialização:', e);
           }
+        },
+
+        abrirModalImportar() {
+          if (!this.assinaturaValida) {
+            this.modalAssinatura = true;
+            return;
+          }
+          this.modalImportar = true;
         },
 
         irParaEntregaDireta(item) {
@@ -620,6 +725,7 @@
               if (res.ok) {
                 const data = await res.json();
                 this.usuarioId = data.data.id;
+                this.usuarioEmail = data.data.email || '';
                 localStorage.setItem('directus_user_id', this.usuarioId);
                 this.usuarioLogado = true;
                 return;
@@ -636,6 +742,7 @@
               const userData = await resSession.json();
               if (userData && userData.data && userData.data.id) {
                 this.usuarioId = userData.data.id;
+                this.usuarioEmail = userData.data.email || '';
                 localStorage.setItem('directus_user_id', this.usuarioId);
                 this.usuarioLogado = true;
                 return;
@@ -644,6 +751,103 @@
           } catch(e) {}
 
           this.usuarioLogado = false;
+        },
+
+        // Gestão de Licença / 7 Dias de Teste via drivexps_users
+        async sincronizarAssinaturaSaaS() {
+          if (!this.usuarioId) return;
+
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, {
+              headers,
+              credentials: 'include'
+            });
+
+            const data = await res.json();
+            const registros = data.data || [];
+
+            if (registros.length === 0) {
+              // Primeiro acesso: Cria 7 dias de trial
+              const dataExpiracao = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+              const novoRegistro = {
+                user_id: this.usuarioId,
+                email: this.usuarioEmail,
+                trial_expira_em: dataExpiracao,
+                status_assinatura: 'trial',
+                plano_ativo: 'gratuito'
+              };
+
+              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
+                method: 'POST',
+                headers,
+                credentials: 'include',
+                body: JSON.stringify(novoRegistro)
+              });
+
+              this.diasRestantesTrial = 7;
+              this.statusAssinatura = 'trial';
+              this.assinaturaValida = true;
+            } else {
+              // Registro existente: Calcula validade
+              const userSaas = registros[0];
+              this.statusAssinatura = userSaas.status_assinatura || 'trial';
+
+              if (this.statusAssinatura === 'ativo') {
+                this.assinaturaValida = true;
+                this.diasRestantesTrial = 0;
+              } else {
+                const agora = new Date();
+                const expira = new Date(userSaas.trial_expira_em || Date.now());
+                const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
+                this.diasRestantesTrial = Math.max(0, diffDias);
+
+                if (diffDias > 0) {
+                  this.assinaturaValida = true;
+                } else {
+                  this.assinaturaValida = false;
+                  this.modalAssinatura = true; // Bloqueia e abre tela de pagamento
+                }
+              }
+            }
+          } catch (err) {
+            console.error('Erro ao verificar licença SaaS:', err);
+          }
+        },
+
+        async gerarPixAssinatura() {
+          this.carregandoPix = true;
+          try {
+            // Chamada ao seu webhook de pagamento no n8n (Mercado Pago ou Asaas)
+            const res = await fetch('https://n8n.studiotesta.com.br/webhook/gerar-pix-drivexps', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: this.usuarioId,
+                email: this.usuarioEmail,
+                plano: this.planoEscolhido
+              })
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              this.codigoPixGerado = data.pix_copia_cola || '00020126580014br.gov.bcb.pix0136studiotesta-drivexps-pix-chave5204000053039865802BR5920DriveXPS6009SaoPaulo62070503***6304ABCD';
+            } else {
+              // Fallback demonstrativo caso o webhook de pagamento ainda não esteja ativo
+              this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136chave-pix-studiotesta@exemplo.com520400005303986540' + (this.planoEscolhido === 'semanal' ? '9.90' : '29.90') + '5802BR5915STUDIOTESTA6009SAOPAULO62070503***6304E1F2';
+            }
+          } catch(e) {
+            this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136chave-pix-studiotesta@exemplo.com520400005303986540' + (this.planoEscolhido === 'semanal' ? '9.90' : '29.90') + '5802BR5915STUDIOTESTA6009SAOPAULO62070503***6304E1F2';
+          } finally {
+            this.carregandoPix = false;
+          }
+        },
+
+        copiarCodigoPix() {
+          navigator.clipboard.writeText(this.codigoPixGerado);
+          alert('Código PIX copiado! Cole no aplicativo do seu banco.');
         },
 
         loginGoogle() {
@@ -1040,6 +1244,11 @@
         },
 
         async enviarParaN8N() {
+          if (!this.assinaturaValida) {
+            this.modalAssinatura = true;
+            return;
+          }
+
           this.carregandoProcesso = true;
           try {
             if (!this.usuarioId) {
@@ -1068,6 +1277,13 @@
 
             if (res.ok) {
               const resJson = await res.json();
+              
+              if (resJson.bloqueado) {
+                alert(resJson.mensagem || 'Assinatura necessária.');
+                this.modalAssinatura = true;
+                return;
+              }
+
               this.modalImportar = false;
               this.pacotesExtraidos = [];
               this.nomeArquivo = '';
