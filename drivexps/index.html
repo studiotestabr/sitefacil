@@ -110,11 +110,11 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="text-orange-500">🚗</span>
-          <span>Varredura por rua: sem ziguezague e economia real de combustível</span>
+          <span>Varredura por rua: sem ziguezague e economia de combustível</span>
         </div>
         <div class="flex items-center gap-2 pt-1 border-t border-gray-800">
           <span class="text-emerald-400">🎁</span>
-          <span class="text-emerald-400 font-bold">7 Dias de Teste Grátis ao entrar!</span>
+          <span class="text-emerald-400 font-bold">7 Dias Grátis (começam na sua 1ª rota)!</span>
         </div>
       </div>
 
@@ -164,7 +164,7 @@
       <div class="space-y-1.5">
         <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Instale o app para ter navegação fluida em tela cheia e resposta ultra rápida no trânsito.
+          Instale o app para ter navegação fluida em tela cheia e abrir romaneios diretamente.
         </p>
       </div>
       
@@ -188,14 +188,24 @@
     </div>
   </div>
 
-  <!-- 4. BANNER DO PERÍODO DE TESTE (SAAS) -->
-  <div x-show="usuarioLogado && diasRestantesTrial > 0 && diasRestantesTrial <= 7 && statusAssinatura !== 'ativo'" 
-       class="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex justify-between items-center text-xs" x-cloak>
-    <span class="text-amber-400 font-bold flex items-center gap-1.5">
-      <span>⏳</span> Período de Teste: <strong x-text="`${diasRestantesTrial} dia(s) restante(s)`"></strong>
-    </span>
-    <button @click="modalAssinatura = true" class="bg-amber-500 hover:bg-amber-400 text-black font-black text-[11px] px-3 py-1 rounded-full transition active:scale-95 shadow-md">
-      Garantir Acesso Ilimitado
+  <!-- 4. BANNER DO PERÍODO DE TESTE (SAAS INTELIGENTE) -->
+  <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" 
+       class="border-b px-4 py-2 flex justify-between items-center text-xs"
+       :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
+    <div>
+      <template x-if="!trialIniciado">
+        <span class="text-emerald-400 font-bold flex items-center gap-1.5">
+          <span>🎁</span> <strong>7 Dias Grátis:</strong> Começam ao gerar sua 1ª rota!
+        </span>
+      </template>
+      <template x-if="trialIniciado">
+        <span class="text-amber-400 font-bold flex items-center gap-1.5">
+          <span>⏳</span> Teste Ativo: <strong x-text="`${diasRestantesTrial} dia(s) restante(s)`"></strong>
+        </span>
+      </template>
+    </div>
+    <button @click="modalAssinatura = true" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-[11px] px-3 py-1 rounded-full transition active:scale-95 shadow-md">
+      Ver Planos
     </button>
   </div>
 
@@ -205,9 +215,14 @@
       <!-- CABEÇALHO -->
       <header class="bg-orange-600 px-4 pt-3 pb-3 sticky top-0 z-30 shadow-xl space-y-2.5">
         <div class="text-center flex justify-between items-center">
-          <button @click="deslogar()" class="text-[10px] bg-black/50 text-orange-200 hover:text-white px-2.5 py-1 rounded-lg font-bold border border-orange-400/30 active:scale-95 transition cursor-pointer">
-            🚪 Sair
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button @click="deslogar()" class="text-[10px] bg-black/50 text-orange-200 hover:text-white px-2.5 py-1 rounded-lg font-bold border border-orange-400/30 active:scale-95 transition cursor-pointer">
+              🚪 Sair
+            </button>
+            <button @click="iniciarTutorial()" class="text-[10px] bg-black/40 text-yellow-300 hover:text-white px-2 py-1 rounded-lg font-bold border border-yellow-400/30 active:scale-95 transition" title="Ver Tutorial">
+              ❓ Tutorial
+            </button>
+          </div>
           <h1 class="font-black text-2xl tracking-wider text-white drop-shadow-sm">DriveXPS</h1>
           <button x-show="!isStandalone" @click="acionarInstalacaoManual()" class="text-xs bg-black/40 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] border border-white/20 active:scale-95 transition">
             📲 Instalar
@@ -226,15 +241,15 @@
         </div>
 
         <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
-          <button @click="abrirModalImportar()" class="bg-white hover:bg-orange-50 text-orange-600 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center shadow-md active:scale-95 transition">
+          <button id="btnTourRota" @click="abrirModalImportar()" class="bg-white hover:bg-orange-50 text-orange-600 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center shadow-md active:scale-95 transition">
             <span class="text-sm leading-none">+</span>
             <span class="leading-none mt-0.5">Rota</span>
           </button>
-          <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition">
+          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition">
             <span class="text-sm leading-none">📦</span>
             <span class="leading-none mt-0.5">Sacolas</span>
           </button>
-          <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition">
+          <button id="btnTourRua" @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition">
             <span class="text-sm leading-none">🚗</span>
             <span class="leading-none mt-0.5">Rua</span>
           </button>
@@ -246,7 +261,7 @@
       </header>
 
       <!-- CONFIGURAÇÃO GPS (CD e CASA) -->
-      <section class="bg-gray-900/90 px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5">
+      <section id="btnTourGPS" class="bg-gray-900/90 px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5">
         <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
           <div class="truncate pr-1">
             <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Partida:</span>
@@ -492,7 +507,105 @@
     </footer>
   </div>
 
-  <!-- MODAL DE ASSINATURA / PAYWALL APÓS 7 DIAS (SAAS) -->
+  <!-- 6. MINI TUTORIAL INTERATIVO (ONBOARDING COM POPUPS) -->
+  <div x-show="tutorialAberto" 
+       class="fixed inset-0 bg-black/80 z-[120] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all">
+      
+      <!-- Passo 1: Boas-vindas -->
+      <template x-if="passoTutorial === 1">
+        <div class="space-y-3">
+          <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">
+            👋
+          </div>
+          <h3 class="text-xl font-black text-white">Bem-vindo ao DriveXPS!</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Vamos te ensinar em 30 segundos como acabar com o ziguezague, economizar gasolina e terminar suas entregas muito mais rápido.
+          </p>
+          <div class="bg-gray-950 p-3 rounded-2xl border border-gray-800 text-[11px] text-emerald-400 font-bold">
+            🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!
+          </div>
+        </div>
+      </template>
+
+      <!-- Passo 2: Botão + Rota -->
+      <template x-if="passoTutorial === 2">
+        <div class="space-y-3">
+          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">
+            📊
+          </div>
+          <h3 class="text-lg font-black text-white">1. Importar Romaneio</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Toque no botão <strong>"+ Rota"</strong> e selecione a planilha <code>.xlsx</code> oficial da SPX Shopee.
+          </p>
+          <p class="text-[11px] text-orange-400 font-semibold bg-black/50 p-2.5 rounded-xl border border-gray-800">
+            Dica de Ouro: Você também pode clicar no arquivo baixado e escolher "Abrir com DriveXPS"!
+          </p>
+        </div>
+      </template>
+
+      <!-- Passo 3: Sacolas e Canetão -->
+      <template x-if="passoTutorial === 3">
+        <div class="space-y-3">
+          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">
+            ✍️
+          </div>
+          <h3 class="text-lg font-black text-white">2. Organização no Canetão</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Na aba <strong>"Sacolas"</strong>, marque com canetão na caixa o número <strong>#CANETÃO</strong>. O app divide automaticamente sua carga em sacolas de 10 em 10 pacotes!
+          </p>
+        </div>
+      </template>
+
+      <!-- Passo 4: Cockpit de Rua -->
+      <template x-if="passoTutorial === 4">
+        <div class="space-y-3">
+          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">
+            🚗
+          </div>
+          <h3 class="text-lg font-black text-white">3. Na Rua com Waze</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Na aba <strong>"Rua"</strong>, o app avisa se a próxima casa fica na mesma rua (sem gastar GPS) e abre o Waze ou Maps com 1 único toque.
+          </p>
+        </div>
+      </template>
+
+      <!-- Passo 5: Conclusão -->
+      <template x-if="passoTutorial === 5">
+        <div class="space-y-3">
+          <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">
+            🏁
+          </div>
+          <h3 class="text-lg font-black text-white">Tudo Pronto para Rodar!</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Grave o ponto do <strong>CD</strong> e da sua <strong>Casa</strong> no menu GPS para a rota terminar pertinho de você. Boas entregas!
+          </p>
+        </div>
+      </template>
+
+      <!-- Botões de Navegação do Tutorial -->
+      <div class="flex items-center justify-between pt-2 border-t border-gray-800">
+        <button @click="concluirTutorial()" class="text-xs text-gray-400 hover:text-white font-bold py-2 px-3">
+          Pular
+        </button>
+
+        <div class="flex items-center gap-1.5">
+          <template x-for="p in 5" :key="p">
+            <span class="w-2 h-2 rounded-full transition" 
+                  :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700'"></span>
+          </template>
+        </div>
+
+        <button @click="proximoPassoTutorial()" 
+                class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl active:scale-95 transition">
+          <span x-text="passoTutorial === 5 ? 'Começar!' : 'Avançar'"></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 7. MODAL DE ASSINATURA / PAYWALL (SAAS) -->
   <div x-show="modalAssinatura" 
        class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
@@ -504,7 +617,7 @@
       <div class="space-y-1">
         <h3 class="text-xl font-black text-white">DriveXPS Ilimitado</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong> eliminando ziguezagues.
+          Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong>.
         </p>
       </div>
 
@@ -657,10 +770,15 @@
         tokenAcesso: localStorage.getItem('directus_token') || null,
         usuarioId: localStorage.getItem('directus_user_id') || null,
         
-        // Controle SaaS
+        // Controle de Trial do SaaS
+        trialIniciado: false,
         diasRestantesTrial: 7,
         statusAssinatura: 'trial',
         assinaturaValida: true,
+
+        // Tutorial / Onboarding
+        tutorialAberto: false,
+        passoTutorial: 1,
 
         mostrarPopupInstalar: false,
         temPromptInstalacao: false,
@@ -679,6 +797,15 @@
               await this.sincronizarAssinaturaSaaS();
               await this.carregarUltimaRota();
 
+              // Inicia Tutorial automaticamente no primeiro acesso
+              if (!localStorage.getItem('drivexps_tutorial_visto')) {
+                setTimeout(() => this.iniciarTutorial(), 600);
+              }
+
+              // 1. Captura de arquivo compartilhado via Android ("Compartilhar com DriveXPS")
+              await this.checarArquivoCompartilhado();
+
+              // 2. Captura de arquivo aberto diretamente ("Abrir com DriveXPS")
               if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
                 launchQueue.setConsumer(async (launchParams) => {
                   if (!launchParams.files.length) return;
@@ -692,6 +819,42 @@
           } catch(e) {
             console.error('Erro na inicialização:', e);
           }
+        },
+
+        async checarArquivoCompartilhado() {
+          if (window.location.search.includes('arquivo_compartilhado=true')) {
+            try {
+              const cache = await caches.open('drivexps-shared-files');
+              const res = await cache.match('ultimo-romaneio');
+              if (res) {
+                const blob = await res.blob();
+                const file = new File([blob], 'romaneio_shopee.xlsx', { type: blob.type });
+                this.abrirModalImportar();
+                this.processarArquivoDirecto(file);
+                await cache.delete('ultimo-romaneio');
+              }
+            } catch(e) {
+              console.error('Erro ao ler romaneio compartilhado:', e);
+            }
+          }
+        },
+
+        iniciarTutorial() {
+          this.passoTutorial = 1;
+          this.tutorialAberto = true;
+        },
+
+        proximoPassoTutorial() {
+          if (this.passoTutorial < 5) {
+            this.passoTutorial++;
+          } else {
+            this.concluirTutorial();
+          }
+        },
+
+        concluirTutorial() {
+          this.tutorialAberto = false;
+          localStorage.setItem('drivexps_tutorial_visto', 'true');
         },
 
         abrirModalImportar() {
@@ -713,7 +876,7 @@
             return;
           }
 
-          if (window.location.search) {
+          if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
             window.history.replaceState({}, document.title, window.location.pathname);
           }
 
@@ -753,7 +916,7 @@
           this.usuarioLogado = false;
         },
 
-        // Gestão de Licença / 7 Dias de Teste via drivexps_users
+        // Gestão de Licença SaaS (7 dias contam apenas a partir da 1ª rota)
         async sincronizarAssinaturaSaaS() {
           if (!this.usuarioId) return;
 
@@ -770,12 +933,11 @@
             const registros = data.data || [];
 
             if (registros.length === 0) {
-              // Primeiro acesso: Cria 7 dias de trial
-              const dataExpiracao = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+              // Primeiro acesso: Cria usuário sem data de expiração (aguarda 1ª rota)
               const novoRegistro = {
                 user_id: this.usuarioId,
                 email: this.usuarioEmail,
-                trial_expira_em: dataExpiracao,
+                trial_expira_em: null,
                 status_assinatura: 'trial',
                 plano_ativo: 'gratuito'
               };
@@ -787,20 +949,28 @@
                 body: JSON.stringify(novoRegistro)
               });
 
+              this.trialIniciado = false;
               this.diasRestantesTrial = 7;
               this.statusAssinatura = 'trial';
               this.assinaturaValida = true;
             } else {
-              // Registro existente: Calcula validade
               const userSaas = registros[0];
               this.statusAssinatura = userSaas.status_assinatura || 'trial';
 
               if (this.statusAssinatura === 'ativo') {
                 this.assinaturaValida = true;
+                this.trialIniciado = true;
                 this.diasRestantesTrial = 0;
+              } else if (!userSaas.trial_expira_em) {
+                // Usuário cadastrado, mas ainda não gerou nenhuma rota
+                this.trialIniciado = false;
+                this.diasRestantesTrial = 7;
+                this.assinaturaValida = true;
               } else {
+                // Já gerou rota: calcula dias restantes
+                this.trialIniciado = true;
                 const agora = new Date();
-                const expira = new Date(userSaas.trial_expira_em || Date.now());
+                const expira = new Date(userSaas.trial_expira_em);
                 const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
                 this.diasRestantesTrial = Math.max(0, diffDias);
 
@@ -820,7 +990,6 @@
         async gerarPixAssinatura() {
           this.carregandoPix = true;
           try {
-            // Chamada ao seu webhook de pagamento no n8n (Mercado Pago ou Asaas)
             const res = await fetch('https://n8n.studiotesta.com.br/webhook/gerar-pix-drivexps', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -833,13 +1002,12 @@
 
             if (res.ok) {
               const data = await res.json();
-              this.codigoPixGerado = data.pix_copia_cola || '00020126580014br.gov.bcb.pix0136studiotesta-drivexps-pix-chave5204000053039865802BR5920DriveXPS6009SaoPaulo62070503***6304ABCD';
+              this.codigoPixGerado = data.pix_copia_cola;
             } else {
-              // Fallback demonstrativo caso o webhook de pagamento ainda não esteja ativo
-              this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136chave-pix-studiotesta@exemplo.com520400005303986540' + (this.planoEscolhido === 'semanal' ? '9.90' : '29.90') + '5802BR5915STUDIOTESTA6009SAOPAULO62070503***6304E1F2';
+              this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136studiotesta-drivexps-pix-chave5204000053039865802BR5920DriveXPS6009SaoPaulo62070503***6304ABCD';
             }
           } catch(e) {
-            this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136chave-pix-studiotesta@exemplo.com520400005303986540' + (this.planoEscolhido === 'semanal' ? '9.90' : '29.90') + '5802BR5915STUDIOTESTA6009SAOPAULO62070503***6304E1F2';
+            this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136studiotesta-drivexps-pix-chave5204000053039865802BR5920DriveXPS6009SaoPaulo62070503***6304ABCD';
           } finally {
             this.carregandoPix = false;
           }
@@ -1287,6 +1455,9 @@
               this.modalImportar = false;
               this.pacotesExtraidos = [];
               this.nomeArquivo = '';
+
+              // Atualiza o estado local do trial após a 1ª rota gerada com sucesso
+              await this.sincronizarAssinaturaSaaS();
 
               if (resJson && resJson.rota_id) {
                 this.rotaAtivaId = resJson.rota_id;
