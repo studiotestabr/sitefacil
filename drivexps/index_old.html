@@ -605,7 +605,7 @@
     </div>
   </div>
 
-  <!-- 7. MODAL DE ASSINATURA / PAYWALL (SAAS) -->
+  <!-- 7. MODAL DE ASSINATURA / PAYWALL COM PUSHIN PAY REAL -->
   <div x-show="modalAssinatura" 
        class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
@@ -622,7 +622,7 @@
       </div>
 
       <!-- SELETOR DE PLANOS -->
-      <div class="space-y-2.5 text-left">
+      <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
         <div @click="planoEscolhido = 'semanal'" 
              class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center"
              :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
@@ -652,12 +652,12 @@
         </div>
       </div>
 
-      <!-- ÁREA DE PIX -->
+      <!-- BOTÃO GERAR PIX PUSHIN PAY -->
       <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
         <button @click="gerarPixAssinatura()" :disabled="carregandoPix"
                 class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
           <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span>
-          <span x-show="carregandoPix">⏳ Gerando Chave PIX...</span>
+          <span x-show="carregandoPix">⏳ Gerando PIX Oficial Pushin Pay...</span>
         </button>
 
         <button x-show="assinaturaValida" @click="modalAssinatura = false" class="text-xs text-gray-400 hover:text-white pt-1 font-bold">
@@ -665,13 +665,31 @@
         </button>
       </div>
 
-      <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-left bg-black/60 p-4 rounded-2xl border border-gray-800">
-        <p class="text-xs font-bold text-emerald-400 text-center">✅ Código PIX Gerado com Sucesso!</p>
-        <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all" x-text="codigoPixGerado"></div>
-        <button @click="copiarCodigoPix()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl text-xs active:scale-95 transition">
+      <!-- EXIBIÇÃO DO PIX PUSHIN PAY COM QR CODE E COPIA E COLA -->
+      <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-center bg-black/80 p-4 rounded-2xl border border-gray-800">
+        <p class="text-xs font-bold text-emerald-400">✅ PIX Gerado com Sucesso!</p>
+
+        <!-- QR Code Imagem (se disponível) -->
+        <template x-if="qrCodeBase64">
+          <div class="flex justify-center py-1">
+            <img :src="qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`" 
+                 alt="QR Code PIX" class="w-44 h-44 rounded-xl border-2 border-emerald-500/50 bg-white p-1">
+          </div>
+        </template>
+
+        <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all text-left max-h-20 overflow-y-auto" x-text="codigoPixGerado"></div>
+        
+        <button @click="copiarCodigoPix()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-2">
           📋 Copiar Código PIX
         </button>
-        <p class="text-[10px] text-gray-400 text-center">Assim que o pagamento for concluído, sua conta é ativada em segundos.</p>
+
+        <div class="flex items-center justify-center gap-2 text-[11px] text-amber-400 animate-pulse pt-1">
+          <span>⏳</span> Aguardando seu pagamento no banco...
+        </div>
+
+        <button @click="resetarPix()" class="text-[11px] text-gray-500 hover:text-gray-400 underline block mx-auto pt-1">
+          Voltar e escolher outro plano
+        </button>
       </div>
     </div>
   </div>
@@ -686,7 +704,7 @@
       <div class="space-y-1">
         <h3 class="text-xl font-black text-white">Seu WhatsApp de Suporte</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Informe seu número com DDD para receber suporte rápido e avisos de melhorias de rotas:
+          Informe seu número com DDD para receber suporte rápido e avisos de rotas:
         </p>
       </div>
 
@@ -782,6 +800,8 @@
         planoEscolhido: 'semanal',
         carregandoPix: false,
         codigoPixGerado: '',
+        qrCodeBase64: '',
+        intervaloPollingPagamento: null,
         
         nomeArquivo: '',
         msgErro: null,
@@ -946,7 +966,6 @@
           this.usuarioLogado = false;
         },
 
-        // Gestão de Licença SaaS + Captura Automática de Nome e Telefone
         async sincronizarAssinaturaSaaS() {
           if (!this.usuarioId) return;
 
@@ -963,7 +982,6 @@
             const registros = data.data || [];
 
             if (registros.length === 0) {
-              // Primeiro acesso: Cria usuário com Nome automático do Google
               const novoRegistro = {
                 user_id: this.usuarioId,
                 email: this.usuarioEmail,
@@ -984,14 +1002,11 @@
               this.diasRestantesTrial = 7;
               this.statusAssinatura = 'trial';
               this.assinaturaValida = true;
-              
-              // Solicita WhatsApp para suporte
               this.modalTelefone = true;
             } else {
               const userSaas = registros[0];
               this.statusAssinatura = userSaas.status_assinatura || 'trial';
 
-              // Se o nome no banco estiver vazio, atualiza automaticamente com o do Google
               if (!userSaas.nome && this.usuarioNome) {
                 await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${userSaas.id}`, {
                   method: 'PATCH',
@@ -1001,7 +1016,6 @@
                 });
               }
 
-              // Se o telefone estiver vazio, solicita educadamente uma única vez
               if (!userSaas.telefone) {
                 this.modalTelefone = true;
               }
@@ -1010,6 +1024,15 @@
                 this.assinaturaValida = true;
                 this.trialIniciado = true;
                 this.diasRestantesTrial = 0;
+                
+                // Se estava esperando pagamento, fecha o modal e para o polling
+                if (this.intervaloPollingPagamento) {
+                  clearInterval(this.intervaloPollingPagamento);
+                  this.intervaloPollingPagamento = null;
+                  this.modalAssinatura = false;
+                  this.codigoPixGerado = '';
+                  alert('🎉 Pagamento Aprovado! Seu DriveXPS está ativo e liberado.');
+                }
               } else if (!userSaas.trial_expira_em) {
                 this.trialIniciado = false;
                 this.diasRestantesTrial = 7;
@@ -1046,7 +1069,6 @@
           if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
 
           try {
-            // Localiza e atualiza o registro do motorista
             const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, {
               headers,
               credentials: 'include'
@@ -1067,6 +1089,7 @@
           }
         },
 
+        // Geração Oficial do PIX Pushin Pay + Início do Polling
         async gerarPixAssinatura() {
           this.carregandoPix = true;
           try {
@@ -1083,19 +1106,36 @@
             if (res.ok) {
               const data = await res.json();
               this.codigoPixGerado = data.pix_copia_cola;
+              this.qrCodeBase64 = data.qr_code_base64 || '';
+
+              // Inicia a checagem automática a cada 4 segundos
+              if (!this.intervaloPollingPagamento) {
+                this.intervaloPollingPagamento = setInterval(() => {
+                  this.sincronizarAssinaturaSaaS();
+                }, 4000);
+              }
             } else {
-              this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136studiotesta-drivexps-pix-chave5204000053039865802BR5920DriveXPS6009SaoPaulo62070503***6304ABCD';
+              alert('Não foi possível gerar o PIX. Tente novamente em instantes.');
             }
           } catch(e) {
-            this.codigoPixGerado = '00020126580014br.gov.bcb.pix0136studiotesta-drivexps-pix-chave5204000053039865802BR5920DriveXPS6009SaoPaulo62070503***6304ABCD';
+            alert('Erro de conexão ao gerar PIX: ' + e.message);
           } finally {
             this.carregandoPix = false;
           }
         },
 
+        resetarPix() {
+          if (this.intervaloPollingPagamento) {
+            clearInterval(this.intervaloPollingPagamento);
+            this.intervaloPollingPagamento = null;
+          }
+          this.codigoPixGerado = '';
+          this.qrCodeBase64 = '';
+        },
+
         copiarCodigoPix() {
           navigator.clipboard.writeText(this.codigoPixGerado);
-          alert('Código PIX copiado! Cole no aplicativo do seu banco.');
+          alert('Código PIX copiado! Abra o app do seu banco e escolha "PIX Copia e Cola".');
         },
 
         loginGoogle() {
@@ -1105,6 +1145,9 @@
         },
 
         async deslogar() {
+          if (this.intervaloPollingPagamento) {
+            clearInterval(this.intervaloPollingPagamento);
+          }
           localStorage.setItem('usuario_deslogado', 'true');
           localStorage.removeItem('directus_token');
           localStorage.removeItem('directus_user_id');
