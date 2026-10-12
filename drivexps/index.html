@@ -121,7 +121,7 @@
       <div class="space-y-3">
         <button @click="loginGoogle()" 
                 class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
-          <svg class="w-5 h-5" viewBox="0 24 24">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
@@ -241,7 +241,7 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 2.5 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 2.6 Pro</p>
       </div>
     </div>
   </div>
@@ -270,14 +270,13 @@
   <!-- 6. APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     <div>
-      <!-- CABEÇALHO ELEVADO DURANTE O TUTORIAL (PASSOS 3 A 6) -->
+      <!-- CABEÇALHO COM ELEVAÇÃO REAL DURANTE O TUTORIAL -->
       <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all"
               :class="{
                 'z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6),
                 'z-30': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))
               }">
         
-        <!-- Linha do Topo (Logo + Menu Hambúrguer) -->
         <div class="flex justify-between items-center transition-opacity"
              :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">
@@ -291,7 +290,6 @@
           </button>
         </div>
 
-        <!-- Linha de Status de Rota -->
         <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity"
              :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
           <div class="flex items-center gap-1.5">
@@ -303,10 +301,8 @@
           </div>
         </div>
 
-        <!-- 4 BOTÕES DO MENU COM SPOTLIGHT INTELIGENTE -->
         <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
-          
-          <!-- BOTÃO 1: + ROTA (PASSO 3) -->
+          <!-- + ROTA -->
           <button id="btnTourRota" @click="abrirModalImportar()" 
                   :class="{
                     'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3,
@@ -318,7 +314,7 @@
             <span class="leading-none mt-0.5">Rota</span>
           </button>
 
-          <!-- BOTÃO 2: SACOLAS (PASSO 4) -->
+          <!-- SACOLAS -->
           <button id="btnTourSacolas" @click="modo = 'carregamento'" 
                   :class="{
                     'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4,
@@ -331,7 +327,7 @@
             <span class="leading-none mt-0.5">Sacolas</span>
           </button>
 
-          <!-- BOTÃO 3: RUA (PASSO 5) -->
+          <!-- RUA -->
           <button id="btnTourRua" @click="modo = 'rua'" 
                   :class="{
                     'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 5,
@@ -344,7 +340,7 @@
             <span class="leading-none mt-0.5">Rua</span>
           </button>
 
-          <!-- BOTÃO 4: HISTÓRICO (PASSO 6) -->
+          <!-- HISTÓRICO -->
           <button id="btnTourHistorico" @click="abrirHistorico()" 
                   :class="{
                     'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 6,
@@ -359,7 +355,7 @@
         </nav>
       </header>
 
-      <!-- CONFIGURAÇÃO GPS (CD e CASA) COM SPOTLIGHT NO PASSO 2 -->
+      <!-- CONFIGURAÇÃO GPS (CD e CASA) -->
       <section id="btnTourGPS" 
                :class="{
                  'ring-4 ring-amber-400 shadow-[0_0_30px_rgba(245,158,11,1)] z-[105] relative bg-gray-900 border-amber-400 scale-[1.01]': tutorialAberto && passoTutorial === 2,
@@ -407,7 +403,6 @@
                    'border-yellow-500/70 bg-yellow-500/5': item.status === 'ausente'
                  }">
               
-              <!-- 4 BLOCOS UNIVERSAIS -->
               <div class="grid grid-cols-4 gap-2 text-center">
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
                   <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
@@ -430,7 +425,6 @@
                 </div>
               </div>
 
-              <!-- SUB-LINHA: PACOTES DO X AO Y -->
               <div class="flex justify-between items-center text-xs px-0.5">
                 <div>
                   <span x-show="item.total_no_local > 1" 
@@ -440,13 +434,11 @@
                 <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(item.ordem_entrega)"></span>
               </div>
 
-              <!-- ENDEREÇO -->
               <div class="space-y-0.5 pt-0.5">
                 <h3 class="font-black text-lg sm:text-xl text-white leading-snug break-words" x-text="item.endereco"></h3>
                 <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
               </div>
 
-              <!-- RASTREIO -->
               <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs">
                 <span class="text-gray-400 font-medium">Rastreio SPX:</span>
                 <span class="font-mono font-black text-xs sm:text-sm text-orange-400 bg-black/90 px-3 py-1 rounded-xl border border-gray-800 tracking-wider shadow-inner" 
@@ -466,7 +458,6 @@
               <span class="text-xs font-black text-yellow-300 uppercase tracking-wider">⚠️ RE-TENTATIVA DE PACOTE PULADO ANTERIORMENTE</span>
             </div>
 
-            <!-- 4 BLOCOS NO TOPO DA RUA -->
             <div class="grid grid-cols-4 gap-2 text-center">
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
                 <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
@@ -493,20 +484,17 @@
               <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
             </div>
 
-            <!-- Código de Rastreio -->
             <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
               <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">CÓDIGO DE RASTREIO SPX:</span>
               <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" 
                     x-text="entregaAtual.codigo_rastreio || 'SPX-REGISTRADO'"></span>
             </div>
 
-            <!-- Alerta de Mesma Rua -->
             <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
               <span class="text-lg">🚶</span>
               <span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
             </div>
 
-            <!-- Alerta de Parada com Múltiplos Pacotes -->
             <div x-show="pacotesMesmoLocal.length > 1" 
                  class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
@@ -529,14 +517,12 @@
               </div>
             </div>
 
-            <!-- Endereço -->
             <div class="space-y-1 pt-1">
               <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
               <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- Botões GPS -->
             <div class="grid grid-cols-2 gap-3 pt-1">
               <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
                  class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
@@ -548,7 +534,6 @@
               </a>
             </div>
 
-            <!-- Botões de Ação na Entrega -->
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
               <button @click="pularEntrega(entregaAtual)" 
                       class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">
@@ -659,7 +644,7 @@
             Toque no botão <strong>"+ Rota"</strong> aceso no topo e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.
           </p>
           <p class="text-xs text-orange-400 font-semibold bg-black/60 p-3 rounded-xl border border-gray-800">
-            Dica de Ouro: Você também pode tocar na planilha no celular e escolher <strong>"Abrir com DriveXPS"</strong>!
+            Dica de Ouro: Você também pode tocar na planilha no celular e escolher <strong>"Compartilhar com DriveXPS"</strong>!
           </p>
         </div>
       </template>
@@ -719,7 +704,7 @@
         </div>
       </template>
 
-      <!-- Botões de Navegação do Tutorial (Com Botão Voltar) -->
+      <!-- Botões de Navegação do Tutorial -->
       <div class="flex items-center justify-between pt-3 border-t border-gray-800">
         <div>
           <button x-show="passoTutorial === 1" @click="concluirTutorial()" class="text-xs text-gray-400 hover:text-white font-bold py-2 px-2.5">
@@ -826,7 +811,7 @@
         </p>
       </div>
 
-      <!-- SELETOR DE PLANOS COM ANCORAGEM IMBATÍVEL -->
+      <!-- SELETOR DE PLANOS -->
       <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
         <div @click="planoEscolhido = 'semanal'" 
              class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center"
@@ -926,7 +911,7 @@
   </div>
 
   <!-- 11. MODAL: IMPORTAR PLANILHA SHOPEE -->
-  <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4" x-cloak>
+  <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <div>
@@ -1022,6 +1007,15 @@
             await this.verificarAutenticacao();
             this.checarInstalacaoPWA();
 
+            // Ouvinte para mensagens do Service Worker quando o app já estiver aberto
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.addEventListener('message', async (event) => {
+                if (event.data && event.data.tipo === 'NOVO_ROMANEIO_COMPARTILHADO') {
+                  await this.processarRomaneioDoCache();
+                }
+              });
+            }
+
             if (this.usuarioLogado) {
               await this.sincronizarAssinaturaSaaS();
               await this.carregarUltimaRota();
@@ -1030,8 +1024,10 @@
                 setTimeout(() => this.iniciarTutorial(), 600);
               }
 
-              await this.checarArquivoCompartilhado();
+              // Checa se o app foi aberto diretamente pelo Compartilhar do Android
+              await this.processarRomaneioDoCache();
 
+              // Suporte a abertura direta (Chrome LaunchQueue)
               if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
                 launchQueue.setConsumer(async (launchParams) => {
                   if (!launchParams.files.length) return;
@@ -1047,21 +1043,51 @@
           }
         },
 
-        async checarArquivoCompartilhado() {
-          if (window.location.search.includes('arquivo_compartilhado=true')) {
+        // Função robusta com repetição (polling) para garantir a leitura do arquivo compartilhado
+        async processarRomaneioDoCache() {
+          const parametroUrl = window.location.search.includes('arquivo_compartilhado=true');
+          
+          let tentativas = 0;
+          const maxTentativas = 6; // Tenta por 3 segundos
+
+          const tentarLer = async () => {
             try {
               const cache = await caches.open('drivexps-shared-files');
               const res = await cache.match('ultimo-romaneio');
+
               if (res) {
                 const blob = await res.blob();
-                const file = new File([blob], 'romaneio_shopee.xlsx', { type: blob.type });
+                const nomeHeader = res.headers.get('X-File-Name');
+                const nomeFinal = nomeHeader ? decodeURIComponent(nomeHeader) : 'romaneio_shopee.xlsx';
+                const file = new File([blob], nomeFinal, { type: blob.type });
+
+                // Limpa o cache para não reprocessar
+                await cache.delete('ultimo-romaneio');
+
+                // Limpa a URL sem dar refresh
+                if (parametroUrl) {
+                  window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
                 this.abrirModalImportar();
                 this.processarArquivoDirecto(file);
-                await cache.delete('ultimo-romaneio');
+                return true;
               }
-            } catch(e) {
-              console.error('Erro ao ler romaneio compartilhado:', e);
+            } catch (err) {
+              console.error('Erro ao ler romaneio do cache:', err);
             }
+            return false;
+          };
+
+          const sucesso = await tentarLer();
+          if (!sucesso && parametroUrl) {
+            const intervalo = setInterval(async () => {
+              tentativas++;
+              const ok = await tentarLer();
+              if (ok || tentativas >= maxTentativas) {
+                clearInterval(intervalo);
+              }
+            }, 500);
           }
         },
 
