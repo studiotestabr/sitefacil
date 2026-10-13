@@ -285,7 +285,7 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 2.8 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 2.9 Pro</p>
       </div>
     </div>
   </div>
@@ -774,7 +774,7 @@
     </div>
   </div>
 
-  <!-- 8. CONFIGURAR CD E CASA (COM BUSCA MANUAL DE ENDEREÇO + GPS) -->
+  <!-- 8. CONFIGURAR CD E CASA -->
   <div x-show="modalCD" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-md border border-gray-800 p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -782,7 +782,6 @@
         <button @click="modalCD = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
 
-      <!-- CD SHOPEE -->
       <div class="space-y-2.5 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
         <label class="text-xs font-bold text-orange-400 block">🏭 CD SHOPEE (Partida da Rota)</label>
         
@@ -807,7 +806,6 @@
         <p x-show="cd.lat" class="text-[10px] text-gray-400 font-mono bg-black/50 p-1.5 rounded-lg border border-gray-900" x-text="`Coordenadas: Lat ${cd.lat.toFixed(5)}, Lng ${cd.lng.toFixed(5)}`"></p>
       </div>
 
-      <!-- SUA CASA -->
       <div class="space-y-2.5 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
         <label class="text-xs font-bold text-green-400 block">🏠 SUA CASA (Término da Rota)</label>
         
@@ -838,7 +836,7 @@
     </div>
   </div>
 
-  <!-- 9. MODAL DE ASSINATURA / PAYWALL COM PUSHIN PAY REAL -->
+  <!-- 9. MODAL DE ASSINATURA -->
   <div x-show="modalAssinatura" 
        class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
@@ -854,7 +852,6 @@
         </p>
       </div>
 
-      <!-- SELETOR DE PLANOS -->
       <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
         <div @click="planoEscolhido = 'semanal'" 
              class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center"
@@ -885,7 +882,6 @@
         </div>
       </div>
 
-      <!-- BOTÃO GERAR PIX PUSHIN PAY -->
       <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
         <button @click="gerarPixAssinatura()" :disabled="carregandoPix"
                 class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
@@ -898,7 +894,6 @@
         </button>
       </div>
 
-      <!-- EXIBIÇÃO DO PIX COM QR CODE E COPIA E COLA -->
       <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-center bg-black/80 p-4 rounded-2xl border border-gray-800">
         <p class="text-xs font-bold text-emerald-400">✅ PIX Gerado com Sucesso!</p>
 
@@ -1001,7 +996,6 @@
         tokenAcesso: localStorage.getItem('directus_token') || null,
         usuarioId: localStorage.getItem('directus_user_id') || null,
         
-        // Controle de Dados da Assinatura
         planoAtivo: 'gratuito',
         dataExpiracao: null,
         trialIniciado: false,
@@ -1009,7 +1003,6 @@
         statusAssinatura: 'trial',
         assinaturaValida: true,
 
-        // Tutorial / Onboarding (7 Passos com Spotlight)
         tutorialAberto: false,
         passoTutorial: 1,
 
@@ -1023,30 +1016,48 @@
 
         async init() {
           try {
+            // 1. BLINDAGEM OFFLINE IMEDIATA: Restaura do cache do celular antes de qualquer requisição
+            this.restaurarCacheLocal();
+
             await this.verificarAutenticacao();
             this.checarInstalacaoPWA();
 
             if (this.usuarioLogado) {
               await this.sincronizarAssinaturaSaaS();
-              await this.carregarUltimaRota();
+              
+              // Se não tinha nada no cache do celular, busca a última rota no Directus
+              if (!this.rotaAtivaId || this.entregas.length === 0) {
+                await this.carregarUltimaRota();
+              }
 
               if (!localStorage.getItem('drivexps_tutorial_visto')) {
                 setTimeout(() => this.iniciarTutorial(), 600);
-              }
-
-              if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
-                launchQueue.setConsumer(async (launchParams) => {
-                  if (!launchParams.files.length) return;
-                  const fileHandle = launchParams.files[0];
-                  const file = await fileHandle.getFile();
-                  this.abrirModalImportar();
-                  this.processarArquivoDirecto(file);
-                });
               }
             }
           } catch(e) {
             console.error('Erro na inicialização:', e);
           }
+        },
+
+        // Restaura rota ativa e entregas do próprio aparelho (Imune a F5 e sem internet)
+        restaurarCacheLocal() {
+          try {
+            const rotaCache = localStorage.getItem('drivexps_rota_ativa_id');
+            const entregasCache = localStorage.getItem('drivexps_entregas_cache');
+            if (rotaCache && entregasCache) {
+              this.rotaAtivaId = parseInt(rotaCache);
+              this.entregas = JSON.parse(entregasCache);
+            }
+          } catch(e) {}
+        },
+
+        salvarCacheLocal() {
+          try {
+            if (this.rotaAtivaId) {
+              localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
+              localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
+            }
+          } catch(e) {}
         },
 
         getTextoStatusAssinatura() {
@@ -1099,7 +1110,7 @@
                   telefone: telLimpo
                 })
               });
-              alert('✅ Dados do perfil atualizados com sucesso no banco!');
+              alert('✅ Dados do perfil atualizados com sucesso!');
             }
           } catch(e) {
             alert('Falha ao salvar dados: ' + e.message);
@@ -1399,6 +1410,8 @@
           localStorage.setItem('usuario_deslogado', 'true');
           localStorage.removeItem('directus_token');
           localStorage.removeItem('directus_user_id');
+          localStorage.removeItem('drivexps_rota_ativa_id');
+          localStorage.removeItem('drivexps_entregas_cache');
 
           this.tokenAcesso = null;
           this.usuarioId = null;
@@ -1614,7 +1627,7 @@
             if (dataRota.data && dataRota.data.length > 0) {
               this.rotaAtivaId = dataRota.data[0].id;
               await this.carregarEntregasPorId(this.rotaAtivaId);
-            } else {
+            } else if (!this.rotaAtivaId) {
               this.entregas = [];
               this.rotaAtivaId = null;
             }
@@ -1633,7 +1646,10 @@
               credentials: 'include'
             });
             const data = await res.json();
-            this.entregas = data.data || [];
+            if (data.data && data.data.length > 0) {
+              this.entregas = data.data;
+              this.salvarCacheLocal();
+            }
           } catch(e) {
             console.error('Erro ao buscar entregas:', e);
           }
@@ -1657,6 +1673,7 @@
         async selecionarRotaHistorico(rotaId) {
           this.rotaAtivaId = rotaId;
           await this.carregarEntregasPorId(rotaId);
+          this.salvarCacheLocal();
           this.modo = 'carregamento';
         },
 
@@ -1680,6 +1697,8 @@
               if (this.rotaAtivaId === rotaId) {
                 this.rotaAtivaId = null;
                 this.entregas = [];
+                localStorage.removeItem('drivexps_rota_ativa_id');
+                localStorage.removeItem('drivexps_entregas_cache');
                 await this.carregarUltimaRota();
               }
               alert(`Rota #${rotaId} apagada com sucesso!`);
@@ -1753,17 +1772,22 @@
 
         async atualizarStatus(id, novoStatus) {
           const idx = this.entregas.findIndex(e => e.id === id);
-          if (idx !== -1) this.entregas[idx].status = novoStatus;
+          if (idx !== -1) {
+            this.entregas[idx].status = novoStatus;
+            this.salvarCacheLocal(); // Atualiza na hora na memória do celular
+          }
 
           const headers = { 'Content-Type': 'application/json' };
           if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
 
-          await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
-            method: 'PATCH',
-            headers,
-            credentials: 'include',
-            body: JSON.stringify({ status: novoStatus })
-          });
+          try {
+            await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
+              method: 'PATCH',
+              headers,
+              credentials: 'include',
+              body: JSON.stringify({ status: novoStatus })
+            });
+          } catch(e) {}
         },
 
         async enviarParaN8N() {
@@ -1819,6 +1843,9 @@
               } else {
                 await this.carregarUltimaRota();
               }
+
+              // Salva a rota ativa e pacotes na memória interna do celular
+              this.salvarCacheLocal();
 
               this.modo = 'carregamento';
             } else {
