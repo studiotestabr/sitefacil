@@ -3,14 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DriveXPS - Rotas Inteligentes</title>
+  <title>DriveXPS - Rotas Inteligentes Shopee Express</title>
   
+  <meta name="description" content="Roteirizador contínuo e organizador de carga para a Shopee Express. Economize até 2h e R$ 25 de gasolina por dia.">
   <meta name="theme-color" content="#ea580c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
-  
+
+  <!-- TAGS OPEN GRAPH (PREVIEW OFICIAL WHATSAPP E REDES SOCIAIS) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DriveXPS">
+  <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
+  <meta property="og:description" content="Varredura contínua por rua sem ziguezague. Economize até 2h e R$ 25 de gasolina por dia com separação de carga no Canetão.">
+  <meta property="og:image" content="https://studiotesta.com.br/drivexps/icon-512.png">
+  <meta property="og:image:secure_url" content="https://studiotesta.com.br/drivexps/icon-512.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:url" content="https://studiotesta.com.br/drivexps/">
+
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
@@ -272,7 +285,7 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 2.7 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 2.8 Pro</p>
       </div>
     </div>
   </div>
@@ -1252,7 +1265,6 @@
                 }
               }
 
-              // Verificação Inteligente de Confirmação do PIX (Só fecha se a data aumentou no banco!)
               if (this.intervaloPollingPagamento) {
                 const novaExpMs = userSaas.trial_expira_em ? new Date(userSaas.trial_expira_em).getTime() : 0;
                 if (novaExpMs > this.dataExpAntesDoPix) {
@@ -1261,7 +1273,7 @@
                   this.modalAssinatura = false;
                   this.codigoPixGerado = '';
                   this.qrCodeBase64 = '';
-                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado e seus dias foram somados com sucesso.');
+                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado com sucesso.');
                 }
               }
             }
@@ -1317,7 +1329,6 @@
 
         async gerarPixAssinatura() {
           this.carregandoPix = true;
-          // Guarda a data exata de vencimento atual para só comemorar quando o banco somar novos dias
           this.dataExpAntesDoPix = this.dataExpiracao ? new Date(this.dataExpiracao).getTime() : 0;
 
           try {
@@ -1336,7 +1347,6 @@
               this.codigoPixGerado = data.pix_copia_cola;
               this.qrCodeBase64 = data.qr_code_base64 || '';
 
-              // Inicia a checagem em segundo plano
               if (!this.intervaloPollingPagamento) {
                 this.intervaloPollingPagamento = setInterval(() => {
                   this.sincronizarAssinaturaSaaS();
