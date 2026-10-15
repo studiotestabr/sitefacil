@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
 
-  <!-- TAGS OPEN GRAPH (PREVIEW OFICIAL WHATSAPP E REDES SOCIAIS) -->
+  <!-- TAGS OPEN GRAPH -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DriveXPS">
   <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
@@ -90,7 +90,7 @@
     }, 1500);
   </script>
 
-  <!-- MODAL DE BUSCA GLOBAL (INTELIGENTE) -->
+  <!-- MODAL DE BUSCA GLOBAL -->
   <div x-show="buscaAberta"
        class="fixed inset-0 bg-gray-950 z-[200] flex flex-col transition-all"
        x-transition:enter="transition ease-out duration-200"
@@ -100,17 +100,15 @@
        x-transition:leave-start="opacity-100 translate-y-0"
        x-transition:leave-end="opacity-0 translate-y-10" x-cloak>
        
-       <!-- Header da Busca -->
        <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
           <div class="flex-1 relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
-              <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..."
+              <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Comércio, Rastreio, Canetão..."
                      class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors">
           </div>
           <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
        </div>
 
-       <!-- Lista de Resultados -->
        <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
            <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
                <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
@@ -123,25 +121,23 @@
                        <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
                    </div>
                    <div class="flex-1 overflow-hidden">
-                       <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
-                       <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
-                       <div class="flex gap-2 mt-1.5">
-                           <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
-                           <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+                       <div class="flex items-center gap-1.5">
+                         <span x-show="item.lado_pista" class="text-[9px] font-black px-1.5 py-0.5 rounded" :class="item.lado_pista === 'MORRO' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-cyan-950 text-cyan-400 border border-cyan-800'" x-text="item.lado_pista === 'MORRO' ? '⛰️ MORRO' : '🏖️ PRAIA'"></span>
+                         <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
                        </div>
+                       <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
                    </div>
                </div>
            </template>
            <template x-if="termoBusca.length === 0">
-               <div class="text-center text-gray-600 mt-10 text-xs">Digite algo para buscar no romaneio atual...</div>
+               <div class="text-center text-gray-600 mt-10 text-xs">Digite para buscar endereço, código ou comércio...</div>
            </template>
        </div>
   </div>
 
-  <!-- 2. TELA DE LOGIN MINIMALISTA -->
+  <!-- 2. TELA DE LOGIN -->
   <div x-show="!usuarioLogado" class="fixed inset-0 bg-gray-950 z-40 flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
     <div class="w-full"></div>
-
     <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
       <div class="flex justify-center">
         <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
@@ -160,7 +156,7 @@
           <span class="text-orange-500">👜</span><span>Separação em sacolas numeradas de 10 em 10</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-orange-500">🚗</span><span>Varredura por rua: sem ziguezague e economia de combustível</span>
+          <span class="text-orange-500">🚗</span><span><strong>Trava de Rodovia:</strong> Nunca cruza pista sem necessidade</span>
         </div>
         <div class="flex items-center gap-2 pt-1 border-t border-gray-800">
           <span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis (começam na sua 1ª rota)!</span>
@@ -176,121 +172,26 @@
           </svg>
           Continuar com o Google
         </button>
-        <button x-show="!isStandalone" @click="acionarInstalacaoManual()" class="w-full bg-gray-800 hover:bg-gray-700 text-orange-400 border border-orange-500/40 font-bold py-3 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-          <span>📲</span> Instalar Aplicativo no Celular
-        </button>
       </div>
-      <p class="text-[10px] text-gray-500 font-medium">Cadastro automático e seguro com sua conta Google.</p>
     </div>
-
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </div>
   </div>
 
-  <!-- POPUP DE INSTALAÇÃO -->
-  <div x-show="mostrarPopupInstalar" 
-       x-transition:enter="transition ease-out duration-300"
-       x-transition:enter-start="opacity-0 translate-y-10 scale-95"
-       x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-       class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
-      <div class="flex justify-center"><img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700"></div>
-      <div class="space-y-1.5">
-        <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Instale o app para ter navegação fluida em tela cheia e abrir romaneios diretamente.</p>
-      </div>
-      <div x-show="!isIOS" class="space-y-2 pt-1">
-        <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition">📲 Instalar Aplicativo Agora</button>
-        <button @click="mostrarPopupInstalar = false" class="text-xs text-gray-400 font-bold py-1">Continuar no navegador</button>
-      </div>
-      <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-gray-300">
-        <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
-        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> no Safari.</p>
-        <p>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
-        <button @click="mostrarPopupInstalar = false" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">Entendido</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- GAVETA MENU -->
-  <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" 
-       x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-       x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
-    <div class="bg-gray-900 border-l border-gray-800 w-full max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto" @click.away="menuAberto = false">
-      <div class="space-y-5">
-        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
-          <div class="flex items-center gap-3">
-            <img src="./icon-192.png" alt="DriveXPS" class="w-11 h-11 rounded-2xl border border-gray-700 shadow-md">
-            <div class="truncate max-w-[190px]">
-              <h2 class="text-base font-black text-white leading-tight truncate" x-text="usuarioNome || 'Motorista'"></h2>
-              <span class="text-xs text-gray-400 font-semibold block truncate" x-text="usuarioEmail || 'Conectado'"></span>
-            </div>
-          </div>
-          <button @click="menuAberto = false" class="text-gray-400 hover:text-white text-2xl font-bold p-1 leading-none">&times;</button>
-        </div>
-        <div class="bg-gray-950 p-4 rounded-2xl border border-gray-800 space-y-2">
-          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
-          <div class="space-y-1">
-            <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
-          </div>
-          <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
-        </div>
-        <div class="bg-gray-950 p-4 rounded-2xl border border-gray-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Dados do Motorista:</span>
-            <span class="text-[10px] text-gray-500">Para suporte via WhatsApp</span>
-          </div>
-          <div class="space-y-2.5">
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Nome Completo:</label>
-              <input type="text" x-model="usuarioNome" placeholder="Seu Nome Completo" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">WhatsApp (com DDD):</label>
-              <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
-            </div>
-            <button @click="salvarDadosCompletosPerfil()" :disabled="salvandoPerfil" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black py-2.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-1.5">
-              <span x-show="!salvandoPerfil">💾 Salvar Meus Dados</span><span x-show="salvandoPerfil">⏳ Salvando...</span>
-            </button>
-          </div>
-        </div>
-        <nav class="space-y-2">
-          <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
-            <span class="text-base">❓</span> Como Usar o App (Tutorial)
-          </button>
-          <button x-show="!isStandalone" @click="menuAberto = false; acionarInstalacaoManual();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-orange-400 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
-            <span class="text-base">📲</span> Instalar Aplicativo no Celular
-          </button>
-        </nav>
-      </div>
-      <div class="space-y-3 pt-6 border-t border-gray-800">
-        <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
-          <span>🚪</span> Sair da Conta
-        </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.2 Pro</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- APLICAÇÃO -->
+  <!-- APLICAÇÃO LOGADA -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     <div>
-      <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all"
-              :class="{'z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6), 'z-30': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}">
-        
-        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
-          <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
-          
+      <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 z-30">
+        <div class="flex justify-between items-center">
+          <h1 class="font-black text-2xl tracking-wide text-white flex items-center gap-1.5">DriveXPS</h1>
           <div class="flex items-center gap-2">
-            <!-- Botão Busca 🔍 (Quadrado Perfeito) -->
             <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Buscar Pacote">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
-            <!-- Botão Menu ☰ (Quadrado Perfeito) -->
             <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Menu">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
@@ -299,7 +200,7 @@
           </div>
         </div>
 
-        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
+        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2">
           <div class="flex items-center gap-1.5">
             <span class="bg-black/80 text-orange-400 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" x-text="rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA'"></span>
           </div>
@@ -307,44 +208,26 @@
         </div>
 
         <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
-          <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 3, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="hover:bg-orange-50 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md hover:bg-orange-50 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">+</span><span class="leading-none mt-0.5">Rota</span>
           </button>
-          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">📦</span><span class="leading-none mt-0.5">Sacolas</span>
           </button>
-          <button id="btnTourRua" @click="modo = 'rua'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 5, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 5, 'bg-black text-white shadow-inner border border-gray-700': modo === 'rua' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'rua' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">🚗</span><span class="leading-none mt-0.5">Rua</span>
           </button>
-          <button id="btnTourHistorico" @click="abrirHistorico()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 6, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 6, 'bg-black text-white shadow-inner border border-gray-700': modo === 'historico' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'historico' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">📜</span><span class="leading-none mt-0.5">Histórico</span>
           </button>
         </nav>
       </header>
 
-      <!-- GPS -->
-      <section id="btnTourGPS" :class="{'ring-4 ring-amber-400 shadow-[0_0_30px_rgba(245,158,11,1)] z-[105] relative bg-gray-900 border-amber-400 scale-[1.01]': tutorialAberto && passoTutorial === 2, 'bg-gray-900/90': !(tutorialAberto && passoTutorial === 2)}" class="px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5 transition-all">
-        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
-          <div class="truncate pr-1">
-            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Partida:</span>
-            <span class="text-xs font-bold text-white truncate block">🏭 CD Saída</span>
-          </div>
-          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border" :class="cd.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'" x-text="cd.lat ? 'Configurado' : 'Pendente'"></span>
-        </button>
-        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
-          <div class="truncate pr-1">
-            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Final:</span>
-            <span class="text-xs font-bold text-white truncate block">🏠 Casa Chegada</span>
-          </div>
-          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border" :class="casa.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'" x-text="casa.lat ? 'Configurada' : 'Pendente'"></span>
-        </button>
-      </section>
-
       <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
-          <p class="text-gray-300 text-xs leading-relaxed">Layout universal otimizado para qualquer veículo. <em>(Toque no card para abrir no Waze).</em></p>
+          <p class="text-gray-300 text-xs leading-relaxed">Organizado com <strong>Trava de Rodovia</strong> (Lado Morro e Lado Praia 100% separados).</p>
         </div>
 
         <div class="space-y-3">
@@ -371,8 +254,9 @@
               </div>
 
               <div class="flex justify-between items-center text-xs px-0.5">
-                <div>
-                  <span x-show="item.total_no_local > 1" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[11px]" x-text="`⚠️ ${item.total_no_local} PACOTES NESTA PARADA`"></span>
+                <div class="flex items-center gap-1.5">
+                  <span x-show="item.lado_pista" class="text-[10px] font-black px-2 py-0.5 rounded-md" :class="item.lado_pista === 'MORRO' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-cyan-950 text-cyan-400 border border-cyan-800'" x-text="item.lado_pista === 'MORRO' ? '⛰️ LADO MORRO' : '🏖️ LADO PRAIA'"></span>
+                  <span x-show="item.total_no_local > 1" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px]" x-text="`⚠️ ${item.total_no_local} PACOTES`"></span>
                 </div>
                 <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(item.ordem_entrega)"></span>
               </div>
@@ -391,12 +275,15 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT) -->
+      <!-- MODO 2: RUA (COCKPIT AVANÇADO COM DUPLA NAVEGAÇÃO) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
-            <div x-show="entregaAtual.status === 'ausente'" class="bg-yellow-500/20 border-2 border-yellow-500 p-2.5 rounded-2xl text-center">
-              <span class="text-xs font-black text-yellow-300 uppercase tracking-wider">⚠️ RE-TENTATIVA DE PACOTE PULADO ANTERIORMENTE</span>
+            
+            <!-- ALERTA DE MUDANÇA DE PISTA DA RODOVIA -->
+            <div x-show="mudouDeLadoDePista" class="bg-purple-950/80 border-2 border-purple-500 p-3 rounded-2xl text-center space-y-1">
+              <span class="text-xs font-black text-purple-300 uppercase tracking-wider block">🚨 ATENÇÃO: TRAVESSIA DE RODOVIA!</span>
+              <p class="text-[11px] text-gray-200">Você terminou um lado da pista e agora vai cruzar para o <strong class="text-purple-300" x-text="entregaAtual.lado_pista === 'MORRO' ? 'LADO MORRO' : 'LADO PRAIA'"></strong> no próximo retorno seguro.</p>
             </div>
 
             <div class="grid grid-cols-4 gap-2 text-center">
@@ -418,59 +305,39 @@
               </div>
             </div>
 
-            <div class="flex justify-end text-xs pr-1">
-              <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
-            </div>
-
-            <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
-              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">CÓDIGO DE RASTREIO SPX:</span>
-              <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" x-text="entregaAtual.codigo_rastreio || 'SPX-REGISTRADO'"></span>
-            </div>
-
-            <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
-              <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
-            </div>
-
-            <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
-              <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
-                <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
-              </p>
-              <p class="text-xs text-gray-300 font-medium leading-none">Confira todas as caixas antes de desembarcar:</p>
-              <div class="space-y-2 pt-1">
-                <template x-for="p in pacotesMesmoLocal" :key="p.id">
-                  <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
-                    <div class="space-x-2">
-                      <span class="text-orange-400 font-black text-sm" x-text="`Canetão #${p.ordem_entrega}`"></span>
-                      <span class="text-white text-xs" x-text="`Ordem SPX ${formatarParada(p.ordem_shopee)}`"></span>
-                    </div>
-                    <span class="tracking-wider text-xs" x-text="p.codigo_rastreio"></span>
-                  </div>
-                </template>
-              </div>
+            <!-- ETIQUETA DE PISTA -->
+            <div class="flex justify-between items-center text-xs">
+              <span x-show="entregaAtual.lado_pista" class="text-xs font-black px-2.5 py-1 rounded-lg" :class="entregaAtual.lado_pista === 'MORRO' ? 'bg-amber-950 text-amber-400 border border-amber-700' : 'bg-cyan-950 text-cyan-400 border border-cyan-700'" x-text="entregaAtual.lado_pista === 'MORRO' ? '⛰️ ESTA ENTREGA É LADO MORRO' : '🏖️ ESTA ENTREGA É LADO PRAIA'"></span>
+              <span class="text-xs font-black text-gray-200 font-mono" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
             </div>
 
             <div class="space-y-1 pt-1">
-              <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
-              <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
+              <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
+              <p class="text-base text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 pt-1">
-              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">🚗 Iniciar Waze</a>
-              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">🗺️ Google Maps</a>
+            <!-- BOTÕES DE NAVEGAÇÃO -->
+            <div class="space-y-2 pt-2">
+              <div class="grid grid-cols-2 gap-2.5">
+                <button @click="abrirWaze(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-1.5 shadow-lg active:scale-95 transition">
+                  🚗 Waze (GPS)
+                </button>
+                <button @click="abrirGoogleMapsGPS(entregaAtual)" class="bg-emerald-600 hover:bg-emerald-500 text-center py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-1.5 shadow-lg active:scale-95 transition">
+                  🗺️ Maps (GPS)
+                </button>
+              </div>
+
+              <!-- BOTÃO DE CORREÇÃO: BUSCAR PELO NOME DO COMÉRCIO / ENDEREÇO TEXTUAL -->
+              <button @click="abrirGoogleMapsTexto(entregaAtual)" class="w-full bg-gray-800 hover:bg-gray-700 text-amber-400 border border-amber-500/40 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                <span>📍</span> Buscar Nome do Local no Maps (Evita erro de pino)
+              </button>
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
               <button @click="pularEntrega(entregaAtual)" class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">⚠️ Ausente / Pular</button>
               <button @click="concluirEntrega(entregaAtual)" class="bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 active:scale-95 transition">✅ Entregue</button>
             </div>
-          </div>
-        </template>
-        <template x-if="!entregaAtual && entregas.length > 0 && naoEntregues.length === 0">
-          <div class="text-center py-24 space-y-4">
-            <span class="text-7xl block">🏁</span>
-            <h2 class="text-3xl font-black text-white" x-text="`Rota #${rotaAtivaId || ''} 100% Concluída!`"></h2>
-            <p class="text-gray-400 text-sm max-w-xs mx-auto">Parabéns! Todos os pacotes da carga foram entregues com sucesso.</p>
           </div>
         </template>
       </main>
@@ -490,7 +357,7 @@
               </div>
               <div class="flex items-center gap-2 pt-1">
                 <button @click="selecionarRotaHistorico(r.id)" class="flex-1 bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700 active:scale-95 transition">Reabrir Detalhes Desta Rota</button>
-                <button @click="apagarRota(r.id)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 p-3 rounded-xl active:scale-95 transition flex items-center justify-center shrink-0" title="Apagar Rota e Pacotes do Banco">
+                <button @click="apagarRota(r.id)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 p-3 rounded-xl active:scale-95 transition flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
               </div>
@@ -500,206 +367,23 @@
       </main>
     </div>
 
-    <!-- Assinatura StudioTesta -->
+    <!-- RODAPÉ -->
     <footer class="py-6 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </footer>
   </div>
 
-  <!-- TUTORIAL, MODAIS DE PIX, TELEFONE E IMPORTAÇÃO (MANTIDOS IGUAIS) -->
-  <!-- 7. MINI TUTORIAL INTERATIVO -->
-  <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
-      <template x-if="passoTutorial === 1">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👋</div>
-          <h3 class="text-2xl font-black text-white">Bem-vindo ao DriveXPS!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Vamos te ensinar em 30 segundos como acabar com o ziguezague, economizar gasolina e terminar suas entregas muito mais rápido.</p>
-          <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-emerald-400 font-bold">🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!</div>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 2">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div>
-          <h3 class="text-2xl font-black text-white">Partida e Chegada</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Veja os botões <strong>acesos no topo</strong>! Grave onde você pega a carga (CD) e onde mora (Casa) para sua rota terminar pertinho de você.</p>
-          <p class="text-xs text-orange-400 font-semibold bg-black/60 p-3 rounded-xl border border-gray-800">Dica: Você pode usar o GPS ou <strong>digitar o endereço</strong> por escrito!</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 3">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">📊</div>
-          <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Rota"</strong> aceso no topo e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
-          <p class="text-xs text-orange-400 font-semibold bg-black/60 p-3 rounded-xl border border-gray-800">Dica de Ouro: Você também pode tocar na planilha no celular e escolher <strong>"Compartilhar com DriveXPS"</strong>!</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 4">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">✍️</div>
-          <h3 class="text-2xl font-black text-white">2. Organização no Canetão</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong> (acesa no topo), marque na caixa com canetão o número <strong>#CANETÃO</strong>.</p>
-          <p class="text-xs text-gray-300">Sua carga é separada de 10 em 10 pacotes por sacola. Você carrega seu carro em minutos!</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 5">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">🚗</div>
-          <h3 class="text-2xl font-black text-white">3. Na Rua com Waze</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong> (acesa no topo), você vê a entrega atual, aviso se a próxima casa fica na mesma rua e abre o Waze ou Maps com 1 único toque.</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 6">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📜</div>
-          <h3 class="text-2xl font-black text-white">4. Histórico de Rotas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong> (acesa no topo), você visualiza todas as rotas anteriores que já fez, pode reabri-las ou apagar rotas antigas.</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 7">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
-          <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Agora é com você. Importe sua primeira rota, organize suas sacolas e aproveite uma entrega rápida e sem estresse.</p>
-        </div>
-      </template>
-      <div class="flex items-center justify-between pt-3 border-t border-gray-800">
-        <div>
-          <button x-show="passoTutorial === 1" @click="concluirTutorial()" class="text-xs text-gray-400 hover:text-white font-bold py-2 px-2.5">Pular</button>
-          <button x-show="passoTutorial > 1" @click="voltarPassoTutorial()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-2 px-3 rounded-xl active:scale-95 transition">← Voltar</button>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <template x-for="p in 7" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
-        </div>
-        <button @click="proximoPassoTutorial()" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-4 rounded-xl active:scale-95 transition shadow-lg shadow-orange-600/30">
-          <span x-text="passoTutorial === 7 ? 'Começar!' : 'Avançar →'"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 8. CONFIGURAR CD E CASA -->
-  <div x-show="modalCD" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 rounded-3xl w-full max-w-md border border-gray-800 p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-        <h2 class="font-black text-base text-orange-500">PONTOS DE PARTIDA E CHEGADA</h2>
-        <button @click="modalCD = false" class="text-gray-400 text-2xl font-bold">&times;</button>
-      </div>
-      <div class="space-y-2.5 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
-        <label class="text-xs font-bold text-orange-400 block">🏭 CD SHOPEE (Partida da Rota)</label>
-        <div class="space-y-1.5">
-          <div class="flex gap-1.5">
-            <input type="text" x-model="buscaEnderecoCD" placeholder="Digite o endereço do CD..." class="flex-1 bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
-            <button @click="buscarEnderecoTexto('cd')" :disabled="buscandoGeo === 'cd'" class="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold px-3 py-2 rounded-xl text-xs active:scale-95 transition">
-              <span x-show="buscandoGeo !== 'cd'">🔍 Buscar</span><span x-show="buscandoGeo === 'cd'">⏳</span>
-            </button>
-          </div>
-        </div>
-        <div class="pt-1">
-          <button @click="capturarLocalizacao('cd')" class="w-full bg-gray-800 hover:bg-gray-700 text-xs py-2.5 rounded-xl font-bold text-green-400 border border-gray-700 active:scale-95 transition flex items-center justify-center gap-1.5">📍 Gravar Meu GPS Atual como CD</button>
-        </div>
-        <p x-show="cd.lat" class="text-[10px] text-gray-400 font-mono bg-black/50 p-1.5 rounded-lg border border-gray-900" x-text="`Coordenadas: Lat ${cd.lat.toFixed(5)}, Lng ${cd.lng.toFixed(5)}`"></p>
-      </div>
-      <div class="space-y-2.5 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
-        <label class="text-xs font-bold text-green-400 block">🏠 SUA CASA (Término da Rota)</label>
-        <div class="space-y-1.5">
-          <div class="flex gap-1.5">
-            <input type="text" x-model="buscaEnderecoCasa" placeholder="Digite o endereço da sua casa..." class="flex-1 bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500">
-            <button @click="buscarEnderecoTexto('casa')" :disabled="buscandoGeo === 'casa'" class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-3 py-2 rounded-xl text-xs active:scale-95 transition">
-              <span x-show="buscandoGeo !== 'casa'">🔍 Buscar</span><span x-show="buscandoGeo === 'casa'">⏳</span>
-            </button>
-          </div>
-        </div>
-        <div class="pt-1">
-          <button @click="capturarLocalizacao('casa')" class="w-full bg-gray-800 hover:bg-gray-700 text-xs py-2.5 rounded-xl font-bold text-green-400 border border-gray-700 active:scale-95 transition flex items-center justify-center gap-1.5">📍 Gravar Meu GPS Atual como Casa</button>
-        </div>
-        <p x-show="casa.lat" class="text-[10px] text-gray-400 font-mono bg-black/50 p-1.5 rounded-lg border border-gray-900" x-text="`Coordenadas: Lat ${casa.lat.toFixed(5)}, Lng ${casa.lng.toFixed(5)}`"></p>
-      </div>
-      <button @click="salvarLocais()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-2xl text-xs active:scale-95 transition shadow-lg">Salvar Coordenadas</button>
-    </div>
-  </div>
-
-  <!-- 9. MODAL DE ASSINATURA -->
-  <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
-      <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">DriveXPS Ilimitado</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong>.</p>
-      </div>
-      <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
-        <div @click="planoEscolhido = 'semanal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Flexível</span>
-            <span class="text-sm font-black text-white">Plano Semanal</span>
-            <span class="text-[11px] text-gray-400 block">Menos que R$ 1,40 por dia</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-orange-400">R$ 9,90</span>
-            <span class="text-[10px] text-gray-500 block">por semana</span>
-          </div>
-        </div>
-        <div @click="planoEscolhido = 'mensal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'mensal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span>
-            <span class="text-sm font-black text-white">Plano Mensal</span>
-            <span class="text-[11px] text-emerald-400 font-bold block">Apenas R$ 0,99 por dia!</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-white">R$ 29,90</span>
-            <span class="text-[10px] text-gray-500 block">por mês</span>
-          </div>
-        </div>
-      </div>
-      <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
-        <button @click="gerarPixAssinatura()" :disabled="carregandoPix" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
-          <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span><span x-show="carregandoPix">⏳ Gerando PIX Oficial Pushin Pay...</span>
-        </button>
-        <button @click="fecharModalAssinatura()" class="text-xs text-gray-400 hover:text-white pt-1 font-bold">Fechar</button>
-      </div>
-      <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-center bg-black/80 p-4 rounded-2xl border border-gray-800">
-        <p class="text-xs font-bold text-emerald-400">✅ PIX Gerado com Sucesso!</p>
-        <template x-if="qrCodeBase64">
-          <div class="flex justify-center py-1">
-            <img :src="qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`" alt="QR Code PIX" class="w-44 h-44 rounded-xl border-2 border-emerald-500/50 bg-white p-1">
-          </div>
-        </template>
-        <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all text-left max-h-20 overflow-y-auto" x-text="codigoPixGerado"></div>
-        <button @click="copiarCodigoPix()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-2">📋 Copiar Código PIX</button>
-        <div class="flex items-center justify-center gap-2 text-[11px] text-amber-400 animate-pulse pt-1"><span>⏳</span> Aguardando seu pagamento no banco...</div>
-        <button @click="resetarPix()" class="text-[11px] text-gray-500 hover:text-gray-400 underline block mx-auto pt-1">Voltar e escolher outro plano</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 10. MODAL DE COLETA DO WHATSAPP -->
-  <div x-show="modalTelefone" class="fixed inset-0 bg-black/90 z-[110] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-emerald-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📱</div>
-      <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">Seu WhatsApp de Suporte</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Informe seu número com DDD para receber suporte rápido e avisos de rotas:</p>
-      </div>
-      <div class="space-y-2 text-left">
-        <label class="text-[11px] font-bold text-gray-400 uppercase">DDD + WhatsApp:</label>
-        <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" class="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono">
-      </div>
-      <button @click="salvarTelefoneMotorista()" :disabled="!inputTelefone || inputTelefone.length < 10" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl active:scale-95 transition">Salvar Contato</button>
-    </div>
-  </div>
-
-  <!-- 11. MODAL DE IMPORTAR PLANILHA -->
+  <!-- MODAL DE IMPORTAR PLANILHA -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <div>
           <h2 class="font-black text-lg text-orange-500">IMPORTAR PLANILHA SHOPEE</h2>
-          <p class="text-xs text-gray-400">Varredura contínua por corredor de rua</p>
+          <p class="text-xs text-gray-400">Varredura contínua com Trava Viária de Rodovia</p>
         </div>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
-      <div x-show="msgErro" class="bg-red-500/20 border border-red-500 p-3 rounded-xl text-xs text-red-200 font-bold" x-text="msgErro"></div>
       <div class="space-y-3">
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
           <span class="text-4xl block mb-2">📊</span>
@@ -709,13 +393,9 @@
         </label>
         <p x-show="nomeArquivo" class="text-xs text-orange-400 font-bold text-center" x-text="`Arquivo: ${nomeArquivo}`"></p>
       </div>
-      <div x-show="pacotesExtraidos.length > 0" class="bg-green-500/15 border border-green-500/40 rounded-2xl p-3.5 text-center space-y-1">
-        <p class="text-sm text-green-400 font-black" x-text="`✅ ${pacotesExtraidos.length} PACOTES RECONHECIDOS!`"></p>
-        <p class="text-xs text-gray-300 font-medium" x-text="`Carga dividida em ${Math.ceil(pacotesExtraidos.length / 10)} sacolas de 10 pacotes.`"></p>
-      </div>
       <button @click="enviarParaN8N()" :disabled="carregandoProcesso || pacotesExtraidos.length === 0" class="w-full py-4 rounded-2xl text-sm font-black flex items-center justify-center gap-2 shadow-xl transition" :class="pacotesExtraidos.length > 0 && !carregandoProcesso ? 'bg-orange-600 hover:bg-orange-500 text-white cursor-pointer shadow-orange-600/40' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700'">
-        <span x-show="!carregandoProcesso" x-text="pacotesExtraidos.length > 0 ? `🚀 Gerar Rota Contínua (${pacotesExtraidos.length} pacotes)` : 'Aguardando Arquivo...'"></span>
-        <span x-show="carregandoProcesso">⏳ Otimizando Varredura de Ruas...</span>
+        <span x-show="!carregandoProcesso" x-text="pacotesExtraidos.length > 0 ? `🚀 Gerar Rota Otimizada (${pacotesExtraidos.length} pacotes)` : 'Aguardando Arquivo...'"></span>
+        <span x-show="carregandoProcesso">⏳ Calculando Travas Viárias e Setores...</span>
       </button>
     </div>
   </div>
@@ -728,28 +408,9 @@
         buscaAberta: false,
         termoBusca: '',
         modalImportar: false,
-        modalCD: false,
-        modalAssinatura: false,
-        modalTelefone: false,
-        inputTelefone: '',
-        planoEscolhido: 'semanal',
-        carregandoPix: false,
-        salvandoPerfil: false,
-        codigoPixGerado: '',
-        qrCodeBase64: '',
-        intervaloPollingPagamento: null,
-        dataExpAntesDoPix: 0,
-        
-        nomeArquivo: '',
-        msgErro: null,
-        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
-        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.1739,"lng":-46.7816}'),
-        buscaEnderecoCD: '',
-        buscaEnderecoCasa: '',
-        buscandoGeo: null,
-
         pacotesExtraidos: [],
         carregandoProcesso: false,
+        nomeArquivo: '',
         entregas: [],
         rotasHistorico: [],
         rotaAtivaId: null,
@@ -760,595 +421,41 @@
         usuarioNome: '',
         tokenAcesso: localStorage.getItem('directus_token') || null,
         usuarioId: localStorage.getItem('directus_user_id') || null,
-        
-        planoAtivo: 'gratuito',
-        dataExpiracao: null,
-        trialIniciado: false,
-        diasRestantesTrial: 7,
-        statusAssinatura: 'trial',
-        assinaturaValida: true,
-
-        tutorialAberto: false,
-        passoTutorial: 1,
-
-        mostrarPopupInstalar: false,
-        temPromptInstalacao: false,
-        isStandalone: false,
-        isIOS: false,
+        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
+        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.1739,"lng":-46.7816}'),
 
         DIRECTUS_URL: 'https://banco.studiotesta.com.br',
         N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
 
         async init() {
-          try {
-            this.restaurarCacheLocal();
-            await this.verificarAutenticacao();
-            this.checarInstalacaoPWA();
-
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.addEventListener('message', async (event) => {
-                if (event.data && event.data.tipo === 'NOVO_ROMANEIO_COMPARTILHADO') {
-                  await this.processarRomaneioDoCache();
-                }
-              });
-            }
-
-            if (this.usuarioLogado) {
-              await this.sincronizarAssinaturaSaaS();
-              
-              if (!this.rotaAtivaId || this.entregas.length === 0) {
-                await this.carregarUltimaRota();
-              }
-
-              if (!localStorage.getItem('drivexps_tutorial_visto')) {
-                setTimeout(() => this.iniciarTutorial(), 600);
-              }
-
-              await this.processarRomaneioDoCache();
-
-              if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
-                launchQueue.setConsumer(async (launchParams) => {
-                  if (!launchParams.files.length) return;
-                  const fileHandle = launchParams.files[0];
-                  const file = await fileHandle.getFile();
-                  this.abrirModalImportar();
-                  this.processarArquivoDirecto(file);
-                });
-              }
-            }
-          } catch(e) {
-            console.error('Erro na inicialização:', e);
+          this.restaurarCacheLocal();
+          await this.verificarAutenticacao();
+          if (this.usuarioLogado && (!this.rotaAtivaId || this.entregas.length === 0)) {
+            await this.carregarUltimaRota();
           }
         },
 
         abrirBusca() {
-            this.buscaAberta = true;
-            this.termoBusca = '';
-            setTimeout(() => this.$refs.inputBusca.focus(), 100);
+          this.buscaAberta = true;
+          this.termoBusca = '';
+          setTimeout(() => this.$refs.inputBusca?.focus(), 100);
         },
 
         formatarParada(val) {
-            if (val === null || val === undefined) return '-';
-            if (val < 0) return '+' + Math.abs(val);
-            return val;
+          if (val === null || val === undefined) return '-';
+          if (val < 0) return '+' + Math.abs(val);
+          return val;
         },
 
         get entregasFiltradas() {
-            if (!this.termoBusca) return [];
-            const t = this.termoBusca.toLowerCase().trim();
-            const apenasNumeros = /^\d+$/.test(t);
-
-            return this.entregas.filter(e => {
-                const paradaStr = this.formatarParada(e.parada_shopee).toString().toLowerCase();
-                const ordemStr = this.formatarParada(e.ordem_shopee).toString().toLowerCase();
-                const sacolaNum = Math.ceil(e.ordem_entrega / 10).toString();
-                const canetaoStr = e.ordem_entrega.toString();
-
-                if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
-                if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
-                if (t.startsWith('+') && t === paradaStr) return true;
-
-                if (apenasNumeros && t.length <= 3) {
-                    return false;
-                }
-
-                return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
-                       (e.bairro && e.bairro.toLowerCase().includes(t)) ||
-                       (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t));
-            });
-        },
-
-        async processarRomaneioDoCache() {
-          const parametroUrl = window.location.search.includes('arquivo_compartilhado=true');
-          let tentativas = 0;
-          const maxTentativas = 6;
-
-          const tentarLer = async () => {
-            try {
-              const cache = await caches.open('drivexps-shared-files');
-              const res = await cache.match('ultimo-romaneio');
-
-              if (res) {
-                const blob = await res.blob();
-                const nomeHeader = res.headers.get('X-File-Name');
-                const nomeFinal = nomeHeader ? decodeURIComponent(nomeHeader) : 'romaneio_shopee.xlsx';
-                const file = new File([blob], nomeFinal, { type: blob.type });
-
-                await cache.delete('ultimo-romaneio');
-
-                if (parametroUrl) {
-                  window.history.replaceState({}, document.title, window.location.pathname);
-                }
-
-                this.abrirModalImportar();
-                this.processarArquivoDirecto(file);
-                return true;
-              }
-            } catch (err) {}
-            return false;
-          };
-
-          const sucesso = await tentarLer();
-          if (!sucesso && parametroUrl) {
-            const intervalo = setInterval(async () => {
-              tentativas++;
-              const ok = await tentarLer();
-              if (ok || tentativas >= maxTentativas) {
-                clearInterval(intervalo);
-              }
-            }, 500);
-          }
-        },
-
-        restaurarCacheLocal() {
-          try {
-            const rotaCache = localStorage.getItem('drivexps_rota_ativa_id');
-            const entregasCache = localStorage.getItem('drivexps_entregas_cache');
-            if (rotaCache && entregasCache) {
-              this.rotaAtivaId = parseInt(rotaCache);
-              this.entregas = JSON.parse(entregasCache);
-            }
-          } catch(e) {}
-        },
-
-        salvarCacheLocal() {
-          try {
-            if (this.rotaAtivaId) {
-              localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
-              localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
-            }
-          } catch(e) {}
-        },
-
-        getTextoStatusAssinatura() {
-          if (this.planoAtivo === 'vitalicio') return 'Acesso Vitalício 👑';
-          let nomePlano = 'Plano Semanal';
-          if (this.planoAtivo === 'mensal') nomePlano = 'Plano Mensal';
-          else if (this.planoAtivo === 'gratuito' || this.statusAssinatura === 'trial') nomePlano = 'Período de Teste';
-
-          if (!this.dataExpiracao) return 'Teste Grátis (Começa na 1ª rota)';
-          const exp = new Date(this.dataExpiracao);
-          const agora = new Date();
-          const diffDias = Math.ceil((exp - agora) / (1000 * 60 * 60 * 24));
-          if (diffDias <= 0) return 'Assinatura Expirada ⚠️';
-          return `${nomePlano} • Vence em ${exp.toLocaleDateString('pt-BR')} (${diffDias}d restantes)`;
-        },
-
-        async salvarDadosCompletosPerfil() {
-          if (!this.usuarioId) return;
-          this.salvandoPerfil = true;
-          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
-          const headers = { 'Content-Type': 'application/json' };
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-          try {
-            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
-            const data = await res.json();
-            if (data.data && data.data[0]) {
-              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${data.data[0].id}`, {
-                method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ nome: this.usuarioNome, telefone: telLimpo })
-              });
-              alert('✅ Dados do perfil atualizados com sucesso!');
-            }
-          } catch(e) { alert('Falha ao salvar dados: ' + e.message); } 
-          finally { this.salvandoPerfil = false; }
-        },
-
-        iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
-        proximoPassoTutorial() { if (this.passoTutorial < 7) this.passoTutorial++; else this.concluirTutorial(); },
-        voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
-        concluirTutorial() { this.tutorialAberto = false; localStorage.setItem('drivexps_tutorial_visto', 'true'); },
-
-        abrirModalImportar() {
-          if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
-          this.modalImportar = true;
-        },
-
-        irParaEntregaDireta(item) {
-          this.entregaSelecionadaId = item.id;
-          this.modo = 'rua';
-        },
-
-        async verificarAutenticacao() {
-          if (localStorage.getItem('usuario_deslogado') === 'true') { this.usuarioLogado = false; return; }
-          if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
-          const extrairDadosUsuario = (u) => {
-            this.usuarioId = u.id;
-            this.usuarioEmail = u.email || '';
-            const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
-            this.usuarioNome = n.trim() || u.email || 'Motorista';
-            localStorage.setItem('directus_user_id', this.usuarioId);
-            this.usuarioLogado = true;
-          };
-          if (this.tokenAcesso) {
-            try {
-              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { headers: { 'Authorization': `Bearer ${this.tokenAcesso}` } });
-              if (res.ok) { const data = await res.json(); extrairDadosUsuario(data.data); return; }
-            } catch(e) {}
-          }
-          try {
-            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
-            if (resSession.ok) {
-              const userData = await resSession.json();
-              if (userData && userData.data && userData.data.id) { extrairDadosUsuario(userData.data); return; }
-            }
-          } catch(e) {}
-          this.usuarioLogado = false;
-        },
-
-        async sincronizarAssinaturaSaaS() {
-          if (!this.usuarioId) return;
-          const headers = { 'Content-Type': 'application/json' };
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-          try {
-            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
-            const data = await res.json();
-            const registros = data.data || [];
-
-            if (registros.length === 0) {
-              const novoRegistro = {
-                user_id: this.usuarioId, email: this.usuarioEmail, nome: this.usuarioNome,
-                trial_expira_em: null, status_assinatura: 'trial', plano_ativo: 'gratuito'
-              };
-              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
-                method: 'POST', headers, credentials: 'include', body: JSON.stringify(novoRegistro)
-              });
-              this.trialIniciado = false; this.diasRestantesTrial = 7; this.statusAssinatura = 'trial';
-              this.planoAtivo = 'gratuito'; this.dataExpiracao = null; this.assinaturaValida = true;
-              this.modalTelefone = true;
-            } else {
-              const userSaas = registros[0];
-              this.statusAssinatura = userSaas.status_assinatura || 'trial';
-              this.planoAtivo = userSaas.plano_ativo || 'gratuito';
-              this.dataExpiracao = userSaas.trial_expira_em || null;
-              if (userSaas.nome) this.usuarioNome = userSaas.nome;
-              if (userSaas.email) this.usuarioEmail = userSaas.email;
-              if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
-
-              if (this.planoAtivo === 'vitalicio') {
-                this.assinaturaValida = true; this.trialIniciado = true; this.diasRestantesTrial = 9999;
-              } else if (!userSaas.trial_expira_em) {
-                this.trialIniciado = false; this.diasRestantesTrial = 7; this.assinaturaValida = true;
-              } else {
-                this.trialIniciado = true;
-                const agora = new Date(); const expira = new Date(userSaas.trial_expira_em);
-                const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
-                this.diasRestantesTrial = Math.max(0, diffDias);
-                if (diffDias > 0) { this.assinaturaValida = true; } 
-                else { this.assinaturaValida = false; this.modalAssinatura = true; }
-              }
-
-              if (this.intervaloPollingPagamento) {
-                const novaExpMs = userSaas.trial_expira_em ? new Date(userSaas.trial_expira_em).getTime() : 0;
-                if (novaExpMs > this.dataExpAntesDoPix) {
-                  clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null;
-                  this.modalAssinatura = false; this.codigoPixGerado = ''; this.qrCodeBase64 = '';
-                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado com sucesso.');
-                }
-              }
-            }
-          } catch (err) {}
-        },
-
-        async buscarEnderecoTexto(tipo) {
-          const query = tipo === 'cd' ? this.buscaEnderecoCD : this.buscaEnderecoCasa;
-          if (!query || query.trim().length < 4) { alert('Por favor, digite um endereço com nome da rua e cidade.'); return; }
-          this.buscandoGeo = tipo;
-          try {
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=br`;
-            const res = await fetch(url); const data = await res.json();
-            if (data && data.length > 0) {
-              const lat = parseFloat(data[0].lat); const lon = parseFloat(data[0].lon);
-              this[tipo].lat = lat; this[tipo].lng = lon;
-              alert(`✅ Localização de ${tipo.toUpperCase()} encontrada com sucesso!\nLat: ${lat.toFixed(5)}, Lng: ${lon.toFixed(5)}`);
-            } else { alert('Endereço não localizado pelo GPS. Tente adicionar o número, bairro e cidade.'); }
-          } catch (e) { alert('Falha na busca de endereço: ' + e.message); } 
-          finally { this.buscandoGeo = null; }
-        },
-
-        capturarLocalizacao(tipo) {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-              this[tipo].lat = pos.coords.latitude; this[tipo].lng = pos.coords.longitude;
-              alert(`GPS de ${tipo.toUpperCase()} salvo via sinal do aparelho!`);
-            }, err => alert('Erro no GPS: ' + err.message));
-          }
-        },
-
-        salvarLocais() {
-          localStorage.setItem('local_cd', JSON.stringify(this.cd));
-          localStorage.setItem('local_casa', JSON.stringify(this.casa));
-          this.modalCD = false;
-        },
-
-        async gerarPixAssinatura() {
-          this.carregandoPix = true;
-          this.dataExpAntesDoPix = this.dataExpiracao ? new Date(this.dataExpiracao).getTime() : 0;
-          try {
-            const res = await fetch('https://n8n.studiotesta.com.br/webhook/gerar-pix-drivexps', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ user_id: this.usuarioId, email: this.usuarioEmail, plano: this.planoEscolhido })
-            });
-            if (res.ok) {
-              const data = await res.json();
-              this.codigoPixGerado = data.pix_copia_cola; this.qrCodeBase64 = data.qr_code_base64 || '';
-              if (!this.intervaloPollingPagamento) {
-                this.intervaloPollingPagamento = setInterval(() => { this.sincronizarAssinaturaSaaS(); }, 4000);
-              }
-            } else { alert('Não foi possível gerar o PIX. Tente novamente em instantes.'); }
-          } catch(e) { alert('Erro de conexão ao gerar PIX: ' + e.message); } 
-          finally { this.carregandoPix = false; }
-        },
-
-        resetarPix() {
-          if (this.intervaloPollingPagamento) { clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null; }
-          this.codigoPixGerado = ''; this.qrCodeBase64 = '';
-        },
-
-        fecharModalAssinatura() {
-          if (this.intervaloPollingPagamento) { clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null; }
-          this.codigoPixGerado = ''; this.qrCodeBase64 = ''; this.modalAssinatura = false;
-        },
-
-        copiarCodigoPix() {
-          navigator.clipboard.writeText(this.codigoPixGerado);
-          alert('Código PIX copiado! Abra o app do seu banco e escolha "PIX Copia e Cola".');
-        },
-
-        loginGoogle() {
-          localStorage.removeItem('usuario_deslogado');
-          const urlLimpa = window.location.origin + window.location.pathname;
-          window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
-        },
-
-        async deslogar() {
-          if (this.intervaloPollingPagamento) clearInterval(this.intervaloPollingPagamento);
-          localStorage.setItem('usuario_deslogado', 'true');
-          localStorage.removeItem('directus_token'); localStorage.removeItem('directus_user_id');
-          localStorage.removeItem('drivexps_rota_ativa_id'); localStorage.removeItem('drivexps_entregas_cache');
-          this.tokenAcesso = null; this.usuarioId = null; this.usuarioLogado = false;
-          this.entregas = []; this.rotaAtivaId = null;
-          try {
-            await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mode: 'session' })
-            });
-          } catch(e) {}
-        },
-
-        getFaixaPacotes(ordem) {
-          const sacola = Math.ceil(ordem / 10);
-          const inicio = (sacola - 1) * 10 + 1; const fim = sacola * 10;
-          return `Pacotes do ${inicio} ao ${fim}`;
-        },
-
-        checarInstalacaoPWA() {
-          this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-          const userAgent = window.navigator.userAgent.toLowerCase(); this.isIOS = /iphone|ipad|ipod/.test(userAgent);
-          if (this.isStandalone) { this.mostrarPopupInstalar = false; return; }
-          if (window.pwaDeferredPrompt) this.temPromptInstalacao = true;
-          window.addEventListener('pwa-pronto-para-instalar', () => { this.temPromptInstalacao = true; });
-        },
-
-        acionarInstalacaoManual() {
-          if (window.pwaDeferredPrompt) this.instalarPWA();
-          else this.mostrarPopupInstalar = true;
-        },
-
-        async instalarPWA() {
-          const prompt = window.pwaDeferredPrompt;
-          if (!prompt) { alert('Para instalar: abra o menu do Chrome (3 pontinhos) e toque em "Adicionar à tela inicial".'); return; }
-          prompt.prompt(); await prompt.userChoice;
-          window.pwaDeferredPrompt = null; this.mostrarPopupInstalar = false;
-        },
-
-        parseLinhasShopee(linhasMatriz) {
-          this.msgErro = null;
-          if (!linhasMatriz || linhasMatriz.length < 2) { this.msgErro = 'Planilha com poucas linhas.'; return []; }
-
-          let idxCabecalho = -1;
-          for (let i = 0; i < Math.min(linhasMatriz.length, 10); i++) {
-            const rowStr = (linhasMatriz[i] || []).join(' ').toLowerCase();
-            if (rowStr.includes('latitude') || rowStr.includes('spx tn') || rowStr.includes('destination address')) { idxCabecalho = i; break; }
-          }
-
-          if (idxCabecalho === -1) { this.msgErro = 'Colunas oficiais da Shopee não foram encontradas na planilha.'; return []; }
-
-          const cabecalho = linhasMatriz[idxCabecalho].map(c => String(c || '').trim().toLowerCase());
-          const acharIdx = (termos) => cabecalho.findIndex(h => termos.some(t => h === t || h.includes(t)));
-
-          const iSequence = acharIdx(['sequence', 'ordem']);
-          const iStop = acharIdx(['stop', 'parada']);
-          let iTN = acharIdx(['spx tn', 'tracking', 'rastreio']);
-          if (iTN === -1 && cabecalho.length > 3) iTN = 3;
-
-          const iAddr = acharIdx(['destination address', 'endereço', 'endereco', 'address']);
-          const iBairro = acharIdx(['bairro', 'neighborhood']);
-          const iCity = acharIdx(['city', 'cidade']);
-          const iCep = acharIdx(['zipcode/postal code', 'zipcode', 'postal', 'cep']);
-          const iLat = acharIdx(['latitude', 'lat']);
-          const iLng = acharIdx(['longitude', 'lng', 'long']);
-
-          const lista = [];
-          let contadorExtra = 1;
-
-          for (let r = idxCabecalho + 1; r < linhasMatriz.length; r++) {
-            const cols = linhasMatriz[r];
-            if (!cols || cols.length <= Math.max(iLat, iLng)) continue;
-
-            const rawLat = String(cols[iLat] || '').replace(',', '.').trim();
-            const rawLng = String(cols[iLng] || '').replace(',', '.').trim();
-            const lat = parseFloat(rawLat); const lng = parseFloat(rawLng);
-
-            if (!lat || !lng || isNaN(lat) || isNaN(lng) || lat === 0) continue;
-
-            const addr = String(cols[iAddr] || '').trim();
-            const rawSeq = iSequence !== -1 ? String(cols[iSequence] || '').trim() : '';
-            const rawStop = iStop !== -1 ? String(cols[iStop] || '').trim() : '';
-            
-            let seqVal = null;
-            let stpVal = null;
-
-            if (rawSeq === '-' || rawStop === '-') {
-                seqVal = -contadorExtra;
-                stpVal = -contadorExtra;
-                contadorExtra++;
-            } else {
-                seqVal = parseInt(rawSeq) || null;
-                stpVal = parseInt(rawStop) || null;
-            }
-            
-            const rawTN = (iTN !== -1 && cols[iTN]) ? String(cols[iTN]).trim() : '';
-            const rastreioFinal = (rawTN && rawTN !== '-') ? rawTN : `BR${Math.floor(100000000000 + Math.random() * 900000000000)}S`;
-
-            let numero = 'S/N';
-            const numMatch = addr.match(/,\s*(\d+|S\/?N)/i);
-            if (numMatch) numero = numMatch[1];
-
-            lista.push({
-              ordem_shopee: seqVal,
-              parada_shopee: stpVal,
-              codigo_rastreio: rastreioFinal,
-              destinatario: stpVal ? `Parada #${stpVal}` : 'Destinatário',
-              telefone: '13999999999',
-              endereco: addr,
-              numero: numero,
-              bairro: iBairro !== -1 && cols[iBairro] ? String(cols[iBairro]).trim() : '',
-              cidade: iCity !== -1 && cols[iCity] ? String(cols[iCity]).trim() : 'Mongaguá',
-              cep: iCep !== -1 && cols[iCep] ? String(cols[iCep]).trim() : '',
-              latitude: lat,
-              longitude: lng
-            });
-          }
-
-          const contagemParadas = {};
-          for (const item of lista) {
-            if (item.parada_shopee) {
-              const chave = `${item.cidade}_${item.endereco.split(',')[0].toLowerCase().trim()}_${item.parada_shopee}`;
-              contagemParadas[chave] = (contagemParadas[chave] || 0) + 1;
-            }
-          }
-          for (const item of lista) {
-            if (item.parada_shopee) {
-              const chave = `${item.cidade}_${item.endereco.split(',')[0].toLowerCase().trim()}_${item.parada_shopee}`;
-              item.total_no_local = contagemParadas[chave] || 1;
-            } else {
-              item.total_no_local = 1;
-            }
-          }
-          return lista;
-        },
-
-        processarArquivoDirecto(file) {
-          this.nomeArquivo = file.name;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            try {
-              const data = new Uint8Array(e.target.result);
-              const wb = XLSX.read(data, { type: 'array' });
-              let entregasAparecidas = [];
-              for (const sheetName of wb.SheetNames) {
-                const ws = wb.Sheets[sheetName];
-                const matriz = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-                const res = this.parseLinhasShopee(matriz);
-                if (res.length > 0) { entregasAparecidas = res; break; }
-              }
-              this.pacotesExtraidos = entregasAparecidas;
-              if (this.pacotesExtraidos.length === 0 && !this.msgErro) {
-                this.msgErro = 'Nenhum pacote com Latitude e Longitude válidas nesta planilha.';
-              }
-            } catch (err) { this.msgErro = 'Erro ao processar: ' + err.message; }
-          };
-          reader.readAsArrayBuffer(file);
-        },
-
-        processarArquivoExcel(event) {
-          const file = event.target.files[0];
-          if (file) this.processarArquivoDirecto(file);
-        },
-
-        async carregarUltimaRota() {
-          try {
-            const headers = {};
-            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-            const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=1`, { headers, credentials: 'include' });
-            const dataRota = await resRota.json();
-            if (dataRota.data && dataRota.data.length > 0) {
-              this.rotaAtivaId = dataRota.data[0].id;
-              await this.carregarEntregasPorId(this.rotaAtivaId);
-            } else if (!this.rotaAtivaId) {
-              this.entregas = []; this.rotaAtivaId = null;
-            }
-          } catch(e) {}
-        },
-
-        async carregarEntregasPorId(rotaId) {
-          try {
-            const headers = {};
-            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-            const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`, { headers, credentials: 'include' });
-            const data = await res.json();
-            if (data.data && data.data.length > 0) {
-              this.entregas = data.data;
-              this.salvarCacheLocal();
-            }
-          } catch(e) {}
-        },
-
-        async abrirHistorico() {
-          this.modo = 'historico';
-          try {
-            const headers = {};
-            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-            const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
-            const dataRota = await resRota.json();
-            this.rotasHistorico = dataRota.data || [];
-          } catch(e) {}
-        },
-
-        async selecionarRotaHistorico(rotaId) {
-          this.rotaAtivaId = rotaId;
-          await this.carregarEntregasPorId(rotaId);
-          this.salvarCacheLocal();
-          this.modo = 'carregamento';
-        },
-
-        async apagarRota(rotaId) {
-          if (!confirm(`Deseja realmente apagar a Rota #${rotaId} e todos os seus pacotes do banco de dados? Esta ação não pode ser desfeita.`)) return;
-          try {
-            const headers = {};
-            if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-            const res = await fetch(`${this.DIRECTUS_URL}/items/rotas/${rotaId}`, { method: 'DELETE', headers, credentials: 'include' });
-            if (res.ok || res.status === 204) {
-              this.rotasHistorico = this.rotasHistorico.filter(r => r.id !== rotaId);
-              if (this.rotaAtivaId === rotaId) {
-                this.rotaAtivaId = null; this.entregas = [];
-                localStorage.removeItem('drivexps_rota_ativa_id'); localStorage.removeItem('drivexps_entregas_cache');
-                await this.carregarUltimaRota();
-              }
-              alert(`Rota #${rotaId} apagada com sucesso!`);
-            } else { alert('Erro ao apagar rota no Directus.'); }
-          } catch(e) { alert('Falha na comunicação: ' + e.message); }
+          if (!this.termoBusca) return [];
+          const t = this.termoBusca.toLowerCase().trim();
+          return this.entregas.filter(e => {
+            return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
+                   (e.bairro && e.bairro.toLowerCase().includes(t)) ||
+                   (e.ordem_entrega && e.ordem_entrega.toString() === t) ||
+                   (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t));
+          });
         },
 
         get naoEntregues() { return this.entregas.filter(e => e.status !== 'entregue'); },
@@ -1358,104 +465,243 @@
             const sel = this.entregas.find(e => e.id === this.entregaSelecionadaId);
             if (sel && sel.status !== 'entregue') return sel;
           }
-          const primeiroPendente = this.entregas.find(e => e.status === 'pendente');
-          if (primeiroPendente) return primeiroPendente;
-          const primeiroPulado = this.entregas.find(e => e.status === 'ausente');
-          if (primeiroPulado) return primeiroPulado;
-          return null;
+          return this.entregas.find(e => e.status === 'pendente') || this.entregas.find(e => e.status === 'ausente') || null;
         },
 
-        get ehMesmaRuaQueAnterior() {
+        // Detecta se a entrega atual cruzou a rodovia em relação à anterior
+        get mudouDeLadoDePista() {
           if (!this.entregaAtual) return false;
           const idx = this.entregas.findIndex(e => e.id === this.entregaAtual.id);
           if (idx <= 0) return false;
-          const anterior = this.entregas[idx - 1];
-          const ruaAtual = (this.entregaAtual.endereco || '').split(',')[0].toLowerCase().trim();
-          const ruaAnterior = (anterior.endereco || '').split(',')[0].toLowerCase().trim();
-          return ruaAtual === ruaAnterior;
+          const ant = this.entregas[idx - 1];
+          return ant.lado_pista && this.entregaAtual.lado_pista && ant.lado_pista !== this.entregaAtual.lado_pista;
         },
 
-        get pacotesMesmoLocal() {
-          if (!this.entregaAtual) return [];
-          const cur = this.entregaAtual;
-          const mesmaRua = (e) => (e.endereco || '').split(',')[0].toLowerCase().trim() === (cur.endereco || '').split(',')[0].toLowerCase().trim();
-          return this.naoEntregues.filter(e => 
-            (e.cidade === cur.cidade && e.parada_shopee && cur.parada_shopee && e.parada_shopee === cur.parada_shopee && mesmaRua(e)) ||
-            (e.cidade === cur.cidade && mesmaRua(e) && Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001)
-          );
+        // NAVEGAÇÃO INTELIGENTE
+        abrirWaze(item) {
+          window.location.href = `waze://?ll=${item.latitude},${item.longitude}&navigate=yes`;
         },
 
-        async pularEntrega(entrega) {
-          await this.atualizarStatus(entrega.id, 'ausente');
-          this.entregaSelecionadaId = null;
+        abrirGoogleMapsGPS(item) {
+          window.location.href = `google.navigation:q=${item.latitude},${item.longitude}`;
         },
 
-        async concluirEntrega(entrega) {
-          const mesmoLocal = this.pacotesMesmoLocal;
-          if (mesmoLocal.length > 1) {
-            const conf = confirm(`Há ${mesmoLocal.length} pacotes nesta Parada. Deseja marcar TODOS como entregues?`);
-            if (conf) {
-              for (const p of mesmoLocal) { await this.atualizarStatus(p.id, 'entregue'); }
-              this.entregaSelecionadaId = null; return;
-            }
-          }
-          this.entregaSelecionadaId = null;
-          await this.atualizarStatus(entrega.id, 'entregue');
+        abrirGoogleMapsTexto(item) {
+          const consulta = encodeURIComponent(`${item.endereco}, ${item.bairro || ''}, ${item.cidade || ''}`);
+          window.open(`https://www.google.com/maps/search/?api=1&query=${consulta}`, '_system');
         },
 
-        async atualizarStatus(id, novoStatus) {
-          const idx = this.entregas.findIndex(e => e.id === id);
-          if (idx !== -1) {
-            this.entregas[idx].status = novoStatus;
-            this.salvarCacheLocal();
-          }
-          const headers = { 'Content-Type': 'application/json' };
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+        restaurarCacheLocal() {
           try {
-            await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
-              method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ status: novoStatus })
-            });
+            const r = localStorage.getItem('drivexps_rota_ativa_id');
+            const e = localStorage.getItem('drivexps_entregas_cache');
+            if (r && e) {
+              this.rotaAtivaId = parseInt(r);
+              this.entregas = JSON.parse(e);
+            }
           } catch(e) {}
         },
 
+        salvarCacheLocal() {
+          if (this.rotaAtivaId) {
+            localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
+            localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
+          }
+        },
+
+        getFaixaPacotes(ordem) {
+          const sacola = Math.ceil(ordem / 10);
+          return `Pacotes ${(sacola - 1) * 10 + 1} ao ${sacola * 10}`;
+        },
+
+        abrirModalImportar() { this.modalImportar = true; },
+        irParaEntregaDireta(item) { this.entregaSelecionadaId = item.id; this.modo = 'rua'; },
+
+        async verificarAutenticacao() {
+          if (localStorage.getItem('usuario_deslogado') === 'true') { this.usuarioLogado = false; return; }
+          const extrair = (u) => {
+            this.usuarioId = u.id;
+            this.usuarioEmail = u.email || '';
+            this.usuarioNome = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email || 'Motorista';
+            localStorage.setItem('directus_user_id', this.usuarioId);
+            this.usuarioLogado = true;
+          };
+          if (this.tokenAcesso) {
+            try {
+              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { headers: { 'Authorization': `Bearer ${this.tokenAcesso}` } });
+              if (res.ok) { const d = await res.json(); extrair(d.data); return; }
+            } catch(e) {}
+          }
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
+            if (res.ok) { const d = await res.json(); if (d?.data?.id) { extrair(d.data); return; } }
+          } catch(e) {}
+          this.usuarioLogado = false;
+        },
+
+        loginGoogle() {
+          localStorage.removeItem('usuario_deslogado');
+          const urlLimpa = window.location.origin + window.location.pathname;
+          window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
+        },
+
+        parseLinhasShopee(linhasMatriz) {
+          let idxCabecalho = -1;
+          for (let i = 0; i < Math.min(linhasMatriz.length, 10); i++) {
+            const r = (linhasMatriz[i] || []).join(' ').toLowerCase();
+            if (r.includes('latitude') || r.includes('spx tn') || r.includes('destination address')) { idxCabecalho = i; break; }
+          }
+          if (idxCabecalho === -1) return [];
+
+          const c = linhasMatriz[idxCabecalho].map(h => String(h || '').trim().toLowerCase());
+          const f = (t) => c.findIndex(h => t.some(x => h === x || h.includes(x)));
+
+          const iSeq = f(['sequence', 'ordem']);
+          const iStp = f(['stop', 'parada']);
+          let iTN = f(['spx tn', 'tracking', 'rastreio']);
+          if (iTN === -1 && c.length > 3) iTN = 3;
+          const iAddr = f(['destination address', 'endereço', 'endereco', 'address']);
+          const iBairro = f(['bairro', 'neighborhood']);
+          const iCity = f(['city', 'cidade']);
+          const iCep = f(['zipcode/postal code', 'zipcode', 'cep']);
+          const iLat = f(['latitude', 'lat']);
+          const iLng = f(['longitude', 'lng', 'long']);
+
+          const lista = [];
+          for (let r = idxCabecalho + 1; r < linhasMatriz.length; r++) {
+            const cols = linhasMatriz[r];
+            if (!cols || cols.length <= Math.max(iLat, iLng)) continue;
+
+            const lat = parseFloat(String(cols[iLat] || '').replace(',', '.').trim());
+            const lng = parseFloat(String(cols[iLng] || '').replace(',', '.').trim());
+            if (!lat || !lng || isNaN(lat) || isNaN(lng)) continue;
+
+            const addr = String(cols[iAddr] || '').trim();
+            lista.push({
+              ordem_shopee: parseInt(cols[iSeq]) || null,
+              parada_shopee: parseInt(cols[iStp]) || null,
+              codigo_rastreio: String(cols[iTN] || '').trim() || `BR${Math.floor(100000000000 + Math.random() * 900000000000)}S`,
+              destinatario: cols[iStp] ? `Parada #${cols[iStp]}` : 'Destinatário',
+              endereco: addr,
+              numero: (addr.match(/,\s*(\d+)/) || ['','S/N'])[1],
+              bairro: iBairro !== -1 ? String(cols[iBairro] || '').trim() : '',
+              cidade: iCity !== -1 ? String(cols[iCity] || '').trim() : 'Itanhaém',
+              cep: iCep !== -1 ? String(cols[iCep] || '').trim() : '',
+              latitude: lat,
+              longitude: lng
+            });
+          }
+          return lista;
+        },
+
+        processarArquivoExcel(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          this.nomeArquivo = file.name;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const data = new Uint8Array(e.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            for (const sn of wb.SheetNames) {
+              const res = this.parseLinhasShopee(XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '' }));
+              if (res.length > 0) { this.pacotesExtraidos = res; break; }
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        },
+
         async enviarParaN8N() {
-          if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
           this.carregandoProcesso = true;
           try {
-            if (!this.usuarioId) {
-              const u = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
-              const ud = await u.json();
-              if (ud?.data?.id) {
-                this.usuarioId = ud.data.id;
-                localStorage.setItem('directus_user_id', this.usuarioId);
-              }
-            }
             const payload = {
-              entregas: this.pacotesExtraidos, user_id: this.usuarioId,
-              cd_lat: this.cd.lat, cd_lng: this.cd.lng, casa_lat: this.casa.lat, casa_lng: this.casa.lng
+              entregas: this.pacotesExtraidos,
+              user_id: this.usuarioId,
+              cd_lat: this.cd.lat, cd_lng: this.cd.lng,
+              casa_lat: this.casa.lat, casa_lng: this.casa.lng
             };
             const res = await fetch(this.N8N_WEBHOOK_URL, {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
             });
             if (res.ok) {
-              const resJson = await res.json();
-              if (resJson.bloqueado) {
-                alert(resJson.mensagem || 'Assinatura necessária.');
-                this.modalAssinatura = true; return;
-              }
-              this.modalImportar = false; this.pacotesExtraidos = []; this.nomeArquivo = '';
-              await this.sincronizarAssinaturaSaaS();
-              if (resJson && resJson.rota_id) {
-                this.rotaAtivaId = resJson.rota_id;
-                await this.carregarEntregasPorId(this.rotaAtivaId);
-              } else { await this.carregarUltimaRota(); }
-              this.salvarCacheLocal();
+              const d = await res.json();
+              this.modalImportar = false;
+              this.rotaAtivaId = d.rota_id;
+              await this.carregarEntregasPorId(this.rotaAtivaId);
               this.modo = 'carregamento';
-            } else { alert('Erro no n8n ao gerar rota.'); }
-          } catch(e) { alert('Falha na comunicação: ' + e.message); } 
-          finally { this.carregandoProcesso = false; }
+            }
+          } catch(e) {
+            alert('Erro de conexão ao gerar rota: ' + e.message);
+          } finally {
+            this.carregandoProcesso = false;
+          }
+        },
+
+        async carregarUltimaRota() {
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=1`, { credentials: 'include' });
+            const d = await res.json();
+            if (d?.data?.length > 0) {
+              this.rotaAtivaId = d.data[0].id;
+              await this.carregarEntregasPorId(this.rotaAtivaId);
+            }
+          } catch(e) {}
+        },
+
+        async carregarEntregasPorId(rotaId) {
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`, { credentials: 'include' });
+            const d = await res.json();
+            if (d?.data?.length > 0) {
+              this.entregas = d.data;
+              this.salvarCacheLocal();
+            }
+          } catch(e) {}
+        },
+
+        async pularEntrega(item) { await this.atualizarStatus(item.id, 'ausente'); },
+        async concluirEntrega(item) { await this.atualizarStatus(item.id, 'entregue'); },
+
+        async atualizarStatus(id, status) {
+          const idx = this.entregas.findIndex(e => e.id === id);
+          if (idx !== -1) {
+            this.entregas[idx].status = status;
+            this.salvarCacheLocal();
+          }
+          await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ status })
+          });
+        },
+
+        async abrirHistorico() {
+          this.modo = 'historico';
+          const res = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { credentials: 'include' });
+          const d = await res.json();
+          this.rotasHistorico = d?.data || [];
+        },
+
+        async selecionarRotaHistorico(id) {
+          this.rotaAtivaId = id;
+          await this.carregarEntregasPorId(id);
+          this.modo = 'carregamento';
+        },
+
+        async apagarRota(id) {
+          if (!confirm(`Deseja apagar a Rota #${id}?`)) return;
+          await fetch(`${this.DIRECTUS_URL}/items/rotas/${id}`, { method: 'DELETE', credentials: 'include' });
+          this.rotasHistorico = this.rotasHistorico.filter(r => r.id !== id);
+          if (this.rotaAtivaId === id) {
+            this.rotaAtivaId = null;
+            this.entregas = [];
+            localStorage.removeItem('drivexps_rota_ativa_id');
+            localStorage.removeItem('drivexps_entregas_cache');
+          }
         }
-      }
+      };
     }
   </script>
 </body>
