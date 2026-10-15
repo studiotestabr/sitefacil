@@ -123,10 +123,7 @@
                        <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
                    </div>
                    <div class="flex-1 overflow-hidden">
-                       <div class="flex items-center gap-1.5">
-                         <span x-show="item.lado_pista" class="text-[9px] font-black px-1.5 py-0.5 rounded" :class="item.lado_pista === 'MORRO' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-cyan-950 text-cyan-400 border border-cyan-800'" x-text="item.lado_pista === 'MORRO' ? '⛰️ MORRO' : '🏖️ PRAIA'"></span>
-                         <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
-                       </div>
+                       <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
                        <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
                        <div class="flex gap-2 mt-1.5">
                            <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
@@ -277,7 +274,7 @@
     </div>
   </div>
 
-  <!-- APLICAÇÃO LOGADA -->
+  <!-- APLICAÇÃO -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     <div>
       <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all"
@@ -325,7 +322,7 @@
         </nav>
       </header>
 
-      <!-- GPS PARTIDA / FINAL -->
+      <!-- GPS -->
       <section id="btnTourGPS" :class="{'ring-4 ring-amber-400 shadow-[0_0_30px_rgba(245,158,11,1)] z-[105] relative bg-gray-900 border-amber-400 scale-[1.01]': tutorialAberto && passoTutorial === 2, 'bg-gray-900/90': !(tutorialAberto && passoTutorial === 2)}" class="px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5 transition-all">
         <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
           <div class="truncate pr-1">
@@ -347,7 +344,7 @@
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
-          <p class="text-gray-300 text-xs leading-relaxed">Layout universal otimizado para qualquer veículo com separação por pista de rodovia. <em>(Toque no card para abrir no Waze).</em></p>
+          <p class="text-gray-300 text-xs leading-relaxed">Layout universal otimizado para qualquer veículo. <em>(Toque no card para abrir no Waze).</em></p>
         </div>
 
         <div class="space-y-3">
@@ -374,8 +371,7 @@
               </div>
 
               <div class="flex justify-between items-center text-xs px-0.5">
-                <div class="flex items-center gap-1.5">
-                  <span x-show="item.lado_pista" class="text-[10px] font-black px-2 py-0.5 rounded-md" :class="item.lado_pista === 'MORRO' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-cyan-950 text-cyan-400 border border-cyan-800'" x-text="item.lado_pista === 'MORRO' ? '⛰️ LADO MORRO' : '🏖️ LADO PRAIA'"></span>
+                <div>
                   <span x-show="item.total_no_local > 1" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[11px]" x-text="`⚠️ ${item.total_no_local} PACOTES NESTA PARADA`"></span>
                 </div>
                 <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(item.ordem_entrega)"></span>
@@ -395,7 +391,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT DEFINITIVO) -->
+      <!-- MODO 2: RUA (COCKPIT UNIVERSAL) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
@@ -422,8 +418,7 @@
               </div>
             </div>
 
-            <div class="flex justify-between items-center text-xs px-1">
-              <span x-show="entregaAtual.lado_pista" class="text-xs font-black px-2 py-0.5 rounded-md" :class="entregaAtual.lado_pista === 'MORRO' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-cyan-950 text-cyan-400 border border-cyan-800'" x-text="entregaAtual.lado_pista === 'MORRO' ? '⛰️ LADO MORRO' : '🏖️ LADO PRAIA'"></span>
+            <div class="flex justify-end text-xs pr-1">
               <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
             </div>
 
@@ -460,9 +455,14 @@
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
+            <!-- BOTÕES DE NAVEGAÇÃO PROFISSIONAL NACIONAL (WAZE & GOOGLE MAPS) -->
             <div class="grid grid-cols-2 gap-3 pt-1">
-              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">🚗 Iniciar Waze</a>
-              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">🗺️ Google Maps</a>
+              <button @click="abrirNavegadorWaze(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition cursor-pointer">
+                🚗 Iniciar Waze
+              </button>
+              <button @click="abrirNavegadorMaps(entregaAtual)" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition cursor-pointer">
+                🗺️ Google Maps
+              </button>
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
@@ -512,7 +512,7 @@
     </footer>
   </div>
 
-  <!-- 7. MINI TUTORIAL INTERATIVO (COMPLETO) -->
+  <!-- 7. MINI TUTORIAL INTERATIVO -->
   <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
       <template x-if="passoTutorial === 1">
@@ -624,7 +624,7 @@
     </div>
   </div>
 
-  <!-- 9. MODAL DE ASSINATURA (COMPLETO COM PUSHIN PAY) -->
+  <!-- 9. MODAL DE ASSINATURA -->
   <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
@@ -699,7 +699,7 @@
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <div>
           <h2 class="font-black text-lg text-orange-500">IMPORTAR PLANILHA SHOPEE</h2>
-          <p class="text-xs text-gray-400">Varredura contínua com Geocodificação Cruzada</p>
+          <p class="text-xs text-gray-400">Varredura contínua por corredor de rua</p>
         </div>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
@@ -719,7 +719,7 @@
       </div>
       <button @click="enviarParaN8N()" :disabled="carregandoProcesso || pacotesExtraidos.length === 0" class="w-full py-4 rounded-2xl text-sm font-black flex items-center justify-center gap-2 shadow-xl transition" :class="pacotesExtraidos.length > 0 && !carregandoProcesso ? 'bg-orange-600 hover:bg-orange-500 text-white cursor-pointer shadow-orange-600/40' : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700'">
         <span x-show="!carregandoProcesso" x-text="pacotesExtraidos.length > 0 ? `🚀 Gerar Rota Contínua (${pacotesExtraidos.length} pacotes)` : 'Aguardando Arquivo...'"></span>
-        <span x-show="carregandoProcesso">⏳ Cruzando Endereços e Otimizando...</span>
+        <span x-show="carregandoProcesso">⏳ Otimizando Varredura de Ruas...</span>
       </button>
     </div>
   </div>
@@ -977,6 +977,39 @@
           this.modo = 'rua';
         },
 
+        // PROTOCOLO UNIVERSAL DE NAVEGAÇÃO DE ALTA PRECISÃO (BRASIL INTEIRO)
+        abrirNavegadorWaze(item) {
+          if (!item) return;
+          const enderecoLimpo = `${item.endereco}, ${item.bairro || ''}, ${item.cidade || ''}`.replace(/\s+/g, ' ').trim();
+          const query = encodeURIComponent(enderecoLimpo);
+
+          // Envia a busca cadastral oficial (q) junto das coordenadas (ll)
+          // Isso força o algoritmo do Waze a fixar o destino na via de acesso correta do imóvel
+          const urlApp = `waze://?q=${query}&ll=${item.latitude},${item.longitude}&navigate=yes`;
+          const urlFallback = `https://waze.com/ul?q=${query}&ll=${item.latitude},${item.longitude}&navigate=yes`;
+
+          window.location.href = urlApp;
+          setTimeout(() => {
+            window.location.href = urlFallback;
+          }, 450);
+        },
+
+        abrirNavegadorMaps(item) {
+          if (!item) return;
+          const enderecoLimpo = `${item.endereco}, ${item.bairro || ''}, ${item.cidade || ''}`.replace(/\s+/g, ' ').trim();
+          const query = encodeURIComponent(enderecoLimpo);
+
+          const urlApp = `google.navigation:q=${query}`;
+          const urlWeb = `https://www.google.com/maps/dir/?api=1&destination=${query}&travelmode=driving`;
+
+          const isAndroid = /android/i.test(navigator.userAgent);
+          if (isAndroid) {
+            window.location.href = urlApp;
+          } else {
+            window.open(urlWeb, '_system');
+          }
+        },
+
         async verificarAutenticacao() {
           if (localStorage.getItem('usuario_deslogado') === 'true') { this.usuarioLogado = false; return; }
           if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
@@ -1066,7 +1099,7 @@
           this.buscandoGeo = tipo;
           try {
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=br`;
-            const res = await fetch(url, { headers: { 'User-Agent': 'DriveXPS-DeliveryOptimizer/5.0' } });
+            const res = await fetch(url, { headers: { 'User-Agent': 'DriveXPS-DeliveryOptimizer/1.0' } });
             const data = await res.json();
             if (data && data.length > 0) {
               const lat = parseFloat(data[0].lat); const lon = parseFloat(data[0].lon);
