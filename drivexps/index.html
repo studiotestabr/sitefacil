@@ -100,7 +100,6 @@
        x-transition:leave-start="opacity-100 translate-y-0"
        x-transition:leave-end="opacity-0 translate-y-10" x-cloak>
        
-       <!-- Header da Busca -->
        <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
           <div class="flex-1 relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
@@ -110,7 +109,6 @@
           <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
        </div>
 
-       <!-- Lista de Resultados -->
        <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
            <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
                <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
@@ -391,7 +389,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT UNIVERSAL) -->
+      <!-- MODO 2: RUA (COCKPIT DEFINITIVO) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
@@ -455,14 +453,9 @@
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- BOTÕES DE NAVEGAÇÃO PROFISSIONAL NACIONAL (WAZE & GOOGLE MAPS) -->
             <div class="grid grid-cols-2 gap-3 pt-1">
-              <button @click="abrirNavegadorWaze(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition cursor-pointer">
-                🚗 Iniciar Waze
-              </button>
-              <button @click="abrirNavegadorMaps(entregaAtual)" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition cursor-pointer">
-                🗺️ Google Maps
-              </button>
+              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">🚗 Iniciar Waze</a>
+              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">🗺️ Google Maps</a>
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
@@ -975,39 +968,6 @@
         irParaEntregaDireta(item) {
           this.entregaSelecionadaId = item.id;
           this.modo = 'rua';
-        },
-
-        // PROTOCOLO UNIVERSAL DE NAVEGAÇÃO DE ALTA PRECISÃO (BRASIL INTEIRO)
-        abrirNavegadorWaze(item) {
-          if (!item) return;
-          const enderecoLimpo = `${item.endereco}, ${item.bairro || ''}, ${item.cidade || ''}`.replace(/\s+/g, ' ').trim();
-          const query = encodeURIComponent(enderecoLimpo);
-
-          // Envia a busca cadastral oficial (q) junto das coordenadas (ll)
-          // Isso força o algoritmo do Waze a fixar o destino na via de acesso correta do imóvel
-          const urlApp = `waze://?q=${query}&ll=${item.latitude},${item.longitude}&navigate=yes`;
-          const urlFallback = `https://waze.com/ul?q=${query}&ll=${item.latitude},${item.longitude}&navigate=yes`;
-
-          window.location.href = urlApp;
-          setTimeout(() => {
-            window.location.href = urlFallback;
-          }, 450);
-        },
-
-        abrirNavegadorMaps(item) {
-          if (!item) return;
-          const enderecoLimpo = `${item.endereco}, ${item.bairro || ''}, ${item.cidade || ''}`.replace(/\s+/g, ' ').trim();
-          const query = encodeURIComponent(enderecoLimpo);
-
-          const urlApp = `google.navigation:q=${query}`;
-          const urlWeb = `https://www.google.com/maps/dir/?api=1&destination=${query}&travelmode=driving`;
-
-          const isAndroid = /android/i.test(navigator.userAgent);
-          if (isAndroid) {
-            window.location.href = urlApp;
-          } else {
-            window.open(urlWeb, '_system');
-          }
         },
 
         async verificarAutenticacao() {
