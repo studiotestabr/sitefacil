@@ -90,7 +90,7 @@
     }, 1500);
   </script>
 
-  <!-- MODAL DE BUSCA GLOBAL (INTELIGENTE) -->
+  <!-- MODAL DE BUSCA GLOBAL (COM BUSCA EXATA) -->
   <div x-show="buscaAberta"
        class="fixed inset-0 bg-gray-950 z-[200] flex flex-col transition-all"
        x-transition:enter="transition ease-out duration-200"
@@ -103,9 +103,9 @@
        <!-- Header da Busca -->
        <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
           <div class="flex-1 relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
-              <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..."
-                     class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-base">🔍</span>
+              <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Canetão (#64), Parada, Rua, Rastreio..."
+                     class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors font-medium">
           </div>
           <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
        </div>
@@ -113,27 +113,27 @@
        <!-- Lista de Resultados -->
        <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
            <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
-               <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
+               <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado com "<span x-text="termoBusca"></span>".</div>
            </template>
            <template x-for="item in entregasFiltradas" :key="item.id">
                <div @click="irParaEntregaDireta(item); buscaAberta = false" 
                     class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer active:scale-95 transition-transform shadow-lg">
                    <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0">
                        <span class="text-[9px] font-black uppercase leading-none opacity-80">Canetão</span>
-                       <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
+                       <span class="text-xl font-black leading-tight mt-0.5 font-mono" x-text="`#${item.ordem_entrega}`"></span>
                    </div>
                    <div class="flex-1 overflow-hidden">
                        <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
                        <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
                        <div class="flex gap-2 mt-1.5">
-                           <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
-                           <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+                           <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold font-mono" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
+                           <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold font-mono" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
                        </div>
                    </div>
                </div>
            </template>
            <template x-if="termoBusca.length === 0">
-               <div class="text-center text-gray-600 mt-10 text-xs">Digite algo para buscar no romaneio atual...</div>
+               <div class="text-center text-gray-600 mt-10 text-xs">Digite o número exato do Canetão, Parada, Rastreio ou Rua...</div>
            </template>
        </div>
   </div>
@@ -269,7 +269,7 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.2 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.3 Pro</p>
       </div>
     </div>
   </div>
@@ -284,16 +284,21 @@
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
           
           <div class="flex items-center gap-2">
-            <!-- Botão Busca 🔍 (Quadrado Perfeito) -->
-            <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Buscar Pacote">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            <!-- Botão Busca 🔍 (Quadrado 36x36px Perfeitamente Centralizado) -->
+            <button @click="abrirBusca()" 
+                    class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 shrink-0 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" 
+                    title="Buscar Pacote">
+              <svg class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
             </button>
-            <!-- Botão Menu ☰ (Quadrado Perfeito) -->
-            <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Menu">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+            <!-- Botão Menu ☰ (Quadrado 36x36px Perfeitamente Centralizado) -->
+            <button @click="menuAberto = true" 
+                    class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 shrink-0 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" 
+                    title="Menu">
+              <svg class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
               </svg>
             </button>
           </div>
@@ -391,7 +396,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT) -->
+      <!-- MODO 2: RUA (COCKPIT COM NAVEGAÇÃO DUPLA INTELIGENTE) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl">
@@ -455,9 +460,17 @@
               <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
+            <!-- BOTÕES GPS (WAZE POR COORDENADAS + GOOGLE MAPS POR ENDEREÇO E COMÉRCIO) -->
             <div class="grid grid-cols-2 gap-3 pt-1">
-              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">🚗 Iniciar Waze</a>
-              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">🗺️ Google Maps</a>
+              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" 
+                 class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-blue-600/30 active:scale-95 transition">
+                🚗 Iniciar Waze
+              </a>
+              <a :href="`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(entregaAtual.endereco + ', ' + (entregaAtual.bairro ? entregaAtual.bairro + ', ' : '') + entregaAtual.cidade)}`" 
+                 target="_blank" rel="noopener noreferrer"
+                 class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 active:scale-95 transition">
+                🗺️ Google Maps
+              </a>
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
@@ -500,86 +513,13 @@
       </main>
     </div>
 
-    <!-- Assinatura StudioTesta -->
     <footer class="py-6 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </footer>
   </div>
 
-  <!-- TUTORIAL, MODAIS DE PIX, TELEFONE E IMPORTAÇÃO (MANTIDOS IGUAIS) -->
-  <!-- 7. MINI TUTORIAL INTERATIVO -->
-  <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
-      <template x-if="passoTutorial === 1">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👋</div>
-          <h3 class="text-2xl font-black text-white">Bem-vindo ao DriveXPS!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Vamos te ensinar em 30 segundos como acabar com o ziguezague, economizar gasolina e terminar suas entregas muito mais rápido.</p>
-          <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-emerald-400 font-bold">🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!</div>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 2">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div>
-          <h3 class="text-2xl font-black text-white">Partida e Chegada</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Veja os botões <strong>acesos no topo</strong>! Grave onde você pega a carga (CD) e onde mora (Casa) para sua rota terminar pertinho de você.</p>
-          <p class="text-xs text-orange-400 font-semibold bg-black/60 p-3 rounded-xl border border-gray-800">Dica: Você pode usar o GPS ou <strong>digitar o endereço</strong> por escrito!</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 3">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">📊</div>
-          <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Rota"</strong> aceso no topo e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
-          <p class="text-xs text-orange-400 font-semibold bg-black/60 p-3 rounded-xl border border-gray-800">Dica de Ouro: Você também pode tocar na planilha no celular e escolher <strong>"Compartilhar com DriveXPS"</strong>!</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 4">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">✍️</div>
-          <h3 class="text-2xl font-black text-white">2. Organização no Canetão</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong> (acesa no topo), marque na caixa com canetão o número <strong>#CANETÃO</strong>.</p>
-          <p class="text-xs text-gray-300">Sua carga é separada de 10 em 10 pacotes por sacola. Você carrega seu carro em minutos!</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 5">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">🚗</div>
-          <h3 class="text-2xl font-black text-white">3. Na Rua com Waze</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong> (acesa no topo), você vê a entrega atual, aviso se a próxima casa fica na mesma rua e abre o Waze ou Maps com 1 único toque.</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 6">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📜</div>
-          <h3 class="text-2xl font-black text-white">4. Histórico de Rotas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong> (acesa no topo), você visualiza todas as rotas anteriores que já fez, pode reabri-las ou apagar rotas antigas.</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 7">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
-          <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Agora é com você. Importe sua primeira rota, organize suas sacolas e aproveite uma entrega rápida e sem estresse.</p>
-        </div>
-      </template>
-      <div class="flex items-center justify-between pt-3 border-t border-gray-800">
-        <div>
-          <button x-show="passoTutorial === 1" @click="concluirTutorial()" class="text-xs text-gray-400 hover:text-white font-bold py-2 px-2.5">Pular</button>
-          <button x-show="passoTutorial > 1" @click="voltarPassoTutorial()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-2 px-3 rounded-xl active:scale-95 transition">← Voltar</button>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <template x-for="p in 7" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
-        </div>
-        <button @click="proximoPassoTutorial()" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-4 rounded-xl active:scale-95 transition shadow-lg shadow-orange-600/30">
-          <span x-text="passoTutorial === 7 ? 'Começar!' : 'Avançar →'"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 8. CONFIGURAR CD E CASA -->
+  <!-- MODAL DE CONFIGURAÇÃO CD E CASA -->
   <div x-show="modalCD" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-md border border-gray-800 p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -620,7 +560,7 @@
     </div>
   </div>
 
-  <!-- 9. MODAL DE ASSINATURA -->
+  <!-- MODAL DE ASSINATURA -->
   <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
@@ -673,23 +613,7 @@
     </div>
   </div>
 
-  <!-- 10. MODAL DE COLETA DO WHATSAPP -->
-  <div x-show="modalTelefone" class="fixed inset-0 bg-black/90 z-[110] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-emerald-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📱</div>
-      <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">Seu WhatsApp de Suporte</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Informe seu número com DDD para receber suporte rápido e avisos de rotas:</p>
-      </div>
-      <div class="space-y-2 text-left">
-        <label class="text-[11px] font-bold text-gray-400 uppercase">DDD + WhatsApp:</label>
-        <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" class="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono">
-      </div>
-      <button @click="salvarTelefoneMotorista()" :disabled="!inputTelefone || inputTelefone.length < 10" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl active:scale-95 transition">Salvar Contato</button>
-    </div>
-  </div>
-
-  <!-- 11. MODAL DE IMPORTAR PLANILHA -->
+  <!-- MODAL DE IMPORTAR PLANILHA -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -730,7 +654,6 @@
         modalImportar: false,
         modalCD: false,
         modalAssinatura: false,
-        modalTelefone: false,
         inputTelefone: '',
         planoEscolhido: 'semanal',
         carregandoPix: false,
@@ -833,28 +756,40 @@
             return val;
         },
 
+        // 🎯 BUSCA ESTRITA INTELIGENTE: Digitar 64 acha EXATAMENTE 64 (Sem falsos positivos)
         get entregasFiltradas() {
             if (!this.termoBusca) return [];
             const t = this.termoBusca.toLowerCase().trim();
-            const apenasNumeros = /^\d+$/.test(t);
+            const tLimpo = t.replace(/^[#+]/, ''); // Remove # ou + digitados
 
             return this.entregas.filter(e => {
-                const paradaStr = this.formatarParada(e.parada_shopee).toString().toLowerCase();
-                const ordemStr = this.formatarParada(e.ordem_shopee).toString().toLowerCase();
-                const sacolaNum = Math.ceil(e.ordem_entrega / 10).toString();
-                const canetaoStr = e.ordem_entrega.toString();
+                const canetao = String(e.ordem_entrega || '');
+                const parada = String(this.formatarParada(e.parada_shopee) || '').toLowerCase();
+                const ordem = String(this.formatarParada(e.ordem_shopee) || '').toLowerCase();
+                const sacola = String(Math.ceil((e.ordem_entrega || 1) / 10));
+                const numCasa = String(e.numero || '').toLowerCase();
+                const endereco = String(e.endereco || '').toLowerCase();
+                const bairro = String(e.bairro || '').toLowerCase();
+                const rastreio = String(e.codigo_rastreio || '').toLowerCase();
 
-                if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
-                if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
-                if (t.startsWith('+') && t === paradaStr) return true;
+                // 1. Match exato nos campos de número
+                if (canetao === t || canetao === tLimpo) return true;
+                if (parada === t || parada === tLimpo || parada === `+${tLimpo}`) return true;
+                if (ordem === t || ordem === tLimpo || ordem === `+${tLimpo}`) return true;
+                if (numCasa === t || numCasa === tLimpo) return true;
+                if (t.startsWith('sacola') && sacola === tLimpo.replace('sacola', '').trim()) return true;
 
-                if (apenasNumeros && t.length <= 3) {
+                // 2. Se for número puro (ex: "64", "12"):
+                // Deve bater apenas como NÚMERO EXATO (evita achar 64 dentro de 164, 640 ou de um CEP)
+                if (/^\d+$/.test(t)) {
+                    const regexNum = new RegExp(`(^|\\D)${t}(\\D|$)`);
+                    if (regexNum.test(endereco)) return true;
+                    if (t.length >= 4 && rastreio.includes(t)) return true;
                     return false;
                 }
 
-                return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
-                       (e.bairro && e.bairro.toLowerCase().includes(t)) ||
-                       (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t));
+                // 3. Se for texto (nome de rua, bairro, código SPX):
+                return endereco.includes(t) || bairro.includes(t) || rastreio.includes(t);
             });
         },
 
@@ -1016,7 +951,6 @@
               });
               this.trialIniciado = false; this.diasRestantesTrial = 7; this.statusAssinatura = 'trial';
               this.planoAtivo = 'gratuito'; this.dataExpiracao = null; this.assinaturaValida = true;
-              this.modalTelefone = true;
             } else {
               const userSaas = registros[0];
               this.statusAssinatura = userSaas.status_assinatura || 'trial';
