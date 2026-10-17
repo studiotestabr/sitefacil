@@ -269,12 +269,33 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.2 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.5 Pro</p>
       </div>
     </div>
   </div>
 
-  <!-- APLICAÇÃO -->
+  <!-- 5. BANNER DO PERÍODO DE TESTE (SAAS INTELIGENTE) -->
+  <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" 
+       class="border-b px-4 py-2 flex justify-between items-center text-xs"
+       :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
+    <div>
+      <template x-if="!trialIniciado">
+        <span class="text-emerald-400 font-bold flex items-center gap-1.5">
+          <span>🎁</span> <strong>7 Dias Grátis:</strong> Começam ao gerar sua 1ª rota!
+        </span>
+      </template>
+      <template x-if="trialIniciado">
+        <span class="text-amber-400 font-bold flex items-center gap-1.5">
+          <span>⏳</span> Teste Ativo: <strong x-text="`${diasRestantesTrial} dia(s) restante(s)`"></strong>
+        </span>
+      </template>
+    </div>
+    <button @click="modalAssinatura = true" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-[11px] px-3 py-1 rounded-full transition active:scale-95 shadow-md">
+      Ver Planos
+    </button>
+  </div>
+
+  <!-- 6. APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     <div>
       <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all"
@@ -284,13 +305,13 @@
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
           
           <div class="flex items-center gap-2">
-            <!-- Botão Busca 🔍 (Quadrado Perfeito) -->
+            <!-- Botão Busca 🔍 -->
             <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Buscar Pacote">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
-            <!-- Botão Menu ☰ (Quadrado Perfeito) -->
+            <!-- Botão Menu ☰ -->
             <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Menu">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
@@ -340,7 +361,7 @@
         </button>
       </section>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
+      <!-- MODO 1: CARREGAMENTO EM SACOLAS (ORDENAÇÃO AUTOMÁTICA DE ENTREGUES PRO FINAL) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
@@ -348,8 +369,15 @@
         </div>
 
         <div class="space-y-3">
-          <template x-for="item in entregas" :key="item.id">
-            <div @click="irParaEntregaDireta(item)" class="bg-[#121824] rounded-2xl border border-gray-800/90 shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99] border-l-[6px] border-l-orange-500 hover:border-orange-500/60" :class="{'opacity-20 line-through bg-black border-gray-900': item.status === 'entregue', 'border-yellow-500/70 bg-yellow-500/5': item.status === 'ausente'}">
+          <!-- AQUI ESTÁ A MÁGICA: x-for="item in entregasOrdenadasParaSacola" -->
+          <template x-for="item in entregasOrdenadasParaSacola" :key="item.id">
+            <div @click="irParaEntregaDireta(item)" 
+                 class="bg-[#121824] rounded-2xl border border-gray-800/90 shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99] border-l-[6px] hover:border-orange-500/60" 
+                 :class="{
+                   'opacity-20 line-through bg-black border-gray-900 border-l-gray-700': item.status === 'entregue',
+                   'border-yellow-500/70 bg-yellow-500/5 border-l-yellow-500': item.status === 'ausente',
+                   'border-l-orange-500': item.status === 'pendente'
+                 }">
               
               <div class="grid grid-cols-4 gap-2 text-center">
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
@@ -507,7 +535,6 @@
     </footer>
   </div>
 
-  <!-- TUTORIAL, MODAIS DE PIX, TELEFONE E IMPORTAÇÃO (MANTIDOS IGUAIS) -->
   <!-- 7. MINI TUTORIAL INTERATIVO -->
   <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
@@ -633,10 +660,10 @@
           <div>
             <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Flexível</span>
             <span class="text-sm font-black text-white">Plano Semanal</span>
-            <span class="text-[11px] text-gray-400 block">Menos que R$ 1,40 por dia</span>
+            <span class="text-[10px] text-gray-400 block mt-0.5">Apenas R$ 0,98 por dia</span>
           </div>
           <div class="text-right">
-            <span class="text-lg font-black text-orange-400">R$ 9,90</span>
+            <span class="text-lg font-black text-orange-400">R$ 6,90</span>
             <span class="text-[10px] text-gray-500 block">por semana</span>
           </div>
         </div>
@@ -644,10 +671,10 @@
           <div>
             <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span>
             <span class="text-sm font-black text-white">Plano Mensal</span>
-            <span class="text-[11px] text-emerald-400 font-bold block">Apenas R$ 0,99 por dia!</span>
+            <span class="text-[11px] text-emerald-400 font-bold block mt-0.5">Apenas R$ 0,66 por dia!</span>
           </div>
           <div class="text-right">
-            <span class="text-lg font-black text-white">R$ 29,90</span>
+            <span class="text-lg font-black text-white">R$ 19,90</span>
             <span class="text-[10px] text-gray-500 block">por mês</span>
           </div>
         </div>
@@ -833,12 +860,21 @@
             return val;
         },
 
+        // ORDENAÇÃO INTELIGENTE: PACOTES ENTREGUES VÃO PRO FINAL DA LISTA
+        get entregasOrdenadasParaSacola() {
+            return [...this.entregas].sort((a, b) => {
+                if (a.status === 'entregue' && b.status !== 'entregue') return 1;
+                if (a.status !== 'entregue' && b.status === 'entregue') return -1;
+                return a.ordem_entrega - b.ordem_entrega;
+            });
+        },
+
         get entregasFiltradas() {
             if (!this.termoBusca) return [];
             const t = this.termoBusca.toLowerCase().trim();
             const apenasNumeros = /^\d+$/.test(t);
 
-            return this.entregas.filter(e => {
+            return this.entregasOrdenadasParaSacola.filter(e => {
                 const paradaStr = this.formatarParada(e.parada_shopee).toString().toLowerCase();
                 const ordemStr = this.formatarParada(e.ordem_shopee).toString().toLowerCase();
                 const sacolaNum = Math.ceil(e.ordem_entrega / 10).toString();
@@ -1022,6 +1058,7 @@
               this.statusAssinatura = userSaas.status_assinatura || 'trial';
               this.planoAtivo = userSaas.plano_ativo || 'gratuito';
               this.dataExpiracao = userSaas.trial_expira_em || null;
+
               if (userSaas.nome) this.usuarioNome = userSaas.nome;
               if (userSaas.email) this.usuarioEmail = userSaas.email;
               if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
