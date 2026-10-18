@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -12,9 +11,103 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
 
-  <!-- REGRA ESSENCIAL ALPINE.JS: EVITA QUALQUER FLASH DE MODAL ANTES DA HORA -->
+  <!-- ESTILOS GLOBAIS: EVITA FLASH DE MODAIS E CONTROLA MODO DIURNO DE ALTO CONTRASTE -->
   <style>
     [x-cloak] { display: none !important; }
+
+    /* MODO DIURNO (ALTO CONTRASTE CONTRA O REFLEXO DO SOL NO PARA-BRISA) */
+    body.theme-claro {
+      background-color: #f1f5f9 !important; /* Slate-100 */
+      color: #0f172a !important; /* Slate-900 (Preto de alto contraste) */
+    }
+    body.theme-claro .bg-gray-950,
+    body.theme-claro .bg-gray-900,
+    body.theme-claro .bg-\[\#121824\] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important; /* Slate-300 */
+      color: #0f172a !important;
+      box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+    body.theme-claro .bg-gray-800,
+    body.theme-claro .bg-\[\#1c2430\],
+    body.theme-claro .bg-\[\#1c1815\] {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.theme-claro .text-white {
+      color: #0f172a !important;
+    }
+    body.theme-claro .text-gray-300,
+    body.theme-claro .text-gray-400 {
+      color: #334155 !important; /* Slate-700: Alta legibilidade */
+    }
+    body.theme-claro .text-gray-200 {
+      color: #1e293b !important;
+    }
+    body.theme-claro .border-gray-800,
+    body.theme-claro .border-gray-700,
+    body.theme-claro .border-\[\#2b394a\] {
+      border-color: #cbd5e1 !important;
+    }
+    body.theme-claro .bg-black,
+    body.theme-claro .bg-black\/80,
+    body.theme-claro .bg-black\/90,
+    body.theme-claro .bg-black\/50,
+    body.theme-claro .bg-black\/40 {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.theme-claro input {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #94a3b8 !important;
+    }
+    body.theme-claro input::placeholder {
+      color: #64748b !important;
+    }
+
+    /* CALIBRAÇÃO DAS CORES DE DESTAQUE NO FUNDO CLARO */
+    body.theme-claro .text-orange-400 {
+      color: #c2410c !important; /* Laranja escuro encorpado */
+    }
+    body.theme-claro .text-yellow-400,
+    body.theme-claro .text-yellow-300 {
+      color: #b45309 !important; /* Âmbar escuro: não fica apagado no branco */
+    }
+    body.theme-claro .text-yellow-200 {
+      color: #78350f !important;
+    }
+    body.theme-claro .bg-orange-500\/10,
+    body.theme-claro .bg-orange-500\/15,
+    body.theme-claro .bg-orange-500\/20 {
+      background-color: #ffedd5 !important; /* Orange-100 */
+      border-color: #fb923c !important;
+      color: #9a3412 !important;
+    }
+    body.theme-claro .bg-yellow-500\/10,
+    body.theme-claro .bg-yellow-500\/20 {
+      background-color: #fef3c7 !important; /* Amber-100 */
+      border-color: #f59e0b !important;
+      color: #92400e !important;
+    }
+    body.theme-claro .bg-emerald-500\/10,
+    body.theme-claro .bg-emerald-500\/15,
+    body.theme-claro .bg-emerald-500\/20 {
+      background-color: #d1fae5 !important; /* Emerald-100 */
+      border-color: #34d399 !important;
+      color: #065f46 !important;
+    }
+    body.theme-claro .text-emerald-400 {
+      color: #047857 !important;
+    }
+    body.theme-claro .text-blue-400 {
+      color: #1d4ed8 !important;
+    }
+    body.theme-claro .text-amber-400 {
+      color: #b45309 !important;
+    }
   </style>
 
   <!-- TAGS OPEN GRAPH (PREVIEW OFICIAL WHATSAPP E REDES SOCIAIS) -->
@@ -56,7 +149,7 @@
     }
   </script>
 </head>
-<body class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between" x-data="entregaApp()">
+<body :class="tema === 'claro' ? 'theme-claro' : 'theme-escuro'" class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between transition-colors duration-300" x-data="entregaApp()">
 
   <!-- 1. SPLASH SCREEN (NUNCA TRAVA) -->
   <div id="splashScreen" 
@@ -174,13 +267,13 @@
     </div>
   </div>
 
-  <!-- 4. GAVETA DO MENU LATERAL (HAMBÚRGUER COM PERFIL COMPLETO) -->
+  <!-- 4. GAVETA DO MENU LATERAL (HAMBÚRGUER COM PERFIL COMPLETO + SELETOR DE TEMA) -->
   <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" 
        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
     
     <div class="bg-gray-900 border-l border-gray-800 w-full max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto" @click.away="menuAberto = false">
-      <div class="space-y-5">
+      <div class="space-y-4">
         <div class="flex items-center justify-between border-b border-gray-800 pb-4">
           <div class="flex items-center gap-3">
             <img src="./icon-192.png" alt="DriveXPS" class="w-11 h-11 rounded-2xl border border-gray-700 shadow-md">
@@ -191,19 +284,44 @@
           </div>
           <button @click="menuAberto = false" class="text-gray-400 hover:text-white text-2xl font-bold p-1 leading-none">&times;</button>
         </div>
-        <div class="bg-gray-950 p-4 rounded-2xl border border-gray-800 space-y-2">
+
+        <!-- STATUS DA ASSINATURA -->
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2">
           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
           <div class="space-y-1">
             <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
           </div>
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
-        <div class="bg-gray-950 p-4 rounded-2xl border border-gray-800 space-y-3">
+
+        <!-- NOVO: SELETOR DE TEMA VISUAL (MODO NOTURNO / DIURNO ALTO CONTRASTE) -->
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência do App:</span>
+            <span class="text-[10px] font-bold" :class="tema === 'claro' ? 'text-amber-500' : 'text-blue-400'" x-text="tema === 'claro' ? '☀️ Modo Sol (Dia)' : '🌙 Modo Noite (Escuro)'"></span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button @click="alternarTema('escuro')" 
+                    class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95"
+                    :class="tema === 'escuro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'">
+              <span>🌙</span> Escuro / Noite
+            </button>
+            <button @click="alternarTema('claro')" 
+                    class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95"
+                    :class="tema === 'claro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'">
+              <span>☀️</span> Claro / Sol
+            </button>
+          </div>
+          <p class="text-[9px] text-gray-400 text-center">O modo claro ativa cores de alto contraste contra o reflexo solar.</p>
+        </div>
+
+        <!-- DADOS DO MOTORISTA -->
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Dados do Motorista:</span>
             <span class="text-[10px] text-gray-500">Para suporte via WhatsApp</span>
           </div>
-          <div class="space-y-2.5">
+          <div class="space-y-2">
             <div>
               <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Nome Completo:</label>
               <input type="text" x-model="usuarioNome" placeholder="Seu Nome Completo" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
@@ -217,6 +335,7 @@
             </button>
           </div>
         </div>
+
         <nav class="space-y-2">
           <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
             <span class="text-base">❓</span> Como Usar o App (Tutorial)
@@ -226,11 +345,12 @@
           </button>
         </nav>
       </div>
-      <div class="space-y-3 pt-6 border-t border-gray-800">
-        <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
+
+      <div class="space-y-3 pt-4 border-t border-gray-800">
+        <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.7 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.8 Pro</p>
       </div>
     </div>
   </div>
@@ -431,7 +551,7 @@
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
             
-            <!-- AJUSTE 1: INDICADOR VISUAL DO BAIRRO ATUAL (VARREDURA CONTÍNUA) -->
+            <!-- INDICADOR VISUAL DO BAIRRO ATUAL (VARREDURA CONTÍNUA) -->
             <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300 shadow-md">
               <div class="flex items-center gap-2 truncate pr-2">
                 <span class="text-base shrink-0">📍</span>
@@ -481,7 +601,7 @@
               <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
             </div>
 
-            <!-- ALERTA DE MÚLTIPLOS PACOTES -->
+            <!-- ALERTA DE MÚLTIPLOS PACOTES (COM VIBRAÇÃO AUTOMÁTICA) -->
             <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
                 <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
@@ -847,6 +967,7 @@
   <script>
     function entregaApp() {
       return {
+        tema: localStorage.getItem('drivexps_tema') || 'escuro',
         modo: 'rua',
         menuAberto: false,
         buscaAberta: false,
@@ -908,8 +1029,27 @@
         DIRECTUS_URL: 'https://banco.studiotesta.com.br',
         N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
 
+        alternarTema(novoTema) {
+          this.tema = novoTema;
+          localStorage.setItem('drivexps_tema', novoTema);
+          if (novoTema === 'claro') {
+            document.body.classList.add('theme-claro');
+            document.body.classList.remove('theme-escuro');
+          } else {
+            document.body.classList.remove('theme-claro');
+            document.body.classList.add('theme-escuro');
+          }
+        },
+
         async init() {
           try {
+            // Aplica o tema salvo no carregamento
+            if (this.tema === 'claro') {
+              document.body.classList.add('theme-claro');
+            } else {
+              document.body.classList.add('theme-escuro');
+            }
+
             this.modalCadastroObrigatorio = false;
             this.restaurarCacheLocal();
             await this.verificarAutenticacao();
@@ -1003,7 +1143,6 @@
             });
         },
 
-        // AJUSTE 1: QUANTIDADE DE PACOTES RESTANTES NO MESMO BAIRRO
         get entregasNoBairroRestantes() {
           if (!this.entregaAtual) return 0;
           const bAtual = (this.entregaAtual.bairro || '').toLowerCase().trim();
@@ -1181,7 +1320,6 @@
         },
 
         async verificarAutenticacao() {
-          // SE O MOTORISTA CLICOU EM SAIR, OBRIGA A MOSTRAR A TELA DE LOGIN DO GOOGLE
           if (localStorage.getItem('usuario_deslogado') === 'true') {
             this.usuarioLogado = false;
             this.modalCadastroObrigatorio = false;
@@ -1282,13 +1420,11 @@
               }
             }
 
-            // GATILHO: SOMENTE SE LOGADO COM GOOGLE E DADOS INCOMPLETOS
             const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
             const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
             const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
 
             if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
-              // Preenche automaticamente com o nome e email que vieram da conta Google
               this.inputNome = (!nomeInvalido) ? userSaas.nome : (this.usuarioNome || '');
               this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
               this.inputTelefone = userSaas?.telefone || '';
@@ -1420,6 +1556,7 @@
           window.pwaDeferredPrompt = null; this.mostrarPopupInstalar = false;
         },
 
+        // PARSER UNIVERSAL SHOPEE EXPRESS BRASIL (COMPATÍVEL COM TODOS OS HUBS)
         parseLinhasShopee(linhasMatriz) {
           this.msgErro = null;
           if (!linhasMatriz || linhasMatriz.length < 2) { this.msgErro = 'Planilha com poucas linhas.'; return []; }
@@ -1427,7 +1564,10 @@
           let idxCabecalho = -1;
           for (let i = 0; i < Math.min(linhasMatriz.length, 10); i++) {
             const rowStr = (linhasMatriz[i] || []).join(' ').toLowerCase();
-            if (rowStr.includes('latitude') || rowStr.includes('spx tn') || rowStr.includes('destination address')) { idxCabecalho = i; break; }
+            if (rowStr.includes('latitude') || rowStr.includes('spx tn') || rowStr.includes('destination address') || rowStr.includes('rastreamento') || rowStr.includes('tracking')) { 
+              idxCabecalho = i; 
+              break; 
+            }
           }
 
           if (idxCabecalho === -1) { this.msgErro = 'Colunas oficiais da Shopee não foram encontradas na planilha.'; return []; }
@@ -1435,15 +1575,15 @@
           const cabecalho = linhasMatriz[idxCabecalho].map(c => String(c || '').trim().toLowerCase());
           const acharIdx = (termos) => cabecalho.findIndex(h => termos.some(t => h === t || h.includes(t)));
 
-          const iSequence = acharIdx(['sequence', 'ordem']);
-          const iStop = acharIdx(['stop', 'parada']);
-          let iTN = acharIdx(['spx tn', 'tracking', 'rastreio']);
+          const iSequence = acharIdx(['sequence', 'ordem', 'seq', 'ordem entrega', 'ordem de parada']);
+          const iStop = acharIdx(['stop', 'parada', 'stop sequence', 'n parada']);
+          let iTN = acharIdx(['spx tn', 'tracking', 'rastreio', 'tracking number', 'número de rastreamento', 'numero de rastreamento', 'código de rastreio', 'codigo de rastreio']);
           if (iTN === -1 && cabecalho.length > 3) iTN = 3;
 
-          const iAddr = acharIdx(['destination address', 'endereço', 'endereco', 'address']);
-          const iBairro = acharIdx(['bairro', 'neighborhood']);
-          const iCity = acharIdx(['city', 'cidade']);
-          const iCep = acharIdx(['zipcode/postal code', 'zipcode', 'postal', 'cep']);
+          const iAddr = acharIdx(['destination address', 'endereço', 'endereco', 'address', 'logradouro', 'rua']);
+          const iBairro = acharIdx(['bairro', 'neighborhood', 'distrito']);
+          const iCity = acharIdx(['city', 'cidade', 'município', 'municipio']);
+          const iCep = acharIdx(['zipcode/postal code', 'zipcode', 'postal', 'cep', 'código postal', 'codigo postal']);
           const iLat = acharIdx(['latitude', 'lat']);
           const iLng = acharIdx(['longitude', 'lng', 'long']);
 
@@ -1641,10 +1781,17 @@
           if (!this.entregaAtual) return [];
           const cur = this.entregaAtual;
           const mesmaRua = (e) => (e.endereco || '').split(',')[0].toLowerCase().trim() === (cur.endereco || '').split(',')[0].toLowerCase().trim();
-          return this.naoEntregues.filter(e => 
+          const lista = this.naoEntregues.filter(e => 
             (e.cidade === cur.cidade && e.parada_shopee && cur.parada_shopee && e.parada_shopee === cur.parada_shopee && mesmaRua(e)) ||
             (e.cidade === cur.cidade && mesmaRua(e) && Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001)
           );
+
+          // Vibração tátil no celular se houver múltiplos pacotes nesta parada
+          if (lista.length > 1 && 'vibrate' in navigator) {
+            navigator.vibrate(80);
+          }
+
+          return lista;
         },
 
         async pularEntrega(entrega) {
@@ -1658,11 +1805,14 @@
             const conf = confirm(`Há ${mesmoLocal.length} pacotes nesta Parada. Deseja marcar TODOS como entregues?`);
             if (conf) {
               for (const p of mesmoLocal) { await this.atualizarStatus(p.id, 'entregue'); }
-              this.entregaSelecionadaId = null; return;
+              this.entregaSelecionadaId = null; 
+              if ('vibrate' in navigator) navigator.vibrate([40, 30, 40]);
+              return;
             }
           }
           this.entregaSelecionadaId = null;
           await this.atualizarStatus(entrega.id, 'entregue');
+          if ('vibrate' in navigator) navigator.vibrate(40);
         },
 
         async atualizarStatus(id, novoStatus) {
