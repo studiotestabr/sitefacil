@@ -12,6 +12,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
 
+  <!-- REGRA ESSENCIAL ALPINE.JS: EVITA QUALQUER FLASH DE MODAL ANTES DA HORA -->
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
+
   <!-- TAGS OPEN GRAPH (PREVIEW OFICIAL WHATSAPP E REDES SOCIAIS) -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DriveXPS">
@@ -757,8 +762,8 @@
     </div>
   </div>
 
-  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO (PÓS-LOGIN) -->
-  <div x-show="modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[160] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
+  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO (SOMENTE SE LOGADO COM GOOGLE) -->
+  <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[160] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
         📋
@@ -896,6 +901,7 @@
 
         async init() {
           try {
+            this.modalCadastroObrigatorio = false;
             this.restaurarCacheLocal();
             await this.verificarAutenticacao();
             this.checarInstalacaoPWA();
@@ -930,6 +936,8 @@
                   this.processarArquivoDirecto(file);
                 });
               }
+            } else {
+              this.modalCadastroObrigatorio = false;
             }
           } catch(e) {
             console.error('Erro na inicialização:', e);
@@ -1157,7 +1165,11 @@
         },
 
         async verificarAutenticacao() {
-          if (localStorage.getItem('usuario_deslogado') === 'true') { this.usuarioLogado = false; return; }
+          if (localStorage.getItem('usuario_deslogado') === 'true') {
+            this.usuarioLogado = false;
+            this.modalCadastroObrigatorio = false;
+            return;
+          }
           if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
             window.history.replaceState({}, document.title, window.location.pathname);
           }
@@ -1182,11 +1194,13 @@
               if (userData && userData.data && userData.data.id) { extrairDadosUsuario(userData.data); return; }
             }
           } catch(e) {}
+          
           this.usuarioLogado = false;
+          this.modalCadastroObrigatorio = false;
         },
 
         async sincronizarAssinaturaSaaS() {
-          if (!this.usuarioId) return;
+          if (!this.usuarioId || !this.usuarioLogado) return;
           const headers = { 'Content-Type': 'application/json' };
           if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
           try {
@@ -1251,12 +1265,12 @@
               }
             }
 
-            // GATILHO BLOQUEANTE: Se faltar Telefone, Nome Real ou E-mail, abre o modal
+            // GATILHO BLOQUEANTE EXCLUSIVO: SOMENTE PARA USUÁRIO LOGADO COM DADOS INCOMPLETOS
             const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
             const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
             const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
 
-            if (nomeInvalido || telInvalido || emailInvalido) {
+            if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
               this.inputNome = (!nomeInvalido) ? userSaas.nome : '';
               this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
               this.inputTelefone = userSaas?.telefone || '';
@@ -1353,6 +1367,7 @@
           localStorage.removeItem('directus_token'); localStorage.removeItem('directus_user_id');
           localStorage.removeItem('drivexps_rota_ativa_id'); localStorage.removeItem('drivexps_entregas_cache');
           this.tokenAcesso = null; this.usuarioId = null; this.usuarioLogado = false;
+          this.modalCadastroObrigatorio = false;
           this.entregas = []; this.rotaAtivaId = null;
           try {
             await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
