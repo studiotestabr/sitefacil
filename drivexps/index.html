@@ -144,7 +144,7 @@
     </div>
   </div>
 
-  <!-- POPUP DE INSTALAÇÃO -->
+  <!-- 3. POPUP DE INSTALAÇÃO DO APP (MODAL PWA) -->
   <div x-show="mostrarPopupInstalar" 
        x-transition:enter="transition ease-out duration-300"
        x-transition:enter-start="opacity-0 translate-y-10 scale-95"
@@ -169,10 +169,11 @@
     </div>
   </div>
 
-  <!-- GAVETA MENU -->
+  <!-- 4. GAVETA DO MENU LATERAL (HAMBÚRGUER COM PERFIL COMPLETO) -->
   <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" 
        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
+    
     <div class="bg-gray-900 border-l border-gray-800 w-full max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto" @click.away="menuAberto = false">
       <div class="space-y-5">
         <div class="flex items-center justify-between border-b border-gray-800 pb-4">
@@ -224,12 +225,12 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3.5 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 4.0 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.7 Pro</p>
       </div>
     </div>
   </div>
 
-  <!-- BANNER DO PERÍODO DE TESTE (SAAS INTELIGENTE) -->
+  <!-- 5. BANNER DO PERÍODO DE TESTE (SAAS INTELIGENTE) -->
   <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" 
        class="border-b px-4 py-2 flex justify-between items-center text-xs"
        :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
@@ -252,6 +253,54 @@
 
   <!-- APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
+    
+    <!-- MODAL DE BUSCA GLOBAL (Movido para dentro do app logado para resolver z-index) -->
+    <div x-show="buscaAberta"
+         class="absolute inset-0 bg-gray-950 z-[200] flex flex-col transition-all"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 translate-y-10"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-10" x-cloak>
+         
+         <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
+            <div class="flex-1 relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
+                <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..."
+                       class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors">
+            </div>
+            <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
+         </div>
+
+         <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+             <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
+                 <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
+             </template>
+             <template x-for="item in entregasFiltradas" :key="item.id">
+                 <div @click="irParaEntregaDireta(item); buscaAberta = false" 
+                      class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer active:scale-95 transition-transform shadow-lg">
+                     <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0">
+                         <span class="text-[9px] font-black uppercase leading-none opacity-80">Canetão</span>
+                         <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
+                     </div>
+                     <div class="flex-1 overflow-hidden">
+                         <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
+                         <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
+                         <div class="flex gap-2 mt-1.5">
+                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
+                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+                         </div>
+                     </div>
+                 </div>
+             </template>
+             <template x-if="termoBusca.length === 0">
+                 <div class="text-center text-gray-600 mt-10 text-xs">Digite algo para buscar no romaneio atual...</div>
+             </template>
+         </div>
+    </div>
+
+    <!-- CABEÇALHO DO APLICATIVO -->
     <div>
       <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
               :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
@@ -374,12 +423,6 @@
 
       <!-- MODO 2: RUA (COCKPIT) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
-        <!-- BOTÃO FLUTUANTE: REOTIMIZAR ROTA -->
-        <button x-show="entregas.length > 0 && naoEntregues.length > 0" @click="reotimizarRotaAovivo()" 
-                class="absolute -top-3 right-4 bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] px-3 py-2 rounded-full shadow-[0_0_15px_rgba(37,99,235,0.6)] flex items-center gap-1.5 active:scale-95 transition z-10">
-          <span>↻</span> Reotimizar
-        </button>
-
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
             
@@ -420,26 +463,27 @@
               <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" x-text="entregaAtual.codigo_rastreio || 'SPX-REGISTRADO'"></span>
             </div>
 
-            <!-- SANFONA DE PACOTES NO MESMO LOCAL -->
-            <div x-show="pacotesMesmoLocal.length > 1" class="bg-gray-900 border border-gray-700 rounded-2xl overflow-hidden">
-              <div class="bg-gray-800 p-3 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="text-lg">📦</span>
-                  <span class="text-sm font-black text-white" x-text="`${pacotesMesmoLocal.length} Pacotes neste endereço`"></span>
-                </div>
-              </div>
-              <div class="p-3 space-y-2">
+            <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
+              <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
+            </div>
+
+            <!-- LAYOUT ORIGINAL: ALERTA AMARELO COM MÚLTIPLOS PACOTES -->
+            <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
+              <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
+                <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
+              </p>
+              <p class="text-xs text-gray-300 font-medium leading-none">Confira todas as caixas antes de desembarcar:</p>
+              <div class="space-y-2 pt-1">
                 <template x-for="p in pacotesMesmoLocal" :key="p.id">
-                  <div class="bg-black/50 border border-gray-800 rounded-xl p-2.5 flex justify-between items-center text-xs">
-                    <span class="font-black text-orange-400" x-text="`Canetão #${p.ordem_entrega}`"></span>
-                    <span class="font-mono text-gray-400" x-text="p.codigo_rastreio"></span>
+                  <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
+                    <div class="space-x-2">
+                      <span class="text-orange-400 font-black text-sm" x-text="`Canetão #${p.ordem_entrega}`"></span>
+                      <span class="text-white text-xs" x-text="`Ordem SPX ${formatarParada(p.ordem_shopee)}`"></span>
+                    </div>
+                    <span class="tracking-wider text-xs" x-text="p.codigo_rastreio"></span>
                   </div>
                 </template>
               </div>
-            </div>
-
-            <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
-              <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
             </div>
 
             <div class="space-y-1 pt-1">
@@ -501,7 +545,7 @@
   </div>
 
   <!-- MODAL DE RESUMO DE IMPORTAÇÃO (Estilo DFRotas) -->
-  <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+  <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6 transform transition-all">
       <div class="pt-6 pb-2 flex justify-center">
         <div class="w-20 h-20 bg-orange-500/20 text-orange-400 rounded-full flex items-center justify-center shadow-lg border border-orange-500/40">
@@ -666,27 +710,29 @@
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
       <div class="space-y-1">
         <h3 class="text-xl font-black text-white">DriveXPS Ilimitado</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Economize 2 horas e R$ 25 de gasolina por dia.</p>
+        <p class="text-xs text-gray-300 leading-relaxed">Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong>.</p>
       </div>
       <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
         <div @click="planoEscolhido = 'semanal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
           <div>
-            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Flexível</span>
-            <span class="text-sm font-black text-white">Semanal</span>
+            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Flexível</span>
+            <span class="text-sm font-black text-white">Plano Semanal</span>
             <span class="text-[10px] text-gray-400 block mt-0.5">Apenas R$ 0,98 / dia</span>
           </div>
           <div class="text-right">
             <span class="text-lg font-black text-orange-400">R$ 6,90</span>
+            <span class="text-[10px] text-gray-500 block">por semana</span>
           </div>
         </div>
         <div @click="planoEscolhido = 'mensal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'mensal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
           <div>
             <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span>
-            <span class="text-sm font-black text-white">Mensal</span>
-            <span class="text-[11px] text-emerald-400 font-bold block mt-0.5">Menos de R$ 0,66 / dia!</span>
+            <span class="text-sm font-black text-white">Plano Mensal</span>
+            <span class="text-[11px] text-emerald-400 font-bold block mt-0.5">Apenas R$ 0,66 / dia!</span>
           </div>
           <div class="text-right">
             <span class="text-lg font-black text-white">R$ 19,90</span>
+            <span class="text-[10px] text-gray-500 block">por mês</span>
           </div>
         </div>
       </div>
@@ -706,6 +752,7 @@
         <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all text-left max-h-20 overflow-y-auto" x-text="codigoPixGerado"></div>
         <button @click="copiarCodigoPix()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-2">📋 Copiar Código PIX</button>
         <div class="flex items-center justify-center gap-2 text-[11px] text-amber-400 animate-pulse pt-1"><span>⏳</span> Aguardando seu pagamento no banco...</div>
+        <button @click="resetarPix()" class="text-[11px] text-gray-500 hover:text-gray-400 underline block mx-auto pt-1">Voltar e escolher outro plano</button>
       </div>
     </div>
   </div>
@@ -848,7 +895,11 @@
         abrirBusca() {
             this.buscaAberta = true;
             this.termoBusca = '';
-            setTimeout(() => this.$refs.inputBusca.focus(), 100);
+            setTimeout(() => {
+                if(this.$refs && this.$refs.inputBusca) {
+                    this.$refs.inputBusca.focus();
+                }
+            }, 100);
         },
 
         formatarParada(val) {
@@ -1090,18 +1141,6 @@
             return lower.includes('s/n') || lower.includes('marginal') || lower.includes('rodovia') || lower.includes(' km');
         },
 
-        async reotimizarRotaAovivo() {
-            if (!confirm('Deseja recalcular a rota a partir da sua localização atual?')) return;
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async pos => {
-                    this.cd.lat = pos.coords.latitude;
-                    this.cd.lng = pos.coords.longitude;
-                    this.pacotesExtraidos = this.naoEntregues;
-                    this.enviarParaN8N(); // Recalcula apenas o que falta!
-                }, err => alert('Ative o GPS para reotimizar a rota.'));
-            }
-        },
-
         async buscarEnderecoTexto(tipo) {
           const query = tipo === 'cd' ? this.buscaEnderecoCD : this.buscaEnderecoCasa;
           if (!query || query.trim().length < 4) { alert('Por favor, digite um endereço com nome da rua e cidade.'); return; }
@@ -1329,7 +1368,7 @@
               this.pacotesExtraidos = entregasAparecidas;
               if (this.pacotesExtraidos.length > 0) {
                  this.modalImportar = false;
-                 this.modalResumoImportacao = true; // Abre Modal Estilo DFRotas
+                 this.modalResumoImportacao = true;
               } else if (!this.msgErro) {
                  this.msgErro = 'Nenhum pacote válido encontrado.';
               }
@@ -1463,7 +1502,7 @@
           const idx = this.entregas.findIndex(e => e.id === id);
           if (idx !== -1) {
             this.entregas[idx].status = novoStatus;
-            this.salvarCacheLocal(); // Auto-ordenação inteligente atualiza na hora
+            this.salvarCacheLocal(); // A fila se auto-ordena na tela
           }
           const headers = { 'Content-Type': 'application/json' };
           if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
@@ -1507,7 +1546,7 @@
               } else { await this.carregarUltimaRota(); }
               this.salvarCacheLocal();
               this.modo = 'carregamento';
-            } else { alert('Erro no sistema ao gerar rota, tente novamente.'); }
+            } else { alert('Erro no n8n ao gerar rota.'); }
           } catch(e) { alert('Falha na comunicação: ' + e.message); } 
           finally { this.carregandoProcesso = false; }
         }
