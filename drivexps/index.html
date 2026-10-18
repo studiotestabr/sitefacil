@@ -431,6 +431,15 @@
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
             
+            <!-- AJUSTE 1: INDICADOR VISUAL DO BAIRRO ATUAL (VARREDURA CONTÍNUA) -->
+            <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300 shadow-md">
+              <div class="flex items-center gap-2 truncate pr-2">
+                <span class="text-base shrink-0">📍</span>
+                <span class="truncate">BAIRRO ATUAL: <strong class="text-white uppercase tracking-wide" x-text="entregaAtual.bairro || 'CENTRO'"></strong></span>
+              </div>
+              <span class="text-[10px] bg-orange-950 text-orange-400 border border-orange-800 px-2.5 py-1 rounded-full font-mono font-black shrink-0 whitespace-nowrap" x-text="`${entregasNoBairroRestantes} no bairro`"></span>
+            </div>
+
             <div x-show="entregaAtual.status === 'ausente'" class="bg-yellow-500/20 border-2 border-yellow-500 p-2.5 rounded-2xl text-center">
               <span class="text-xs font-black text-yellow-300 uppercase tracking-wider">⚠️ RE-TENTATIVA DE PACOTE PULADO ANTERIORMENTE</span>
             </div>
@@ -762,8 +771,8 @@
     </div>
   </div>
 
-  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO (SOMENTE SE LOGADO COM GOOGLE) -->
-  <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[160] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
+  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO (SOMENTE APÓS LOGIN GOOGLE E SOBRE O APP) -->
+  <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
         📋
@@ -772,30 +781,30 @@
       <div class="space-y-1">
         <h3 class="text-xl font-black text-white">Complete seu Cadastro</h3>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Para liberar suas rotas e receber suporte direto no WhatsApp, confirme seus dados:
+          Dados do seu login Google carregados! Confirme seu WhatsApp para liberar as rotas:
         </p>
       </div>
 
       <div class="space-y-3 text-left">
-        <!-- NOME COMPLETO -->
+        <!-- NOME COMPLETO (VEM DO GOOGLE) -->
         <div>
           <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
             Nome Completo *
           </label>
-          <input type="text" x-model="inputNome" placeholder="Ex: João da Silva" 
+          <input type="text" x-model="inputNome" placeholder="Seu Nome Completo" 
                  class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
         </div>
 
-        <!-- WHATSAPP COM DDD -->
+        <!-- WHATSAPP COM DDD (OBRIGATÓRIO) -->
         <div>
           <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
             WhatsApp (com DDD) *
           </label>
-          <input type="tel" x-model="inputTelefone" placeholder="Ex: 13991994837" maxlength="15" 
+          <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" 
                  class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
         </div>
 
-        <!-- E-MAIL -->
+        <!-- E-MAIL (VEM DO GOOGLE) -->
         <div>
           <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
             Seu E-mail *
@@ -994,6 +1003,13 @@
             });
         },
 
+        // AJUSTE 1: QUANTIDADE DE PACOTES RESTANTES NO MESMO BAIRRO
+        get entregasNoBairroRestantes() {
+          if (!this.entregaAtual) return 0;
+          const bAtual = (this.entregaAtual.bairro || '').toLowerCase().trim();
+          return this.naoEntregues.filter(e => (e.bairro || '').toLowerCase().trim() === bAtual).length;
+        },
+
         async processarRomaneioDoCache() {
           const parametroUrl = window.location.search.includes('arquivo_compartilhado=true');
           let tentativas = 0;
@@ -1165,6 +1181,7 @@
         },
 
         async verificarAutenticacao() {
+          // SE O MOTORISTA CLICOU EM SAIR, OBRIGA A MOSTRAR A TELA DE LOGIN DO GOOGLE
           if (localStorage.getItem('usuario_deslogado') === 'true') {
             this.usuarioLogado = false;
             this.modalCadastroObrigatorio = false;
@@ -1177,7 +1194,7 @@
             this.usuarioId = u.id;
             this.usuarioEmail = u.email || '';
             const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
-            this.usuarioNome = n.trim() || u.email || 'Motorista';
+            this.usuarioNome = n.trim() || u.email || '';
             localStorage.setItem('directus_user_id', this.usuarioId);
             this.usuarioLogado = true;
           };
@@ -1265,13 +1282,14 @@
               }
             }
 
-            // GATILHO BLOQUEANTE EXCLUSIVO: SOMENTE PARA USUÁRIO LOGADO COM DADOS INCOMPLETOS
+            // GATILHO: SOMENTE SE LOGADO COM GOOGLE E DADOS INCOMPLETOS
             const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
             const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
             const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
 
             if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
-              this.inputNome = (!nomeInvalido) ? userSaas.nome : '';
+              // Preenche automaticamente com o nome e email que vieram da conta Google
+              this.inputNome = (!nomeInvalido) ? userSaas.nome : (this.usuarioNome || '');
               this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
               this.inputTelefone = userSaas?.telefone || '';
               this.erroCadastroObrigatorio = '';
