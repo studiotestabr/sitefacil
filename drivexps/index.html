@@ -254,7 +254,7 @@
   <!-- APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     
-    <!-- MODAL DE BUSCA GLOBAL (Movido para dentro do app logado para resolver z-index) -->
+    <!-- MODAL DE BUSCA GLOBAL -->
     <div x-show="buscaAberta"
          class="absolute inset-0 bg-gray-950 z-[200] flex flex-col transition-all"
          x-transition:enter="transition ease-out duration-200"
@@ -309,13 +309,13 @@
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
           
           <div class="flex items-center gap-2">
-            <!-- Botão Busca 🔍 (Quadrado Perfeito) -->
+            <!-- Botão Busca 🔍 -->
             <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Buscar Pacote">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
-            <!-- Botão Menu ☰ (Quadrado Perfeito) -->
+            <!-- Botão Menu ☰ -->
             <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Menu">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
@@ -365,7 +365,7 @@
         </button>
       </section>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS (Auto-Ordenação Inteligente) -->
+      <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
@@ -467,7 +467,7 @@
               <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
             </div>
 
-            <!-- LAYOUT ORIGINAL: ALERTA AMARELO COM MÚLTIPLOS PACOTES -->
+            <!-- ALERTA DE MÚLTIPLOS PACOTES -->
             <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
                 <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
@@ -544,7 +544,7 @@
     </footer>
   </div>
 
-  <!-- MODAL DE RESUMO DE IMPORTAÇÃO (Estilo DFRotas) -->
+  <!-- MODAL DE RESUMO DE IMPORTAÇÃO -->
   <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6 transform transition-all">
       <div class="pt-6 pb-2 flex justify-center">
@@ -757,19 +757,59 @@
     </div>
   </div>
 
-  <!-- 10. MODAL DE COLETA DO WHATSAPP -->
-  <div x-show="modalTelefone" class="fixed inset-0 bg-black/90 z-[110] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-emerald-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📱</div>
+  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO (PÓS-LOGIN) -->
+  <div x-show="modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[160] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
+      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
+        📋
+      </div>
+      
       <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">Seu WhatsApp de Suporte</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Informe seu número com DDD para receber suporte rápido e avisos de rotas:</p>
+        <h3 class="text-xl font-black text-white">Complete seu Cadastro</h3>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Para liberar suas rotas e receber suporte direto no WhatsApp, confirme seus dados:
+        </p>
       </div>
-      <div class="space-y-2 text-left">
-        <label class="text-[11px] font-bold text-gray-400 uppercase">DDD + WhatsApp:</label>
-        <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" class="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono">
+
+      <div class="space-y-3 text-left">
+        <!-- NOME COMPLETO -->
+        <div>
+          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
+            Nome Completo *
+          </label>
+          <input type="text" x-model="inputNome" placeholder="Ex: João da Silva" 
+                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+        </div>
+
+        <!-- WHATSAPP COM DDD -->
+        <div>
+          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
+            WhatsApp (com DDD) *
+          </label>
+          <input type="tel" x-model="inputTelefone" placeholder="Ex: 13991994837" maxlength="15" 
+                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
+        </div>
+
+        <!-- E-MAIL -->
+        <div>
+          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
+            Seu E-mail *
+          </label>
+          <input type="email" x-model="inputEmail" placeholder="seuemail@gmail.com" 
+                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+        </div>
+
+        <p x-show="erroCadastroObrigatorio" class="text-xs text-red-400 font-bold text-center pt-1" x-text="erroCadastroObrigatorio"></p>
       </div>
-      <button @click="salvarTelefoneMotorista()" :disabled="!inputTelefone || inputTelefone.length < 10" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl active:scale-95 transition">Salvar Contato</button>
+
+      <div class="pt-2">
+        <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" 
+                class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <span x-show="!salvandoPerfil">✅ Concluir e Acessar o App</span>
+          <span x-show="salvandoPerfil">⏳ Gravando seus dados...</span>
+        </button>
+        <p class="text-[10px] text-gray-500 font-medium mt-2">Seus dados estão protegidos e não serão compartilhados.</p>
+      </div>
     </div>
   </div>
 
@@ -802,7 +842,11 @@
         modalCD: false,
         modalAssinatura: false,
         modalTelefone: false,
+        modalCadastroObrigatorio: false,
+        inputNome: '',
+        inputEmail: '',
         inputTelefone: '',
+        erroCadastroObrigatorio: '',
         planoEscolhido: 'semanal',
         carregandoPix: false,
         salvandoPerfil: false,
@@ -1037,6 +1081,66 @@
           finally { this.salvandoPerfil = false; }
         },
 
+        async salvarCadastroObrigatorio() {
+          this.erroCadastroObrigatorio = '';
+          const nomeLimpo = (this.inputNome || '').trim();
+          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
+          const emailLimpo = (this.inputEmail || '').trim().toLowerCase();
+
+          if (!nomeLimpo || nomeLimpo.toLowerCase() === 'motorista' || nomeLimpo.length < 3) {
+            this.erroCadastroObrigatorio = 'Por favor, digite seu nome e sobrenome.';
+            return;
+          }
+
+          if (telLimpo.length < 10 || telLimpo.length > 11) {
+            this.erroCadastroObrigatorio = 'Informe um WhatsApp válido com DDD (10 ou 11 dígitos).';
+            return;
+          }
+
+          if (!emailLimpo || !emailLimpo.includes('@') || !emailLimpo.includes('.')) {
+            this.erroCadastroObrigatorio = 'Informe um e-mail válido.';
+            return;
+          }
+
+          this.salvandoPerfil = true;
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+
+            if (data.data && data.data[0]) {
+              const regId = data.data[0].id;
+              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${regId}`, {
+                method: 'PATCH',
+                headers,
+                credentials: 'include',
+                body: JSON.stringify({
+                  nome: nomeLimpo,
+                  telefone: telLimpo,
+                  email: emailLimpo
+                })
+              });
+
+              this.usuarioNome = nomeLimpo;
+              this.usuarioEmail = emailLimpo;
+              this.inputTelefone = telLimpo;
+              this.modalCadastroObrigatorio = false;
+            } else {
+              this.erroCadastroObrigatorio = 'Registro não encontrado. Tente recarregar a página.';
+            }
+          } catch(e) {
+            this.erroCadastroObrigatorio = 'Falha ao salvar: ' + e.message;
+          } finally {
+            this.salvandoPerfil = false;
+          }
+        },
+
+        salvarTelefoneMotorista() {
+          return this.salvarCadastroObrigatorio();
+        },
+
         iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
         proximoPassoTutorial() { if (this.passoTutorial < 7) this.passoTutorial++; else this.concluirTutorial(); },
         voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
@@ -1090,24 +1194,37 @@
             const data = await res.json();
             const registros = data.data || [];
 
+            let userSaas = null;
+
             if (registros.length === 0) {
               const novoRegistro = {
-                user_id: this.usuarioId, email: this.usuarioEmail, nome: this.usuarioNome,
-                trial_expira_em: null, status_assinatura: 'trial', plano_ativo: 'gratuito'
+                user_id: this.usuarioId,
+                email: this.usuarioEmail || null,
+                nome: (this.usuarioNome && this.usuarioNome !== 'Motorista') ? this.usuarioNome : null,
+                telefone: null,
+                trial_expira_em: null,
+                status_assinatura: 'trial',
+                plano_ativo: 'gratuito'
               };
-              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
+              const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
                 method: 'POST', headers, credentials: 'include', body: JSON.stringify(novoRegistro)
               });
-              this.trialIniciado = false; this.diasRestantesTrial = 7; this.statusAssinatura = 'trial';
-              this.planoAtivo = 'gratuito'; this.dataExpiracao = null; this.assinaturaValida = true;
-              this.modalTelefone = true;
+              const postData = await postRes.json();
+              userSaas = postData.data;
+
+              this.trialIniciado = false;
+              this.diasRestantesTrial = 7;
+              this.statusAssinatura = 'trial';
+              this.planoAtivo = 'gratuito';
+              this.dataExpiracao = null;
+              this.assinaturaValida = true;
             } else {
-              const userSaas = registros[0];
+              userSaas = registros[0];
               this.statusAssinatura = userSaas.status_assinatura || 'trial';
               this.planoAtivo = userSaas.plano_ativo || 'gratuito';
               this.dataExpiracao = userSaas.trial_expira_em || null;
 
-              if (userSaas.nome) this.usuarioNome = userSaas.nome;
+              if (userSaas.nome && userSaas.nome !== 'Motorista') this.usuarioNome = userSaas.nome;
               if (userSaas.email) this.usuarioEmail = userSaas.email;
               if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
 
@@ -1133,7 +1250,25 @@
                 }
               }
             }
-          } catch (err) {}
+
+            // GATILHO BLOQUEANTE: Se faltar Telefone, Nome Real ou E-mail, abre o modal
+            const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
+            const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
+            const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
+
+            if (nomeInvalido || telInvalido || emailInvalido) {
+              this.inputNome = (!nomeInvalido) ? userSaas.nome : '';
+              this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
+              this.inputTelefone = userSaas?.telefone || '';
+              this.erroCadastroObrigatorio = '';
+              this.modalCadastroObrigatorio = true;
+            } else {
+              this.modalCadastroObrigatorio = false;
+            }
+
+          } catch (err) {
+            console.error('Erro na sincronização SaaS:', err);
+          }
         },
 
         isGpsSuspeito(endereco) {
@@ -1299,7 +1434,6 @@
             let seqVal = null;
             let stpVal = null;
 
-            // Lógica Espelho: Se a planilha trouxer '-', salvamos como número negativo para exibirmos +X na tela!
             if (rawSeq === '-' || rawStop === '-') {
                 seqVal = -contadorExtra;
                 stpVal = -contadorExtra;
@@ -1502,7 +1636,7 @@
           const idx = this.entregas.findIndex(e => e.id === id);
           if (idx !== -1) {
             this.entregas[idx].status = novoStatus;
-            this.salvarCacheLocal(); // A fila se auto-ordena na tela
+            this.salvarCacheLocal();
           }
           const headers = { 'Content-Type': 'application/json' };
           if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
