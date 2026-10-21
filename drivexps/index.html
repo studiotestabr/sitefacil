@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -18,13 +19,13 @@
     /* MODO DIURNO (ALTO CONTRASTE CONTRA O REFLEXO DO SOL NO PARA-BRISA) */
     body.theme-claro {
       background-color: #f1f5f9 !important; /* Slate-100 */
-      color: #0f172a !important; /* Slate-900 (Preto de alto contraste) */
+      color: #0f172a !important; /* Slate-900 */
     }
     body.theme-claro .bg-gray-950,
     body.theme-claro .bg-gray-900,
     body.theme-claro .bg-\[\#121824\] {
       background-color: #ffffff !important;
-      border-color: #cbd5e1 !important; /* Slate-300 */
+      border-color: #cbd5e1 !important;
       color: #0f172a !important;
       box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08);
     }
@@ -40,7 +41,7 @@
     }
     body.theme-claro .text-gray-300,
     body.theme-claro .text-gray-400 {
-      color: #334155 !important; /* Slate-700: Alta legibilidade */
+      color: #334155 !important;
     }
     body.theme-claro .text-gray-200 {
       color: #1e293b !important;
@@ -68,13 +69,12 @@
       color: #64748b !important;
     }
 
-    /* CALIBRAÇÃO DAS CORES DE DESTAQUE NO FUNDO CLARO */
     body.theme-claro .text-orange-400 {
-      color: #c2410c !important; /* Laranja escuro encorpado */
+      color: #c2410c !important;
     }
     body.theme-claro .text-yellow-400,
     body.theme-claro .text-yellow-300 {
-      color: #b45309 !important; /* Âmbar escuro: não fica apagado no branco */
+      color: #b45309 !important;
     }
     body.theme-claro .text-yellow-200 {
       color: #78350f !important;
@@ -82,20 +82,20 @@
     body.theme-claro .bg-orange-500\/10,
     body.theme-claro .bg-orange-500\/15,
     body.theme-claro .bg-orange-500\/20 {
-      background-color: #ffedd5 !important; /* Orange-100 */
+      background-color: #ffedd5 !important;
       border-color: #fb923c !important;
       color: #9a3412 !important;
     }
     body.theme-claro .bg-yellow-500\/10,
     body.theme-claro .bg-yellow-500\/20 {
-      background-color: #fef3c7 !important; /* Amber-100 */
+      background-color: #fef3c7 !important;
       border-color: #f59e0b !important;
       color: #92400e !important;
     }
     body.theme-claro .bg-emerald-500\/10,
     body.theme-claro .bg-emerald-500\/15,
     body.theme-claro .bg-emerald-500\/20 {
-      background-color: #d1fae5 !important; /* Emerald-100 */
+      background-color: #d1fae5 !important;
       border-color: #34d399 !important;
       color: #065f46 !important;
     }
@@ -294,7 +294,7 @@
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
-        <!-- NOVO: SELETOR DE TEMA VISUAL (MODO NOTURNO / DIURNO ALTO CONTRASTE) -->
+        <!-- SELETOR DE TEMA VISUAL (MODO NOTURNO / DIURNO ALTO CONTRASTE) -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência do App:</span>
@@ -339,6 +339,9 @@
         <nav class="space-y-2">
           <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
             <span class="text-base">❓</span> Como Usar o App (Tutorial)
+          </button>
+          <button @click="menuAberto = false; carregarRotaExemplo();" class="w-full bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
+            <span class="text-base">🧪</span> Carregar Carga de Exemplo
           </button>
           <button x-show="!isStandalone" @click="menuAberto = false; acionarInstalacaoManual();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-orange-400 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
             <span class="text-base">📲</span> Instalar Aplicativo no Celular
@@ -451,7 +454,9 @@
 
         <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
           <div class="flex items-center gap-1.5">
-            <span class="bg-black/80 text-orange-400 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" x-text="rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA'"></span>
+            <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" 
+                  :class="rotaAtivaId === 'DEMO' ? 'text-emerald-400 border border-emerald-500/50' : 'text-orange-400'"
+                  x-text="rotaAtivaId === 'DEMO' ? '🧪 ROTA DEMO (SIMULAÇÃO)' : (rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA')"></span>
           </div>
           <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
         </div>
@@ -490,8 +495,30 @@
         </button>
       </section>
 
+      <!-- TELA INICIAL QUANDO NÃO HÁ ROTA CARREGADA (BOAS-VINDAS / DEMO) -->
+      <section x-show="entregas.length === 0" class="p-6 max-w-md mx-auto w-full text-center space-y-5 my-8">
+        <div class="w-20 h-20 bg-orange-500/20 text-orange-400 rounded-3xl flex items-center justify-center mx-auto text-4xl border border-orange-500/40 shadow-xl">
+          🚗
+        </div>
+        <div class="space-y-1.5">
+          <h2 class="text-2xl font-black text-white">Nenhuma Rota Ativa</h2>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Importe a planilha oficial da Shopee ou experimente a carga simulada agora mesmo para ver o app funcionando:
+          </p>
+        </div>
+        <div class="space-y-3 pt-2">
+          <button @click="abrirModalImportar()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+            <span>📊</span> Importar Planilha Shopee (.xlsx)
+          </button>
+          <button @click="carregarRotaExemplo()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/50 font-black py-3.5 rounded-2xl text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+            <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
+          </button>
+        </div>
+        <p class="text-[10px] text-gray-500">A demonstração organiza 3 sacolas de 10 no canetão e simula as entregas na rua.</p>
+      </section>
+
       <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
-      <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
+      <main x-show="modo === 'carregamento' && entregas.length > 0" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
           <p class="text-gray-300 text-xs leading-relaxed">Layout universal otimizado para qualquer veículo. <em>(Toque no card para abrir no Waze).</em></p>
@@ -547,7 +574,7 @@
       </main>
 
       <!-- MODO 2: RUA (COCKPIT) -->
-      <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
+      <main x-show="modo === 'rua' && entregas.length > 0" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
             
@@ -640,8 +667,11 @@
         <template x-if="!entregaAtual && entregas.length > 0 && naoEntregues.length === 0">
           <div class="text-center py-24 space-y-4">
             <span class="text-7xl block">🏁</span>
-            <h2 class="text-3xl font-black text-white" x-text="`Rota #${rotaAtivaId || ''} 100% Concluída!`"></h2>
+            <h2 class="text-3xl font-black text-white" x-text="rotaAtivaId === 'DEMO' ? 'Demonstração 100% Concluída!' : `Rota #${rotaAtivaId || ''} 100% Concluída!`"></h2>
             <p class="text-gray-400 text-sm max-w-xs mx-auto">Parabéns! Todos os pacotes da carga foram entregues com sucesso.</p>
+            <button @click="abrirModalImportar()" class="mt-4 bg-orange-600 hover:bg-orange-500 text-white font-black py-3 px-6 rounded-2xl text-xs active:scale-95 transition shadow-lg">
+              Carregar Minha Rota Real da Shopee
+            </button>
           </div>
         </template>
       </main>
@@ -749,8 +779,11 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">📊</div>
           <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Rota"</strong> aceso no topo e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
-          <p class="text-xs text-orange-400 font-semibold bg-black/60 p-3 rounded-xl border border-gray-800">Dica de Ouro: Você também pode tocar na planilha no celular e escolher <strong>"Compartilhar com DriveXPS"</strong>!</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Rota"</strong> e selecione a planilha <code>.xlsx</code> baixada no app da SPX.</p>
+          <div class="bg-emerald-950/60 p-3 rounded-2xl border border-emerald-500/40 text-xs text-emerald-300 font-bold text-left space-y-1">
+            <span class="block text-emerald-400 uppercase tracking-wider text-[10px]">🧪 Está de folga ou sem planilha?</span>
+            <p>Você pode clicar em <strong>"Carregar Carga de Demonstração"</strong> para ver 30 pacotes de teste funcionando na hora!</p>
+          </div>
         </div>
       </template>
       <template x-if="passoTutorial === 4">
@@ -765,21 +798,24 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">🚗</div>
           <h3 class="text-2xl font-black text-white">3. Na Rua com Waze</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong> (acesa no topo), você vê a entrega atual, aviso se a próxima casa fica na mesma rua e abre o Waze ou Maps com 1 único toque.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong> (acesa no topo), você vê a entrega atual, aviso de bairro e abre o Waze ou Maps com 1 único toque.</p>
         </div>
       </template>
       <template x-if="passoTutorial === 6">
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📜</div>
           <h3 class="text-2xl font-black text-white">4. Histórico de Rotas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong> (acesa no topo), você visualiza todas as rotas anteriores que já fez, pode reabri-las ou apagar rotas antigas.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong>, você visualiza todas as rotas anteriores que já fez, pode reabri-las ou apagar rotas antigas.</p>
         </div>
       </template>
       <template x-if="passoTutorial === 7">
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
           <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Agora é com você. Importe sua primeira rota, organize suas sacolas e aproveite uma entrega rápida e sem estresse.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Importe sua planilha oficial ou experimente a simulação com 30 pacotes para ver a facilidade na prática.</p>
+          <button @click="carregarRotaExemplo()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
+            <span>🧪</span> Começar com Carga de Demonstração (30 Pacotes)
+          </button>
         </div>
       </template>
       <div class="flex items-center justify-between pt-3 border-t border-gray-800">
@@ -947,19 +983,37 @@
     </div>
   </div>
 
-  <!-- 11. MODAL DE IMPORTAR PLANILHA (SELECIONAR ARQUIVO) -->
+  <!-- 11. MODAL DE IMPORTAR PLANILHA (SELECIONAR ARQUIVO OU SIMULAR DEMO) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <h2 class="font-black text-lg text-orange-500">IMPORTAR PLANILHA</h2>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
+      
       <div class="space-y-3">
+        <!-- BOTÃO 1: SUBIR ARQUIVO REAL -->
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
           <span class="text-4xl block mb-2">📊</span>
           <span class="text-sm font-black block text-white">Toque para escolher o .XLSX</span>
+          <span class="text-[10px] text-gray-400 block mt-1">Planilha oficial baixada no aplicativo da Shopee</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
         </label>
+
+        <!-- DIVISÓRIA -->
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-gray-800"></div>
+          <span class="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-black tracking-widest">Ou experimente sem planilha</span>
+          <div class="flex-grow border-t border-gray-800"></div>
+        </div>
+
+        <!-- BOTÃO 2: CARREGAR ROTA DE DEMONSTRAÇÃO -->
+        <button @click="carregarRotaExemplo()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-lg">
+          <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
+        </button>
+        <p class="text-[10px] text-gray-400 text-center leading-relaxed">
+          Ideal para quem está em casa de folga e quer testar a divisão no canetão e a navegação no Waze.
+        </p>
       </div>
     </div>
   </div>
@@ -1041,9 +1095,59 @@
           }
         },
 
+        // INJEÇÃO DA CARGA DE DEMONSTRAÇÃO (30 PACOTES SIMULADOS)
+        carregarRotaExemplo() {
+          const pacotesDemo = [
+            // SACOLA 1 (Pacotes 1 a 10) - Bairro: Boqueirão
+            { id: 9001, ordem_entrega: 1, ordem_carregamento: 30, parada_shopee: 1, ordem_shopee: 1, codigo_rastreio: 'SPXBR900101', destinatario: 'Carlos Eduardo', telefone: '13991234501', endereco: 'Av. Costa e Silva, 250', numero: '250', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0085, longitude: -46.4110, total_no_local: 1, status: 'pendente' },
+            { id: 9002, ordem_entrega: 2, ordem_carregamento: 29, parada_shopee: 2, ordem_shopee: 2, codigo_rastreio: 'SPXBR900102', destinatario: 'Mariana Santos', telefone: '13991234502', endereco: 'Av. Costa e Silva, 340', numero: '340', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0091, longitude: -46.4118, total_no_local: 1, status: 'pendente' },
+            { id: 9003, ordem_entrega: 3, ordem_carregamento: 28, parada_shopee: 3, ordem_shopee: 3, codigo_rastreio: 'SPXBR900103', destinatario: 'Fernando Lima', telefone: '13991234503', endereco: 'Rua Pernambuco, 115', numero: '115', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-010', latitude: -24.0102, longitude: -46.4125, total_no_local: 2, status: 'pendente' },
+            { id: 9004, ordem_entrega: 4, ordem_carregamento: 27, parada_shopee: 3, ordem_shopee: 4, codigo_rastreio: 'SPXBR900104', destinatario: 'Fernando Lima', telefone: '13991234503', endereco: 'Rua Pernambuco, 115', numero: '115', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-010', latitude: -24.0102, longitude: -46.4125, total_no_local: 2, status: 'pendente' },
+            { id: 9005, ordem_entrega: 5, ordem_carregamento: 26, parada_shopee: 4, ordem_shopee: 5, codigo_rastreio: 'SPXBR900105', destinatario: 'Patrícia Gomes', telefone: '13991234505', endereco: 'Rua Pernambuco, 230', numero: '230', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-010', latitude: -24.0110, longitude: -46.4132, total_no_local: 1, status: 'pendente' },
+            { id: 9006, ordem_entrega: 6, ordem_carregamento: 25, parada_shopee: 5, ordem_shopee: 6, codigo_rastreio: 'SPXBR900106', destinatario: 'Lucas Ribeiro', telefone: '13991234506', endereco: 'Rua São Paulo, 80', numero: '80', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-020', latitude: -24.0121, longitude: -46.4140, total_no_local: 1, status: 'pendente' },
+            { id: 9007, ordem_entrega: 7, ordem_carregamento: 24, parada_shopee: 6, ordem_shopee: 7, codigo_rastreio: 'SPXBR900107', destinatario: 'Juliana Alves', telefone: '13991234507', endereco: 'Rua São Paulo, 195', numero: '195', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-020', latitude: -24.0128, longitude: -46.4146, total_no_local: 1, status: 'pendente' },
+            { id: 9008, ordem_entrega: 8, ordem_carregamento: 23, parada_shopee: 7, ordem_shopee: 8, codigo_rastreio: 'SPXBR900108', destinatario: 'Ricardo Rocha', telefone: '13991234508', endereco: 'Rua Rio de Janeiro, 55', numero: '55', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-030', latitude: -24.0135, longitude: -46.4152, total_no_local: 1, status: 'pendente' },
+            { id: 9009, ordem_entrega: 9, ordem_carregamento: 22, parada_shopee: 8, ordem_shopee: 9, codigo_rastreio: 'SPXBR900109', destinatario: 'Beatriz Martins', telefone: '13991234509', endereco: 'Rua Rio de Janeiro, 180', numero: '180', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-030', latitude: -24.0142, longitude: -46.4159, total_no_local: 1, status: 'pendente' },
+            { id: 9010, ordem_entrega: 10, ordem_carregamento: 21, parada_shopee: 9, ordem_shopee: 10, codigo_rastreio: 'SPXBR900110', destinatario: 'Thiago Farias', telefone: '13991234510', endereco: 'Av. Brasil, 410', numero: '410', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-040', latitude: -24.0150, longitude: -46.4168, total_no_local: 1, status: 'pendente' },
+
+            // SACOLA 2 (Pacotes 11 a 20) - Bairro: Canto do Forte
+            { id: 9011, ordem_entrega: 11, ordem_carregamento: 20, parada_shopee: 10, ordem_shopee: 11, codigo_rastreio: 'SPXBR900111', destinatario: 'Camila Nogueira', telefone: '13991234511', endereco: 'Av. Mal. Maurício da Rocha, 90', numero: '90', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-100', latitude: -24.0040, longitude: -46.4020, total_no_local: 1, status: 'pendente' },
+            { id: 9012, ordem_entrega: 12, ordem_carregamento: 19, parada_shopee: 11, ordem_shopee: 12, codigo_rastreio: 'SPXBR900112', destinatario: 'Marcos Vinicius', telefone: '13991234512', endereco: 'Av. Mal. Maurício da Rocha, 210', numero: '210', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-100', latitude: -24.0048, longitude: -46.4028, total_no_local: 1, status: 'pendente' },
+            { id: 9013, ordem_entrega: 13, ordem_carregamento: 18, parada_shopee: 12, ordem_shopee: 13, codigo_rastreio: 'SPXBR900113', destinatario: 'Vanessa Souza', telefone: '13991234513', endereco: 'Rua Xixová, 65', numero: '65', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-110', latitude: -24.0055, longitude: -46.4035, total_no_local: 1, status: 'pendente' },
+            { id: 9014, ordem_entrega: 14, ordem_carregamento: 17, parada_shopee: 13, ordem_shopee: 14, codigo_rastreio: 'SPXBR900114', destinatario: 'Leandro Cardoso', telefone: '13991234514', endereco: 'Rua Xixová, 140', numero: '140', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-110', latitude: -24.0062, longitude: -46.4042, total_no_local: 1, status: 'pendente' },
+            { id: 9015, ordem_entrega: 15, ordem_carregamento: 16, parada_shopee: 14, ordem_shopee: 15, codigo_rastreio: 'SPXBR900115', destinatario: 'Aline Miranda', telefone: '13991234515', endereco: 'Rua Tiradentes, 85', numero: '85', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-120', latitude: -24.0070, longitude: -46.4050, total_no_local: 1, status: 'pendente' },
+            { id: 9016, ordem_entrega: 16, ordem_carregamento: 15, parada_shopee: 15, ordem_shopee: 16, codigo_rastreio: 'SPXBR900116', destinatario: 'Renato Silva', telefone: '13991234516', endereco: 'Rua Tiradentes, 175', numero: '175', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-120', latitude: -24.0076, longitude: -46.4058, total_no_local: 2, status: 'pendente' },
+            { id: 9017, ordem_entrega: 17, ordem_carregamento: 14, parada_shopee: 15, ordem_shopee: 17, codigo_rastreio: 'SPXBR900117', destinatario: 'Renato Silva', telefone: '13991234516', endereco: 'Rua Tiradentes, 175', numero: '175', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-120', latitude: -24.0076, longitude: -46.4058, total_no_local: 2, status: 'pendente' },
+            { id: 9018, ordem_entrega: 18, ordem_carregamento: 13, parada_shopee: 16, ordem_shopee: 18, codigo_rastreio: 'SPXBR900118', destinatario: 'Rodrigo Antunes', telefone: '13991234518', endereco: 'Av. Castelo Branco, 1100', numero: '1100', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-130', latitude: -24.0083, longitude: -46.4065, total_no_local: 1, status: 'pendente' },
+            { id: 9019, ordem_entrega: 19, ordem_carregamento: 12, parada_shopee: 17, ordem_shopee: 19, codigo_rastreio: 'SPXBR900119', destinatario: 'Débora Fonseca', telefone: '13991234519', endereco: 'Av. Castelo Branco, 1250', numero: '1250', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-130', latitude: -24.0090, longitude: -46.4072, total_no_local: 1, status: 'pendente' },
+            { id: 9020, ordem_entrega: 20, ordem_carregamento: 11, parada_shopee: 18, ordem_shopee: 20, codigo_rastreio: 'SPXBR900120', destinatario: 'Gustavo Pinheiro', telefone: '13991234520', endereco: 'Rua Bahia, 95', numero: '95', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-140', latitude: -24.0098, longitude: -46.4080, total_no_local: 1, status: 'pendente' },
+
+            // SACOLA 3 (Pacotes 21 a 30) - Bairro: Guilhermina
+            { id: 9021, ordem_entrega: 21, ordem_carregamento: 10, parada_shopee: 19, ordem_shopee: 21, codigo_rastreio: 'SPXBR900121', destinatario: 'Sabrina Ramos', telefone: '13991234521', endereco: 'Av. Guilhermina, 130', numero: '130', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-000', latitude: -24.0160, longitude: -46.4210, total_no_local: 1, status: 'pendente' },
+            { id: 9022, ordem_entrega: 22, ordem_carregamento: 9, parada_shopee: 20, ordem_shopee: 22, codigo_rastreio: 'SPXBR900122', destinatario: 'Claudio Mendes', telefone: '13991234522', endereco: 'Av. Guilhermina, 280', numero: '280', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-000', latitude: -24.0168, longitude: -46.4218, total_no_local: 1, status: 'pendente' },
+            { id: 9023, ordem_entrega: 23, ordem_carregamento: 8, parada_shopee: 21, ordem_shopee: 23, codigo_rastreio: 'SPXBR900123', destinatario: 'Priscila Dias', telefone: '13991234523', endereco: 'Rua Colômbia, 75', numero: '75', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-010', latitude: -24.0175, longitude: -46.4225, total_no_local: 1, status: 'pendente' },
+            { id: 9024, ordem_entrega: 24, ordem_carregamento: 7, parada_shopee: 22, ordem_shopee: 24, codigo_rastreio: 'SPXBR900124', destinatario: 'Fábio Teixeira', telefone: '13991234524', endereco: 'Rua Colômbia, 190', numero: '190', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-010', latitude: -24.0182, longitude: -46.4232, total_no_local: 1, status: 'pendente' },
+            { id: 9025, ordem_entrega: 25, ordem_carregamento: 6, parada_shopee: 23, ordem_shopee: 25, codigo_rastreio: 'SPXBR900125', destinatario: 'Tatiane Moreira', telefone: '13991234525', endereco: 'Rua Venezuela, 60', numero: '60', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-020', latitude: -24.0190, longitude: -46.4240, total_no_local: 1, status: 'pendente' },
+            { id: 9026, ordem_entrega: 26, ordem_carregamento: 5, parada_shopee: 24, ordem_shopee: 26, codigo_rastreio: 'SPXBR900126', destinatario: 'Bruno Cavalcanti', telefone: '13991234526', endereco: 'Rua Venezuela, 170', numero: '170', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-020', latitude: -24.0198, longitude: -46.4248, total_no_local: 1, status: 'pendente' },
+            { id: 9027, ordem_entrega: 27, ordem_carregamento: 4, parada_shopee: 25, ordem_shopee: 27, codigo_rastreio: 'SPXBR900127', destinatario: 'Helena Carvalho', telefone: '13991234527', endereco: 'Av. Brasil, 820', numero: '820', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0205, longitude: -46.4255, total_no_local: 1, status: 'pendente' },
+            { id: 9028, ordem_entrega: 28, ordem_carregamento: 3, parada_shopee: 26, ordem_shopee: 28, codigo_rastreio: 'SPXBR900128', destinatario: 'Douglas Monteiro', telefone: '13991234528', endereco: 'Av. Brasil, 950', numero: '950', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0212, longitude: -46.4262, total_no_local: 1, status: 'pendente' },
+            { id: 9029, ordem_entrega: 29, ordem_carregamento: 2, parada_shopee: 27, ordem_shopee: 29, codigo_rastreio: 'SPXBR900129', destinatario: 'Natália Cunha', telefone: '13991234529', endereco: 'Rua Ipanema, 45', numero: '45', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-040', latitude: -24.0220, longitude: -46.4270, total_no_local: 1, status: 'pendente' },
+            { id: 9030, ordem_entrega: 30, ordem_carregamento: 1, parada_shopee: 28, ordem_shopee: 30, codigo_rastreio: 'SPXBR900130', destinatario: 'Igor Ferreira', telefone: '13991234530', endereco: 'Rua Ipanema, 130', numero: '130', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-040', latitude: -24.0228, longitude: -46.4278, total_no_local: 1, status: 'pendente' }
+          ];
+
+          this.rotaAtivaId = 'DEMO';
+          this.entregas = pacotesDemo;
+          this.salvarCacheLocal();
+          this.modalImportar = false;
+          this.tutorialAberto = false;
+          this.modo = 'carregamento';
+          
+          if ('vibrate' in navigator) navigator.vibrate(60);
+          alert('🧪 Carga de Demonstração (30 Pacotes) ativada com sucesso!\n\nVeja como os pacotes foram divididos em Sacolas de 10 em 10 pro Canetão. Depois toque na aba "Rua" para testar o cockpit e o Waze!');
+        },
+
         async init() {
           try {
-            // Aplica o tema salvo no carregamento
             if (this.tema === 'claro') {
               document.body.classList.add('theme-claro');
             } else {
@@ -1109,7 +1213,6 @@
             return val;
         },
 
-        // ORDENAÇÃO INTELIGENTE: PACOTES ENTREGUES VÃO PRO FINAL DA LISTA
         get entregasOrdenadasParaSacola() {
             return [...this.entregas].sort((a, b) => {
                 if (a.status === 'entregue' && b.status !== 'entregue') return 1;
@@ -1196,7 +1299,7 @@
             const rotaCache = localStorage.getItem('drivexps_rota_ativa_id');
             const entregasCache = localStorage.getItem('drivexps_entregas_cache');
             if (rotaCache && entregasCache) {
-              this.rotaAtivaId = parseInt(rotaCache);
+              this.rotaAtivaId = rotaCache === 'DEMO' ? 'DEMO' : parseInt(rotaCache);
               this.entregas = JSON.parse(entregasCache);
             }
           } catch(e) {}
@@ -1556,7 +1659,6 @@
           window.pwaDeferredPrompt = null; this.mostrarPopupInstalar = false;
         },
 
-        // PARSER UNIVERSAL SHOPEE EXPRESS BRASIL (COMPATÍVEL COM TODOS OS HUBS)
         parseLinhasShopee(linhasMatriz) {
           this.msgErro = null;
           if (!linhasMatriz || linhasMatriz.length < 2) { this.msgErro = 'Planilha com poucas linhas.'; return []; }
@@ -1786,7 +1888,6 @@
             (e.cidade === cur.cidade && mesmaRua(e) && Math.abs(e.latitude - cur.latitude) < 0.0001 && Math.abs(e.longitude - cur.longitude) < 0.0001)
           );
 
-          // Vibração tátil no celular se houver múltiplos pacotes nesta parada
           if (lista.length > 1 && 'vibrate' in navigator) {
             navigator.vibrate(80);
           }
