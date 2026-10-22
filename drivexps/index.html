@@ -267,7 +267,7 @@
     </div>
   </div>
 
-  <!-- 4. GAVETA DO MENU LATERAL (HAMBÚRGUER COM PERFIL COMPLETO + SELETOR DE TEMA) -->
+  <!-- 4. GAVETA DO MENU LATERAL (COM HISTÓRICO E SELETOR DE TEMA) -->
   <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" 
        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
@@ -294,7 +294,7 @@
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
-        <!-- SELETOR DE TEMA VISUAL (MODO NOTURNO / DIURNO ALTO CONTRASTE) -->
+        <!-- SELETOR DE TEMA VISUAL -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência do App:</span>
@@ -427,12 +427,12 @@
          </div>
     </div>
 
-    <!-- CABEÇALHO DO APLICATIVO (SEM BOTÕES DE CD/CASA FIXOS) -->
+    <!-- CABEÇALHO DO APLICATIVO (COM AS 4 ABAS REEXIBIDAS: ROTA, SACOLAS, RUA, HISTÓRICO) -->
     <div>
       <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
-              :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 5)}">
+              :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)}">
         
-        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 5)}">
+        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)}">
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
           
           <div class="flex items-center gap-2">
@@ -449,7 +449,7 @@
           </div>
         </div>
 
-        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 5)}">
+        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)}">
           <div class="flex items-center gap-1.5">
             <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" 
                   :class="rotaAtivaId === 'DEMO' ? 'text-emerald-400 border border-emerald-500/50' : 'text-orange-400'"
@@ -458,15 +458,18 @@
           <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
         </div>
 
-        <nav class="grid grid-cols-3 gap-2 pt-0.5">
-          <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 2, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5) && passoTutorial !== 2, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5))}" class="hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
-            <span class="text-sm leading-none">+</span><span class="leading-none mt-0.5">Nova Rota</span>
+        <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
+          <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 2, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 2, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="hover:bg-orange-50 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+            <span class="text-sm leading-none">+</span><span class="leading-none mt-0.5">Rota</span>
           </button>
-          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5) && passoTutorial !== 3, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5))}" class="font-black py-2.5 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 3, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">📦</span><span class="leading-none mt-0.5">Sacolas</span>
           </button>
-          <button id="btnTourRua" @click="modo = 'rua'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5)), 'bg-orange-700 text-orange-100': modo !== 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5))}" class="font-black py-2.5 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button id="btnTourRua" @click="modo = 'rua'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">🚗</span><span class="leading-none mt-0.5">Rua</span>
+          </button>
+          <button id="btnTourHistorico" @click="abrirHistorico()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 5, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 5, 'bg-black text-white shadow-inner border border-gray-700': modo === 'historico' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'historico' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+            <span class="text-sm leading-none">📜</span><span class="leading-none mt-0.5">Histórico</span>
           </button>
         </nav>
       </header>
@@ -652,7 +655,7 @@
         </template>
       </main>
 
-      <!-- MODO 3: HISTÓRICO -->
+      <!-- MODO 3: HISTÓRICO (RESTAURADO E FUNCIONAL) -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full" x-cloak>
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
@@ -684,7 +687,7 @@
     </footer>
   </div>
 
-  <!-- MODAL DE IMPORTAÇÃO (COM CAMPOS DINÂMICOS DE PARTIDA, CHEGADA E DEMONSTRAÇÃO) -->
+  <!-- MODAL DE IMPORTAÇÃO (COM CAMPOS GENÉRICOS DE PARTIDA E CHEGADA) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -692,7 +695,7 @@
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
 
-      <!-- CONFIGURAÇÃO DE PARTIDA E CHEGADA DIRETAS NO MODAL -->
+      <!-- CONFIGURAÇÃO DE PARTIDA E CHEGADA COM VALORES GENÉRICOS -->
       <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs">
         <div class="flex justify-between items-center">
           <span class="font-black text-orange-400 uppercase tracking-wider text-[11px]">📍 Ponto de Partida e Chegada</span>
@@ -703,17 +706,16 @@
         <div class="space-y-2">
           <div>
             <label class="text-[10px] text-gray-400 font-bold block mb-1">Partida (Onde você pega a carga / CD ou sua rua):</label>
-            <input type="text" x-model="inputPartidaModal" placeholder="Ex: Av. Jussara, 463 ou Nome do CD" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+            <input type="text" x-model="inputPartidaModal" placeholder="Ex: Av. Principal, 100 ou Nome do CD" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
           </div>
           <div>
             <label class="text-[10px] text-gray-400 font-bold block mb-1">Chegada (Onde a rota termina / Sua casa):</label>
-            <input type="text" x-model="inputChegadaModal" placeholder="Ex: Av. Jussara, 463 ou sua residência" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500">
+            <input type="text" x-model="inputChegadaModal" placeholder="Ex: Rua das Flores, 500 ou sua residência" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500">
           </div>
         </div>
       </div>
       
       <div class="space-y-3">
-        <!-- BOTÃO DE SUBIR PLANILHA REAL -->
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
           <span class="text-3xl block mb-1.5">📊</span>
           <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
@@ -721,14 +723,12 @@
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
         </label>
 
-        <!-- DIVISÓRIA -->
         <div class="relative flex py-1 items-center">
           <div class="flex-grow border-t border-gray-800"></div>
           <span class="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-black tracking-widest">Ou teste sem planilha</span>
           <div class="flex-grow border-t border-gray-800"></div>
         </div>
 
-        <!-- BOTÃO DE CARGA DE DEMONSTRAÇÃO -->
         <button @click="carregarRotaExemploModal()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-lg">
           <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
         </button>
@@ -781,7 +781,7 @@
     </div>
   </div>
 
-  <!-- TUTORIAL INTERATIVO 100% ATUALIZADO -->
+  <!-- TUTORIAL INTERATIVO -->
   <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
       <template x-if="passoTutorial === 1">
@@ -796,16 +796,16 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">📊</div>
           <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Nova Rota"</strong> e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Nova Rota"</strong>, informe sua partida/chegada (ou use o GPS) e selecione a planilha <code>.xlsx</code>.</p>
           <div class="bg-emerald-950/60 p-3 rounded-2xl border border-emerald-500/40 text-xs text-emerald-300 font-bold text-left space-y-1">
             <span class="block text-emerald-400 uppercase tracking-wider text-[10px]">🧪 Está de folga ou sem planilha?</span>
-            <p>Você pode clicar em <strong>"Carregar Carga de Demonstração"</strong> no modal de importação para testar 30 pacotes simulados na hora!</p>
+            <p>Clique em <strong>"Carregar Carga de Demonstração"</strong> no mesmo modal para testar 30 pacotes na hora!</p>
           </div>
         </div>
       </template>
       <template x-if="passoTutorial === 3">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">✍️</div>
+          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">✍️</div>
           <h3 class="text-2xl font-black text-white">2. Organização no Canetão</h3>
           <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, marque na caixa o número do <strong>#CANETÃO</strong>.</p>
           <p class="text-xs text-gray-300">Sua carga é separada de 10 em 10 pacotes por sacola. Carregue seu carro em minutos!</p>
@@ -820,7 +820,14 @@
       </template>
       <template x-if="passoTutorial === 5">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
+          <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">📜</div>
+          <h3 class="text-2xl font-black text-white">4. Histórico de Rotas</h3>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong>, você visualiza todas as rotas anteriores que já fez, pode reabri-las ou apagar rotas antigas.</p>
+        </div>
+      </template>
+      <template x-if="passoTutorial === 6">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">🏁</div>
           <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
           <p class="text-sm text-gray-200 leading-relaxed">Importe sua planilha oficial ou experimente a simulação com 30 pacotes para ver a eficiência na prática.</p>
           <button @click="tutorialAberto = false; carregarRotaExemplo();" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
@@ -834,16 +841,16 @@
           <button x-show="passoTutorial > 1" @click="voltarPassoTutorial()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-2 px-3 rounded-xl active:scale-95 transition">← Voltar</button>
         </div>
         <div class="flex items-center gap-1.5">
-          <template x-for="p in 5" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
+          <template x-for="p in 6" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
         </div>
         <button @click="proximoPassoTutorial()" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-4 rounded-xl active:scale-95 transition shadow-lg shadow-orange-600/30">
-          <span x-text="passoTutorial === 5 ? 'Começar!' : 'Avançar →'"></span>
+          <span x-text="passoTutorial === 6 ? 'Começar!' : 'Avançar →'"></span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 8. MODAL DE ASSINATURA -->
+  <!-- MODAL DE ASSINATURA -->
   <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
@@ -896,7 +903,7 @@
     </div>
   </div>
 
-  <!-- 9. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO -->
+  <!-- MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
@@ -966,10 +973,6 @@
         
         nomeArquivo: '',
         msgErro: null,
-        buscaEnderecoCD: '',
-        buscaEnderecoCasa: '',
-        buscandoGeo: null,
-
         pacotesExtraidos: [],
         carregandoProcesso: false,
         entregas: [],
@@ -1338,7 +1341,7 @@
         },
 
         iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
-        proximoPassoTutorial() { if (this.passoTutorial < 5) this.passoTutorial++; else this.concluirTutorial(); },
+        proximoPassoTutorial() { if (this.passoTutorial < 6) this.passoTutorial++; else this.concluirTutorial(); },
         voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
         concluirTutorial() { this.tutorialAberto = false; localStorage.setItem('drivexps_tutorial_visto', 'true'); },
 
@@ -1479,12 +1482,10 @@
 
         async converterTextoParaCoord(texto) {
           if (!texto || texto.trim().length < 3) return null;
-          // Se já estiver no formato 'lat, lng'
           const partes = texto.split(',');
           if (partes.length === 2 && !isNaN(parseFloat(partes[0])) && !isNaN(parseFloat(partes[1]))) {
             return { latitude: parseFloat(partes[0]), longitude: parseFloat(partes[1]) };
           }
-          // Se for endereço por extenso, consulta no Nominatim do OpenStreetMap
           try {
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&limit=1&countrycodes=br`;
             const res = await fetch(url);
@@ -1862,7 +1863,6 @@
               }
             }
 
-            // Converte os textos do modal em coordenadas geográficas reais para envio ao n8n
             let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
             let coordChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
 
