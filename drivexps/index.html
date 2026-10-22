@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
 
+  <!-- ESTILOS GLOBAIS -->
   <style>
     [x-cloak] { display: none !important; }
 
@@ -229,7 +230,7 @@
 
       <div class="space-y-3 pt-4 border-t border-gray-800">
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">🚪 Sair da Conta</button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 4.0 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 4.1 Pro</p>
       </div>
     </div>
   </div>
@@ -311,6 +312,10 @@
               </div>
               <h3 class="font-black text-lg text-white" x-text="item.endereco"></h3>
               <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
+              <div class="flex items-center justify-between pt-2 border-t border-gray-800 text-xs">
+                <span class="text-gray-400">Rastreio SPX:</span>
+                <span class="font-mono font-black text-orange-400" x-text="item.codigo_rastreio"></span>
+              </div>
             </div>
           </template>
         </div>
@@ -324,13 +329,30 @@
               <span>📍 BAIRRO: <strong class="text-white uppercase" x-text="entregaAtual.bairro || 'CENTRO'"></strong></span>
               <span class="bg-orange-950 text-orange-400 px-2.5 py-1 rounded-full font-mono" x-text="`${entregasNoBairroRestantes} no bairro`"></span>
             </div>
-            <h2 class="text-3xl font-black text-white" x-text="entregaAtual.endereco"></h2>
-            <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
-            <div class="grid grid-cols-2 gap-3 pt-2">
+
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1"><span class="text-[10px] text-orange-400 font-black block">CANETÃO</span><span class="text-3xl font-black text-orange-400 font-mono" x-text="`#${entregaAtual.ordem_entrega}`"></span></div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1"><span class="text-[10px] text-gray-400 font-black block">PARADA</span><span class="text-3xl font-black text-white font-mono" x-text="formatarParada(entregaAtual.parada_shopee)"></span></div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1"><span class="text-[10px] text-gray-400 font-black block">ORDEM</span><span class="text-3xl font-black text-white font-mono" x-text="formatarParada(entregaAtual.ordem_shopee)"></span></div>
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1"><span class="text-[10px] text-orange-400 font-black block">SACOLA</span><span class="text-3xl font-black text-orange-400 font-mono" x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span></div>
+            </div>
+
+            <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
+              <span class="text-xs font-bold text-gray-400">RASTREIO:</span>
+              <span class="font-mono font-black text-orange-400" x-text="entregaAtual.codigo_rastreio"></span>
+            </div>
+
+            <div class="space-y-1">
+              <h2 class="text-3xl font-black text-white" x-text="entregaAtual.endereco"></h2>
+              <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-1">
               <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2">🚗 Waze</a>
               <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2">🗺️ Maps</a>
             </div>
-            <div class="grid grid-cols-2 gap-3 pt-2">
+
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
               <button @click="pularEntrega(entregaAtual)" class="bg-gray-800 text-yellow-400 py-4 rounded-2xl font-bold">⚠️ Pular</button>
               <button @click="concluirEntrega(entregaAtual)" class="bg-orange-600 text-white py-4 rounded-2xl font-black text-lg">✅ Entregue</button>
             </div>
@@ -338,7 +360,7 @@
         </template>
       </main>
 
-      <!-- MODO 3: HISTÓRICO (RESTAURADO) -->
+      <!-- MODO 3: HISTÓRICO -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full" x-cloak>
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
@@ -370,7 +392,7 @@
     </footer>
   </div>
 
-  <!-- MODAL DE IMPORTAÇÃO (COM CAMPOS GENÉRICOS) -->
+  <!-- MODAL DE IMPORTAÇÃO (COM CAMPOS GENÉRICOS DE PARTIDA E CHEGADA) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -441,7 +463,7 @@
           </div>
         </div>
         <div class="pt-2 space-y-3">
-          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
             <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
             <span x-show="carregandoProcesso">⏳ Calculando vias...</span>
           </button>
@@ -451,7 +473,7 @@
     </div>
   </div>
 
-  <!-- TUTORIAL INTERATIVO -->
+  <!-- TUTORIAL -->
   <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
       <template x-if="passoTutorial === 1">
@@ -459,7 +481,6 @@
           <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👋</div>
           <h3 class="text-2xl font-black text-white">Bem-vindo ao DriveXPS!</h3>
           <p class="text-sm text-gray-200 leading-relaxed">O roteirizador contínuo que acaba com o ziguezague, organiza suas sacolas de 10 em 10 e economiza seu combustível.</p>
-          <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-emerald-400 font-bold">🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!</div>
         </div>
       </template>
       <template x-if="passoTutorial === 2">
@@ -552,7 +573,7 @@
     </div>
   </div>
 
-  <!-- MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO -->
+  <!-- MODAL DE CADASTRO OBRIGATÓRIO -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">📋</div>
@@ -666,7 +687,7 @@
               alert('📍 Sua localização atual foi gravada no Ponto de Partida e Chegada!');
             }, err => alert('Erro no GPS: ' + err.message));
           } else {
-            alert('Geolocalização não suportada pelo seu navegador.');
+            alert('Geolocalização não suportada.');
           }
         },
 
