@@ -110,7 +110,7 @@
     }
   </style>
 
-  <!-- TAGS OPEN GRAPH (PREVIEW OFICIAL WHATSAPP E REDES SOCIAIS) -->
+  <!-- TAGS OPEN GRAPH -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DriveXPS">
   <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
@@ -151,7 +151,7 @@
 </head>
 <body :class="tema === 'claro' ? 'theme-claro' : 'theme-escuro'" class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between transition-colors duration-300" x-data="entregaApp()">
 
-  <!-- 1. SPLASH SCREEN (NUNCA TRAVA) -->
+  <!-- 1. SPLASH SCREEN -->
   <div id="splashScreen" 
        class="fixed inset-0 z-[100] bg-black flex flex-col justify-end items-center pb-12 select-none transition-all duration-500 ease-out"
        style="background-image: url('./splash.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -312,7 +312,6 @@
               <span>☀️</span> Claro / Sol
             </button>
           </div>
-          <p class="text-[9px] text-gray-400 text-center">O modo claro ativa cores de alto contraste contra o reflexo solar.</p>
         </div>
 
         <!-- DADOS DO MOTORISTA -->
@@ -353,12 +352,12 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.8 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.9 Pro</p>
       </div>
     </div>
   </div>
 
-  <!-- 5. BANNER DO PERÍODO DE TESTE (SAAS INTELIGENTE) -->
+  <!-- 5. BANNER DO PERÍODO DE TESTE -->
   <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" 
        class="border-b px-4 py-2 flex justify-between items-center text-xs"
        :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
@@ -428,22 +427,20 @@
          </div>
     </div>
 
-    <!-- CABEÇALHO DO APLICATIVO -->
+    <!-- CABEÇALHO DO APLICATIVO (SEM BOTÕES DE CD/CASA FIXOS) -->
     <div>
       <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
-              :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
+              :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 5)}">
         
-        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
+        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 5)}">
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
           
           <div class="flex items-center gap-2">
-            <!-- Botão Busca 🔍 -->
             <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Buscar Pacote">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
-            <!-- Botão Menu ☰ -->
             <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Menu">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
@@ -452,7 +449,7 @@
           </div>
         </div>
 
-        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
+        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 5)}">
           <div class="flex items-center gap-1.5">
             <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" 
                   :class="rotaAtivaId === 'DEMO' ? 'text-emerald-400 border border-emerald-500/50' : 'text-orange-400'"
@@ -461,42 +458,21 @@
           <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
         </div>
 
-        <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
-          <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 3, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="hover:bg-orange-50 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
-            <span class="text-sm leading-none">+</span><span class="leading-none mt-0.5">Rota</span>
+        <nav class="grid grid-cols-3 gap-2 pt-0.5">
+          <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 2, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5) && passoTutorial !== 2, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5))}" class="hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+            <span class="text-sm leading-none">+</span><span class="leading-none mt-0.5">Nova Rota</span>
           </button>
-          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5) && passoTutorial !== 3, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5))}" class="font-black py-2.5 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">📦</span><span class="leading-none mt-0.5">Sacolas</span>
           </button>
-          <button id="btnTourRua" @click="modo = 'rua'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 5, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 5, 'bg-black text-white shadow-inner border border-gray-700': modo === 'rua' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'rua' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
+          <button id="btnTourRua" @click="modo = 'rua'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5)), 'bg-orange-700 text-orange-100': modo !== 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 5))}" class="font-black py-2.5 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
             <span class="text-sm leading-none">🚗</span><span class="leading-none mt-0.5">Rua</span>
-          </button>
-          <button id="btnTourHistorico" @click="abrirHistorico()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 6, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 6, 'bg-black text-white shadow-inner border border-gray-700': modo === 'historico' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'historico' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
-            <span class="text-sm leading-none">📜</span><span class="leading-none mt-0.5">Histórico</span>
           </button>
         </nav>
       </header>
 
-      <!-- GPS -->
-      <section id="btnTourGPS" :class="{'ring-4 ring-amber-400 shadow-[0_0_30px_rgba(245,158,11,1)] z-[105] relative bg-gray-900 border-amber-400 scale-[1.01]': tutorialAberto && passoTutorial === 2, 'bg-gray-900/90': !(tutorialAberto && passoTutorial === 2)}" class="px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5 transition-all">
-        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
-          <div class="truncate pr-1">
-            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Partida:</span>
-            <span class="text-xs font-bold text-white truncate block">🏭 CD Saída</span>
-          </div>
-          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border" :class="cd.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'" x-text="cd.lat ? 'Configurado' : 'Pendente'"></span>
-        </button>
-        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
-          <div class="truncate pr-1">
-            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Final:</span>
-            <span class="text-xs font-bold text-white truncate block">🏠 Casa Chegada</span>
-          </div>
-          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border" :class="casa.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'" x-text="casa.lat ? 'Configurada' : 'Pendente'"></span>
-        </button>
-      </section>
-
-      <!-- TELA INICIAL QUANDO NÃO HÁ ROTA CARREGADA (BOAS-VINDAS / DEMO) -->
-      <section x-show="entregas.length === 0" class="p-6 max-w-md mx-auto w-full text-center space-y-5 my-8">
+      <!-- TELA INICIAL QUANDO NÃO HÁ ROTA CARREGADA -->
+      <section x-show="entregas.length === 0" class="p-6 max-w-md mx-auto w-full text-center space-y-5 my-8" x-cloak>
         <div class="w-20 h-20 bg-orange-500/20 text-orange-400 rounded-3xl flex items-center justify-center mx-auto text-4xl border border-orange-500/40 shadow-xl">
           🚗
         </div>
@@ -510,7 +486,7 @@
           <button @click="abrirModalImportar()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
             <span>📊</span> Importar Planilha Shopee (.xlsx)
           </button>
-          <button @click="carregarRotaExemplo()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/50 font-black py-3.5 rounded-2xl text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+          <button @click="carregarRotaExemplo()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
             <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
           </button>
         </div>
@@ -518,7 +494,7 @@
       </section>
 
       <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
-      <main x-show="modo === 'carregamento' && entregas.length > 0" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
+      <main x-show="modo === 'carregamento' && entregas.length > 0" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full" x-cloak>
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
           <p class="text-gray-300 text-xs leading-relaxed">Layout universal otimizado para qualquer veículo. <em>(Toque no card para abrir no Waze).</em></p>
@@ -574,7 +550,7 @@
       </main>
 
       <!-- MODO 2: RUA (COCKPIT) -->
-      <main x-show="modo === 'rua' && entregas.length > 0" class="p-4 max-w-xl mx-auto w-full relative">
+      <main x-show="modo === 'rua' && entregas.length > 0" class="p-4 max-w-xl mx-auto w-full relative" x-cloak>
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
             
@@ -628,7 +604,7 @@
               <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
             </div>
 
-            <!-- ALERTA DE MÚLTIPLOS PACOTES (COM VIBRAÇÃO AUTOMÁTICA) -->
+            <!-- ALERTA DE MÚLTIPLOS PACOTES -->
             <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
                 <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
@@ -677,7 +653,7 @@
       </main>
 
       <!-- MODO 3: HISTÓRICO -->
-      <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full">
+      <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full" x-cloak>
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
           <template x-for="r in rotasHistorico" :key="r.id">
@@ -706,6 +682,58 @@
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </footer>
+  </div>
+
+  <!-- MODAL DE IMPORTAÇÃO (COM CAMPOS DINÂMICOS DE PARTIDA, CHEGADA E DEMONSTRAÇÃO) -->
+  <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <h2 class="font-black text-lg text-orange-500">IMPORTAR ROMANEIO</h2>
+        <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
+      </div>
+
+      <!-- CONFIGURAÇÃO DE PARTIDA E CHEGADA DIRETAS NO MODAL -->
+      <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs">
+        <div class="flex justify-between items-center">
+          <span class="font-black text-orange-400 uppercase tracking-wider text-[11px]">📍 Ponto de Partida e Chegada</span>
+          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-gray-700 active:scale-95 transition">
+            📍 Usar Meu GPS Atual
+          </button>
+        </div>
+        <div class="space-y-2">
+          <div>
+            <label class="text-[10px] text-gray-400 font-bold block mb-1">Partida (Onde você pega a carga / CD ou sua rua):</label>
+            <input type="text" x-model="inputPartidaModal" placeholder="Ex: Av. Jussara, 463 ou Nome do CD" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+          </div>
+          <div>
+            <label class="text-[10px] text-gray-400 font-bold block mb-1">Chegada (Onde a rota termina / Sua casa):</label>
+            <input type="text" x-model="inputChegadaModal" placeholder="Ex: Av. Jussara, 463 ou sua residência" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500">
+          </div>
+        </div>
+      </div>
+      
+      <div class="space-y-3">
+        <!-- BOTÃO DE SUBIR PLANILHA REAL -->
+        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
+          <span class="text-3xl block mb-1.5">📊</span>
+          <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
+          <span class="text-[10px] text-gray-400 block mt-1">Planilha oficial de entregas da Shopee</span>
+          <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
+        </label>
+
+        <!-- DIVISÓRIA -->
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-gray-800"></div>
+          <span class="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-black tracking-widest">Ou teste sem planilha</span>
+          <div class="flex-grow border-t border-gray-800"></div>
+        </div>
+
+        <!-- BOTÃO DE CARGA DE DEMONSTRAÇÃO -->
+        <button @click="carregarRotaExemploModal()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-lg">
+          <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL DE RESUMO DE IMPORTAÇÃO -->
@@ -739,9 +767,6 @@
           <div class="flex items-center gap-3 text-gray-300">
             <span class="text-emerald-400 text-lg">✔</span> <span x-text="`${new Set(pacotesExtraidos.map(p=>p.parada_shopee)).size} Paradas Únicas`"></span>
           </div>
-          <div class="flex items-center gap-3 text-red-400 bg-red-500/10 p-2 rounded-xl border border-red-500/20" x-show="pacotesExtraidos.filter(p=>p.gps_suspeito).length > 0">
-            <span class="text-lg">❓</span> <span x-text="`${pacotesExtraidos.filter(p=>p.gps_suspeito).length} GPS Suspeitos (Marginais/S-N)`"></span>
-          </div>
         </div>
         <div class="pt-2 space-y-3">
           <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
@@ -756,65 +781,50 @@
     </div>
   </div>
 
-  <!-- TUTORIAL INTERATIVO -->
+  <!-- TUTORIAL INTERATIVO 100% ATUALIZADO -->
   <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
       <template x-if="passoTutorial === 1">
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👋</div>
           <h3 class="text-2xl font-black text-white">Bem-vindo ao DriveXPS!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Vamos te ensinar em 30 segundos como acabar com o ziguezague, economizar gasolina e terminar suas entregas muito mais rápido.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">O roteirizador contínuo que acaba com o ziguezague, organiza suas sacolas de 10 em 10 e economiza seu combustível.</p>
           <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-emerald-400 font-bold">🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!</div>
         </div>
       </template>
       <template x-if="passoTutorial === 2">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div>
-          <h3 class="text-2xl font-black text-white">Partida e Chegada</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Veja os botões <strong>acesos no topo</strong>! Grave onde você pega a carga (CD) e onde mora (Casa) para sua rota terminar pertinho de você.</p>
-          <p class="text-xs text-orange-400 font-semibold bg-black/60 p-3 rounded-xl border border-gray-800">Dica: Você pode usar o GPS ou <strong>digitar o endereço</strong> por escrito!</p>
+          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">📊</div>
+          <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
+          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Nova Rota"</strong> e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX.</p>
+          <div class="bg-emerald-950/60 p-3 rounded-2xl border border-emerald-500/40 text-xs text-emerald-300 font-bold text-left space-y-1">
+            <span class="block text-emerald-400 uppercase tracking-wider text-[10px]">🧪 Está de folga ou sem planilha?</span>
+            <p>Você pode clicar em <strong>"Carregar Carga de Demonstração"</strong> no modal de importação para testar 30 pacotes simulados na hora!</p>
+          </div>
         </div>
       </template>
       <template x-if="passoTutorial === 3">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">📊</div>
-          <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Rota"</strong> e selecione a planilha <code>.xlsx</code> baixada no app da SPX.</p>
-          <div class="bg-emerald-950/60 p-3 rounded-2xl border border-emerald-500/40 text-xs text-emerald-300 font-bold text-left space-y-1">
-            <span class="block text-emerald-400 uppercase tracking-wider text-[10px]">🧪 Está de folga ou sem planilha?</span>
-            <p>Você pode clicar em <strong>"Carregar Carga de Demonstração"</strong> para ver 30 pacotes de teste funcionando na hora!</p>
-          </div>
+          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">✍️</div>
+          <h3 class="text-2xl font-black text-white">2. Organização no Canetão</h3>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, marque na caixa o número do <strong>#CANETÃO</strong>.</p>
+          <p class="text-xs text-gray-300">Sua carga é separada de 10 em 10 pacotes por sacola. Carregue seu carro em minutos!</p>
         </div>
       </template>
       <template x-if="passoTutorial === 4">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">✍️</div>
-          <h3 class="text-2xl font-black text-white">2. Organização no Canetão</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong> (acesa no topo), marque na caixa com canetão o número <strong>#CANETÃO</strong>.</p>
-          <p class="text-xs text-gray-300">Sua carga é separada de 10 em 10 pacotes por sacola. Você carrega seu carro em minutos!</p>
+          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">🚗</div>
+          <h3 class="text-2xl font-black text-white">3. Na Rua com Waze</h3>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong>, acompanhe o **Bairro Atual**, veja se a próxima entrega é na mesma rua e abra o Waze ou Maps com 1 toque.</p>
         </div>
       </template>
       <template x-if="passoTutorial === 5">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">🚗</div>
-          <h3 class="text-2xl font-black text-white">3. Na Rua com Waze</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong> (acesa no topo), você vê a entrega atual, aviso de bairro e abre o Waze ou Maps com 1 único toque.</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 6">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📜</div>
-          <h3 class="text-2xl font-black text-white">4. Histórico de Rotas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong>, você visualiza todas as rotas anteriores que já fez, pode reabri-las ou apagar rotas antigas.</p>
-        </div>
-      </template>
-      <template x-if="passoTutorial === 7">
-        <div class="space-y-3.5">
           <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
           <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Importe sua planilha oficial ou experimente a simulação com 30 pacotes para ver a facilidade na prática.</p>
-          <button @click="carregarRotaExemplo()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
-            <span>🧪</span> Começar com Carga de Demonstração (30 Pacotes)
+          <p class="text-sm text-gray-200 leading-relaxed">Importe sua planilha oficial ou experimente a simulação com 30 pacotes para ver a eficiência na prática.</p>
+          <button @click="tutorialAberto = false; carregarRotaExemplo();" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
+            <span>🧪</span> Testar Carga de Demonstração Agora
           </button>
         </div>
       </template>
@@ -824,57 +834,16 @@
           <button x-show="passoTutorial > 1" @click="voltarPassoTutorial()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-2 px-3 rounded-xl active:scale-95 transition">← Voltar</button>
         </div>
         <div class="flex items-center gap-1.5">
-          <template x-for="p in 7" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
+          <template x-for="p in 5" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
         </div>
         <button @click="proximoPassoTutorial()" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-4 rounded-xl active:scale-95 transition shadow-lg shadow-orange-600/30">
-          <span x-text="passoTutorial === 7 ? 'Começar!' : 'Avançar →'"></span>
+          <span x-text="passoTutorial === 5 ? 'Começar!' : 'Avançar →'"></span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 8. CONFIGURAR CD E CASA -->
-  <div x-show="modalCD" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 rounded-3xl w-full max-w-md border border-gray-800 p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-        <h2 class="font-black text-base text-orange-500">PONTOS DE PARTIDA E CHEGADA</h2>
-        <button @click="modalCD = false" class="text-gray-400 text-2xl font-bold">&times;</button>
-      </div>
-      <div class="space-y-2.5 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
-        <label class="text-xs font-bold text-orange-400 block">🏭 CD SHOPEE (Partida da Rota)</label>
-        <div class="space-y-1.5">
-          <div class="flex gap-1.5">
-            <input type="text" x-model="buscaEnderecoCD" placeholder="Digite o endereço do CD..." class="flex-1 bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
-            <button @click="buscarEnderecoTexto('cd')" :disabled="buscandoGeo === 'cd'" class="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold px-3 py-2 rounded-xl text-xs active:scale-95 transition">
-              <span x-show="buscandoGeo !== 'cd'">🔍 Buscar</span><span x-show="buscandoGeo === 'cd'">⏳</span>
-            </button>
-          </div>
-        </div>
-        <div class="pt-1">
-          <button @click="capturarLocalizacao('cd')" class="w-full bg-gray-800 hover:bg-gray-700 text-xs py-2.5 rounded-xl font-bold text-green-400 border border-gray-700 active:scale-95 transition flex items-center justify-center gap-1.5">📍 Gravar Meu GPS Atual como CD</button>
-        </div>
-        <p x-show="cd.lat" class="text-[10px] text-gray-400 font-mono bg-black/50 p-1.5 rounded-lg border border-gray-900" x-text="`Coordenadas: Lat ${cd.lat.toFixed(5)}, Lng ${cd.lng.toFixed(5)}`"></p>
-      </div>
-      <div class="space-y-2.5 bg-gray-950 p-3.5 rounded-2xl border border-gray-800">
-        <label class="text-xs font-bold text-green-400 block">🏠 SUA CASA (Término da Rota)</label>
-        <div class="space-y-1.5">
-          <div class="flex gap-1.5">
-            <input type="text" x-model="buscaEnderecoCasa" placeholder="Digite o endereço da sua casa..." class="flex-1 bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500">
-            <button @click="buscarEnderecoTexto('casa')" :disabled="buscandoGeo === 'casa'" class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-3 py-2 rounded-xl text-xs active:scale-95 transition">
-              <span x-show="buscandoGeo !== 'casa'">🔍 Buscar</span><span x-show="buscandoGeo === 'casa'">⏳</span>
-            </button>
-          </div>
-        </div>
-        <div class="pt-1">
-          <button @click="capturarLocalizacao('casa')" class="w-full bg-gray-800 hover:bg-gray-700 text-xs py-2.5 rounded-xl font-bold text-green-400 border border-gray-700 active:scale-95 transition flex items-center justify-center gap-1.5">📍 Gravar Meu GPS Atual como Casa</button>
-        </div>
-        <p x-show="casa.lat" class="text-[10px] text-gray-400 font-mono bg-black/50 p-1.5 rounded-lg border border-gray-900" x-text="`Coordenadas: Lat ${casa.lat.toFixed(5)}, Lng ${casa.lng.toFixed(5)}`"></p>
-      </div>
-      <button @click="salvarLocais()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-2xl text-xs active:scale-95 transition shadow-lg">Salvar Coordenadas</button>
-    </div>
-  </div>
-
-  <!-- 9. MODAL DE ASSINATURA -->
+  <!-- 8. MODAL DE ASSINATURA -->
   <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
@@ -927,7 +896,7 @@
     </div>
   </div>
 
-  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO (SOMENTE APÓS LOGIN GOOGLE E SOBRE O APP) -->
+  <!-- 9. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
@@ -942,78 +911,27 @@
       </div>
 
       <div class="space-y-3 text-left">
-        <!-- NOME COMPLETO (VEM DO GOOGLE) -->
         <div>
-          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
-            Nome Completo *
-          </label>
-          <input type="text" x-model="inputNome" placeholder="Seu Nome Completo" 
-                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">Nome Completo *</label>
+          <input type="text" x-model="inputNome" placeholder="Seu Nome Completo" class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
         </div>
-
-        <!-- WHATSAPP COM DDD (OBRIGATÓRIO) -->
         <div>
-          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
-            WhatsApp (com DDD) *
-          </label>
-          <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" 
-                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
+          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">WhatsApp (com DDD) *</label>
+          <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
         </div>
-
-        <!-- E-MAIL (VEM DO GOOGLE) -->
         <div>
-          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
-            Seu E-mail *
-          </label>
-          <input type="email" x-model="inputEmail" placeholder="seuemail@gmail.com" 
-                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">Seu E-mail *</label>
+          <input type="email" x-model="inputEmail" placeholder="seuemail@gmail.com" class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
         </div>
-
         <p x-show="erroCadastroObrigatorio" class="text-xs text-red-400 font-bold text-center pt-1" x-text="erroCadastroObrigatorio"></p>
       </div>
 
       <div class="pt-2">
-        <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" 
-                class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+        <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
           <span x-show="!salvandoPerfil">✅ Concluir e Acessar o App</span>
           <span x-show="salvandoPerfil">⏳ Gravando seus dados...</span>
         </button>
         <p class="text-[10px] text-gray-500 font-medium mt-2">Seus dados estão protegidos e não serão compartilhados.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 11. MODAL DE IMPORTAR PLANILHA (SELECIONAR ARQUIVO OU SIMULAR DEMO) -->
-  <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-        <h2 class="font-black text-lg text-orange-500">IMPORTAR PLANILHA</h2>
-        <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
-      </div>
-      
-      <div class="space-y-3">
-        <!-- BOTÃO 1: SUBIR ARQUIVO REAL -->
-        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-7 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
-          <span class="text-4xl block mb-2">📊</span>
-          <span class="text-sm font-black block text-white">Toque para escolher o .XLSX</span>
-          <span class="text-[10px] text-gray-400 block mt-1">Planilha oficial baixada no aplicativo da Shopee</span>
-          <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
-        </label>
-
-        <!-- DIVISÓRIA -->
-        <div class="relative flex py-1 items-center">
-          <div class="flex-grow border-t border-gray-800"></div>
-          <span class="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-black tracking-widest">Ou experimente sem planilha</span>
-          <div class="flex-grow border-t border-gray-800"></div>
-        </div>
-
-        <!-- BOTÃO 2: CARREGAR ROTA DE DEMONSTRAÇÃO -->
-        <button @click="carregarRotaExemplo()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-lg">
-          <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
-        </button>
-        <p class="text-[10px] text-gray-400 text-center leading-relaxed">
-          Ideal para quem está em casa de folga e quer testar a divisão no canetão e a navegação no Waze.
-        </p>
       </div>
     </div>
   </div>
@@ -1035,6 +953,8 @@
         inputNome: '',
         inputEmail: '',
         inputTelefone: '',
+        inputPartidaModal: '',
+        inputChegadaModal: '',
         erroCadastroObrigatorio: '',
         planoEscolhido: 'semanal',
         carregandoPix: false,
@@ -1046,8 +966,6 @@
         
         nomeArquivo: '',
         msgErro: null,
-        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
-        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.1739,"lng":-46.7816}'),
         buscaEnderecoCD: '',
         buscaEnderecoCasa: '',
         buscandoGeo: null,
@@ -1095,10 +1013,26 @@
           }
         },
 
-        // INJEÇÃO DA CARGA DE DEMONSTRAÇÃO (30 PACOTES SIMULADOS)
+        capturarGPSModal() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+              const latLngStr = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+              this.inputPartidaModal = latLngStr;
+              this.inputChegadaModal = latLngStr;
+              alert('📍 Sua localização atual foi gravada no Ponto de Partida e Chegada!');
+            }, err => alert('Erro no GPS: ' + err.message));
+          } else {
+            alert('Geolocalização não suportada pelo seu navegador.');
+          }
+        },
+
+        carregarRotaExemploModal() {
+          this.modalImportar = false;
+          this.carregarRotaExemplo();
+        },
+
         carregarRotaExemplo() {
           const pacotesDemo = [
-            // SACOLA 1 (Pacotes 1 a 10) - Bairro: Boqueirão
             { id: 9001, ordem_entrega: 1, ordem_carregamento: 30, parada_shopee: 1, ordem_shopee: 1, codigo_rastreio: 'SPXBR900101', destinatario: 'Carlos Eduardo', telefone: '13991234501', endereco: 'Av. Costa e Silva, 250', numero: '250', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0085, longitude: -46.4110, total_no_local: 1, status: 'pendente' },
             { id: 9002, ordem_entrega: 2, ordem_carregamento: 29, parada_shopee: 2, ordem_shopee: 2, codigo_rastreio: 'SPXBR900102', destinatario: 'Mariana Santos', telefone: '13991234502', endereco: 'Av. Costa e Silva, 340', numero: '340', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0091, longitude: -46.4118, total_no_local: 1, status: 'pendente' },
             { id: 9003, ordem_entrega: 3, ordem_carregamento: 28, parada_shopee: 3, ordem_shopee: 3, codigo_rastreio: 'SPXBR900103', destinatario: 'Fernando Lima', telefone: '13991234503', endereco: 'Rua Pernambuco, 115', numero: '115', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-010', latitude: -24.0102, longitude: -46.4125, total_no_local: 2, status: 'pendente' },
@@ -1109,8 +1043,6 @@
             { id: 9008, ordem_entrega: 8, ordem_carregamento: 23, parada_shopee: 7, ordem_shopee: 8, codigo_rastreio: 'SPXBR900108', destinatario: 'Ricardo Rocha', telefone: '13991234508', endereco: 'Rua Rio de Janeiro, 55', numero: '55', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-030', latitude: -24.0135, longitude: -46.4152, total_no_local: 1, status: 'pendente' },
             { id: 9009, ordem_entrega: 9, ordem_carregamento: 22, parada_shopee: 8, ordem_shopee: 9, codigo_rastreio: 'SPXBR900109', destinatario: 'Beatriz Martins', telefone: '13991234509', endereco: 'Rua Rio de Janeiro, 180', numero: '180', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-030', latitude: -24.0142, longitude: -46.4159, total_no_local: 1, status: 'pendente' },
             { id: 9010, ordem_entrega: 10, ordem_carregamento: 21, parada_shopee: 9, ordem_shopee: 10, codigo_rastreio: 'SPXBR900110', destinatario: 'Thiago Farias', telefone: '13991234510', endereco: 'Av. Brasil, 410', numero: '410', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-040', latitude: -24.0150, longitude: -46.4168, total_no_local: 1, status: 'pendente' },
-
-            // SACOLA 2 (Pacotes 11 a 20) - Bairro: Canto do Forte
             { id: 9011, ordem_entrega: 11, ordem_carregamento: 20, parada_shopee: 10, ordem_shopee: 11, codigo_rastreio: 'SPXBR900111', destinatario: 'Camila Nogueira', telefone: '13991234511', endereco: 'Av. Mal. Maurício da Rocha, 90', numero: '90', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-100', latitude: -24.0040, longitude: -46.4020, total_no_local: 1, status: 'pendente' },
             { id: 9012, ordem_entrega: 12, ordem_carregamento: 19, parada_shopee: 11, ordem_shopee: 12, codigo_rastreio: 'SPXBR900112', destinatario: 'Marcos Vinicius', telefone: '13991234512', endereco: 'Av. Mal. Maurício da Rocha, 210', numero: '210', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-100', latitude: -24.0048, longitude: -46.4028, total_no_local: 1, status: 'pendente' },
             { id: 9013, ordem_entrega: 13, ordem_carregamento: 18, parada_shopee: 12, ordem_shopee: 13, codigo_rastreio: 'SPXBR900113', destinatario: 'Vanessa Souza', telefone: '13991234513', endereco: 'Rua Xixová, 65', numero: '65', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-110', latitude: -24.0055, longitude: -46.4035, total_no_local: 1, status: 'pendente' },
@@ -1121,8 +1053,6 @@
             { id: 9018, ordem_entrega: 18, ordem_carregamento: 13, parada_shopee: 16, ordem_shopee: 18, codigo_rastreio: 'SPXBR900118', destinatario: 'Rodrigo Antunes', telefone: '13991234518', endereco: 'Av. Castelo Branco, 1100', numero: '1100', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-130', latitude: -24.0083, longitude: -46.4065, total_no_local: 1, status: 'pendente' },
             { id: 9019, ordem_entrega: 19, ordem_carregamento: 12, parada_shopee: 17, ordem_shopee: 19, codigo_rastreio: 'SPXBR900119', destinatario: 'Débora Fonseca', telefone: '13991234519', endereco: 'Av. Castelo Branco, 1250', numero: '1250', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-130', latitude: -24.0090, longitude: -46.4072, total_no_local: 1, status: 'pendente' },
             { id: 9020, ordem_entrega: 20, ordem_carregamento: 11, parada_shopee: 18, ordem_shopee: 20, codigo_rastreio: 'SPXBR900120', destinatario: 'Gustavo Pinheiro', telefone: '13991234520', endereco: 'Rua Bahia, 95', numero: '95', bairro: 'Canto do Forte', cidade: 'Praia Grande', cep: '11700-140', latitude: -24.0098, longitude: -46.4080, total_no_local: 1, status: 'pendente' },
-
-            // SACOLA 3 (Pacotes 21 a 30) - Bairro: Guilhermina
             { id: 9021, ordem_entrega: 21, ordem_carregamento: 10, parada_shopee: 19, ordem_shopee: 21, codigo_rastreio: 'SPXBR900121', destinatario: 'Sabrina Ramos', telefone: '13991234521', endereco: 'Av. Guilhermina, 130', numero: '130', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-000', latitude: -24.0160, longitude: -46.4210, total_no_local: 1, status: 'pendente' },
             { id: 9022, ordem_entrega: 22, ordem_carregamento: 9, parada_shopee: 20, ordem_shopee: 22, codigo_rastreio: 'SPXBR900122', destinatario: 'Claudio Mendes', telefone: '13991234522', endereco: 'Av. Guilhermina, 280', numero: '280', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-000', latitude: -24.0168, longitude: -46.4218, total_no_local: 1, status: 'pendente' },
             { id: 9023, ordem_entrega: 23, ordem_carregamento: 8, parada_shopee: 21, ordem_shopee: 23, codigo_rastreio: 'SPXBR900123', destinatario: 'Priscila Dias', telefone: '13991234523', endereco: 'Rua Colômbia, 75', numero: '75', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-010', latitude: -24.0175, longitude: -46.4225, total_no_local: 1, status: 'pendente' },
@@ -1143,7 +1073,7 @@
           this.modo = 'carregamento';
           
           if ('vibrate' in navigator) navigator.vibrate(60);
-          alert('🧪 Carga de Demonstração (30 Pacotes) ativada com sucesso!\n\nVeja como os pacotes foram divididos em Sacolas de 10 em 10 pro Canetão. Depois toque na aba "Rua" para testar o cockpit e o Waze!');
+          alert('🧪 Carga de Demonstração (30 Pacotes) ativada com sucesso!');
         },
 
         async init() {
@@ -1408,7 +1338,7 @@
         },
 
         iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
-        proximoPassoTutorial() { if (this.passoTutorial < 7) this.passoTutorial++; else this.concluirTutorial(); },
+        proximoPassoTutorial() { if (this.passoTutorial < 5) this.passoTutorial++; else this.concluirTutorial(); },
         voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
         concluirTutorial() { this.tutorialAberto = false; localStorage.setItem('drivexps_tutorial_visto', 'true'); },
 
@@ -1547,35 +1477,23 @@
             return lower.includes('s/n') || lower.includes('marginal') || lower.includes('rodovia') || lower.includes(' km');
         },
 
-        async buscarEnderecoTexto(tipo) {
-          const query = tipo === 'cd' ? this.buscaEnderecoCD : this.buscaEnderecoCasa;
-          if (!query || query.trim().length < 4) { alert('Por favor, digite um endereço com nome da rua e cidade.'); return; }
-          this.buscandoGeo = tipo;
-          try {
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=br`;
-            const res = await fetch(url); const data = await res.json();
-            if (data && data.length > 0) {
-              const lat = parseFloat(data[0].lat); const lon = parseFloat(data[0].lon);
-              this[tipo].lat = lat; this[tipo].lng = lon;
-              alert(`✅ Localização de ${tipo.toUpperCase()} encontrada com sucesso!\nLat: ${lat.toFixed(5)}, Lng: ${lon.toFixed(5)}`);
-            } else { alert('Endereço não localizado pelo GPS. Tente adicionar o número, bairro e cidade.'); }
-          } catch (e) { alert('Falha na busca de endereço: ' + e.message); } 
-          finally { this.buscandoGeo = null; }
-        },
-
-        capturarLocalizacao(tipo) {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-              this[tipo].lat = pos.coords.latitude; this[tipo].lng = pos.coords.longitude;
-              alert(`GPS de ${tipo.toUpperCase()} salvo via sinal do aparelho!`);
-            }, err => alert('Erro no GPS: ' + err.message));
+        async converterTextoParaCoord(texto) {
+          if (!texto || texto.trim().length < 3) return null;
+          // Se já estiver no formato 'lat, lng'
+          const partes = texto.split(',');
+          if (partes.length === 2 && !isNaN(parseFloat(partes[0])) && !isNaN(parseFloat(partes[1]))) {
+            return { latitude: parseFloat(partes[0]), longitude: parseFloat(partes[1]) };
           }
-        },
-
-        salvarLocais() {
-          localStorage.setItem('local_cd', JSON.stringify(this.cd));
-          localStorage.setItem('local_casa', JSON.stringify(this.casa));
-          this.modalCD = false;
+          // Se for endereço por extenso, consulta no Nominatim do OpenStreetMap
+          try {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&limit=1&countrycodes=br`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data && data.length > 0) {
+              return { latitude: parseFloat(data[0].lat), longitude: parseFloat(data[0].lon) };
+            }
+          } catch (e) {}
+          return null;
         },
 
         async gerarPixAssinatura() {
@@ -1943,10 +1861,20 @@
                 localStorage.setItem('directus_user_id', this.usuarioId);
               }
             }
+
+            // Converte os textos do modal em coordenadas geográficas reais para envio ao n8n
+            let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
+            let coordChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
+
             const payload = {
-              entregas: this.pacotesExtraidos, user_id: this.usuarioId,
-              cd_lat: this.cd.lat, cd_lng: this.cd.lng, casa_lat: this.casa.lat, casa_lng: this.casa.lng
+              entregas: this.pacotesExtraidos,
+              user_id: this.usuarioId,
+              cd_lat: coordPartida ? coordPartida.latitude : (this.pacotesExtraidos[0]?.latitude || -24.1667),
+              cd_lng: coordPartida ? coordPartida.longitude : (this.pacotesExtraidos[0]?.longitude || -46.7800),
+              casa_lat: coordChegada ? coordChegada.latitude : (coordPartida ? coordPartida.latitude : -24.1739),
+              casa_lng: coordChegada ? coordChegada.longitude : (coordPartida ? coordPartida.longitude : -46.7816)
             };
+
             const res = await fetch(this.N8N_WEBHOOK_URL, {
               method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
