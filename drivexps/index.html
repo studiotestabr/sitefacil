@@ -682,6 +682,19 @@
           <span class="text-orange-400 text-xl mt-0.5">ℹ️</span>
           <p class="text-sm text-orange-200 leading-relaxed font-bold">O sistema irá organizar as ruas e corrigir mãos de direção automaticamente.</p>
         </div>
+        
+        <!-- EXIBIÇÃO REAL DOS ENDEREÇOS DE PARTIDA E CHEGADA CONFIGURADOS -->
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs">
+          <div class="flex items-center justify-between border-b border-gray-800/80 pb-1.5">
+            <span class="text-orange-400 font-bold uppercase text-[10px]">📍 Partida Real:</span>
+            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoPartidaTexto || 'CD / Coordenada Atual'"></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-emerald-400 font-bold uppercase text-[10px]">🏠 Chegada Real:</span>
+            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoChegadaTexto || 'Residência / Ponto Final'"></span>
+          </div>
+        </div>
+
         <div class="flex items-center justify-between border-b border-gray-800 pb-5">
           <div class="flex items-center gap-2.5">
             <span class="text-2xl">📦</span>
@@ -952,6 +965,8 @@
         inputTelefone: '',
         inputPartidaModal: '',
         inputChegadaModal: '',
+        resumoPartidaTexto: '',
+        resumoChegadaTexto: '',
         erroCadastroObrigatorio: '',
         planoEscolhido: 'semanal',
         carregandoPix: false,
@@ -1021,6 +1036,8 @@
         },
 
         carregarRotaExemplo() {
+          this.resumoPartidaTexto = 'CD Central (Simulação)';
+          this.resumoChegadaTexto = 'Residência (Simulação)';
           const pacotesDemo = [
             { id: 9001, ordem_entrega: 1, ordem_carregamento: 30, parada_shopee: 1, ordem_shopee: 1, codigo_rastreio: 'SPXBR900101', destinatario: 'Carlos Eduardo', telefone: '13991234501', endereco: 'Av. Costa e Silva, 250', numero: '250', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0085, longitude: -46.4110, total_no_local: 1, status: 'pendente' },
             { id: 9002, ordem_entrega: 2, ordem_carregamento: 29, parada_shopee: 2, ordem_shopee: 2, codigo_rastreio: 'SPXBR900102', destinatario: 'Mariana Santos', telefone: '13991234502', endereco: 'Av. Costa e Silva, 340', numero: '340', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0091, longitude: -46.4118, total_no_local: 1, status: 'pendente' },
@@ -1048,7 +1065,7 @@
             { id: 9024, ordem_entrega: 24, ordem_carregamento: 7, parada_shopee: 22, ordem_shopee: 24, codigo_rastreio: 'SPXBR900124', destinatario: 'Fábio Teixeira', telefone: '13991234524', endereco: 'Rua Colômbia, 190', numero: '190', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-010', latitude: -24.0182, longitude: -46.4232, total_no_local: 1, status: 'pendente' },
             { id: 9025, ordem_entrega: 25, ordem_carregamento: 6, parada_shopee: 23, ordem_shopee: 25, codigo_rastreio: 'SPXBR900125', destinatario: 'Tatiane Moreira', telefone: '13991234525', endereco: 'Rua Venezuela, 60', numero: '60', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-020', latitude: -24.0190, longitude: -46.4240, total_no_local: 1, status: 'pendente' },
             { id: 9026, ordem_entrega: 26, ordem_carregamento: 5, parada_shopee: 24, ordem_shopee: 26, codigo_rastreio: 'SPXBR900126', destinatario: 'Bruno Cavalcanti', telefone: '13991234526', endereco: 'Rua Venezuela, 170', numero: '170', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-020', latitude: -24.0198, longitude: -46.4248, total_no_local: 1, status: 'pendente' },
-            { id: 9027, ordem_entrega: 27, ordem_carregamento: 4, parada_shopee: 25, ordem_shopee: 27, codigo_rastreio: 'SPXBR900127', destinatario: 'Helena Carvalho', telefone: '13991234527', endereco: 'Av. Brasil, 820', numero: '820', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0205, longitude: -46.4255, total_no_local: 1, status: 'pendente' },
+            { id: 9027, ordem_entrega: 27, ordem_carregamento: 4, parada_shopee: 25, ordem_shopee: 27, codigo_rastreio: 'SPXBR900127',DataItem: 'Helena Carvalho', destinatario: 'Helena Carvalho', telefone: '13991234527', endereco: 'Av. Brasil, 820', numero: '820', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0205, longitude: -46.4255, total_no_local: 1, status: 'pendente' },
             { id: 9028, ordem_entrega: 28, ordem_carregamento: 3, parada_shopee: 26, ordem_shopee: 28, codigo_rastreio: 'SPXBR900128', destinatario: 'Douglas Monteiro', telefone: '13991234528', endereco: 'Av. Brasil, 950', numero: '950', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0212, longitude: -46.4262, total_no_local: 1, status: 'pendente' },
             { id: 9029, ordem_entrega: 29, ordem_carregamento: 2, parada_shopee: 27, ordem_shopee: 29, codigo_rastreio: 'SPXBR900129', destinatario: 'Natália Cunha', telefone: '13991234529', endereco: 'Rua Ipanema, 45', numero: '45', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-040', latitude: -24.0220, longitude: -46.4270, total_no_local: 1, status: 'pendente' },
             { id: 9030, ordem_entrega: 30, ordem_carregamento: 1, parada_shopee: 28, ordem_shopee: 30, codigo_rastreio: 'SPXBR900130', destinatario: 'Igor Ferreira', telefone: '13991234530', endereco: 'Rua Ipanema, 130', numero: '130', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-040', latitude: -24.0228, longitude: -46.4278, total_no_local: 1, status: 'pendente' }
@@ -1681,6 +1698,10 @@
               }
               this.pacotesExtraidos = entregasAparecidas;
               if (this.pacotesExtraidos.length > 0) {
+                 // POPULA O TEXTO REAL DOS CAMPOS PARA EXIBIÇÃO NO MODAL DE RESUMO
+                 this.resumoPartidaTexto = this.inputPartidaModal.trim() || `CD / Puxado do 1º Pacote`;
+                 this.resumoChegadaTexto = this.inputChegadaModal.trim() || `Residência / Ponto Final`;
+                 
                  this.modalImportar = false;
                  this.modalResumoImportacao = true;
               } else if (!this.msgErro) {
@@ -1859,7 +1880,7 @@
               cd_lat: coordPartida ? coordPartida.latitude : (this.pacotesExtraidos[0]?.latitude || -24.1667),
               cd_lng: coordPartida ? coordPartida.longitude : (this.pacotesExtraidos[0]?.longitude || -46.7800),
               casa_lat: coordChegada ? coordChegada.latitude : (coordPartida ? coordPartida.latitude : -24.1739),
-              casa_lng: coordChegada ? coordChegada.longitude : (coordPartida ? coordPartida.longitude : -46.7816)
+              casa_lng: coordChegada ? coordChegada.longitude : (coordPartida ? coordPasso = coordChegada.longitude : -46.7816)
             };
 
             const res = await fetch(this.N8N_WEBHOOK_URL, {
