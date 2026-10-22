@@ -477,7 +477,7 @@
         </nav>
       </header>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
+      <!-- MODO 1: CARREGAMENTO EM SACOLAS (ATUALIZADO CONFORME LAYOUT SOLICITADO) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
@@ -519,9 +519,10 @@
                 <span x-show="item.total_no_local > 1" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px]" x-text="`⚠️ ${item.total_no_local} PACOTES NA PARADA`"></span>
               </div>
 
-              <div class="space-y-0.5 pt-0.5">
+              <!-- ENDEREÇO E BAIRRO COM FONTE AMPLIADA -->
+              <div class="space-y-1 pt-0.5">
                 <h3 class="font-black text-lg sm:text-xl text-white leading-snug break-words" :class="{'line-through': item.status === 'entregue'}" x-text="item.endereco"></h3>
-                <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
+                <p class="text-base font-bold text-gray-300" x-text="`${item.bairro} - ${item.cidade}`"></p>
               </div>
 
               <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs">
@@ -533,7 +534,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT) -->
+      <!-- MODO 2: RUA (COCKPIT - ATUALIZADO CONFORME LAYOUT SOLICITADO) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
@@ -607,13 +608,14 @@
               </div>
             </div>
 
-            <div class="space-y-1 pt-1">
-              <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
-              <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
-              <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
+            <!-- ENDEREÇO E BAIRRO AMPLIADOS CONFORME SOLICITADO NA FOTO 1 -->
+            <div class="space-y-1.5 pt-1">
+              <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
+              <p class="text-lg sm:text-xl text-gray-200 font-black" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
+              <p class="text-sm text-gray-400 font-mono tracking-wider pt-0.5" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 pt-1">
+            <div class="grid grid-cols-2 gap-3 pt-2">
               <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">🚗 Iniciar Waze</a>
               <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">🗺️ Maps</a>
             </div>
@@ -1065,7 +1067,7 @@
             { id: 9024, ordem_entrega: 24, ordem_carregamento: 7, parada_shopee: 22, ordem_shopee: 24, codigo_rastreio: 'SPXBR900124', destinatario: 'Fábio Teixeira', telefone: '13991234524', endereco: 'Rua Colômbia, 190', numero: '190', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-010', latitude: -24.0182, longitude: -46.4232, total_no_local: 1, status: 'pendente' },
             { id: 9025, ordem_entrega: 25, ordem_carregamento: 6, parada_shopee: 23, ordem_shopee: 25, codigo_rastreio: 'SPXBR900125', destinatario: 'Tatiane Moreira', telefone: '13991234525', endereco: 'Rua Venezuela, 60', numero: '60', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-020', latitude: -24.0190, longitude: -46.4240, total_no_local: 1, status: 'pendente' },
             { id: 9026, ordem_entrega: 26, ordem_carregamento: 5, parada_shopee: 24, ordem_shopee: 26, codigo_rastreio: 'SPXBR900126', destinatario: 'Bruno Cavalcanti', telefone: '13991234526', endereco: 'Rua Venezuela, 170', numero: '170', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-020', latitude: -24.0198, longitude: -46.4248, total_no_local: 1, status: 'pendente' },
-            { id: 9027, ordem_entrega: 27, ordem_carregamento: 4, parada_shopee: 25, ordem_shopee: 27, codigo_rastreio: 'SPXBR900127',DataItem: 'Helena Carvalho', destinatario: 'Helena Carvalho', telefone: '13991234527', endereco: 'Av. Brasil, 820', numero: '820', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0205, longitude: -46.4255, total_no_local: 1, status: 'pendente' },
+            { id: 9027, ordem_entrega: 27, ordem_carregamento: 4, parada_shopee: 25, ordem_shopee: 27, codigo_rastreio: 'SPXBR900127', destinatario: 'Helena Carvalho', telefone: '13991234527', endereco: 'Av. Brasil, 820', numero: '820', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0205, longitude: -46.4255, total_no_local: 1, status: 'pendente' },
             { id: 9028, ordem_entrega: 28, ordem_carregamento: 3, parada_shopee: 26, ordem_shopee: 28, codigo_rastreio: 'SPXBR900128', destinatario: 'Douglas Monteiro', telefone: '13991234528', endereco: 'Av. Brasil, 950', numero: '950', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-030', latitude: -24.0212, longitude: -46.4262, total_no_local: 1, status: 'pendente' },
             { id: 9029, ordem_entrega: 29, ordem_carregamento: 2, parada_shopee: 27, ordem_shopee: 29, codigo_rastreio: 'SPXBR900129', destinatario: 'Natália Cunha', telefone: '13991234529', endereco: 'Rua Ipanema, 45', numero: '45', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-040', latitude: -24.0220, longitude: -46.4270, total_no_local: 1, status: 'pendente' },
             { id: 9030, ordem_entrega: 30, ordem_carregamento: 1, parada_shopee: 28, ordem_shopee: 30, codigo_rastreio: 'SPXBR900130', destinatario: 'Igor Ferreira', telefone: '13991234530', endereco: 'Rua Ipanema, 130', numero: '130', bairro: 'Guilhermina', cidade: 'Praia Grande', cep: '11701-040', latitude: -24.0228, longitude: -46.4278, total_no_local: 1, status: 'pendente' }
@@ -1087,6 +1089,7 @@
             if (this.tema === 'claro') {
               document.body.classList.add('theme-claro');
             } else {
+              document.body.classList.remove('theme-claro');
               document.body.classList.add('theme-escuro');
             }
 
@@ -1698,9 +1701,8 @@
               }
               this.pacotesExtraidos = entregasAparecidas;
               if (this.pacotesExtraidos.length > 0) {
-                 // POPULA O TEXTO REAL DOS CAMPOS PARA EXIBIÇÃO NO MODAL DE RESUMO
-                 this.resumoPartidaTexto = this.inputPartidaModal.trim() || `CD / Puxado do 1º Pacote`;
-                 this.resumoChegadaTexto = this.inputChegadaModal.trim() || `Residência / Ponto Final`;
+                 this.resumoPartidaTexto = (this.inputPartidaModal && this.inputPartidaModal.trim() !== '') ? this.inputPartidaModal.trim() : 'Localização do 1º Pacote (GPS)';
+                 this.resumoChegadaTexto = (this.inputChegadaModal && this.inputChegadaModal.trim() !== '') ? this.inputChegadaModal.trim() : 'Retorno ao Ponto Inicial';
                  
                  this.modalImportar = false;
                  this.modalResumoImportacao = true;
@@ -1880,7 +1882,7 @@
               cd_lat: coordPartida ? coordPartida.latitude : (this.pacotesExtraidos[0]?.latitude || -24.1667),
               cd_lng: coordPartida ? coordPartida.longitude : (this.pacotesExtraidos[0]?.longitude || -46.7800),
               casa_lat: coordChegada ? coordChegada.latitude : (coordPartida ? coordPartida.latitude : -24.1739),
-              casa_lng: coordChegada ? coordChegada.longitude : (coordPartida ? coordPasso = coordChegada.longitude : -46.7816)
+              casa_lng: coordChegada ? coordChegada.longitude : (coordPartida ? coordPartida.longitude : -46.7816)
             };
 
             const res = await fetch(this.N8N_WEBHOOK_URL, {
