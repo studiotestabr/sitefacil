@@ -477,24 +477,6 @@
         </nav>
       </header>
 
-      <!-- GPS -->
-      <section id="btnTourGPS" :class="{'ring-4 ring-amber-400 shadow-[0_0_30px_rgba(245,158,11,1)] z-[105] relative bg-gray-900 border-amber-400 scale-[1.01]': tutorialAberto && passoTutorial === 2, 'bg-gray-900/90': !(tutorialAberto && passoTutorial === 2)}" class="px-4 py-2 border-b border-gray-800 grid grid-cols-2 gap-2.5 transition-all">
-        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
-          <div class="truncate pr-1">
-            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Partida:</span>
-            <span class="text-xs font-bold text-white truncate block">🏭 CD Saída</span>
-          </div>
-          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border" :class="cd.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'" x-text="cd.lat ? 'Configurado' : 'Pendente'"></span>
-        </button>
-        <button @click="modalCD = true" class="bg-gray-800 hover:bg-gray-700 border border-gray-700/80 rounded-xl p-2 flex items-center justify-between text-left active:scale-95 transition shadow-sm">
-          <div class="truncate pr-1">
-            <span class="text-[10px] text-gray-400 font-bold block uppercase tracking-wider">Ponto Final:</span>
-            <span class="text-xs font-bold text-white truncate block">🏠 Casa Chegada</span>
-          </div>
-          <span class="text-[10px] font-black px-2 py-0.5 rounded-full border" :class="casa.lat ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-yellow-950 text-yellow-400 border-yellow-800'" x-text="casa.lat ? 'Configurada' : 'Pendente'"></span>
-        </button>
-      </section>
-
       <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
@@ -962,7 +944,6 @@
         termoBusca: '',
         modalImportar: false,
         modalResumoImportacao: false,
-        modalCD: false,
         modalAssinatura: false,
         modalTelefone: false,
         modalCadastroObrigatorio: false,
@@ -982,12 +963,7 @@
         
         nomeArquivo: '',
         msgErro: null,
-        cd: JSON.parse(localStorage.getItem('local_cd') || '{"lat":-24.1667,"lng":-46.7800}'),
-        casa: JSON.parse(localStorage.getItem('local_casa') || '{"lat":-24.1739,"lng":-46.7816}'),
-        buscaEnderecoCD: '',
-        buscaEnderecoCasa: '',
-        buscandoGeo: null,
-
+        
         pacotesExtraidos: [],
         carregandoProcesso: false,
         entregas: [],
