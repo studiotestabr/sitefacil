@@ -12,14 +12,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
 
-  <!-- ESTILOS GLOBAIS: EVITA FLASH DE MODAIS E CONTROLA MODO DIURNO DE ALTO CONTRASTE -->
   <style>
     [x-cloak] { display: none !important; }
 
-    /* MODO DIURNO (ALTO CONTRASTE CONTRA O REFLEXO DO SOL NO PARA-BRISA) */
     body.theme-claro {
-      background-color: #f1f5f9 !important; /* Slate-100 */
-      color: #0f172a !important; /* Slate-900 */
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
     }
     body.theme-claro .bg-gray-950,
     body.theme-claro .bg-gray-900,
@@ -36,21 +34,13 @@
       border-color: #cbd5e1 !important;
       color: #0f172a !important;
     }
-    body.theme-claro .text-white {
-      color: #0f172a !important;
-    }
+    body.theme-claro .text-white { color: #0f172a !important; }
     body.theme-claro .text-gray-300,
-    body.theme-claro .text-gray-400 {
-      color: #334155 !important;
-    }
-    body.theme-claro .text-gray-200 {
-      color: #1e293b !important;
-    }
+    body.theme-claro .text-gray-400 { color: #334155 !important; }
+    body.theme-claro .text-gray-200 { color: #1e293b !important; }
     body.theme-claro .border-gray-800,
     body.theme-claro .border-gray-700,
-    body.theme-claro .border-\[\#2b394a\] {
-      border-color: #cbd5e1 !important;
-    }
+    body.theme-claro .border-\[\#2b394a\] { border-color: #cbd5e1 !important; }
     body.theme-claro .bg-black,
     body.theme-claro .bg-black\/80,
     body.theme-claro .bg-black\/90,
@@ -65,20 +55,11 @@
       color: #0f172a !important;
       border-color: #94a3b8 !important;
     }
-    body.theme-claro input::placeholder {
-      color: #64748b !important;
-    }
-
-    body.theme-claro .text-orange-400 {
-      color: #c2410c !important;
-    }
+    body.theme-claro input::placeholder { color: #64748b !important; }
+    body.theme-claro .text-orange-400 { color: #c2410c !important; }
     body.theme-claro .text-yellow-400,
-    body.theme-claro .text-yellow-300 {
-      color: #b45309 !important;
-    }
-    body.theme-claro .text-yellow-200 {
-      color: #78350f !important;
-    }
+    body.theme-claro .text-yellow-300 { color: #b45309 !important; }
+    body.theme-claro .text-yellow-200 { color: #78350f !important; }
     body.theme-claro .bg-orange-500\/10,
     body.theme-claro .bg-orange-500\/15,
     body.theme-claro .bg-orange-500\/20 {
@@ -99,18 +80,11 @@
       border-color: #34d399 !important;
       color: #065f46 !important;
     }
-    body.theme-claro .text-emerald-400 {
-      color: #047857 !important;
-    }
-    body.theme-claro .text-blue-400 {
-      color: #1d4ed8 !important;
-    }
-    body.theme-claro .text-amber-400 {
-      color: #b45309 !important;
-    }
+    body.theme-claro .text-emerald-400 { color: #047857 !important; }
+    body.theme-claro .text-blue-400 { color: #1d4ed8 !important; }
+    body.theme-claro .text-amber-400 { color: #b45309 !important; }
   </style>
 
-  <!-- TAGS OPEN GRAPH -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DriveXPS">
   <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
@@ -126,12 +100,10 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
 
-  <!-- Tailwind, Alpine.js e SheetJS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- Captura do PWA -->
   <script>
     window.pwaDeferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -151,7 +123,7 @@
 </head>
 <body :class="tema === 'claro' ? 'theme-claro' : 'theme-escuro'" class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between transition-colors duration-300" x-data="entregaApp()">
 
-  <!-- 1. SPLASH SCREEN -->
+  <!-- SPLASH SCREEN -->
   <div id="splashScreen" 
        class="fixed inset-0 z-[100] bg-black flex flex-col justify-end items-center pb-12 select-none transition-all duration-500 ease-out"
        style="background-image: url('./splash.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -188,37 +160,17 @@
     }, 1500);
   </script>
 
-  <!-- 2. TELA DE LOGIN MINIMALISTA SAAS -->
+  <!-- TELA DE LOGIN -->
   <div x-show="!usuarioLogado" class="fixed inset-0 bg-gray-950 z-40 flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
     <div class="w-full"></div>
-
     <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
       <div class="flex justify-center">
         <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
       </div>
-
       <div class="space-y-1.5">
         <h2 class="text-3xl font-black text-white tracking-wide">DriveXPS</h2>
-        <p class="text-xs text-gray-400 font-medium leading-relaxed">
-          Roteirizador contínuo e organizador de carga profissional.
-        </p>
+        <p class="text-xs text-gray-400 font-medium leading-relaxed">Roteirizador contínuo e organizador de carga profissional.</p>
       </div>
-
-      <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
-        <div class="flex items-center gap-2">
-          <span class="text-orange-500">✍️</span><span>Numeração contínua para marcar no <strong>Canetão</strong></span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-orange-500">👜</span><span>Separação em sacolas numeradas de 10 em 10</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-orange-500">🚗</span><span>Varredura por rua: sem ziguezague e economia de combustível</span>
-        </div>
-        <div class="flex items-center gap-2 pt-1 border-t border-gray-800">
-          <span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis (começam na sua 1ª rota)!</span>
-        </div>
-      </div>
-
       <div class="space-y-3">
         <button @click="loginGoogle()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -229,49 +181,16 @@
           </svg>
           Continuar com o Google
         </button>
-        <button x-show="!isStandalone" @click="acionarInstalacaoManual()" class="w-full bg-gray-800 hover:bg-gray-700 text-orange-400 border border-orange-500/40 font-bold py-3 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-          <span>📲</span> Instalar Aplicativo no Celular
-        </button>
       </div>
-      <p class="text-[10px] text-gray-500 font-medium">Cadastro automático e seguro com sua conta Google.</p>
     </div>
-
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </div>
   </div>
 
-  <!-- 3. POPUP DE INSTALAÇÃO DO APP (MODAL PWA) -->
-  <div x-show="mostrarPopupInstalar" 
-       x-transition:enter="transition ease-out duration-300"
-       x-transition:enter-start="opacity-0 translate-y-10 scale-95"
-       x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-       class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
-      <div class="flex justify-center"><img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700"></div>
-      <div class="space-y-1.5">
-        <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Instale o app para ter navegação fluida em tela cheia e abrir romaneios diretamente.</p>
-      </div>
-      <div x-show="!isIOS" class="space-y-2 pt-1">
-        <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition">📲 Instalar Aplicativo Agora</button>
-        <button @click="mostrarPopupInstalar = false" class="text-xs text-gray-400 font-bold py-1">Continuar no navegador</button>
-      </div>
-      <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-gray-300">
-        <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
-        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> no Safari.</p>
-        <p>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
-        <button @click="mostrarPopupInstalar = false" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">Entendido</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. GAVETA DO MENU LATERAL (COM HISTÓRICO E SELETOR DE TEMA) -->
-  <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" 
-       x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-       x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
-    
+  <!-- MENU LATERAL -->
+  <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-l border-gray-800 w-full max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto" @click.away="menuAberto = false">
       <div class="space-y-4">
         <div class="flex items-center justify-between border-b border-gray-800 pb-4">
@@ -285,128 +204,51 @@
           <button @click="menuAberto = false" class="text-gray-400 hover:text-white text-2xl font-bold p-1 leading-none">&times;</button>
         </div>
 
-        <!-- STATUS DA ASSINATURA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2">
           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
-          <div class="space-y-1">
-            <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
-          </div>
+          <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
-        <!-- SELETOR DE TEMA VISUAL -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência do App:</span>
             <span class="text-[10px] font-bold" :class="tema === 'claro' ? 'text-amber-500' : 'text-blue-400'" x-text="tema === 'claro' ? '☀️ Modo Sol (Dia)' : '🌙 Modo Noite (Escuro)'"></span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button @click="alternarTema('escuro')" 
-                    class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95"
-                    :class="tema === 'escuro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'">
-              <span>🌙</span> Escuro / Noite
-            </button>
-            <button @click="alternarTema('claro')" 
-                    class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95"
-                    :class="tema === 'claro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'">
-              <span>☀️</span> Claro / Sol
-            </button>
-          </div>
-        </div>
-
-        <!-- DADOS DO MOTORISTA -->
-        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Dados do Motorista:</span>
-            <span class="text-[10px] text-gray-500">Para suporte via WhatsApp</span>
-          </div>
-          <div class="space-y-2">
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Nome Completo:</label>
-              <input type="text" x-model="usuarioNome" placeholder="Seu Nome Completo" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">WhatsApp (com DDD):</label>
-              <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
-            </div>
-            <button @click="salvarDadosCompletosPerfil()" :disabled="salvandoPerfil" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black py-2.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-1.5">
-              <span x-show="!salvandoPerfil">💾 Salvar Meus Dados</span><span x-show="salvandoPerfil">⏳ Salvando...</span>
-            </button>
+            <button @click="alternarTema('escuro')" class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95" :class="tema === 'escuro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700'">🌙 Escuro</button>
+            <button @click="alternarTema('claro')" class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95" :class="tema === 'claro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700'">☀️ Claro</button>
           </div>
         </div>
 
         <nav class="space-y-2">
-          <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
-            <span class="text-base">❓</span> Como Usar o App (Tutorial)
-          </button>
-          <button @click="menuAberto = false; carregarRotaExemplo();" class="w-full bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
-            <span class="text-base">🧪</span> Carregar Carga de Exemplo
-          </button>
-          <button x-show="!isStandalone" @click="menuAberto = false; acionarInstalacaoManual();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-orange-400 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
-            <span class="text-base">📲</span> Instalar Aplicativo no Celular
-          </button>
+          <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">❓ Como Usar o App (Tutorial)</button>
+          <button @click="menuAberto = false; carregarRotaExemplo();" class="w-full bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">🧪 Carregar Carga de Exemplo</button>
         </nav>
       </div>
 
       <div class="space-y-3 pt-4 border-t border-gray-800">
-        <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
-          <span>🚪</span> Sair da Conta
-        </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.9 Pro</p>
+        <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">🚪 Sair da Conta</button>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 4.0 Pro</p>
       </div>
     </div>
-  </div>
-
-  <!-- 5. BANNER DO PERÍODO DE TESTE -->
-  <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" 
-       class="border-b px-4 py-2 flex justify-between items-center text-xs"
-       :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
-    <div>
-      <template x-if="!trialIniciado">
-        <span class="text-emerald-400 font-bold flex items-center gap-1.5">
-          <span>🎁</span> <strong>7 Dias Grátis:</strong> Começam ao gerar sua 1ª rota!
-        </span>
-      </template>
-      <template x-if="trialIniciado">
-        <span class="text-amber-400 font-bold flex items-center gap-1.5">
-          <span>⏳</span> Teste Ativo: <strong x-text="`${diasRestantesTrial} dia(s) restante(s)`"></strong>
-        </span>
-      </template>
-    </div>
-    <button @click="modalAssinatura = true" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-[11px] px-3 py-1 rounded-full transition active:scale-95 shadow-md">
-      Ver Planos
-    </button>
   </div>
 
   <!-- APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     
-    <!-- MODAL DE BUSCA GLOBAL -->
-    <div x-show="buscaAberta"
-         class="absolute inset-0 bg-gray-950 z-[200] flex flex-col transition-all"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 translate-y-10"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 translate-y-10" x-cloak>
-         
+    <!-- BUSCA GLOBAL -->
+    <div x-show="buscaAberta" class="absolute inset-0 bg-gray-950 z-[200] flex flex-col transition-all" x-cloak>
          <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
             <div class="flex-1 relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
-                <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..."
-                       class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors">
+                <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..." class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500">
             </div>
-            <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
+            <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2">Cancelar</button>
          </div>
-
          <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
-             <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
-                 <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
-             </template>
              <template x-for="item in entregasFiltradas" :key="item.id">
-                 <div @click="irParaEntregaDireta(item); buscaAberta = false" 
-                      class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer active:scale-95 transition-transform shadow-lg">
+                 <div @click="irParaEntregaDireta(item); buscaAberta = false" class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer shadow-lg">
                      <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0">
                          <span class="text-[9px] font-black uppercase leading-none opacity-80">Canetão</span>
                          <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
@@ -414,248 +256,89 @@
                      <div class="flex-1 overflow-hidden">
                          <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
                          <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
-                         <div class="flex gap-2 mt-1.5">
-                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
-                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
-                         </div>
                      </div>
                  </div>
-             </template>
-             <template x-if="termoBusca.length === 0">
-                 <div class="text-center text-gray-600 mt-10 text-xs">Digite algo para buscar no romaneio atual...</div>
              </template>
          </div>
     </div>
 
-    <!-- CABEÇALHO DO APLICATIVO (COM AS 4 ABAS REEXIBIDAS: ROTA, SACOLAS, RUA, HISTÓRICO) -->
+    <!-- CABEÇALHO -->
     <div>
-      <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
-              :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)}">
-        
-        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)}">
+      <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 z-30">
+        <div class="flex justify-between items-center">
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
-          
           <div class="flex items-center gap-2">
-            <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Buscar Pacote">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </button>
-            <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Menu">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-            </button>
+            <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg></button>
+            <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
           </div>
         </div>
-
-        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)}">
-          <div class="flex items-center gap-1.5">
-            <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" 
-                  :class="rotaAtivaId === 'DEMO' ? 'text-emerald-400 border border-emerald-500/50' : 'text-orange-400'"
-                  x-text="rotaAtivaId === 'DEMO' ? '🧪 ROTA DEMO (SIMULAÇÃO)' : (rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA')"></span>
-          </div>
+        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2">
+          <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" :class="rotaAtivaId === 'DEMO' ? 'text-emerald-400' : 'text-orange-400'" x-text="rotaAtivaId === 'DEMO' ? '🧪 ROTA DEMO' : (rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA')"></span>
           <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
         </div>
 
         <nav class="grid grid-cols-4 gap-1.5 pt-0.5">
-          <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 2, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 2, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="hover:bg-orange-50 font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
-            <span class="text-sm leading-none">+</span><span class="leading-none mt-0.5">Rota</span>
-          </button>
-          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 3, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
-            <span class="text-sm leading-none">📦</span><span class="leading-none mt-0.5">Sacolas</span>
-          </button>
-          <button id="btnTourRua" @click="modo = 'rua'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'rua' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
-            <span class="text-sm leading-none">🚗</span><span class="leading-none mt-0.5">Rua</span>
-          </button>
-          <button id="btnTourHistorico" @click="abrirHistorico()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 5, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6) && passoTutorial !== 5, 'bg-black text-white shadow-inner border border-gray-700': modo === 'historico' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'historico' && !(tutorialAberto && (passoTutorial >= 2 && passoTutorial <= 6))}" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition-all">
-            <span class="text-sm leading-none">📜</span><span class="leading-none mt-0.5">Histórico</span>
-          </button>
+          <button @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition"><span class="text-sm leading-none">+</span><span class="leading-none mt-0.5">Rota</span></button>
+          <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition"><span class="text-sm leading-none">📦</span><span class="leading-none mt-0.5">Sacolas</span></button>
+          <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition"><span class="text-sm leading-none">🚗</span><span class="leading-none mt-0.5">Rua</span></button>
+          <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2 rounded-xl text-xs flex flex-col items-center justify-center active:scale-95 transition"><span class="text-sm leading-none">📜</span><span class="leading-none mt-0.5">Histórico</span></button>
         </nav>
       </header>
 
-      <!-- TELA INICIAL QUANDO NÃO HÁ ROTA CARREGADA -->
+      <!-- TELA INICIAL VAZIA -->
       <section x-show="entregas.length === 0" class="p-6 max-w-md mx-auto w-full text-center space-y-5 my-8" x-cloak>
-        <div class="w-20 h-20 bg-orange-500/20 text-orange-400 rounded-3xl flex items-center justify-center mx-auto text-4xl border border-orange-500/40 shadow-xl">
-          🚗
-        </div>
+        <div class="w-20 h-20 bg-orange-500/20 text-orange-400 rounded-3xl flex items-center justify-center mx-auto text-4xl border border-orange-500/40 shadow-xl">🚗</div>
         <div class="space-y-1.5">
           <h2 class="text-2xl font-black text-white">Nenhuma Rota Ativa</h2>
-          <p class="text-xs text-gray-400 leading-relaxed">
-            Importe a planilha oficial da Shopee ou experimente a carga simulada agora mesmo para ver o app funcionando:
-          </p>
+          <p class="text-xs text-gray-400 leading-relaxed">Importe a planilha oficial da Shopee ou experimente a carga simulada agora mesmo:</p>
         </div>
         <div class="space-y-3 pt-2">
-          <button @click="abrirModalImportar()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
-            <span>📊</span> Importar Planilha Shopee (.xlsx)
-          </button>
-          <button @click="carregarRotaExemplo()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
-            <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
-          </button>
+          <button @click="abrirModalImportar()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition">📊 Importar Planilha Shopee (.xlsx)</button>
+          <button @click="carregarRotaExemplo()" class="w-full bg-emerald-600/20 text-emerald-400 border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs active:scale-95 transition">🧪 Carregar Carga de Demonstração (30 Pacotes)</button>
         </div>
-        <p class="text-[10px] text-gray-500">A demonstração organiza 3 sacolas de 10 no canetão e simula as entregas na rua.</p>
       </section>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
+      <!-- MODO 1: SACOLAS -->
       <main x-show="modo === 'carregamento' && entregas.length > 0" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full" x-cloak>
-        <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
-          <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
-          <p class="text-gray-300 text-xs leading-relaxed">Layout universal otimizado para qualquer veículo. <em>(Toque no card para abrir no Waze).</em></p>
-        </div>
-
         <div class="space-y-3">
           <template x-for="item in entregasOrdenadasParaSacola" :key="item.id">
-            <div @click="irParaEntregaDireta(item)" 
-                 class="bg-[#121824] rounded-2xl border shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99] border-l-[6px]" 
-                 :class="{
-                   'opacity-30 bg-black border-gray-900 border-l-gray-800 grayscale': item.status === 'entregue',
-                   'border-yellow-500/70 bg-yellow-500/5 border-l-yellow-500': item.status === 'ausente',
-                   'border-gray-800 border-l-orange-500 hover:border-orange-500/60': item.status === 'pendente'
-                 }">
-              
+            <div @click="irParaEntregaDireta(item)" class="bg-[#121824] rounded-2xl border shadow-xl p-4 space-y-3 cursor-pointer border-l-[6px]" :class="item.status === 'entregue' ? 'opacity-30 bg-black grayscale' : 'border-gray-800 border-l-orange-500'">
               <div class="grid grid-cols-4 gap-2 text-center">
-                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
-                  <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
-                </div>
-                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
-                  <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.parada_shopee)"></span>
-                </div>
-                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
-                  <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.ordem_shopee)"></span>
-                </div>
-                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-                  <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
-                </div>
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1"><span class="text-[10px] text-orange-400 font-black block">CANETÃO</span><span class="text-2xl font-black text-orange-400 font-mono" x-text="`#${item.ordem_entrega}`"></span></div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1"><span class="text-[10px] text-gray-400 font-black block">PARADA</span><span class="text-2xl font-black text-white font-mono" x-text="formatarParada(item.parada_shopee)"></span></div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1"><span class="text-[10px] text-gray-400 font-black block">ORDEM</span><span class="text-2xl font-black text-white font-mono" x-text="formatarParada(item.ordem_shopee)"></span></div>
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1"><span class="text-[10px] text-orange-400 font-black block">SACOLA</span><span class="text-2xl font-black text-orange-400 font-mono" x-text="Math.ceil(item.ordem_entrega / 10)"></span></div>
               </div>
-
-              <!-- TAGS VISUAIS -->
-              <div class="flex flex-wrap gap-2 pt-1">
-                <span x-show="item.gps_suspeito" class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">❓ Verificar GPS</span>
-                <span x-show="item.total_no_local > 1" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px]" x-text="`⚠️ ${item.total_no_local} PACOTES NA PARADA`"></span>
-              </div>
-
-              <div class="space-y-0.5 pt-0.5">
-                <h3 class="font-black text-lg sm:text-xl text-white leading-snug break-words" :class="{'line-through': item.status === 'entregue'}" x-text="item.endereco"></h3>
-                <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
-              </div>
-
-              <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs">
-                <span class="text-gray-400 font-medium">Rastreio SPX:</span>
-                <span class="font-mono font-black text-xs sm:text-sm text-orange-400 bg-black/90 px-3 py-1 rounded-xl border border-gray-800 tracking-wider shadow-inner" x-text="item.codigo_rastreio || 'SPX-REGISTRADO'"></span>
-              </div>
+              <h3 class="font-black text-lg text-white" x-text="item.endereco"></h3>
+              <p class="text-sm font-semibold text-gray-400" x-text="`${item.bairro} - ${item.cidade}`"></p>
             </div>
           </template>
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT) -->
+      <!-- MODO 2: RUA -->
       <main x-show="modo === 'rua' && entregas.length > 0" class="p-4 max-w-xl mx-auto w-full relative" x-cloak>
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
-            
-            <!-- INDICADOR VISUAL DO BAIRRO ATUAL (VARREDURA CONTÍNUA) -->
-            <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300 shadow-md">
-              <div class="flex items-center gap-2 truncate pr-2">
-                <span class="text-base shrink-0">📍</span>
-                <span class="truncate">BAIRRO ATUAL: <strong class="text-white uppercase tracking-wide" x-text="entregaAtual.bairro || 'CENTRO'"></strong></span>
-              </div>
-              <span class="text-[10px] bg-orange-950 text-orange-400 border border-orange-800 px-2.5 py-1 rounded-full font-mono font-black shrink-0 whitespace-nowrap" x-text="`${entregasNoBairroRestantes} no bairro`"></span>
+            <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300">
+              <span>📍 BAIRRO: <strong class="text-white uppercase" x-text="entregaAtual.bairro || 'CENTRO'"></strong></span>
+              <span class="bg-orange-950 text-orange-400 px-2.5 py-1 rounded-full font-mono" x-text="`${entregasNoBairroRestantes} no bairro`"></span>
             </div>
-
-            <div x-show="entregaAtual.status === 'ausente'" class="bg-yellow-500/20 border-2 border-yellow-500 p-2.5 rounded-2xl text-center">
-              <span class="text-xs font-black text-yellow-300 uppercase tracking-wider">⚠️ RE-TENTATIVA DE PACOTE PULADO ANTERIORMENTE</span>
+            <h2 class="text-3xl font-black text-white" x-text="entregaAtual.endereco"></h2>
+            <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2">🚗 Waze</a>
+              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2">🗺️ Maps</a>
             </div>
-
-            <div x-show="entregaAtual.gps_suspeito" class="bg-red-500/20 border-2 border-red-500 p-2.5 rounded-2xl flex items-center gap-3">
-              <span class="text-2xl">🚨</span>
-              <p class="text-xs font-black text-red-400 leading-tight">ATENÇÃO: Pino suspeito! A Shopee pode ter jogado o pino na Marginal errada. Confira o endereço escrito.</p>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <button @click="pularEntrega(entregaAtual)" class="bg-gray-800 text-yellow-400 py-4 rounded-2xl font-bold">⚠️ Pular</button>
+              <button @click="concluirEntrega(entregaAtual)" class="bg-orange-600 text-white py-4 rounded-2xl font-black text-lg">✅ Entregue</button>
             </div>
-
-            <div class="grid grid-cols-4 gap-2 text-center">
-              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-                <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
-                <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
-              </div>
-              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
-                <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.parada_shopee)"></span>
-              </div>
-              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
-                <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.ordem_shopee)"></span>
-              </div>
-              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-                <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-                <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span>
-              </div>
-            </div>
-
-            <div class="flex justify-end text-xs pr-1">
-              <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
-            </div>
-
-            <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3 flex items-center justify-between">
-              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">CÓDIGO DE RASTREIO SPX:</span>
-              <span class="text-base sm:text-lg font-mono font-black text-orange-400 tracking-wider" x-text="entregaAtual.codigo_rastreio || 'SPX-REGISTRADO'"></span>
-            </div>
-
-            <div x-show="ehMesmaRuaQueAnterior" class="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3 flex items-center gap-2 text-emerald-400 text-xs font-black">
-              <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
-            </div>
-
-            <!-- ALERTA DE MÚLTIPLOS PACOTES -->
-            <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
-              <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
-                <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
-              </p>
-              <p class="text-xs text-gray-300 font-medium leading-none">Confira todas as caixas antes de desembarcar:</p>
-              <div class="space-y-2 pt-1">
-                <template x-for="p in pacotesMesmoLocal" :key="p.id">
-                  <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
-                    <div class="space-x-2">
-                      <span class="text-orange-400 font-black text-sm" x-text="`Canetão #${p.ordem_entrega}`"></span>
-                      <span class="text-white text-xs" x-text="`Ordem SPX ${formatarParada(p.ordem_shopee)}`"></span>
-                    </div>
-                    <span class="tracking-wider text-xs" x-text="p.codigo_rastreio"></span>
-                  </div>
-                </template>
-              </div>
-            </div>
-
-            <div class="space-y-1 pt-1">
-              <h2 class="text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
-              <p class="text-lg text-gray-300 font-bold" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
-              <p class="text-xs text-gray-400 font-mono tracking-wider" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 pt-1">
-              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">🚗 Iniciar Waze</a>
-              <a :href="`google.navigation:q=${entregaAtual.latitude},${entregaAtual.longitude}`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">🗺️ Maps</a>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
-              <button @click="pularEntrega(entregaAtual)" class="bg-gray-800 hover:bg-gray-700 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">⚠️ Ausente / Pular</button>
-              <button @click="concluirEntrega(entregaAtual)" class="bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 active:scale-95 transition">✅ Entregue</button>
-            </div>
-          </div>
-        </template>
-        <template x-if="!entregaAtual && entregas.length > 0 && naoEntregues.length === 0">
-          <div class="text-center py-24 space-y-4">
-            <span class="text-7xl block">🏁</span>
-            <h2 class="text-3xl font-black text-white" x-text="rotaAtivaId === 'DEMO' ? 'Demonstração 100% Concluída!' : `Rota #${rotaAtivaId || ''} 100% Concluída!`"></h2>
-            <p class="text-gray-400 text-sm max-w-xs mx-auto">Parabéns! Todos os pacotes da carga foram entregues com sucesso.</p>
-            <button @click="abrirModalImportar()" class="mt-4 bg-orange-600 hover:bg-orange-500 text-white font-black py-3 px-6 rounded-2xl text-xs active:scale-95 transition shadow-lg">
-              Carregar Minha Rota Real da Shopee
-            </button>
           </div>
         </template>
       </main>
 
-      <!-- MODO 3: HISTÓRICO (RESTAURADO E FUNCIONAL) -->
+      <!-- MODO 3: HISTÓRICO (RESTAURADO) -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full" x-cloak>
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
@@ -680,14 +363,14 @@
       </main>
     </div>
 
-    <!-- Assinatura StudioTesta -->
+    <!-- RODAPÉ -->
     <footer class="py-6 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </footer>
   </div>
 
-  <!-- MODAL DE IMPORTAÇÃO (COM CAMPOS GENÉRICOS DE PARTIDA E CHEGADA) -->
+  <!-- MODAL DE IMPORTAÇÃO (COM CAMPOS GENÉRICOS) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -695,13 +378,10 @@
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
 
-      <!-- CONFIGURAÇÃO DE PARTIDA E CHEGADA COM VALORES GENÉRICOS -->
       <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs">
         <div class="flex justify-between items-center">
           <span class="font-black text-orange-400 uppercase tracking-wider text-[11px]">📍 Ponto de Partida e Chegada</span>
-          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-gray-700 active:scale-95 transition">
-            📍 Usar Meu GPS Atual
-          </button>
+          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-gray-700 active:scale-95 transition">📍 Usar Meu GPS Atual</button>
         </div>
         <div class="space-y-2">
           <div>
@@ -722,16 +402,12 @@
           <span class="text-[10px] text-gray-400 block mt-1">Planilha oficial de entregas da Shopee</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
         </label>
-
         <div class="relative flex py-1 items-center">
           <div class="flex-grow border-t border-gray-800"></div>
           <span class="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-black tracking-widest">Ou teste sem planilha</span>
           <div class="flex-grow border-t border-gray-800"></div>
         </div>
-
-        <button @click="carregarRotaExemploModal()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-lg">
-          <span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)
-        </button>
+        <button @click="carregarRotaExemploModal()" class="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border-2 border-emerald-500/40 font-black py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-lg"><span>🧪</span> Carregar Carga de Demonstração (30 Pacotes)</button>
       </div>
     </div>
   </div>
@@ -748,10 +424,6 @@
         <div class="text-center space-y-1.5">
           <h2 class="text-3xl font-black text-white tracking-tight">Planilha Importada</h2>
           <p class="text-base text-gray-400 font-medium">Pronta para otimização.</p>
-        </div>
-        <div class="bg-orange-500/10 p-4 rounded-2xl border border-orange-500/30 flex items-start gap-3">
-          <span class="text-orange-400 text-xl mt-0.5">ℹ️</span>
-          <p class="text-sm text-orange-200 leading-relaxed font-bold">O sistema irá organizar as ruas e corrigir mãos de direção automaticamente.</p>
         </div>
         <div class="flex items-center justify-between border-b border-gray-800 pb-5">
           <div class="flex items-center gap-2.5">
@@ -773,9 +445,7 @@
             <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
             <span x-show="carregandoProcesso">⏳ Calculando vias...</span>
           </button>
-          <button @click="modalResumoImportacao = false; pacotesExtraidos = [];" class="w-full text-sm text-gray-500 hover:text-white font-bold py-3 transition">
-            Cancelar Importação
-          </button>
+          <button @click="modalResumoImportacao = false; pacotesExtraidos = [];" class="w-full text-sm text-gray-500 hover:text-white font-bold py-3 transition">Cancelar Importação</button>
         </div>
       </div>
     </div>
@@ -794,35 +464,30 @@
       </template>
       <template x-if="passoTutorial === 2">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">📊</div>
+          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">📊</div>
           <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
           <p class="text-sm text-gray-200 leading-relaxed">Toque no botão <strong>"+ Nova Rota"</strong>, informe sua partida/chegada (ou use o GPS) e selecione a planilha <code>.xlsx</code>.</p>
-          <div class="bg-emerald-950/60 p-3 rounded-2xl border border-emerald-500/40 text-xs text-emerald-300 font-bold text-left space-y-1">
-            <span class="block text-emerald-400 uppercase tracking-wider text-[10px]">🧪 Está de folga ou sem planilha?</span>
-            <p>Clique em <strong>"Carregar Carga de Demonstração"</strong> no mesmo modal para testar 30 pacotes na hora!</p>
-          </div>
         </div>
       </template>
       <template x-if="passoTutorial === 3">
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">✍️</div>
           <h3 class="text-2xl font-black text-white">2. Organização no Canetão</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, marque na caixa o número do <strong>#CANETÃO</strong>.</p>
-          <p class="text-xs text-gray-300">Sua carga é separada de 10 em 10 pacotes por sacola. Carregue seu carro em minutos!</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, marque na caixa o número do <strong>#CANETÃO</strong> de 10 em 10.</p>
         </div>
       </template>
       <template x-if="passoTutorial === 4">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">🚗</div>
+          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">🚗</div>
           <h3 class="text-2xl font-black text-white">3. Na Rua com Waze</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong>, acompanhe o **Bairro Atual**, veja se a próxima entrega é na mesma rua e abra o Waze ou Maps com 1 toque.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong>, acompanhe o **Bairro Atual** e abra o Waze ou Maps com 1 toque.</p>
         </div>
       </template>
       <template x-if="passoTutorial === 5">
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">📜</div>
           <h3 class="text-2xl font-black text-white">4. Histórico de Rotas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong>, você visualiza todas as rotas anteriores que já fez, pode reabri-las ou apagar rotas antigas.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong>, você visualiza todas as rotas anteriores que já fez.</p>
         </div>
       </template>
       <template x-if="passoTutorial === 6">
@@ -830,9 +495,7 @@
           <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">🏁</div>
           <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
           <p class="text-sm text-gray-200 leading-relaxed">Importe sua planilha oficial ou experimente a simulação com 30 pacotes para ver a eficiência na prática.</p>
-          <button @click="tutorialAberto = false; carregarRotaExemplo();" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
-            <span>🧪</span> Testar Carga de Demonstração Agora
-          </button>
+          <button @click="tutorialAberto = false; carregarRotaExemplo();" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs active:scale-95 transition shadow-lg flex items-center justify-center gap-2"><span>🧪</span> Testar Carga de Demonstração Agora</button>
         </div>
       </template>
       <div class="flex items-center justify-between pt-3 border-t border-gray-800">
@@ -859,32 +522,18 @@
         <p class="text-xs text-gray-300 leading-relaxed">Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong>.</p>
       </div>
       <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
-        <div @click="planoEscolhido = 'semanal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Flexível</span>
-            <span class="text-sm font-black text-white">Plano Semanal</span>
-            <span class="text-[10px] text-gray-400 block mt-0.5">Apenas R$ 0,98 / dia</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-orange-400">R$ 6,90</span>
-            <span class="text-[10px] text-gray-500 block">por semana</span>
-          </div>
+        <div @click="planoEscolhido = 'semanal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg' : 'bg-black/40 border-gray-800'">
+          <div><span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Flexível</span><span class="text-sm font-black text-white">Plano Semanal</span></div>
+          <div class="text-right"><span class="text-lg font-black text-orange-400">R$ 6,90</span><span class="text-[10px] text-gray-500 block">por semana</span></div>
         </div>
-        <div @click="planoEscolhido = 'mensal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'mensal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span>
-            <span class="text-sm font-black text-white">Plano Mensal</span>
-            <span class="text-[11px] text-emerald-400 font-bold block mt-0.5">Apenas R$ 0,66 / dia!</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-white">R$ 19,90</span>
-            <span class="text-[10px] text-gray-500 block">por mês</span>
-          </div>
+        <div @click="planoEscolhido = 'mensal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'mensal' ? 'bg-orange-500/10 border-orange-500 shadow-lg' : 'bg-black/40 border-gray-800'">
+          <div><span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span><span class="text-sm font-black text-white">Plano Mensal</span></div>
+          <div class="text-right"><span class="text-lg font-black text-white">R$ 19,90</span><span class="text-[10px] text-gray-500 block">por mês</span></div>
         </div>
       </div>
       <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
         <button @click="gerarPixAssinatura()" :disabled="carregandoPix" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
-          <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span><span x-show="carregandoPix">⏳ Gerando PIX Oficial Pushin Pay...</span>
+          <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span><span x-show="carregandoPix">⏳ Gerando PIX Oficial...</span>
         </button>
         <button @click="fecharModalAssinatura()" class="text-xs text-gray-400 hover:text-white pt-1 font-bold">Fechar</button>
       </div>
@@ -906,17 +555,11 @@
   <!-- MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
-        📋
-      </div>
-      
+      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">📋</div>
       <div class="space-y-1">
         <h3 class="text-xl font-black text-white">Complete seu Cadastro</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">
-          Dados do seu login Google carregados! Confirme seu WhatsApp para liberar as rotas:
-        </p>
+        <p class="text-xs text-gray-300 leading-relaxed">Dados do seu login Google carregados! Confirme seu WhatsApp para liberar as rotas:</p>
       </div>
-
       <div class="space-y-3 text-left">
         <div>
           <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">Nome Completo *</label>
@@ -932,13 +575,11 @@
         </div>
         <p x-show="erroCadastroObrigatorio" class="text-xs text-red-400 font-bold text-center pt-1" x-text="erroCadastroObrigatorio"></p>
       </div>
-
       <div class="pt-2">
-        <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+        <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
           <span x-show="!salvandoPerfil">✅ Concluir e Acessar o App</span>
           <span x-show="salvandoPerfil">⏳ Gravando seus dados...</span>
         </button>
-        <p class="text-[10px] text-gray-500 font-medium mt-2">Seus dados estão protegidos e não serão compartilhados.</p>
       </div>
     </div>
   </div>
@@ -1863,6 +1504,7 @@
               }
             }
 
+            // Converte os textos do modal em coordenadas geográficas reais para envio ao n8n
             let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
             let coordChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
 
