@@ -1195,35 +1195,33 @@
         },
 
         async iniciarNavegacaoNativa(entrega) {
-            if (!navigator.geolocation) {
-                alert('GPS não suportado no seu aparelho.'); return;
-            }
+            if (!navigator.geolocation) { alert('GPS não suportado.'); return; }
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
-            this.instrucaoAtual = 'Buscando sinal de GPS...';
-            this.distanciaProximaManobra = '';
+            this.instrucaoAtual = 'Carregando rota...';
             
-            this.falarTexto('Navegação iniciada.');
-
-            setTimeout(() => { this.inicializarMapaNavegacao(); }, 200);
-
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const startLat = pos.coords.latitude;
-                const startLng = pos.coords.longitude;
-                const endLat = entrega.latitude;
-                const endLng = entrega.longitude;
-
-                await this.tracarRotaOSRM(startLat, startLng, endLat, endLng);
+            // Garantir tempo para o container do mapa existir
+            setTimeout(async () => {
+                this.inicializarMapaNavegacao();
                 
-                this.watchPositionId = navigator.geolocation.watchPosition(
-                    (novaPos) => this.atualizarPosicaoCarro(novaPos, endLat, endLng),
-                    (err) => console.warn('Erro GPS (Watch):', err),
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-                );
-            }, (err) => {
-                alert('GPS falhou. Ative a localização e tente novamente.');
-                this.pararNavegacao();
-            }, { enableHighAccuracy: true });
+                // Pega a posição atual para garantir que o carro nasça no lugar certo
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const sLat = pos.coords.latitude;
+                    const sLng = pos.coords.longitude;
+                    
+                    // Desenha a rota imediatamente com a geometria do banco
+                    await this.tracarRotaOSRM(sLat, sLng, entrega.latitude, entrega.longitude);
+                    
+                    // Centraliza o mapa no carro imediatamente
+                    this.mapaNav.setView([sLat, sLng], 19);
+                    
+                    this.watchPositionId = navigator.geolocation.watchPosition(
+                        (novaPos) => this.atualizarPosicaoCarro(novaPos, entrega.latitude, entrega.longitude),
+                        (err) => console.warn('Erro GPS:', err),
+                        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                    );
+                }, () => alert('Ative o GPS para navegar.'), { enableHighAccuracy: true });
+            }, 300);
         },
 
         inicializarMapaNavegacao() {
@@ -1235,17 +1233,24 @@
         },
 
         async tracarRotaOSRM(sLat, sLng, eLat, eLng) {
-            this.instrucaoAtual = 'Carregando rota...';
-            
-            // Tenta usar a geometria que já veio do banco (se existir)
+            // Desenha a geometria que já está salva no banco
             if (this.rotaGeometria && this.rotaGeometria.length > 10) {
                 const coords = this.decodePolyline(this.rotaGeometria).map(c => [c[1], c[0]]);
                 if (this.linhaRotaNav) this.mapaNav.removeLayer(this.linhaRotaNav);
-                this.linhaRotaNav = L.polyline(coords, { color: '#3b82f6', weight: 10, opacity: 0.8 }).addTo(this.mapaNav);
+                
+                // A linha laranja característica das rotas do seu app
+                this.linhaRotaNav = L.polyline(coords, { 
+                    color: '#ea580c', 
+                    weight: 10, 
+                    opacity: 0.9,
+                    lineCap: 'round',
+                    lineJoin: 'round' 
+                }).addTo(this.mapaNav);
+                
                 this.mapaNav.fitBounds(this.linhaRotaNav.getBounds(), { padding: [50, 50] });
-                this.instrucaoAtual = 'Rota carregada do banco';
-                return;
+                this.instrucaoAtual = 'Rota carregada!';
             }
+        },
 
             // Se não tiver geometria salva, tenta o OSRM (apenas como fallback)
             try {
