@@ -65,6 +65,49 @@
       color: #0f172a !important;
       border-color: #94a3b8 !important;
     }
+    body.theme-claro input::placeholder {
+      color: #64748b !important;
+    }
+
+    body.theme-claro .text-orange-400 {
+      color: #c2410c !important;
+    }
+    body.theme-claro .text-yellow-400,
+    body.theme-claro .text-yellow-300 {
+      color: #b45309 !important;
+    }
+    body.theme-claro .text-yellow-200 {
+      color: #78350f !important;
+    }
+    body.theme-claro .bg-orange-500\/10,
+    body.theme-claro .bg-orange-500\/15,
+    body.theme-claro .bg-orange-500\/20 {
+      background-color: #ffedd5 !important;
+      border-color: #fb923c !important;
+      color: #9a3412 !important;
+    }
+    body.theme-claro .bg-yellow-500\/10,
+    body.theme-claro .bg-yellow-500\/20 {
+      background-color: #fef3c7 !important;
+      border-color: #f59e0b !important;
+      color: #92400e !important;
+    }
+    body.theme-claro .bg-emerald-500\/10,
+    body.theme-claro .bg-emerald-500\/15,
+    body.theme-claro .bg-emerald-500\/20 {
+      background-color: #d1fae5 !important;
+      border-color: #34d399 !important;
+      color: #065f46 !important;
+    }
+    body.theme-claro .text-emerald-400 {
+      color: #047857 !important;
+    }
+    body.theme-claro .text-blue-400 {
+      color: #1d4ed8 !important;
+    }
+    body.theme-claro .text-amber-400 {
+      color: #b45309 !important;
+    }
 
     /* FILTRO DE MODO NOTURNO PARA O MAPA OPENSTREETMAP (SEM API KEY E SEM AFETAR PINOS) */
     .theme-escuro #mapaContainer .leaflet-tile-pane {
@@ -90,6 +133,10 @@
   <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
   <meta property="og:description" content="Varredura contínua por rua sem ziguezague. Economize até 2h e R$ 25 de gasolina por dia com separação de carga no Canetão.">
   <meta property="og:image" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
+  <meta property="og:image:secure_url" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
   <meta property="og:url" content="https://studiotesta.com.br/drivexps/app/">
 
   <link rel="manifest" href="./manifest.json">
@@ -241,7 +288,7 @@
     </div>
   </div>
 
-  <!-- 4. GAVETA DO MENU LATERAL (HAMBÚRGUER COM PERFIL COMPLETO + SELETOR DE TEMA) -->
+  <!-- 4. GAVETA DO MENU LATERAL -->
   <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" 
        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
@@ -286,6 +333,7 @@
               <span>☀️</span> Claro / Sol
             </button>
           </div>
+          <p class="text-[9px] text-gray-400 text-center">O modo claro ativa cores de alto contraste contra o reflexo solar.</p>
         </div>
 
         <!-- DADOS DO MOTORISTA -->
@@ -355,6 +403,52 @@
   <!-- APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado" class="flex-1 flex flex-col justify-between" x-cloak>
     
+    <!-- 🔍 MODAL DE BUSCA GLOBAL (RESTAURADO PERFEITAMENTE) -->
+    <div x-show="buscaAberta"
+         class="absolute inset-0 bg-gray-950 z-[200] flex flex-col transition-all"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 translate-y-10"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-10" x-cloak>
+         
+         <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
+            <div class="flex-1 relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
+                <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..."
+                       class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors">
+            </div>
+            <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
+         </div>
+
+         <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+             <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
+                 <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
+             </template>
+             <template x-for="item in entregasFiltradas" :key="item.id">
+                 <div @click="irParaEntregaDireta(item); buscaAberta = false" 
+                      class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer active:scale-95 transition-transform shadow-lg">
+                     <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0">
+                         <span class="text-[9px] font-black uppercase leading-none opacity-80">Canetão</span>
+                         <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
+                     </div>
+                     <div class="flex-1 overflow-hidden">
+                         <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
+                         <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
+                         <div class="flex gap-2 mt-1.5">
+                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
+                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+                         </div>
+                     </div>
+                 </div>
+             </template>
+             <template x-if="termoBusca.length === 0">
+                 <div class="text-center text-gray-600 mt-10 text-xs">Digite algo para buscar no romaneio atual...</div>
+             </template>
+         </div>
+    </div>
+
     <!-- CABEÇALHO DO APLICATIVO -->
     <div>
       <header class="bg-orange-600 px-3 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
@@ -621,7 +715,7 @@
     </footer>
   </div>
 
-  <!-- MODAL DE RESUMO DE IMPORTAÇÃO -->
+  <!-- MODAL DE RESUMO DE IMPORTAÇÃO (RESTAURADO COM TODOS OS CHECKS) -->
   <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6 transform transition-all">
       <div class="pt-6 pb-2 flex justify-center">
@@ -658,6 +752,8 @@
           </div>
           <span class="text-4xl font-black text-white" x-text="pacotesExtraidos.length"></span>
         </div>
+
+        <!-- LISTA DE CONFERÊNCIA RESTAURADA NA ÍNTEGRA -->
         <div class="space-y-4 text-sm sm:text-base font-bold pl-2">
           <div class="flex items-center gap-3 text-gray-300">
             <span class="text-emerald-400 text-lg">✔</span> <span x-text="`${Math.ceil(pacotesExtraidos.length / 10)} Sacolas para organizar`"></span>
@@ -669,6 +765,7 @@
             <span class="text-lg">❓</span> <span x-text="`${pacotesExtraidos.filter(p=>p.gps_suspeito).length} GPS Suspeitos (Marginais/S-N)`"></span>
           </div>
         </div>
+
         <div class="pt-2 space-y-3">
           <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
             <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
@@ -682,197 +779,7 @@
     </div>
   </div>
 
-  <!-- TUTORIAL INTERATIVO (8 PASSOS COMPLETOS COM MAPA E CARD FINAL RESTAURADO) -->
-  <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
-      
-      <template x-if="passoTutorial === 1">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👋</div>
-          <h3 class="text-2xl font-black text-white">Bem-vindo ao DriveXPS!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Vamos te ensinar em 30 segundos como acabar com o ziguezague, economizar gasolina e terminar suas entregas muito mais rápido.</p>
-          <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-emerald-400 font-bold">🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!</div>
-        </div>
-      </template>
-
-      <template x-if="passoTutorial === 2">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div>
-          <h3 class="text-2xl font-black text-white">Partida e Chegada</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Informe onde você inicia e termina a rota no modal de importação (ou use o GPS atual do seu celular).</p>
-        </div>
-      </template>
-
-      <template x-if="passoTutorial === 3">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div>
-          <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"+ Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
-        </div>
-      </template>
-
-      <template x-if="passoTutorial === 4">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">👜</div>
-          <h3 class="text-2xl font-black text-white">2. Organização nas Sacolas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, confira os pacotes organizados de 10 em 10 e marque no canetão o número <strong>#CANETÃO</strong> nas caixas.</p>
-        </div>
-      </template>
-
-      <template x-if="passoTutorial === 5">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🚗</div>
-          <h3 class="text-2xl font-black text-white">3. Na Rua com Waze</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong>, você vê a entrega atual e abre o Waze ou Maps com 1 único toque. O celular vibra se houver mais de 1 pacote no mesmo endereço!</p>
-        </div>
-      </template>
-
-      <template x-if="passoTutorial === 6">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">🗺️</div>
-          <h3 class="text-2xl font-black text-white">4. Mapa Visual das Entregas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Mapa"</strong>, você vê a rota inteira desenhada! Pinos <strong>azuis</strong> (CD/Casa), <strong>verdes</strong> (pendentes), <strong>vermelhos</strong> (entregues) e <strong>amarelos</strong> (ausentes/pulados para entregar na volta).</p>
-        </div>
-      </template>
-
-      <template x-if="passoTutorial === 7">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">📜</div>
-          <h3 class="text-2xl font-black text-white">5. Histórico de Rotas</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong>, você visualiza todas as rotas anteriores que já fez, podendo reabri-las ou apagá-las do banco.</p>
-        </div>
-      </template>
-
-      <template x-if="passoTutorial === 8">
-        <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
-          <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Agora é com você. Importe sua primeira rota, organize suas sacolas e aproveite uma entrega rápida e sem estresse.</p>
-        </div>
-      </template>
-
-      <div class="flex items-center justify-between pt-3 border-t border-gray-800">
-        <div>
-          <button x-show="passoTutorial === 1" @click="concluirTutorial()" class="text-xs text-gray-400 hover:text-white font-bold py-2 px-2.5">Pular</button>
-          <button x-show="passoTutorial > 1" @click="voltarPassoTutorial()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-2 px-3 rounded-xl active:scale-95 transition">← Voltar</button>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <template x-for="p in 8" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
-        </div>
-        <button @click="proximoPassoTutorial()" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-4 rounded-xl active:scale-95 transition shadow-lg shadow-orange-600/30">
-          <span x-text="passoTutorial === 8 ? 'Começar!' : 'Avançar →'"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE ASSINATURA -->
-  <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
-      <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">DriveXPS Ilimitado</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong>.</p>
-      </div>
-      <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
-        <div @click="planoEscolhido = 'semanal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Flexível</span>
-            <span class="text-sm font-black text-white">Plano Semanal</span>
-            <span class="text-[10px] text-gray-400 block mt-0.5">Apenas R$ 0,98 / dia</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-orange-400">R$ 6,90</span>
-            <span class="text-[10px] text-gray-500 block">por semana</span>
-          </div>
-        </div>
-        <div @click="planoEscolhido = 'mensal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'mensal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span>
-            <span class="text-sm font-black text-white">Plano Mensal</span>
-            <span class="text-[11px] text-emerald-400 font-bold block mt-0.5">Apenas R$ 0,66 / dia!</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-white">R$ 19,90</span>
-            <span class="text-[10px] text-gray-500 block">por mês</span>
-          </div>
-        </div>
-      </div>
-      <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
-        <button @click="gerarPixAssinatura()" :disabled="carregandoPix" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
-          <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span><span x-show="carregandoPix">⏳ Gerando PIX Oficial Pushin Pay...</span>
-        </button>
-        <button @click="fecharModalAssinatura()" class="text-xs text-gray-400 hover:text-white pt-1 font-bold">Fechar</button>
-      </div>
-      <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-center bg-black/80 p-4 rounded-2xl border border-gray-800">
-        <p class="text-xs font-bold text-emerald-400">✅ PIX Gerado com Sucesso!</p>
-        <template x-if="qrCodeBase64">
-          <div class="flex justify-center py-1">
-            <img :src="qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`" alt="QR Code PIX" class="w-44 h-44 rounded-xl border-2 border-emerald-500/50 bg-white p-1">
-          </div>
-        </template>
-        <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all text-left max-h-20 overflow-y-auto" x-text="codigoPixGerado"></div>
-        <button @click="copiarCodigoPix()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-2">📋 Copiar Código PIX</button>
-        <div class="flex items-center justify-center gap-2 text-[11px] text-amber-400 animate-pulse pt-1"><span>⏳</span> Aguardando seu pagamento no banco...</div>
-        <button @click="resetarPix()" class="text-[11px] text-gray-500 hover:text-gray-400 underline block mx-auto pt-1">Voltar e escolher outro plano</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO (SOMENTE APÓS LOGIN GOOGLE E SOBRE O APP) -->
-  <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">
-        📋
-      </div>
-      
-      <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">Complete seu Cadastro</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">
-          Dados do seu login Google carregados! Confirme seu WhatsApp para liberar as rotas:
-        </p>
-      </div>
-
-      <div class="space-y-3 text-left">
-        <div>
-          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
-            Nome Completo *
-          </label>
-          <input type="text" x-model="inputNome" placeholder="Seu Nome Completo" 
-                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
-        </div>
-
-        <div>
-          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
-            WhatsApp (com DDD) *
-          </label>
-          <input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" 
-                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
-        </div>
-
-        <div>
-          <label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">
-            Seu E-mail *
-          </label>
-          <input type="email" x-model="inputEmail" placeholder="seuemail@gmail.com" 
-                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
-        </div>
-
-        <p x-show="erroCadastroObrigatorio" class="text-xs text-red-400 font-bold text-center pt-1" x-text="erroCadastroObrigatorio"></p>
-      </div>
-
-      <div class="pt-2">
-        <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" 
-                class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
-          <span x-show="!salvandoPerfil">✅ Concluir e Acessar o App</span>
-          <span x-show="salvandoPerfil">⏳ Gravando seus dados...</span>
-        </button>
-        <p class="text-[10px] text-gray-500 font-medium mt-2">Seus dados estão protegidos e não serão compartilhados.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 11. MODAL DE IMPORTAR PLANILHA (COM PARTIDA E CHEGADA REAIS) -->
+  <!-- MODAL DE IMPORTAR PLANILHA -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -1151,10 +1058,10 @@
         },
 
         carregarRotaExemplo() {
-          this.coordPartidaSalva = { latitude: -24.0085, longitude: -46.4110 };
+          this.coordPartidaSalva = { latitude: -24.0040, longitude: -46.4020 };
           this.coordChegadaSalva = { latitude: -24.0228, longitude: -46.4278 };
           this.resumoPartidaTexto = 'CD Central (Simulação)';
-          this.resumoChegadaTexto = 'Casa (Simulação)';
+          this.resumoChegadaTexto = 'Residência (Simulação)';
 
           const pacotesDemo = [
             { id: 9001, ordem_entrega: 1, ordem_carregamento: 30, parada_shopee: 1, ordem_shopee: 1, codigo_rastreio: 'SPXBR900101', destinatario: 'Carlos Eduardo', telefone: '13991234501', endereco: 'Av. Costa e Silva, 250', numero: '250', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0085, longitude: -46.4110, total_no_local: 1, status: 'pendente' },
