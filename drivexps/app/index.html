@@ -1252,23 +1252,6 @@
             }
         },
 
-            // Se não tiver geometria salva, tenta o OSRM (apenas como fallback)
-            try {
-                const url = `http://192.168.1.199:5000/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
-                const res = await fetch(url);
-                const data = await res.json();
-                if (data.routes && data.routes.length > 0) {
-                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-                    if (this.linhaRotaNav) this.mapaNav.removeLayer(this.linhaRotaNav);
-                    this.linhaRotaNav = L.polyline(coords, { color: '#3b82f6', weight: 10, opacity: 0.8 }).addTo(this.mapaNav);
-                    this.passosRota = data.routes[0].legs[0].steps;
-                    this.mapaNav.fitBounds(this.linhaRotaNav.getBounds(), { padding: [50, 50] });
-                }
-            } catch (e) {
-                this.instrucaoAtual = 'Rota local pronta.';
-            }
-        },
-
         atualizarPosicaoCarro(pos, destLat, destLng) {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
