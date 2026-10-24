@@ -117,7 +117,6 @@
     .theme-claro #mapaNavegacao .leaflet-tile-pane { filter: contrast(1.1) brightness(1.1); }
     .theme-escuro #mapaNavegacao .leaflet-tile-pane { filter: brightness(0.5) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3); }
 
-
     /* CUSTOMIZAÇÃO DE BALÕES DO LEAFLET (POPUP) NO TEMA ESCURO */
     .leaflet-popup-content-wrapper {
       background-color: #0f172a !important;
@@ -766,7 +765,13 @@
                <span class="text-4xl font-black block text-blue-400 font-mono tracking-tight" x-text="distanciaProximaManobra || 'GPS...'"></span>
                <span class="text-xl font-bold leading-tight mt-1 block" x-text="instrucaoAtual"></span>
             </div>
-            <button @click="pararNavegacao()" class="bg-red-500/20 text-red-400 px-4 py-3 rounded-xl font-black active:scale-95 border border-red-500/40 text-lg shrink-0">✕ Sair</button>
+            <div class="flex flex-col gap-2 shrink-0">
+               <button @click="pararNavegacao()" class="bg-red-500/20 text-red-400 px-4 py-3 rounded-xl font-black active:scale-95 border border-red-500/40 text-lg">✕ Sair</button>
+               <button @click="alternarVoz()" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl font-bold active:scale-95 border border-gray-700 text-sm flex items-center justify-center gap-2">
+                  <span x-show="vozHabilitada">🔊 Voz On</span>
+                  <span x-show="!vozHabilitada">🔈 Voz Off</span>
+               </button>
+            </div>
          </div>
       </div>
       
@@ -1000,7 +1005,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (MAIS DE 2100 LINHAS SEM CORTES) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO -->
   <script>
     function entregaApp() {
       return {
@@ -1018,6 +1023,8 @@
         passosRota: [],
         passoAtualIndex: 0,
         headingAtual: 0,
+        vozHabilitada: true,
+        ultimaInstrucaoFalada: '',
         // ====================================
         
         menuAberto: false,
@@ -1212,7 +1219,29 @@
           }
         },
 
-        // ==== NOVAS FUNÇÕES DE NAVEGAÇÃO NATIVA ====
+        // ==== FUNÇÕES DE NAVEGAÇÃO NATIVA (VOZ E FIORINO LARANJA) ====
+        
+        falarTexto(texto) {
+            if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
+            const synth = window.speechSynthesis;
+            if (synth.speaking) synth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(texto);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.0; 
+            utterance.pitch = 1.0;
+            synth.speak(utterance);
+        },
+
+        alternarVoz() {
+            this.vozHabilitada = !this.vozHabilitada;
+            if (this.vozHabilitada) {
+                this.falarTexto('Avisos de voz ativados.');
+            } else {
+                window.speechSynthesis.cancel();
+            }
+        },
+
         async iniciarNavegacaoNativa(entrega) {
             if (!navigator.geolocation) {
                 alert('GPS não suportado no seu aparelho.'); return;
@@ -1222,6 +1251,9 @@
             this.instrucaoAtual = 'Buscando sinal de GPS...';
             this.distanciaProximaManobra = '';
             
+            // Inicia o motor de voz (precisa ser chamado no click do usuário)
+            this.falarTexto('Navegação DriveX P S iniciada.');
+
             setTimeout(() => { this.inicializarMapaNavegacao(); }, 200);
 
             navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -1253,7 +1285,7 @@
 
         async tracarRotaOSRM(sLat, sLng, eLat, eLng) {
             try {
-                const url = `http://192.168.1.199:5000/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full`;
+                const url = `http://192.168.1.199:5000/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
                 const res = await fetch(url);
                 const data = await res.json();
 
@@ -1271,8 +1303,8 @@
                     this.mapaNav.fitBounds(this.linhaRotaNav.getBounds(), { padding: [40, 40] });
                 }
             } catch (error) {
-                console.error('Erro de OSRM (Servidor Offline?):', error);
-                this.instrucaoAtual = 'Siga em direção ao destino (Modo Bússola)';
+                console.error('Erro de OSRM:', error);
+                this.instrucaoAtual = 'Siga em direção ao destino';
             }
         },
 
@@ -1283,17 +1315,34 @@
             const heading = pos.coords.heading !== null ? pos.coords.heading : this.headingAtual;
             this.headingAtual = heading;
 
-            const iconHtml = `<div style="transform: rotate(${heading}deg); transition: transform 0.4s ease-out; font-size: 38px; text-shadow: 0 4px 10px rgba(0,0,0,0.6); display: flex; align-items:center; justify-content:center;">🚙</div>`;
+            // Desenho nativo SVG da Fiorino Laranja da Shopee vista de cima
+            const svgCarro = `
+            <svg width="40" height="70" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));">
+              <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
+              <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
+              <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
+              <rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/>
+              <rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/>
+              <rect x="10" y="60" width="20" height="3" fill="#333"/>
+              <path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#222"/>
+              <rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/>
+              <rect x="6" y="2" width="6" height="3" rx="1" fill="#fde047"/>
+              <rect x="28" y="2" width="6" height="3" rx="1" fill="#fde047"/>
+              <rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+              <rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+            </svg>`;
+
+            const iconHtml = `<div style="transform: rotate(${heading}deg); transition: transform 0.4s linear; display: flex; align-items:center; justify-content:center; width: 40px; height: 70px;">${svgCarro}</div>`;
 
             if (!this.marcadorCarro) {
-                const icone = L.divIcon({ className: 'custom-gps-car', html: iconHtml, iconSize: [46, 46], iconAnchor: [23, 23] });
+                const icone = L.divIcon({ className: 'custom-gps-car', html: iconHtml, iconSize: [40, 70], iconAnchor: [20, 35] });
                 this.marcadorCarro = L.marker([lat, lng], { icon: icone }).addTo(this.mapaNav);
                 
                 const iconDest = L.divIcon({ className: 'dest-gps', html: '<div style="font-size:38px;">🏁</div>', iconSize: [38,38], iconAnchor: [19,38] });
                 L.marker([destLat, destLng], { icon: iconDest }).addTo(this.mapaNav);
             } else {
                 this.marcadorCarro.setLatLng([lat, lng]);
-                this.marcadorCarro.setIcon(L.divIcon({ className: 'custom-gps-car', html: iconHtml, iconSize: [46, 46], iconAnchor: [23, 23] }));
+                this.marcadorCarro.setIcon(L.divIcon({ className: 'custom-gps-car', html: iconHtml, iconSize: [40, 70], iconAnchor: [20, 35] }));
             }
 
             if (speed > 5) {
@@ -1321,7 +1370,15 @@
         atualizarInstrucaoUI() {
             if (this.passosRota.length === 0 || this.passoAtualIndex >= this.passosRota.length) return;
             const step = this.passosRota[this.passoAtualIndex];
-            this.instrucaoAtual = this.traduzirInstrucao(step);
+            const novaInstrucao = this.traduzirInstrucao(step);
+
+            if (this.instrucaoAtual !== novaInstrucao) {
+                this.instrucaoAtual = novaInstrucao;
+                if (this.ultimaInstrucaoFalada !== novaInstrucao) {
+                    this.falarTexto(novaInstrucao);
+                    this.ultimaInstrucaoFalada = novaInstrucao;
+                }
+            }
         },
 
         traduzirInstrucao(step) {
@@ -1361,6 +1418,7 @@
                 navigator.geolocation.clearWatch(this.watchPositionId);
                 this.watchPositionId = null;
             }
+            window.speechSynthesis.cancel();
             this.modo = 'rua'; 
         },
 
