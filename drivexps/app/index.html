@@ -522,7 +522,6 @@
         <!-- 5 ABAS DE NAVEGAÇÃO (+ ROTA COM SETA VERDE DE UPLOAD, SACOLAS, RUA, MAPA, HISTÓRICO) -->
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 7) && passoTutorial !== 3, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 7))}" class="hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
-            <!-- SETA VERDE PARA CIMA INDICANDO UPLOAD DA PLANILHA -->
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
             <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
@@ -603,7 +602,6 @@
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
             
-            <!-- INDICADOR VISUAL DO BAIRRO ATUAL (VARREDURA CONTÍNUA) -->
             <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300 shadow-md">
               <div class="flex items-center gap-2 truncate pr-2">
                 <span class="text-base shrink-0">📍</span>
@@ -699,23 +697,23 @@
         </template>
       </main>
 
-      <!-- MODO 4: MAPA VISUAL COM LEAFLET (LIVRE DE API KEY) -->
-      <main x-show="modo === 'mapa'" class="p-3 sm:p-4 max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-3">
-        <!-- LEGENDA DOS PINOS -->
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div class="flex items-center gap-4 flex-wrap">
-            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-blue-500 border border-white inline-block"></span> <strong>CD / Casa</strong></span>
-            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-white inline-block"></span> <strong>Pendente</strong></span>
-            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-red-500 border border-white inline-block"></span> <strong>Entregue</strong></span>
-            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-yellow-400 border border-white inline-block"></span> <strong>Ausente/Pulado</strong></span>
+      <!-- MODO 4: MAPA VISUAL COM LEAFLET (ALTURA REDUZIDA E LEGENDA EM LINHA ÚNICA) -->
+      <main x-show="modo === 'mapa'" class="p-2 sm:p-4 max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-2">
+        <!-- LEGENDA DOS PINOS ALINHADA EM UMA ÚNICA LINHA -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs">
+          <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 border border-white shrink-0"></span> <strong class="text-slate-200">CD/Casa</strong></span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shrink-0"></span> <strong class="text-slate-200">Pendente</strong></span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 border border-white shrink-0"></span> <strong class="text-slate-200">Entregue</strong></span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-white shrink-0"></span> <strong class="text-slate-200">Ausente</strong></span>
           </div>
-          <button @click="centralizarMapaNaCarga()" class="bg-gray-800 hover:bg-gray-700 text-orange-400 border border-gray-700 px-3 py-1 rounded-xl text-xs font-bold active:scale-95 transition">
-            🎯 Ver Rota Inteira
+          <button @click="centralizarMapaNaCarga()" class="bg-gray-800 hover:bg-gray-700 text-orange-400 border border-gray-700 px-2 py-0.5 rounded-lg text-[10px] font-black shrink-0 active:scale-95 transition whitespace-nowrap">
+            🎯 Rota
           </button>
         </div>
 
-        <!-- CONTAINER DO MAPA LEAFLET -->
-        <div class="w-full h-[68vh] rounded-3xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
+        <!-- CONTAINER DO MAPA LEAFLET COM ALTURA AJUSTADA PARA CELULAR -->
+        <div class="w-full h-[54vh] sm:h-[62vh] rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
           <div id="mapaContainer" class="w-full h-full z-10"></div>
         </div>
       </main>
@@ -752,7 +750,7 @@
     </footer>
   </div>
 
-  <!-- MODAL DE RESUMO DE IMPORTAÇÃO (COM TODOS OS CHECKS E DETALHES DE PARTIDA/CHEGADA) -->
+  <!-- MODAL DE RESUMO DE IMPORTAÇÃO -->
   <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6 transform transition-all">
       <div class="pt-6 pb-2 flex justify-center">
@@ -848,7 +846,6 @@
         <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
           <span class="text-3xl block mb-1.5">📊</span>
           <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
-          <span class="text-[10px] text-gray-400 block mt-1">Planilha oficial de entregas da Shopee</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
         </label>
         <div class="relative flex py-1 items-center">
@@ -874,7 +871,6 @@
         modalImportar: false,
         modalResumoImportacao: false,
         modalAssinatura: false,
-        modalTelefone: false,
         modalCadastroObrigatorio: false,
         inputNome: '',
         inputEmail: '',
