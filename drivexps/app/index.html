@@ -110,12 +110,11 @@
     }
 
     /* FILTRO DE MODO NOTURNO PARA O MAPA OPENSTREETMAP */
-    .theme-escuro #mapaContainer .leaflet-tile-pane {
+    .theme-escuro #mapaContainer .leaflet-tile-pane,
+    .theme-escuro #mapaNavegacao .leaflet-tile-pane {
       filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.85);
     }
-    /* FILTRO DE MODO NOTURNO E DIURNO PARA O MAPA DE NAVEGACAO NATIVA */
-    .theme-claro #mapaNavegacao .leaflet-tile-pane { filter: contrast(1.1) brightness(1.1); }
-    .theme-escuro #mapaNavegacao .leaflet-tile-pane { filter: brightness(0.5) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3); }
+    .theme-claro #mapaNavegacao .leaflet-tile-pane { filter: none; }
 
     /* CUSTOMIZAÇÃO DE BALÕES DO LEAFLET (POPUP) NO TEMA ESCURO */
     .leaflet-popup-content-wrapper {
@@ -494,7 +493,7 @@
     </div>
 
     <!-- CABEÇALHO DO APLICATIVO -->
-    <div>
+    <div x-show="modo !== 'navegacao'">
       <header class="bg-orange-600 px-3 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
               :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8)}">
         
@@ -755,42 +754,31 @@
 
     </div> <!-- Fechamento da div que esconde o painel principal quando no modo navegacao -->
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA EM TELA CHEIA -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE / UBER (TELA 100% LIMPA) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col" x-cloak>
       
-      <!-- Barra Superior de Instruções GPS -->
-      <div class="bg-[#0f172a] text-white p-4 shadow-xl z-20 flex flex-col justify-between border-b-4 border-blue-600">
-         <div class="flex items-start justify-between gap-4">
-            <div class="flex-1">
-               <span class="text-4xl font-black block text-blue-400 font-mono tracking-tight" x-text="distanciaProximaManobra || 'GPS...'"></span>
-               <span class="text-xl font-bold leading-tight mt-1 block" x-text="instrucaoAtual"></span>
+      <!-- Caixa de Instrução Superior (Estilo Uber/Waze) -->
+      <div class="bg-[#121824]/95 backdrop-blur-md text-white p-4 shadow-2xl z-20 flex items-center justify-between border-b-2 border-blue-600/80">
+         <div class="flex items-center gap-3.5 flex-1 pr-2">
+            <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg shrink-0 font-black text-white">
+               ➔
             </div>
-            <div class="flex flex-col gap-2 shrink-0">
-               <button @click="pararNavegacao()" class="bg-red-500/20 text-red-400 px-4 py-3 rounded-xl font-black active:scale-95 border border-red-500/40 text-lg">✕ Sair</button>
-               <button @click="alternarVoz()" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl font-bold active:scale-95 border border-gray-700 text-sm flex items-center justify-center gap-2">
-                  <span x-show="vozHabilitada">🔊 Voz On</span>
-                  <span x-show="!vozHabilitada">🔈 Voz Off</span>
-               </button>
+            <div class="flex-1 overflow-hidden">
+               <span class="text-2xl font-black text-blue-400 font-mono block leading-none" x-text="distanciaProximaManobra || 'Calculando...'"></span>
+               <h3 class="text-base font-black text-white truncate mt-1 leading-snug" x-text="instrucaoAtual"></h3>
             </div>
+         </div>
+         <div class="flex flex-col gap-2 shrink-0">
+            <button @click="pararNavegacao()" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-xl font-black text-xs border border-red-500/40 active:scale-95">✕ Sair</button>
+            <button @click="alternarVoz()" class="bg-gray-800 text-gray-200 px-3 py-1.5 rounded-xl font-bold text-xs border border-gray-700 active:scale-95" x-text="vozHabilitada ? '🔊 Voz On' : '🔈 Voz Off'"></button>
          </div>
       </div>
       
-      <!-- Mapa de Navegação (Rastreio) -->
+      <!-- Mapa de Navegação em Tela Cheia -->
       <div class="flex-1 relative bg-gray-900">
          <div id="mapaNavegacao" class="w-full h-full z-10"></div>
-         <!-- Botão Recentralizar Carro -->
+         <!-- Botão Centralizar Carro -->
          <button @click="centralizarCarro()" class="absolute bottom-6 right-4 z-[400] bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl border-2 border-white/20 active:scale-95 transition">🎯</button>
-      </div>
-
-      <!-- Barra Inferior de Chegada -->
-      <div class="bg-gray-900 border-t-2 border-gray-800 p-5 shadow-[0_-10px_20px_rgba(0,0,0,0.5)] z-20 pb-8">
-         <div class="flex justify-between items-center gap-3">
-            <div class="flex-1 overflow-hidden">
-               <h2 class="text-lg font-black text-white truncate" x-text="entregaNavegacao?.endereco"></h2>
-               <p class="text-sm text-gray-400 font-bold" x-text="`Parada ${formatarParada(entregaNavegacao?.parada_shopee)} • Canetão #${entregaNavegacao?.ordem_entrega}`"></p>
-            </div>
-            <button @click="concluirEntrega(entregaNavegacao); pararNavegacao();" class="bg-orange-600 hover:bg-orange-500 text-white py-3.5 px-6 rounded-2xl font-black text-lg shadow-xl shadow-orange-600/40 shrink-0 active:scale-95">✅ Entregue</button>
-         </div>
       </div>
     </main>
 
@@ -878,7 +866,7 @@
         <div class="space-y-3.5"><div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">👜</div><h3 class="text-2xl font-black text-white">2. Organização nas Sacolas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, confira os pacotes organizados de 10 em 10 e marque no canetão o número <strong>#CANETÃO</strong> nas caixas.</p></div>
       </template>
       <template x-if="passoTutorial === 5">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🚗</div><h3 class="text-2xl font-black text-white">3. Na Rua</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong>, você vê a entrega atual e abre a <strong>Navegação Nativa</strong> com 1 único toque. O celular vibra se houver mais de 1 pacote no mesmo endereço!</p></div>
+        <div class="space-y-3.5"><div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🚗</div><h3 class="text-2xl font-black text-white">3. Na Rua</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong>, você vê a entrega atual e abre a <strong>Navegação Nativa com Voz e Carro 3D</strong> com 1 único toque. O celular vibra se houver mais de 1 pacote no mesmo endereço!</p></div>
       </template>
       <template x-if="passoTutorial === 6">
         <div class="space-y-3.5"><div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">🗺️</div><h3 class="text-2xl font-black text-white">4. Mapa Visual das Entregas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Mapa"</strong>, você vê a rota inteira desenhada! Pinos <strong>azuis</strong> (CD/Casa), <strong>verdes</strong> (pendentes), <strong>vermelhos</strong> (entregues) e <strong>amarelos</strong> (ausentes/pulados para entregar na volta).</p></div>
@@ -1005,7 +993,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM NAVEGAÇÃO NATIVA UBER/WAZE + VOZ + FIORINO SVG) -->
   <script>
     function entregaApp() {
       return {
@@ -1026,7 +1014,7 @@
         vozHabilitada: true,
         ultimaInstrucaoFalada: '',
         // ====================================
-        
+
         menuAberto: false,
         buscaAberta: false,
         termoBusca: '',
@@ -1219,27 +1207,21 @@
           }
         },
 
-        // ==== FUNÇÕES DE NAVEGAÇÃO NATIVA (VOZ E FIORINO LARANJA) ====
-        
+        // ==== NOVAS FUNÇÕES DE NAVEGAÇÃO NATIVA (VOZ + FIORINI SVG + GATILHO DE CHEGADA) ====
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
             const synth = window.speechSynthesis;
             if (synth.speaking) synth.cancel();
-            
             const utterance = new SpeechSynthesisUtterance(texto);
             utterance.lang = 'pt-BR';
-            utterance.rate = 1.0; 
+            utterance.rate = 1.0;
             utterance.pitch = 1.0;
             synth.speak(utterance);
         },
 
         alternarVoz() {
             this.vozHabilitada = !this.vozHabilitada;
-            if (this.vozHabilitada) {
-                this.falarTexto('Avisos de voz ativados.');
-            } else {
-                window.speechSynthesis.cancel();
-            }
+            this.falarTexto(this.vozHabilitada ? 'Avisos de voz ativados.' : 'Avisos de voz desativados.');
         },
 
         async iniciarNavegacaoNativa(entrega) {
@@ -1251,8 +1233,7 @@
             this.instrucaoAtual = 'Buscando sinal de GPS...';
             this.distanciaProximaManobra = '';
             
-            // Inicia o motor de voz (precisa ser chamado no click do usuário)
-            this.falarTexto('Navegação DriveX P S iniciada.');
+            this.falarTexto('Navegação iniciada.');
 
             setTimeout(() => { this.inicializarMapaNavegacao(); }, 200);
 
@@ -1278,7 +1259,8 @@
         inicializarMapaNavegacao() {
             if (!this.mapaNav) {
                 this.mapaNav = L.map('mapaNavegacao', { zoomControl: false, attributionControl: false }).setView([-24.1667, -46.7800], 18);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 20 }).addTo(this.mapaNav);
+                // Usando OpenStreetMap livre igual à aba Mapa para sumir o erro de API Key
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 20 }).addTo(this.mapaNav);
             }
             this.mapaNav.invalidateSize();
         },
@@ -1315,23 +1297,17 @@
             const heading = pos.coords.heading !== null ? pos.coords.heading : this.headingAtual;
             this.headingAtual = heading;
 
-            // Desenho nativo SVG da Fiorino Laranja da Shopee vista de cima
-            const svgCarro = `
-            <svg width="40" height="70" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));">
-              <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
-              <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
-              <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
-              <rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/>
-              <rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/>
-              <rect x="10" y="60" width="20" height="3" fill="#333"/>
-              <path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#222"/>
-              <rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/>
-              <rect x="6" y="2" width="6" height="3" rx="1" fill="#fde047"/>
-              <rect x="28" y="2" width="6" height="3" rx="1" fill="#fde047"/>
-              <rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
-              <rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
-            </svg>`;
+            // GATILHO AUTOMÁTICO DE PROXIMIDADE (CHEGADA A < 15 METROS DO DESTINO)
+            const distanciaDestino = this.calcularDistancia(lat, lng, destLat, destLng);
+            if (distanciaDestino < 15) {
+                this.falarTexto('Você chegou ao destino.');
+                this.concluirEntregaAutomatico(this.entregaNavegacao);
+                this.pararNavegacao();
+                return;
+            }
 
+            // Desenho vetorizado SVG da Fiorino Laranja Shopee vista de cima
+            const svgCarro = `<svg width="40" height="70" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));"><rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/><rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/><rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/><rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/><rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/><rect x="10" y="60" width="20" height="3" fill="#333"/><path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#222"/><rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/><rect x="6" y="2" width="6" height="3" rx="1" fill="#fde047"/><rect x="28" y="2" width="6" height="3" rx="1" fill="#fde047"/><rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/><rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/></svg>`;
             const iconHtml = `<div style="transform: rotate(${heading}deg); transition: transform 0.4s linear; display: flex; align-items:center; justify-content:center; width: 40px; height: 70px;">${svgCarro}</div>`;
 
             if (!this.marcadorCarro) {
@@ -1371,7 +1347,6 @@
             if (this.passosRota.length === 0 || this.passoAtualIndex >= this.passosRota.length) return;
             const step = this.passosRota[this.passoAtualIndex];
             const novaInstrucao = this.traduzirInstrucao(step);
-
             if (this.instrucaoAtual !== novaInstrucao) {
                 this.instrucaoAtual = novaInstrucao;
                 if (this.ultimaInstrucaoFalada !== novaInstrucao) {
@@ -1427,7 +1402,15 @@
                 this.mapaNav.setView(this.marcadorCarro.getLatLng(), 19, { animate: true });
             }
         },
-        // ===========================================
+
+        concluirEntregaAutomatico(entrega) {
+            if (entrega) {
+                entrega.status = 'entregue';
+                this.salvarCacheLocal();
+            }
+            this.modo = 'rua';
+        },
+        // =======================================================
 
         carregarRotaExemplo() {
           this.coordPartidaSalva = { latitude: -24.0085, longitude: -46.4110 };
@@ -2262,7 +2245,6 @@
           if (idx !== -1) {
             this.entregas[idx].status = novoStatus;
             this.salvarCacheLocal();
-            // Atualiza os pinos no mapa instantaneamente se o mapa estiver ativo!
             if (this.modo === 'mapa') {
               this.desenharPinosERotaNoMapa();
             }
@@ -2289,7 +2271,6 @@
               }
             }
 
-            // Converte os textos do modal em coordenadas geográficas reais para envio ao n8n
             let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
             let coordChegada = null;
             const pStr = this.inputPartidaModal.trim();
@@ -2298,7 +2279,7 @@
             if (pStr) coordPartida = await this.converterTextoParaCoord(pStr);
             if (cStr) {
               if (cStr.toLowerCase() === pStr.toLowerCase()) {
-                coordChegada = coordPartida; // MESMO ENDEREÇO = MESMA COORDENADA EXATA
+                coordChegada = coordPartida;
               } else {
                 coordChegada = await this.converterTextoParaCoord(cStr);
               }
