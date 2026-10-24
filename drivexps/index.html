@@ -108,15 +108,27 @@
     body.theme-claro .text-amber-400 {
       color: #b45309 !important;
     }
+
+    /* CUSTOMIZAÇÃO DE BALÕES DO LEAFLET (POPUP) NO TEMA ESCURO */
+    .leaflet-popup-content-wrapper {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      border-radius: 1rem !important;
+      border: 1px solid #334155 !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+    }
+    .leaflet-popup-tip {
+      background-color: #0f172a !important;
+    }
   </style>
 
-  <!-- TAGS OPEN GRAPH (PREVIEW OFICIAL WHATSAPP E REDES SOCIAIS) -->
+  <!-- TAGS OPEN GRAPH -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DriveXPS">
   <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
   <meta property="og:description" content="Varredura contínua por rua sem ziguezague. Economize até 2h e R$ 25 de gasolina por dia com separação de carga no Canetão.">
-  <meta property="og:image" content="https://studiotesta.com.br/drivexps/icon-512.png">
-  <meta property="og:image:secure_url" content="https://studiotesta.com.br/drivexps/icon-512.png">
+  <meta property="og:image" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
+  <meta property="og:image:secure_url" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
@@ -125,6 +137,10 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Leaflet CSS & JS para o Mapa Ultra Veloz -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Tailwind, Alpine.js e SheetJS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -249,7 +265,7 @@
        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
        class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
-      <div class="flex justify-center"><img src="./icon/-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700"></div>
+      <div class="flex justify-center"><img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700"></div>
       <div class="space-y-1.5">
         <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
         <p class="text-xs text-gray-300 leading-relaxed">Instale o app para ter navegação fluida em tela cheia e abrir romaneios diretamente.</p>
@@ -353,7 +369,7 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.7 Pro</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.8 Pro</p>
       </div>
     </div>
   </div>
@@ -430,10 +446,9 @@
 
     <!-- CABEÇALHO DO APLICATIVO -->
     <div>
-      <header class="bg-orange-600 px-4 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
-              :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
+      <header class="bg-orange-600 px-3 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30">
         
-        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
+        <div class="flex justify-between items-center">
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
           
           <div class="flex items-center gap-2">
@@ -452,7 +467,7 @@
           </div>
         </div>
 
-        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)}">
+        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2">
           <div class="flex items-center gap-1.5">
             <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" 
                   :class="rotaAtivaId === 'DEMO' ? 'text-emerald-400 border border-emerald-500/50' : 'text-orange-400'"
@@ -461,19 +476,22 @@
           <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
         </div>
 
-        <!-- ABAS DE NAVEGAÇÃO COM ÍCONES À ESQUERDA E TEXTO AMPLIADO -->
-        <nav class="grid grid-cols-4 gap-1.5 pt-1">
-          <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 3, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all">
-            <span class="text-base leading-none">🗺️</span><span class="text-xs font-black tracking-wide">+ Rota</span>
+        <!-- 5 ABAS DE NAVEGAÇÃO (+ ROTA, SACOLAS, RUA, MAPA, HISTÓRICO) -->
+        <nav class="grid grid-cols-5 gap-1 pt-1">
+          <button id="btnTourRota" @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+            <span class="text-sm">➕</span><span class="text-[11px] font-black tracking-wide">Rota</span>
           </button>
-          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all">
-            <span class="text-base leading-none">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
+          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+            <span class="text-sm">👜</span><span class="text-[11px] font-black tracking-wide">Sacolas</span>
           </button>
-          <button id="btnTourRua" @click="modo = 'rua'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 5, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 5, 'bg-black text-white shadow-inner border border-gray-700': modo === 'rua' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'rua' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all">
-            <span class="text-base leading-none">🚗</span><span class="text-xs font-black tracking-wide">Rua</span>
+          <button id="btnTourRua" @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+            <span class="text-sm">🚗</span><span class="text-[11px] font-black tracking-wide">Rua</span>
           </button>
-          <button id="btnTourHistorico" @click="abrirHistorico()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 6, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6) && passoTutorial !== 6, 'bg-black text-white shadow-inner border border-gray-700': modo === 'historico' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6)), 'bg-orange-700 text-orange-100': modo !== 'historico' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 6))}" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all">
-            <span class="text-base leading-none">📜</span><span class="text-xs font-black tracking-wide">Histórico</span>
+          <button id="btnTourMapa" @click="abrirAbaMapa()" :class="modo === 'mapa' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+            <span class="text-sm">🗺️</span><span class="text-[11px] font-black tracking-wide">Mapa</span>
+          </button>
+          <button id="btnTourHistorico" @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+            <span class="text-sm">📜</span><span class="text-[11px] font-black tracking-wide">Histórico</span>
           </button>
         </nav>
       </header>
@@ -636,7 +654,28 @@
         </template>
       </main>
 
-      <!-- MODO 3: HISTÓRICO -->
+      <!-- MODO 4: MAPA VISUAL COM LEAFLET (NOVA ABA REQUISITADA) -->
+      <main x-show="modo === 'mapa'" class="p-3 sm:p-4 max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-3">
+        <!-- LEGENDA DOS PINOS -->
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-4 flex-wrap">
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-blue-500 border border-white inline-block"></span> <strong>CD / Casa</strong></span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-white inline-block"></span> <strong>Pendente</strong></span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-red-500 border border-white inline-block"></span> <strong>Entregue</strong></span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-yellow-400 border border-white inline-block"></span> <strong>Ausente/Pulado</strong></span>
+          </div>
+          <button @click="centralizarMapaNaCarga()" class="bg-gray-800 hover:bg-gray-700 text-orange-400 border border-gray-700 px-3 py-1 rounded-xl text-xs font-bold active:scale-95 transition">
+            🎯 Ver Rota Inteira
+          </button>
+        </div>
+
+        <!-- CONTAINER DO MAPA LEAFLET -->
+        <div class="w-full h-[68vh] rounded-3xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
+          <div id="mapaContainer" class="w-full h-full z-10"></div>
+        </div>
+      </main>
+
+      <!-- MODO 5: HISTÓRICO -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full">
         <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
         <div class="space-y-3">
@@ -729,7 +768,7 @@
     </div>
   </div>
 
-  <!-- TUTORIAL INTERATIVO ATUALIZADO COM OS NOVOS ÍCONES E TEXTOS -->
+  <!-- TUTORIAL INTERATIVO -->
   <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
       <template x-if="passoTutorial === 1">
@@ -751,7 +790,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🗺️</div>
           <h3 class="text-2xl font-black text-white">1. Importar Rota</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"🗺️ Rota"</strong> no topo e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"➕ Rota"</strong> no topo e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
         </div>
       </template>
       <template x-if="passoTutorial === 4">
@@ -981,6 +1020,15 @@
         
         nomeArquivo: '',
         msgErro: null,
+
+        // DADOS DE PARTIDA E CHEGADA REAIS PARA O MAPA
+        coordPartidaSalva: null,
+        coordChegadaSalva: null,
+
+        // INSTÂNCIA DO LEAFLET
+        mapaLeaflet: null,
+        grupoMarcadores: null,
+        linhaTrajeto: null,
         
         pacotesExtraidos: [],
         carregandoProcesso: false,
@@ -1038,9 +1086,145 @@
           }
         },
 
+        // ========================================================
+        // 🗺️ MOTOR DO MAPA LEAFLET COM PINOS COLORIDOS INTERATIVOS
+        // ========================================================
+        abrirAbaMapa() {
+          this.modo = 'mapa';
+          setTimeout(() => {
+            this.inicializarOuAtualizarMapa();
+          }, 150);
+        },
+
+        inicializarOuAtualizarMapa() {
+          const container = document.getElementById('mapaContainer');
+          if (!container) return;
+
+          if (!this.mapaLeaflet) {
+            this.mapaLeaflet = L.map('mapaContainer', {
+              zoomControl: false
+            }).setView([-24.1667, -46.7800], 13);
+
+            L.control.zoom({ position: 'bottomright' }).addTo(this.mapaLeaflet);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+              maxZoom: 19,
+              attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+            }).addTo(this.mapaLeaflet);
+
+            this.grupoMarcadores = L.featureGroup().addTo(this.mapaLeaflet);
+          }
+
+          this.mapaLeaflet.invalidateSize();
+          this.desenharPinosERotaNoMapa();
+        },
+
+        desenharPinosERotaNoMapa() {
+          if (!this.mapaLeaflet || !this.grupoMarcadores) return;
+          this.grupoMarcadores.clearLayers();
+
+          if (this.linhaTrajeto) {
+            this.mapaLeaflet.removeLayer(this.linhaTrajeto);
+            this.linhaTrajeto = null;
+          }
+
+          const pontosLinha = [];
+
+          // 1. PINO AZUL DE SAÍDA (CD)
+          if (this.coordPartidaSalva && this.coordPartidaSalva.latitude) {
+            const posCD = [this.coordPartidaSalva.latitude, this.coordPartidaSalva.longitude];
+            pontosLinha.push(posCD);
+
+            const iconeCD = L.divIcon({
+              className: 'custom-pin-cd',
+              html: `<div style="background-color: #2563eb; color: #fff; font-size: 15px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(37,99,235,0.8);">🏭</div>`,
+              iconSize: [34, 34],
+              iconAnchor: [17, 17]
+            });
+
+            L.marker(posCD, { icon: iconeCD })
+              .bindPopup(`<strong>📍 PONTO DE PARTIDA</strong><br>Saída do CD / Base`)
+              .addTo(this.grupoMarcadores);
+          }
+
+          // 2. PINOS DOS PACOTES (VERDE = PENDENTE, VERMELHO = ENTREGUE, AMARELO = AUSENTE)
+          const entregasOrdenadas = [...this.entregas].sort((a, b) => a.ordem_entrega - b.ordem_entrega);
+
+          entregasOrdenadas.forEach(p => {
+            if (!p.latitude || !p.longitude) return;
+            const coord = [p.latitude, p.longitude];
+            pontosLinha.push(coord);
+
+            let corFundo = '#10b981'; // 🟢 Verde (Pendente)
+            if (p.status === 'entregue') corFundo = '#ef4444'; // 🔴 Vermelho (Entregue)
+            if (p.status === 'ausente') corFundo = '#f59e0b'; // 🟡 Amarelo (Ausente/Pulado)
+
+            const iconePacote = L.divIcon({
+              className: 'custom-pin-pacote',
+              html: `<div style="background-color: ${corFundo}; color: #000; font-weight: 900; font-family: monospace; font-size: 11px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.6);">#${p.ordem_entrega}</div>`,
+              iconSize: [28, 28],
+              iconAnchor: [14, 14]
+            });
+
+            const popupContent = `
+              <div style="font-family: sans-serif; min-width: 170px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="color: #ea580c; font-size: 14px;">Canetão #${p.ordem_entrega}</strong>
+                  <span style="font-size: 10px; background: #334155; color: #fff; padding: 2px 6px; border-radius: 4px;">Sacola ${Math.ceil(p.ordem_entrega / 10)}</span>
+                </div>
+                <div style="font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 2px;">${p.endereco}</div>
+                <div style="font-size: 10px; color: #94a3b8; margin-bottom: 8px;">${p.bairro} - ${p.cidade}</div>
+                <a href="waze://?ll=${p.latitude},${p.longitude}&navigate=yes" style="display: block; background: #ea580c; color: #fff; text-align: center; padding: 6px; border-radius: 8px; font-weight: 900; font-size: 11px; text-decoration: none;">🚗 Abrir no Waze</a>
+              </div>
+            `;
+
+            L.marker(coord, { icon: iconePacote })
+              .bindPopup(popupContent)
+              .addTo(this.grupoMarcadores);
+          });
+
+          // 3. PINO AZUL DE CHEGADA (CASA)
+          if (this.coordChegadaSalva && this.coordChegadaSalva.latitude) {
+            const posCasa = [this.coordChegadaSalva.latitude, this.coordChegadaSalva.longitude];
+            pontosLinha.push(posCasa);
+
+            const iconeCasa = L.divIcon({
+              className: 'custom-pin-casa',
+              html: `<div style="background-color: #3b82f6; color: #fff; font-size: 15px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(59,130,246,0.8);">🏠</div>`,
+              iconSize: [34, 34],
+              iconAnchor: [17, 17]
+            });
+
+            L.marker(posCasa, { icon: iconeCasa })
+              .bindPopup(`<strong>🏠 PONTO DE CHEGADA</strong><br>Destino final / Casa`)
+              .addTo(this.grupoMarcadores);
+          }
+
+          // 4. LINHA DA ROTA (SERPENTINA CONTÍNUA)
+          if (pontosLinha.length > 1) {
+            this.linhaTrajeto = L.polyline(pontosLinha, {
+              color: '#ea580c',
+              weight: 4,
+              opacity: 0.85,
+              dashArray: '6, 8'
+            }).addTo(this.mapaLeaflet);
+          }
+
+          this.centralizarMapaNaCarga();
+        },
+
+        centralizarMapaNaCarga() {
+          if (this.mapaLeaflet && this.grupoMarcadores && this.grupoMarcadores.getLayers().length > 0) {
+            this.mapaLeaflet.fitBounds(this.grupoMarcadores.getBounds(), { padding: [40, 40] });
+          }
+        },
+
         carregarRotaExemplo() {
+          this.coordPartidaSalva = { latitude: -24.0040, longitude: -46.4020 };
+          this.coordChegadaSalva = { latitude: -24.0228, longitude: -46.4278 };
           this.resumoPartidaTexto = 'CD Central (Simulação)';
-          this.resumoChegadaTexto = 'Residência (Simulação)';
+          this.resumoChegadaTexto = 'Casa (Simulação)';
+
           const pacotesDemo = [
             { id: 9001, ordem_entrega: 1, ordem_carregamento: 30, parada_shopee: 1, ordem_shopee: 1, codigo_rastreio: 'SPXBR900101', destinatario: 'Carlos Eduardo', telefone: '13991234501', endereco: 'Av. Costa e Silva, 250', numero: '250', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0085, longitude: -46.4110, total_no_local: 1, status: 'pendente' },
             { id: 9002, ordem_entrega: 2, ordem_carregamento: 29, parada_shopee: 2, ordem_shopee: 2, codigo_rastreio: 'SPXBR900102', destinatario: 'Mariana Santos', telefone: '13991234502', endereco: 'Av. Costa e Silva, 340', numero: '340', bairro: 'Boqueirão', cidade: 'Praia Grande', cep: '11700-000', latitude: -24.0091, longitude: -46.4118, total_no_local: 1, status: 'pendente' },
@@ -1090,7 +1274,6 @@
             if (this.tema === 'claro') {
               document.body.classList.add('theme-claro');
             } else {
-              document.body.classList.remove('theme-claro');
               document.body.classList.add('theme-escuro');
             }
 
@@ -1238,10 +1421,14 @@
           try {
             const rotaCache = localStorage.getItem('drivexps_rota_ativa_id');
             const entregasCache = localStorage.getItem('drivexps_entregas_cache');
+            const coordP = localStorage.getItem('drivexps_partida_coord');
+            const coordC = localStorage.getItem('drivexps_chegada_coord');
             if (rotaCache && entregasCache) {
               this.rotaAtivaId = rotaCache === 'DEMO' ? 'DEMO' : parseInt(rotaCache);
               this.entregas = JSON.parse(entregasCache);
             }
+            if (coordP) this.coordPartidaSalva = JSON.parse(coordP);
+            if (coordC) this.coordChegadaSalva = JSON.parse(coordC);
           } catch(e) {}
         },
 
@@ -1250,6 +1437,8 @@
             if (this.rotaAtivaId) {
               localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
               localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
+              if (this.coordPartidaSalva) localStorage.setItem('drivexps_partida_coord', JSON.stringify(this.coordPartidaSalva));
+              if (this.coordChegadaSalva) localStorage.setItem('drivexps_chegada_coord', JSON.stringify(this.coordChegadaSalva));
             }
           } catch(e) {}
         },
@@ -1744,6 +1933,9 @@
             if (data.data && data.data.length > 0) {
               this.entregas = data.data;
               this.salvarCacheLocal();
+              if (this.modo === 'mapa') {
+                this.$nextTick(() => this.desenharPinosERotaNoMapa());
+              }
             }
           } catch(e) {}
         },
@@ -1850,6 +2042,10 @@
           if (idx !== -1) {
             this.entregas[idx].status = novoStatus;
             this.salvarCacheLocal();
+            // Se o mapa estiver aberto, atualiza a cor do pino imediatamente!
+            if (this.modo === 'mapa') {
+              this.desenharPinosERotaNoMapa();
+            }
           }
           const headers = { 'Content-Type': 'application/json' };
           if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
@@ -1876,6 +2072,9 @@
             // Converte os textos do modal em coordenadas geográficas reais para envio ao n8n
             let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
             let coordChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
+
+            this.coordPartidaSalva = coordPartida;
+            this.coordChegadaSalva = coordChegada;
 
             const payload = {
               entregas: this.pacotesExtraidos,
