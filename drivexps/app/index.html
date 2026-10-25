@@ -15,7 +15,7 @@
   <style>
     [x-cloak] { display: none !important; }
 
-    /* MODO DIURNO (ALTO CONTRASTE CONTRA O REFLEXO DO SOL NO PARA-BRISA) */
+    /* MODO DIURNO (ALTO CONTRASTE) */
     body.theme-claro {
       background-color: #f1f5f9 !important;
       color: #0f172a !important;
@@ -85,13 +85,9 @@
     body.theme-claro .text-blue-400 { color: #1d4ed8 !important; }
     body.theme-claro .text-amber-400 { color: #b45309 !important; }
 
-    /* FILTRO DE MODO NOTURNO PARA O MAPA OPENSTREETMAP (100% SEGURO E SEM ERRO DE CHAVE) */
-    .theme-escuro #mapaContainer .leaflet-tile-pane,
-    .theme-escuro #mapaNavegacao .leaflet-tile-pane {
-      filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35);
-    }
-    .theme-claro #mapaNavegacao .leaflet-tile-pane {
-      filter: contrast(1.05) brightness(1.02);
+    /* MODO NOTURNO DA ABA MAPA (LEAFLET) */
+    .theme-escuro #mapaContainer .leaflet-tile-pane {
+      filter: brightness(0.68) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35);
     }
 
     .leaflet-popup-content-wrapper {
@@ -103,7 +99,7 @@
     }
     .leaflet-popup-tip { background-color: #0f172a !important; }
 
-    /* === CONTROLES ESTILO WAZE === */
+    /* ESTILOS WAZE DO VELOCÍMETRO E MIRA */
     .waze-speed-circle {
       width: 58px;
       height: 58px;
@@ -135,16 +131,16 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 70px;
-      height: 80px;
+      width: 60px;
+      height: 70px;
       pointer-events: none;
     }
     .fiorino-aura {
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: rgba(56, 189, 248, 0.32);
-      border: 2px solid rgba(56, 189, 248, 0.65);
+      background: rgba(56, 189, 248, 0.35);
+      border: 2px solid rgba(56, 189, 248, 0.7);
       position: absolute;
       z-index: 1;
     }
@@ -152,15 +148,14 @@
       position: relative;
       z-index: 2;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.85));
-      transition: transform 0.25s linear;
     }
     .fiorino-placa-rua {
-      margin-top: 4px;
+      margin-top: 3px;
       background: #ffffff;
       color: #0f172a;
       border: 1px solid rgba(0, 0, 0, 0.2);
       border-radius: 9999px;
-      padding: 2px 10px;
+      padding: 2px 8px;
       font-size: 11px;
       font-weight: 900;
       white-space: nowrap;
@@ -180,9 +175,13 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
 
-  <!-- Leaflet Oficial e Estável -->
+  <!-- Leaflet para a aba Mapa geral -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- MapLibre GL: Motor 3D com rotação nativa do Waze (100% Free) -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
   <!-- Tailwind, Alpine.js e SheetJS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -311,7 +310,7 @@
           <span class="text-orange-500">👜</span><span>Separação em sacolas numeradas de 10 em 10</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-orange-500">🧭</span><span><strong>Navegador Nativo estilo Waze</strong> sem sair do app</span>
+          <span class="text-orange-500">🧭</span><span><strong>Navegador Nativo estilo Waze 3D</strong> sem sair do app</span>
         </div>
         <div class="flex items-center gap-2 pt-1 border-t border-gray-800">
           <span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis (começam na sua 1ª rota)!</span>
@@ -783,7 +782,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE REAL (LEAFLET NATIVO COM TILES OSM REAIS) -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL + OPENFREEMAP DARK) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -821,9 +820,8 @@
          </div>
       </div>
       
-      <!-- MAPA NATIVO LEAFLET (100% FUNCIONAL, NUNCA PEDE CHAVE) -->
-      <div class="absolute inset-0 w-full h-full z-10" id="navMapContainerWrapper">
-         <div id="mapaNavegacao" class="w-full h-full"></div>
+      <!-- MAPA NATIVO 3D REAL (SEM API KEY, ESTILO ESCURO OPENFREEMAP OFICIAL) -->
+      <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL">
       </div>
 
       <!-- VELOCÍMETRO ESTILO WAZE FLUTUANTE (CANTO INFERIOR ESQUERDO) -->
@@ -1096,10 +1094,9 @@
         
         // ==== VARIÁVEIS NAVEGAÇÃO NATIVA ESTILO WAZE ====
         entregaNavegacao: null,
-        mapaNav: null,
-        marcadorCarroNav: null,
-        linhaRotaNav: null,
-        marcadorDestinoNav: null,
+        mapaNavGL: null,
+        marcadorCarroGL: null,
+        marcadorDestinoGL: null,
         watchPositionId: null,
         instrucaoAtual: 'Calculando melhor trajeto...',
         distanciaProximaManobra: '',
@@ -1314,7 +1311,7 @@
           }
         },
 
-        // ==== ENGINE NAVEGAÇÃO NATIVA ESTILO WAZE REAL ====
+        // ==== ENGINE NAVEGAÇÃO NATIVA 3D (MAPLIBRE GL ESTILO WAZE REAL) ====
 
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1344,9 +1341,9 @@
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
             this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-            this.instrucaoAtual = `Traçando rota para ${entrega.endereco}...`;
+            this.instrucaoAtual = `Iniciando trajeto para a Parada #${this.formatarParada(entrega?.parada_shopee)}...`;
             this.distanciaProximaManobra = '...';
-            this.nomeRuaAtualCarro = 'Calculando...';
+            this.nomeRuaAtualCarro = 'Localizando via...';
             this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
             this.iconeManobraNav = '⬆️';
             this.chegadaAnunciada = false;
@@ -1357,9 +1354,43 @@
             this.falarTexto(`Iniciando rota para ${entrega.endereco}`);
 
             setTimeout(() => { 
-                this.inicializarMapaNavegacao(); 
-            }, 250);
+                this.inicializarMapaNavGL(entrega); 
+            }, 300);
+        },
 
+        inicializarMapaNavGL(entrega) {
+            const container = document.getElementById('mapaNavGL');
+            if (!container) return;
+
+            if (this.mapaNavGL) {
+                this.mapaNavGL.remove();
+                this.mapaNavGL = null;
+            }
+
+            // ESTILO OPENFREEMAP OFICIAL (NÃO EXIGE CHAVE DE API, TOTALMENTE FREE E ESCURO NOTURNO)
+            const styleUrl = this.tema === 'claro' 
+                ? 'https://tiles.openfreemap.org/styles/liberty'
+                : 'https://tiles.openfreemap.org/styles/dark';
+
+            this.mapaNavGL = new maplibregl.Map({
+                container: 'mapaNavGL',
+                style: styleUrl,
+                center: [entrega.longitude, entrega.latitude],
+                zoom: 19.3,       // ZOOM PROPORCIONAL AO DA SUA FOTO 2 DO WAZE
+                pitch: 60,        // INCLINAÇÃO DA CÂMERA 3D ATRÁS DO CARRO
+                bearing: 0
+            });
+
+            this.mapaNavGL.on('dragstart', () => {
+                this.mapaArrastadoPeloUsuario = true;
+            });
+
+            this.mapaNavGL.on('load', () => {
+                this.iniciarGPSContinuoNavegacao(entrega);
+            });
+        },
+
+        iniciarGPSContinuoNavegacao(entrega) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 let sLat = pos.coords.latitude;
                 let sLng = pos.coords.longitude;
@@ -1371,8 +1402,8 @@
                 this.ultimaLatCarro = sLat;
                 this.ultimaLngCarro = sLng;
 
-                this.atualizarOuCriarMarcadorCarro(sLat, sLng, 0);
-                this.centralizarNoCarro(sLat, sLng);
+                this.atualizarMarcadorCarroGL(sLat, sLng, 0);
+                this.centralizarNoCarroGL(sLat, sLng, 0);
 
                 await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
@@ -1385,29 +1416,6 @@
                 alert('Não foi possível obter o sinal de GPS.');
                 this.pararNavegacao();
             }, { enableHighAccuracy: true });
-        },
-
-        inicializarMapaNavegacao() {
-            const el = document.getElementById('mapaNavegacao');
-            if (!el) return;
-
-            if (!this.mapaNav) {
-                // Leaflet puro com tiles oficiais OpenStreetMap (Zero erro de chave)
-                this.mapaNav = L.map('mapaNavegacao', { 
-                  zoomControl: false, 
-                  attributionControl: false 
-                }).setView([-24.1667, -46.7800], 19);
-
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-                  maxZoom: 19 
-                }).addTo(this.mapaNav);
-
-                this.mapaNav.on('dragstart', () => {
-                    this.mapaArrastadoPeloUsuario = true;
-                });
-            }
-
-            this.mapaNav.invalidateSize(true);
         },
 
         async travarCoordenadaNaRua(lat, lng) {
@@ -1428,7 +1436,7 @@
             return { lat, lng, nomeRua: '' };
         },
 
-        // PARSER DA LINHA LARANJA
+        // CALCULA E DESENHA O TRAÇADO LARANJA OFICIAL COM CONTORNO WAZE
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             try {
                 let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
@@ -1446,48 +1454,60 @@
 
                 if (data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
-                    let coordsLatLon = [];
+                    let coordsLngLat = [];
 
-                    // Converte para coordenadas que o Leaflet entende [lat, lng]
                     if (route.geometry && typeof route.geometry === 'object' && Array.isArray(route.geometry.coordinates)) {
-                        coordsLatLon = route.geometry.coordinates.map(c => [Number(c[1]), Number(c[0])]);
+                        coordsLngLat = route.geometry.coordinates.map(c => [Number(c[0]), Number(c[1])]);
                     } else if (typeof route.geometry === 'string') {
-                        coordsLatLon = this.decodePolyline(route.geometry);
+                        const ptsLatLon = this.decodePolyline(route.geometry);
+                        coordsLngLat = ptsLatLon.map(p => [p[1], p[0]]);
                     }
 
-                    if (coordsLatLon.length > 0) {
-                        this.coordenadasRotaAtual = coordsLatLon;
+                    if (coordsLngLat.length > 0) {
+                        this.coordenadasRotaAtual = coordsLngLat;
 
-                        if (this.linhaRotaNav) {
-                            this.mapaNav.removeLayer(this.linhaRotaNav);
-                            this.linhaRotaNav = null;
+                        // Adiciona ou atualiza a linha laranja (#ea580c) no MapLibre GL
+                        if (this.mapaNavGL.getSource('rota-source')) {
+                            this.mapaNavGL.getSource('rota-source').setData({
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'LineString',
+                                    coordinates: coordsLngLat
+                                }
+                            });
+                        } else {
+                            this.mapaNavGL.addSource('rota-source', {
+                                type: 'geojson',
+                                data: {
+                                    type: 'Feature',
+                                    geometry: {
+                                        type: 'LineString',
+                                        coordinates: coordsLngLat
+                                    }
+                                }
+                            });
+
+                            // Borda escura para dar contraste Waze
+                            this.mapaNavGL.addLayer({
+                                id: 'rota-borda',
+                                type: 'line',
+                                source: 'rota-source',
+                                layout: { 'line-join': 'round', 'line-cap': 'round' },
+                                paint: { 'line-color': '#0f172a', 'line-width': 14, 'line-opacity': 0.85 }
+                            });
+
+                            // Linha Laranja Oficial (#ea580c) de alta visibilidade
+                            this.mapaNavGL.addLayer({
+                                id: 'rota-linha',
+                                type: 'line',
+                                source: 'rota-source',
+                                layout: { 'line-join': 'round', 'line-cap': 'round' },
+                                paint: { 'line-color': '#ea580c', 'line-width': 9, 'line-opacity': 1.0 }
+                            });
                         }
 
-                        // LINHA LARANJA OFICIAL ESTILO WAZE (#ea580c) DE 10PX
-                        this.linhaRotaNav = L.polyline(coordsLatLon, { 
-                          color: '#ea580c', 
-                          weight: 10, 
-                          opacity: 0.98, 
-                          lineCap: 'round', 
-                          lineJoin: 'round' 
-                        }).addTo(this.mapaNav);
-
-                        // Marcador oficial de destino
-                        if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
-                        const iconDest = L.divIcon({ 
-                          className: 'dest-waze', 
-                          html: `
-                            <div style="display:flex; flex-direction:column; align-items:center;">
-                              <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.6);">
-                                #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
-                              </div>
-                              <div style="font-size:32px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));">📍</div>
-                            </div>
-                          `, 
-                          iconSize: [40, 52], 
-                          iconAnchor: [20, 52] 
-                        });
-                        this.marcadorDestinoNav = L.marker([eLat, eLng], { icon: iconDest }).addTo(this.mapaNav);
+                        // Marcador oficial de destino (Pino na casa do cliente)
+                        this.atualizarMarcadorDestinoGL(eLat, eLng);
 
                         const distanciaMetros = Math.round(route.distance);
                         this.distanciaProximaManobra = distanciaMetros > 1000 ? (distanciaMetros / 1000).toFixed(1) + ' km' : distanciaMetros + ' m';
@@ -1496,9 +1516,19 @@
                         this.passoAtualIndex = 0;
                         this.atualizarInstrucaoUI();
 
-                        // Centraliza e aproxima na rua
-                        if (!this.mapaArrastadoPeloUsuario) {
-                          this.mapaNav.setView([sLat, sLng], 19, { animate: true });
+                        // ALINHAMENTO DA RUA NA VERTICAL (RUA RETA PARA CIMA IGUAL À FOTO 2)
+                        if (coordsLngLat.length > 1) {
+                            const bearingInicial = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
+                            this.headingAtual = bearingInicial;
+                            if (!this.mapaArrastadoPeloUsuario) {
+                                this.mapaNavGL.easeTo({
+                                    center: [sLng, sLat],
+                                    bearing: bearingInicial, // ROTAÇÃO AUTOMÁTICA DA RUA PARA A VERTICAL
+                                    pitch: 60,
+                                    zoom: 19.3,              // ESCALA DA RUA PROPORCIONAL AO CARRO
+                                    duration: 600
+                                });
+                            }
                         }
                     }
                 }
@@ -1508,56 +1538,80 @@
             }
         },
 
-        atualizarOuCriarMarcadorCarro(lat, lng, heading) {
-            if (!this.mapaNav) return;
+        atualizarMarcadorDestinoGL(lat, lng) {
+            if (!this.mapaNavGL) return;
+            if (this.marcadorDestinoGL) {
+                this.marcadorDestinoGL.setLngLat([lng, lat]);
+                return;
+            }
 
-            const iconHtml = `
-              <div class="fiorino-container">
-                <div class="fiorino-aura"></div>
-                <div class="fiorino-svg-wrapper" style="transform: rotate(${heading}deg);">
-                  <svg width="28" height="50" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
-                    <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
-                    <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
-                    <rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/>
-                    <rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/>
-                    <rect x="10" y="60" width="20" height="3" fill="#333"/>
-                    <path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#1e293b"/>
-                    <rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/>
-                    <rect x="6" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
-                    <rect x="28" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
-                    <rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
-                    <rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
-                  </svg>
+            const el = document.createElement('div');
+            el.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.7);">
+                    #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
+                  </div>
+                  <div style="font-size:34px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));">📍</div>
                 </div>
-                <div class="fiorino-placa-rua">${this.nomeRuaAtualCarro || 'Sua Posição'}</div>
-              </div>
             `;
 
-            const iconeCarro = L.divIcon({
-              className: 'custom-fiorino-marker',
-              html: iconHtml,
-              iconSize: [70, 80],
-              iconAnchor: [35, 40]
-            });
+            this.marcadorDestinoGL = new maplibregl.Marker({ element: el, anchor: 'bottom' })
+                .setLngLat([lng, lat])
+                .addTo(this.mapaNavGL);
+        },
 
-            if (!this.marcadorCarroNav) {
-                this.marcadorCarroNav = L.marker([lat, lng], { icon: iconeCarro, zIndexOffset: 1000 }).addTo(this.mapaNav);
+        atualizarMarcadorCarroGL(lat, lng, heading) {
+            if (!this.mapaNavGL) return;
+
+            if (!this.marcadorCarroGL) {
+                const el = document.createElement('div');
+                el.className = 'fiorino-container';
+                el.innerHTML = `
+                    <div class="fiorino-aura"></div>
+                    <div class="fiorino-svg-wrapper">
+                      <svg width="28" height="50" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
+                        <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
+                        <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
+                        <rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/>
+                        <rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/>
+                        <rect x="10" y="60" width="20" height="3" fill="#333"/>
+                        <path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#1e293b"/>
+                        <rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/>
+                        <rect x="6" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
+                        <rect x="28" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
+                        <rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+                        <rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+                      </svg>
+                    </div>
+                    <div class="fiorino-placa-rua" id="placaRuaCarro">${this.nomeRuaAtualCarro || 'Sua Posição'}</div>
+                `;
+
+                this.marcadorCarroGL = new maplibregl.Marker({ element: el, anchor: 'center' })
+                    .setLngLat([lng, lat])
+                    .addTo(this.mapaNavGL);
             } else {
-                this.marcadorCarroNav.setLatLng([lat, lng]);
-                this.marcadorCarroNav.setIcon(iconeCarro);
+                this.marcadorCarroGL.setLngLat([lng, lat]);
+                const p = document.getElementById('placaRuaCarro');
+                if (p) p.innerText = this.nomeRuaAtualCarro || 'Sua Posição';
             }
         },
 
-        centralizarNoCarro(lat, lng) {
-            if (!this.mapaNav) return;
-            this.mapaNav.setView([lat, lng], 19, { animate: true });
+        centralizarNoCarroGL(lat, lng, bearing) {
+            if (!this.mapaNavGL) return;
+            this.mapaNavGL.easeTo({
+                center: [lng, lat],
+                bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
+                pitch: 60,
+                zoom: 19.3,
+                duration: 400
+            });
         },
 
         centralizarCarroManual() {
             this.mapaArrastadoPeloUsuario = false;
             if (this.ultimaLatCarro && this.ultimaLngCarro) {
-                this.centralizarNoCarro(this.ultimaLatCarro, this.ultimaLngCarro);
+                this.centralizarNoCarroGL(this.ultimaLatCarro, this.ultimaLngCarro, this.headingAtual);
             }
         },
 
@@ -1565,7 +1619,7 @@
             if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length === 0) return false;
             let menorDist = Infinity;
             for (const pt of this.coordenadasRotaAtual) {
-                const d = this.calcularDistancia(cLat, cLng, pt[0], pt[1]);
+                const d = this.calcularDistancia(cLat, cLng, pt[1], pt[0]);
                 if (d < menorDist) menorDist = d;
             }
             return menorDist > 35;
@@ -1600,10 +1654,10 @@
                this.headingAtual = headingCalculado;
             }
 
-            this.atualizarOuCriarMarcadorCarro(lat, lng, this.headingAtual);
+            this.atualizarMarcadorCarroGL(lat, lng, 0);
 
             if (!this.mapaArrastadoPeloUsuario) {
-                this.mapaNav.panTo([lat, lng], { animate: true, duration: 0.5 });
+                this.centralizarNoCarroGL(lat, lng, this.headingAtual);
             }
 
             this.ultimaLatCarro = lat;
@@ -1728,18 +1782,12 @@
             if ('speechSynthesis' in window) {
                window.speechSynthesis.cancel();
             }
-            if (this.linhaRotaNav && this.mapaNav) {
-               this.mapaNav.removeLayer(this.linhaRotaNav);
-               this.linhaRotaNav = null;
+            if (this.mapaNavGL) {
+               this.mapaNavGL.remove();
+               this.mapaNavGL = null;
             }
-            if (this.marcadorDestinoNav && this.mapaNav) {
-               this.mapaNav.removeLayer(this.marcadorDestinoNav);
-               this.marcadorDestinoNav = null;
-            }
-            if (this.marcadorCarroNav && this.mapaNav) {
-               this.mapaNav.removeLayer(this.marcadorCarroNav);
-               this.marcadorCarroNav = null;
-            }
+            this.marcadorCarroGL = null;
+            this.marcadorDestinoGL = null;
             this.coordenadasRotaAtual = [];
             this.mapaArrastadoPeloUsuario = false;
             this.modo = 'rua'; 
