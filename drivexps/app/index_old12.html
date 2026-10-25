@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DriveXPS - Rotas Inteligentes Shopee Express</title>
+  
+  <meta name="description" content="Roteirizador contínuo e organizador de carga para a Shopee Express com Navegação Nativa GPS integrada.">
+  <meta name="theme-color" content="#ea580c">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DriveXPS">
+
+  <style>
+    [x-cloak] { display: none !important; }
+
+    /* MODO DIURNO (ALTO CONTRASTE) */
+    body.theme-claro {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    body.theme-claro .bg-gray-950,
+    body.theme-claro .bg-gray-900,
+    body.theme-claro .bg-\[\#121824\] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+    body.theme-claro .bg-gray-800,
+    body.theme-claro .bg-\[\#1c2430\],
+    body.theme-claro .bg-\[\#1c1815\] {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.theme-claro .text-white {
+      color: #0f172a !important;
+    }
+    body.theme-claro .text-gray-300,
+    body.theme-claro .text-gray-400 {
+      color: #334155 !important;
+    }
+    body.theme-claro .text-gray-200 {
+      color: #1e293b !important;
+    }
+    body.theme-claro .border-gray-800,
+    body.theme-claro .border-gray-700,
+    body.theme-claro .border-\[\#2b394a\] {
+      border-color: #cbd5e1 !important;
+    }
+    body.theme-claro .bg-black,
+    body.theme-claro .bg-black\/80,
+    body.theme-claro .bg-black\/90,
+    body.theme-claro .bg-black\/50,
+    body.theme-claro .bg-black\/40 {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.theme-claro input {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #94a3b8 !important;
+    }
+    body.theme-claro input::placeholder {
+      color: #64748b !important;
+    }
+
+    /* FILTRO DE MODO NOTURNO PARA O MAPA */
+    .theme-escuro #mapaContainer .leaflet-tile-pane,
+    .theme-escuro #mapaNavegacaoHUD .leaflet-tile-pane {
+      filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.85);
+    }
+
+    .leaflet-popup-content-wrapper {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      border-radius: 1rem !important;
+      border: 1px solid #334155 !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+    }
+    .leaflet-popup-tip {
+      background-color: #0f172a !important;
+    }
+
+    /* Marcador do Veículo / Navegador */
+    .marcador-carro-pulsante {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .marcador-carro-pulsante .pulse-circle {
+      position: absolute;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(234, 88, 12, 0.4);
+      animation: pulseCarro 1.8s infinite;
+    }
+    .marcador-carro-pulsante .car-icon {
+      position: relative;
+      z-index: 2;
+      width: 28px;
+      height: 28px;
+      background: #ea580c;
+      color: #fff;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    @keyframes pulseCarro {
+      0% { transform: scale(0.8); opacity: 0.9; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+  </style>
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DriveXPS">
+  <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
+  <meta property="og:description" content="Navegador nativo com varredura contínua e separação no Canetão.">
+  <meta property="og:image" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
+  <meta property="og:url" content="https://studiotesta.com.br/drivexps/app/">
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Tailwind, Alpine.js e SheetJS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    window.pwaDeferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.pwaDeferredPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-pronto-para-instalar'));
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ServiceWorker ativo!', reg.scope))
+          .catch(err => console.error('Erro no ServiceWorker:', err));
+      });
+    }
+  </script>
+</head>
+<body :class="tema === 'claro' ? 'theme-claro' : 'theme-escuro'" class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between transition-colors duration-300" x-data="entregaApp()">
+
+  <!-- 1. SPLASH SCREEN -->
+  <div id="splashScreen" 
+       class="fixed inset-0 z-[100] bg-black flex flex-col justify-end items-center pb-12 select-none transition-all duration-500 ease-out"
+       style="background-image: url('./splash.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="w-full max-w-xs px-6 space-y-2 text-center">
+      <p id="splashTexto" class="text-[11px] font-black text-amber-400 tracking-widest uppercase font-mono animate-pulse">
+        INICIANDO SISTEMA...
+      </p>
+      <div class="w-full bg-black/80 border border-orange-500/60 rounded-full h-3.5 p-0.5 shadow-2xl overflow-hidden backdrop-blur-sm">
+        <div id="splashBarra" class="h-full bg-gradient-to-r from-orange-600 via-amber-400 to-yellow-300 rounded-full shadow-[0_0_12px_rgba(245,158,11,0.9)] transition-all duration-500 ease-out" style="width: 25%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      const b = document.getElementById('splashBarra');
+      const t = document.getElementById('splashTexto');
+      if (b) b.style.width = '75%';
+      if (t) t.innerText = 'CARREGANDO ROTAS...';
+    }, 500);
+    setTimeout(() => {
+      const b = document.getElementById('splashBarra');
+      const t = document.getElementById('splashTexto');
+      if (b) b.style.width = '100%';
+      if (t) t.innerText = 'SISTEMA PRONTO!';
+    }, 1100);
+    setTimeout(() => {
+      const s = document.getElementById('splashScreen');
+      if (s) {
+        s.style.opacity = '0';
+        s.style.pointerEvents = 'none';
+        setTimeout(() => s.remove(), 500);
+      }
+    }, 1500);
+  </script>
+
+  <!-- 2. TELA DE BLOQUEIO OBRIGATÓRIA: CELULAR FORA DO MODO PWA -->
+  <div x-show="isMobile && !isStandalone" class="fixed inset-0 bg-gray-950 z-[95] flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
+    <div class="w-full"></div>
+    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
+      <div class="flex justify-center">
+        <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
+      </div>
+      <div class="space-y-2">
+        <span class="inline-block bg-orange-500/10 text-orange-400 text-[10px] font-black uppercase px-3.5 py-1 rounded-full border border-orange-500/30">
+          Instalação Obrigatória
+        </span>
+        <h2 class="text-2xl font-black text-white tracking-wide">Instale o DriveXPS</h2>
+        <p class="text-xs text-gray-300 leading-relaxed">
+          Para garantir <strong>navegação nativa fluida em tela cheia</strong> e integração com o GPS, instale o app no celular.
+        </p>
+      </div>
+      <div x-show="!isIOS" class="space-y-3 pt-1">
+        <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📲</span> Instalar Aplicativo no Celular
+        </button>
+      </div>
+      <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs text-gray-300">
+        <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
+        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> no Safari.</p>
+        <p>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
+      </div>
+    </div>
+    <div class="pt-6 pb-2 text-center text-xs select-text">
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
+      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
+    </div>
+  </div>
+
+  <!-- 2.1 TELA DE LOGIN MINIMALISTA SAAS -->
+  <div x-show="!usuarioLogado && (!isMobile || isStandalone)" class="fixed inset-0 bg-gray-950 z-40 flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
+    <div class="w-full"></div>
+    <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
+      <div class="flex justify-center">
+        <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
+      </div>
+      <div class="space-y-1.5">
+        <h2 class="text-3xl font-black text-white tracking-wide">DriveXPS</h2>
+        <p class="text-xs text-gray-400 font-medium leading-relaxed">
+          Roteirizador contínuo e organizador de carga profissional com Navegação Nativa GPS.
+        </p>
+      </div>
+      <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
+        <div class="flex items-center gap-2"><span class="text-orange-500">✍️</span><span>Marcação no <strong>Canetão</strong> contínua</span></div>
+        <div class="flex items-center gap-2"><span class="text-orange-500">👜</span><span>Separação em sacolas numeradas</span></div>
+        <div class="flex items-center gap-2"><span class="text-orange-500">🧭</span><span><strong>Navegador GPS nativo</strong> estilo Uber sem sair do app</span></div>
+        <div class="flex items-center gap-2 pt-1 border-t border-gray-800"><span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis na 1ª rota!</span></div>
+      </div>
+      <div class="space-y-3">
+        <button @click="loginGoogle()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          Continuar com o Google
+        </button>
+      </div>
+    </div>
+    <div class="pt-6 pb-2 text-center text-xs select-text">
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
+      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
+    </div>
+  </div>
+
+  <!-- 3. MENU LATERAL -->
+  <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 border-l border-gray-800 w-full max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto" @click.away="menuAberto = false">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+          <div class="flex items-center gap-3">
+            <img src="./icon-192.png" alt="DriveXPS" class="w-11 h-11 rounded-2xl border border-gray-700 shadow-md">
+            <div class="truncate max-w-[190px]">
+              <h2 class="text-base font-black text-white leading-tight truncate" x-text="usuarioNome || 'Motorista'"></h2>
+              <span class="text-xs text-gray-400 font-semibold block truncate" x-text="usuarioEmail || 'Conectado'"></span>
+            </div>
+          </div>
+          <button @click="menuAberto = false" class="text-gray-400 hover:text-white text-2xl font-bold p-1 leading-none">&times;</button>
+        </div>
+
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
+          <div class="space-y-1">
+            <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
+          </div>
+          <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
+        </div>
+
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência:</span>
+            <span class="text-[10px] font-bold" :class="tema === 'claro' ? 'text-amber-500' : 'text-blue-400'" x-text="tema === 'claro' ? '☀️ Modo Sol (Dia)' : '🌙 Modo Noite (Escuro)'"></span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button @click="alternarTema('escuro')" class="py-2 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1 border transition" :class="tema === 'escuro' ? 'bg-orange-600 text-white border-orange-500' : 'bg-gray-800 text-gray-300 border-gray-700'">🌙 Noite</button>
+            <button @click="alternarTema('claro')" class="py-2 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1 border transition" :class="tema === 'claro' ? 'bg-orange-600 text-white border-orange-500' : 'bg-gray-800 text-gray-300 border-gray-700'">☀️ Sol</button>
+          </div>
+        </div>
+
+        <nav class="space-y-2">
+          <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">❓ Tutorial</button>
+          <button @click="menuAberto = false; carregarRotaExemplo();" class="w-full bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">🧪 Carregar Rota Exemplo</button>
+        </nav>
+      </div>
+
+      <div class="space-y-3 pt-4 border-t border-gray-800">
+        <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 text-red-300 hover:bg-red-600 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">🚪 Sair da Conta</button>
+        <p class="text-[10px] text-gray-500 text-center">DriveXPS • v3.9 Navegação Nativa</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. BANNER TRIAL -->
+  <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" class="border-b px-4 py-2 flex justify-between items-center text-xs" :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
+    <div>
+      <template x-if="!trialIniciado"><span class="text-emerald-400 font-bold">🎁 7 Dias Grátis: Começam ao gerar sua 1ª rota!</span></template>
+      <template x-if="trialIniciado"><span class="text-amber-400 font-bold" x-text="`⏳ Teste Ativo: ${diasRestantesTrial} dia(s) restante(s)`"></span></template>
+    </div>
+    <button @click="modalAssinatura = true" class="bg-orange-600 text-white font-black text-[11px] px-3 py-1 rounded-full shadow-md">Ver Planos</button>
+  </div>
+
+  <!-- 5. APLICAÇÃO PRINCIPAL -->
+  <div x-show="usuarioLogado && (!isMobile || isStandalone)" class="flex-1 flex flex-col justify-between" x-cloak>
+    
+    <!-- MODAL DE BUSCA -->
+    <div x-show="buscaAberta" class="absolute inset-0 bg-gray-950 z-[200] flex flex-col" x-cloak>
+      <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
+        <div class="flex-1 relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
+          <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..." class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
+        <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2">Cancelar</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+        <template x-for="item in entregasFiltradas" :key="item.id">
+          <div @click="irParaEntregaDireta(item); buscaAberta = false" class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer">
+            <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0">
+              <span class="text-[9px] font-black uppercase">Canetão</span>
+              <span class="text-xl font-black" x-text="`#${item.ordem_entrega}`"></span>
+            </div>
+            <div class="flex-1 overflow-hidden">
+              <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
+              <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- CABEÇALHO -->
+    <div>
+      <header class="bg-orange-600 px-3 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 z-30">
+        <div class="flex justify-between items-center">
+          <h1 class="font-black text-2xl tracking-wide text-white flex items-center gap-1.5">DriveXPS</h1>
+          <div class="flex items-center gap-2">
+            <button @click="abrirBusca()" class="text-white flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20">🔍</button>
+            <button @click="menuAberto = true" class="text-white flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20">☰</button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2">
+          <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider" :class="rotaAtivaId === 'DEMO' ? 'text-emerald-400' : 'text-orange-400'" x-text="rotaAtivaId === 'DEMO' ? '🧪 ROTA DEMO' : (rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA')"></span>
+          <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
+        </div>
+
+        <!-- 5 ABAS DE NAVEGAÇÃO -->
+        <nav class="grid grid-cols-5 gap-1 pt-1">
+          <button @click="abrirModalImportar()" class="bg-white text-orange-600 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+            <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+            <span>+ Rota</span>
+          </button>
+          <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+            <span>👜</span><span>Sacolas</span>
+          </button>
+          <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+            <span>🚗</span><span>Rua</span>
+          </button>
+          <button @click="abrirAbaMapa()" :class="modo === 'mapa' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+            <span>🗺️</span><span>Mapa</span>
+          </button>
+          <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+            <span>📜</span><span>Histórico</span>
+          </button>
+        </nav>
+      </header>
+
+      <!-- MODO 1: SACOLAS -->
+      <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
+        <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1">
+          <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
+          <p class="text-gray-300 text-xs">Toque em qualquer pacote para ir direto à navegação daquele destino.</p>
+        </div>
+
+        <div class="space-y-3">
+          <template x-for="item in entregasOrdenadasParaSacola" :key="item.id">
+            <div @click="irParaEntregaDireta(item)" class="bg-[#121824] rounded-2xl border shadow-xl p-4 space-y-3 cursor-pointer border-l-[6px]" :class="{
+                   'opacity-30 bg-black border-gray-900 border-l-gray-800 grayscale': item.status === 'entregue',
+                   'border-yellow-500/70 bg-yellow-500/5 border-l-yellow-500': item.status === 'ausente',
+                   'border-gray-800 border-l-orange-500 hover:border-orange-500/60': item.status === 'pendente'
+                 }">
+              <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+                  <span class="text-[10px] text-orange-400 font-black uppercase">CANETÃO</span>
+                  <span class="text-2xl font-black text-orange-400 font-mono mt-1" x-text="`#${item.ordem_entrega}`"></span>
+                </div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+                  <span class="text-[10px] text-gray-400 font-black uppercase">PARADA</span>
+                  <span class="text-2xl font-black text-white font-mono mt-1" x-text="formatarParada(item.parada_shopee)"></span>
+                </div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+                  <span class="text-[10px] text-gray-400 font-black uppercase">ORDEM</span>
+                  <span class="text-2xl font-black text-white font-mono mt-1" x-text="formatarParada(item.ordem_shopee)"></span>
+                </div>
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+                  <span class="text-[10px] text-orange-400 font-black uppercase">SACOLA</span>
+                  <span class="text-2xl font-black text-orange-400 font-mono mt-1" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
+                </div>
+              </div>
+
+              <div class="space-y-1 pt-0.5">
+                <h3 class="font-black text-lg text-white" :class="{'line-through': item.status === 'entregue'}" x-text="item.endereco"></h3>
+                <p class="text-base font-bold text-gray-300" x-text="`${item.bairro} - ${item.cidade}`"></p>
+              </div>
+
+              <div class="flex items-center justify-between pt-2 border-t border-gray-800 text-xs">
+                <span class="text-gray-400">Rastreio SPX:</span>
+                <span class="font-mono font-black text-orange-400 bg-black/90 px-3 py-1 rounded-xl" x-text="item.codigo_rastreio"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </main>
+
+      <!-- MODO 2: RUA (COCKPIT PRINCIPAL) -->
+      <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
+        <template x-if="entregaAtual">
+          <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
+            
+            <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300">
+              <div class="flex items-center gap-2 truncate pr-2">
+                <span>📍</span>
+                <span class="truncate">BAIRRO: <strong class="text-white uppercase" x-text="entregaAtual.bairro || 'CENTRO'"></strong></span>
+              </div>
+              <span class="text-[10px] bg-orange-950 text-orange-400 border border-orange-800 px-2.5 py-1 rounded-full font-mono" x-text="`${entregasNoBairroRestantes} no bairro`"></span>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+                <span class="text-[10px] text-orange-400 font-black uppercase">CANETÃO</span>
+                <span class="text-3xl font-black text-orange-400 font-mono mt-1" x-text="`#${entregaAtual.ordem_entrega}`"></span>
+              </div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+                <span class="text-[10px] text-gray-400 font-black uppercase">PARADA</span>
+                <span class="text-3xl font-black text-white font-mono mt-1" x-text="formatarParada(entregaAtual.parada_shopee)"></span>
+              </div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+                <span class="text-[10px] text-gray-400 font-black uppercase">ORDEM</span>
+                <span class="text-3xl font-black text-white font-mono mt-1" x-text="formatarParada(entregaAtual.ordem_shopee)"></span>
+              </div>
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+                <span class="text-[10px] text-orange-400 font-black uppercase">SACOLA</span>
+                <span class="text-3xl font-black text-orange-400 font-mono mt-1" x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span>
+              </div>
+            </div>
+
+            <!-- ENDEREÇO DA ENTREGA -->
+            <div class="space-y-1.5 pt-1">
+              <h2 class="text-2xl font-black text-white leading-tight" x-text="entregaAtual.endereco"></h2>
+              <p class="text-lg text-gray-200 font-black" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
+              <p class="text-sm text-gray-400 font-mono" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
+            </div>
+
+            <!-- 🚗 BOTÕES REORGANIZADOS: NAVEGAR NO APP (LADO ESQUERDO) + WAZE (LADO DIREITO) -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <!-- BOTÃO 1: NAVEGADOR NATIVO INTEGRADO (ESTILO UBER) -->
+              <button @click="iniciarNavegadorNativo(entregaAtual)" class="bg-orange-600 hover:bg-orange-500 text-white text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl shadow-orange-600/30 active:scale-95 transition cursor-pointer">
+                🧭 Navegar no App
+              </button>
+
+              <!-- BOTÃO 2: WAZE EXTERNO (COMO FALLBACK) -->
+              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-blue-600 hover:bg-blue-500 text-white text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">
+                🚗 Waze
+              </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
+              <button @click="pularEntrega(entregaAtual)" class="bg-gray-800 text-yellow-400 py-4 rounded-2xl font-bold text-sm border border-gray-700 active:scale-95 transition">⚠️ Ausente / Pular</button>
+              <button @click="concluirEntrega(entregaAtual)" class="bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition">✅ Entregue</button>
+            </div>
+          </div>
+        </template>
+      </main>
+
+      <!-- MODO 4: MAPA GERAL -->
+      <main x-show="modo === 'mapa'" class="p-2 sm:p-4 max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-2">
+        <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> CD/Casa</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Pendente</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Entregue</span>
+          </div>
+          <button @click="centralizarMapaNaCarga()" class="bg-gray-800 text-orange-400 border border-gray-700 px-2 py-0.5 rounded-lg text-xs font-black">🎯 Rota</button>
+        </div>
+        <div class="w-full h-[54vh] sm:h-[62vh] rounded-2xl overflow-hidden border-2 border-orange-500/40 relative">
+          <div id="mapaContainer" class="w-full h-full z-10"></div>
+        </div>
+      </main>
+
+      <!-- MODO 5: HISTÓRICO -->
+      <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full">
+        <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
+        <div class="space-y-3">
+          <template x-for="r in rotasHistorico" :key="r.id">
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 flex justify-between items-center">
+              <div>
+                <span class="text-base font-black text-white" x-text="`Rota #${r.id}`"></span>
+                <p class="text-xs text-gray-400" x-text="`Data: ${r.data ? new Date(r.data).toLocaleDateString('pt-BR') : 'Hoje'}`"></p>
+              </div>
+              <button @click="selecionarRotaHistorico(r.id)" class="bg-gray-800 px-4 py-2.5 rounded-xl text-xs font-bold text-gray-200">Reabrir</button>
+            </div>
+          </template>
+        </div>
+      </main>
+    </div>
+
+    <!-- 🧭 INTERFACE DE NAVEGAÇÃO NATIVA HUD (ESTILO UBER / TELA CHEIA) -->
+    <div x-show="navegacaoHUDAtiva" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between" x-cloak>
+      
+      <!-- CARD SUPERIOR: INSTRUÇÃO DE MANOBRA (ESTILO WAZE/UBER) -->
+      <div class="bg-gray-900 border-b-2 border-orange-500 p-4 shadow-2xl z-20 flex items-center justify-between">
+        <div class="flex items-center gap-3.5">
+          <div class="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg shadow-orange-600/40 text-white shrink-0">
+            <span x-text="iconeManobraNavegacao">⬆️</span>
+          </div>
+          <div>
+            <span class="text-2xl font-black text-white font-mono leading-none block" x-text="distanciaAteDestinoTexto">Calculando...</span>
+            <p class="text-xs font-bold text-orange-400 mt-0.5 truncate max-w-[210px]" x-text="instrucaoManobraTexto">Siga na via atual</p>
+          </div>
+        </div>
+        
+        <button @click="encerrarNavegadorNativo()" class="bg-gray-800 border border-gray-700 text-gray-300 font-bold px-3 py-2 rounded-xl text-xs active:scale-95 transition">
+          Fechar ✕
+        </button>
+      </div>
+
+      <!-- MAPA NATIVO LEAFLET EM TEMPO REAL -->
+      <div class="flex-1 w-full relative z-10">
+        <div id="mapaNavegacaoHUD" class="w-full h-full"></div>
+      </div>
+
+      <!-- CARD INFERIOR: CONTROLE RÁPIDO DO PACOTE ATUAL -->
+      <div class="bg-gray-900 border-t border-gray-800 p-4 space-y-3 z-20 shadow-2xl">
+        <div class="flex justify-between items-center text-xs">
+          <div class="flex items-center gap-2">
+            <span class="bg-orange-600 px-2.5 py-1 rounded-lg font-black text-white font-mono" x-text="`Canetão #${entregaAtual ? entregaAtual.ordem_entrega : ''}`"></span>
+            <span class="text-gray-300 font-bold truncate max-w-[180px]" x-text="entregaAtual ? entregaAtual.endereco : ''"></span>
+          </div>
+          <span class="text-emerald-400 font-bold" x-text="velocidadeGPS">0 km/h</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <button @click="pularEntrega(entregaAtual); encerrarNavegadorNativo();" class="bg-gray-800 text-yellow-400 py-3.5 rounded-xl font-bold text-xs border border-gray-700 active:scale-95">
+            ⚠️ Ausente / Pular
+          </button>
+          <button @click="concluirEntrega(entregaAtual); encerrarNavegadorNativo();" class="bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-black text-sm shadow-lg active:scale-95">
+            ✅ Entregue
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="py-6 text-center text-xs select-text">
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
+      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
+    </footer>
+  </div>
+
+  <!-- MODAL DE RESUMO DE IMPORTAÇÃO -->
+  <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl p-6 space-y-4">
+      <h2 class="text-2xl font-black text-white">Planilha Importada</h2>
+      <p class="text-xs text-gray-300">O sistema irá organizar as ruas e mãos de direção.</p>
+      <div class="flex justify-between border-y border-gray-800 py-3">
+        <span class="text-sm font-bold text-gray-300">Total de Pacotes</span>
+        <span class="text-2xl font-black text-orange-400" x-text="pacotesExtraidos.length"></span>
+      </div>
+      <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-base shadow-xl active:scale-95 transition">
+        <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
+        <span x-show="carregandoProcesso">⏳ Otimizando...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DE IMPORTAR PLANILHA -->
+  <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <h2 class="font-black text-lg text-orange-500">IMPORTAR ROMANEIO</h2>
+        <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
+      </div>
+      <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 transition">
+        <span class="text-3xl block mb-1.5">📊</span>
+        <span class="text-sm font-black text-white">Toque para selecionar romaneio .XLSX</span>
+        <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
+      </label>
+      <button @click="modalImportar = false; carregarRotaExemplo();" class="w-full bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 font-black py-3 rounded-2xl text-xs active:scale-95 transition">🧪 Testar Carga de Demonstração (30 Pacotes)</button>
+    </div>
+  </div>
+
+  <!-- SCRIPT ALPINE.JS COM SUPORTE AO NAVEGADOR NATIVO OSRM -->
+  <script>
+    function entregaApp() {
+      return {
+        tema: localStorage.getItem('drivexps_tema') || 'escuro',
+        modo: 'rua',
+        menuAberto: false,
+        buscaAberta: false,
+        termoBusca: '',
+        modalImportar: false,
+        modalResumoImportacao: false,
+        modalAssinatura: false,
+        inputPartidaModal: '',
+        inputChegadaModal: '',
+        resumoPartidaTexto: '',
+        resumoChegadaTexto: '',
+        planoEscolhido: 'semanal',
+        carregandoPix: false,
+        codigoPixGerado: '',
+        qrCodeBase64: '',
+        
+        pacotesExtraidos: [],
+        carregandoProcesso: false,
+        entregas: [],
+        rotasHistorico: [],
+        rotaAtivaId: null,
+        entregaSelecionadaId: null,
+
+        usuarioLogado: false,
+        usuarioEmail: '',
+        usuarioNome: '',
+        tokenAcesso: localStorage.getItem('directus_token') || null,
+        usuarioId: localStorage.getItem('directus_user_id') || null,
+        
+        planoAtivo: 'gratuito',
+        dataExpiracao: null,
+        trialIniciado: false,
+        diasRestantesTrial: 7,
+        statusAssinatura: 'trial',
+        assinaturaValida: true,
+
+        tutorialAberto: false,
+        passoTutorial: 1,
+
+        isStandalone: false,
+        isIOS: false,
+        isMobile: false,
+
+        /* MAPA PADRÃO */
+        mapaLeaflet: null,
+        grupoMarcadores: null,
+        linhaTrajeto: null,
+        coordPartidaSalva: null,
+        coordChegadaSalva: null,
+        rotaGeometria: null,
+
+        /* SISTEMA DE NAVEGAÇÃO NATIVA (HUD ESTILO UBER) */
+        navegacaoHUDAtiva: false,
+        mapaNavegacao: null,
+        marcadorCarro: null,
+        marcadorDestino: null,
+        linhaNavegacao: null,
+        watchIdGPS: null,
+        posicaoAtualMotorista: null,
+        distanciaAteDestinoTexto: 'Calculando...',
+        instrucaoManobraTexto: 'Siga na via atual',
+        iconeManobraNavegacao: '⬆️',
+        velocidadeGPS: '0 km/h',
+        ultimaInstrucaoFalada: '',
+
+        DIRECTUS_URL: 'https://banco.studiotesta.com.br',
+        N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
+        OSRM_ROUTER_URL: 'http://192.168.1.199:5000', // Servidor OSRM Local
+
+        alternarTema(novoTema) {
+          this.tema = novoTema;
+          localStorage.setItem('drivexps_tema', novoTema);
+          if (novoTema === 'claro') {
+            document.body.classList.add('theme-claro');
+            document.body.classList.remove('theme-escuro');
+          } else {
+            document.body.classList.remove('theme-claro');
+            document.body.classList.add('theme-escuro');
+          }
+        },
+
+        /* 🧭 INICIAR O NAVEGADOR NATIVO EM TELA CHEIA */
+        iniciarNavegadorNativo(entrega) {
+          if (!entrega || !entrega.latitude || !entrega.longitude) {
+            alert('Coordenadas de entrega inválidas.');
+            return;
+          }
+
+          this.navegacaoHUDAtiva = true;
+
+          setTimeout(() => {
+            this.inicializarMapaNavegacao(entrega);
+            this.iniciarRastreamentoGPSContinuo(entrega);
+          }, 200);
+        },
+
+        inicializarMapaNavegacao(entrega) {
+          const container = document.getElementById('mapaNavegacaoHUD');
+          if (!container) return;
+
+          if (!this.mapaNavegacao) {
+            this.mapaNavegacao = L.map('mapaNavegacaoHUD', { zoomControl: false }).setView([entrega.latitude, entrega.longitude], 17);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.mapaNavegacao);
+          } else {
+            this.mapaNavegacao.invalidateSize();
+          }
+
+          if (this.marcadorDestino) {
+            this.mapaNavegacao.removeLayer(this.marcadorDestino);
+          }
+
+          // Pino da Casa do Cliente
+          const iconeDestino = L.divIcon({
+            className: 'custom-pin-destino',
+            html: `<div style="background-color: #ea580c; color: #fff; font-weight: 900; font-family: monospace; font-size: 13px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">#${entrega.ordem_entrega}</div>`,
+            iconSize: [34, 34], iconAnchor: [17, 17]
+          });
+
+          this.marcadorDestino = L.marker([entrega.latitude, entrega.longitude], { icon: iconeDestino }).addTo(this.mapaNavegacao);
+        },
+
+        iniciarRastreamentoGPSContinuo(entrega) {
+          if (!navigator.geolocation) {
+            alert('GPS não suportado neste navegador.');
+            return;
+          }
+
+          const opcoesGPS = {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 10000
+          };
+
+          this.watchIdGPS = navigator.geolocation.watchPosition(
+            (pos) => {
+              const lat = pos.coords.latitude;
+              const lng = pos.coords.longitude;
+              const vel = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
+              this.velocidadeGPS = `${vel} km/h`;
+              this.posicaoAtualMotorista = [lat, lng];
+
+              // Atualiza o Marcador do Carro com Seta e Pulso
+              if (!this.marcadorCarro) {
+                const iconeCarro = L.divIcon({
+                  className: 'marcador-carro-pulsante',
+                  html: `<div class="pulse-circle"></div><div class="car-icon">🚗</div>`,
+                  iconSize: [38, 38], iconAnchor: [19, 19]
+                });
+                this.marcadorCarro = L.marker([lat, lng], { icon: iconeCarro }).addTo(this.mapaNavegacao);
+              } else {
+                this.marcadorCarro.setLatLng([lat, lng]);
+              }
+
+              // Centraliza o mapa suavemente no veículo
+              this.mapaNavegacao.panTo([lat, lng], { animate: true });
+
+              // Calcula o caminho viário da posição atual até a casa do cliente
+              this.calcularRotaViariaNativa(lat, lng, entrega.latitude, entrega.longitude);
+            },
+            (err) => {
+              console.warn('Erro ao ler GPS contínuo:', err);
+            },
+            opcoesGPS
+          );
+        },
+
+        async calcularRotaViariaNativa(origemLat, origemLng, destLat, destLng) {
+          try {
+            // Tenta consultar o seu OSRM local primeiro; se indisponível pela web externa, usa o OSRM público como fallback
+            const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${origemLng},${origemLat};${destLng},${destLat}?overview=full&geometries=geojson&steps=true`;
+            let res = null;
+            try {
+              res = await fetch(urlLocal, { signal: AbortSignal.timeout(2000) });
+            } catch(e) {
+              const urlPublica = `https://router.project-osrm.org/route/v1/driving/${origemLng},${origemLat};${destLng},${destLat}?overview=full&geometries=geojson&steps=true`;
+              res = await fetch(urlPublica);
+            }
+
+            if (!res || !res.ok) return;
+            const dados = await res.json();
+            if (!dados.routes || dados.routes.length === 0) return;
+
+            const rota = dados.routes[0];
+            const distanciaMetros = Math.round(rota.distance);
+
+            if (distanciaMetros > 1000) {
+              this.distanciaAteDestinoTexto = `${(distanciaMetros / 1000).toFixed(1)} km`;
+            } else {
+              this.distanciaAteDestinoTexto = `${distanciaMetros} m`;
+            }
+
+            // Interpretação de Instruções e Manobras
+            if (rota.legs && rota.legs[0] && rota.legs[0].steps && rota.legs[0].steps.length > 0) {
+              const proximoPasso = rota.legs[0].steps[0];
+              const nomeRua = proximoPasso.name || 'sua rota';
+              const tipoManobra = proximoPasso.maneuver ? proximoPasso.maneuver.modifier : '';
+
+              if (tipoManobra.includes('right')) {
+                this.iconeManobraNavegacao = '➡️';
+                this.instrucaoManobraTexto = `Vire à direita na ${nomeRua}`;
+              } else if (tipoManobra.includes('left')) {
+                this.iconeManobraNavegacao = '⬅️';
+                this.instrucaoManobraTexto = `Vire à esquerda na ${nomeRua}`;
+              } else {
+                this.iconeManobraNavegacao = '⬆️';
+                this.instrucaoManobraTexto = `Siga em frente na ${nomeRua}`;
+              }
+
+              // Fala a manobra com síntese de voz nativa
+              this.falarInstrucao(this.instrucaoManobraTexto);
+            }
+
+            // Desenha a linha viária do trajeto atual
+            const coordenadasGeoJSON = rota.geometry.coordinates.map(c => [c[1], c[0]]);
+            if (this.linhaNavegacao) {
+              this.mapaNavegacao.removeLayer(this.linhaNavegacao);
+            }
+            this.linhaNavegacao = L.polyline(coordenadasGeoJSON, {
+              color: '#ea580c',
+              weight: 6,
+              opacity: 0.95
+            }).addTo(this.mapaNavegacao);
+
+          } catch(err) {
+            console.error('Erro na rota nativa OSRM:', err);
+          }
+        },
+
+        falarInstrucao(texto) {
+          if ('speechSynthesis' in window && texto !== this.ultimaInstrucaoFalada) {
+            this.ultimaInstrucaoFalada = texto;
+            const fala = new SpeechSynthesisUtterance(texto);
+            fala.lang = 'pt-BR';
+            fala.rate = 1.05;
+            window.speechSynthesis.speak(fala);
+          }
+        },
+
+        encerrarNavegadorNativo() {
+          if (this.watchIdGPS) {
+            navigator.geolocation.clearWatch(this.watchIdGPS);
+            this.watchIdGPS = null;
+          }
+          if (this.linhaNavegacao && this.mapaNavegacao) {
+            this.mapaNavegacao.removeLayer(this.linhaNavegacao);
+            this.linhaNavegacao = null;
+          }
+          this.navegacaoHUDAtiva = false;
+        },
+
+        /* MÉTODOS DE ROTA E MAPA GERAL */
+        abrirAbaMapa() {
+          this.modo = 'mapa';
+          setTimeout(() => { this.inicializarOuAtualizarMapa(); }, 150);
+        },
+
+        inicializarOuAtualizarMapa() {
+          const container = document.getElementById('mapaContainer');
+          if (!container) return;
+
+          if (!this.mapaLeaflet) {
+            this.mapaLeaflet = L.map('mapaContainer', { zoomControl: false }).setView([-24.1667, -46.7800], 13);
+            L.control.zoom({ position: 'bottomright' }).addTo(this.mapaLeaflet);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.mapaLeaflet);
+            this.grupoMarcadores = L.featureGroup().addTo(this.mapaLeaflet);
+          }
+          this.mapaLeaflet.invalidateSize();
+          this.desenharPinosERotaNoMapa();
+        },
+
+        desenharPinosERotaNoMapa() {
+          if (!this.mapaLeaflet || !this.grupoMarcadores) return;
+          this.grupoMarcadores.clearLayers();
+          if (this.linhaTrajeto) { this.mapaLeaflet.removeLayer(this.linhaTrajeto); this.linhaTrajeto = null; }
+
+          const entregasOrdenadas = [...this.entregas].sort((a, b) => a.ordem_entrega - b.ordem_entrega);
+          const pontosLinha = [];
+
+          entregasOrdenadas.forEach(p => {
+            if (!p.latitude || !p.longitude) return;
+            const coord = [p.latitude, p.longitude];
+            pontosLinha.push(coord);
+
+            let corFundo = '#10b981';
+            if (p.status === 'entregue') corFundo = '#ef4444';
+            if (p.status === 'ausente') corFundo = '#f59e0b';
+
+            const iconePacote = L.divIcon({
+              className: 'custom-pin-pacote',
+              html: `<div style="background-color: ${corFundo}; color: #000; font-weight: 900; font-family: monospace; font-size: 11px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff;">#${p.ordem_entrega}</div>`,
+              iconSize: [28, 28], iconAnchor: [14, 14]
+            });
+
+            L.marker(coord, { icon: iconePacote }).addTo(this.grupoMarcadores);
+          });
+
+          if (pontosLinha.length > 1) {
+            this.linhaTrajeto = L.polyline(pontosLinha, { color: '#ea580c', weight: 4, opacity: 0.85 }).addTo(this.mapaLeaflet);
+          }
+          this.centralizarMapaNaCarga();
+        },
+
+        centralizarMapaNaCarga() {
+          if (this.mapaLeaflet && this.grupoMarcadores && this.grupoMarcadores.getLayers().length > 0) {
+            this.mapaLeaflet.fitBounds(this.grupoMarcadores.getBounds(), { padding: [40, 40] });
+          }
+        },
+
+        carregarRotaExemplo() {
+          const pacotesDemo = [
+            { id: 9001, ordem_entrega: 1, parada_shopee: 1, ordem_shopee: 1, codigo_rastreio: 'SPXBR900101', endereco: 'Av. Costa e Silva, 250', bairro: 'Boqueirão', cidade: 'Praia Grande', latitude: -24.0085, longitude: -46.4110, status: 'pendente' },
+            { id: 9002, ordem_entrega: 2, parada_shopee: 2, ordem_shopee: 2, codigo_rastreio: 'SPXBR900102', endereco: 'Av. Costa e Silva, 340', bairro: 'Boqueirão', cidade: 'Praia Grande', latitude: -24.0091, longitude: -46.4118, status: 'pendente' },
+            { id: 9003, ordem_entrega: 3, parada_shopee: 3, ordem_shopee: 3, codigo_rastreio: 'SPXBR900103', endereco: 'Rua Pernambuco, 115', bairro: 'Boqueirão', cidade: 'Praia Grande', latitude: -24.0102, longitude: -46.4125, status: 'pendente' }
+          ];
+
+          this.rotaAtivaId = 'DEMO';
+          this.entregas = pacotesDemo;
+          this.salvarCacheLocal();
+          this.modo = 'rua';
+          alert('🧪 Carga de Demonstração ativada!');
+        },
+
+        async init() {
+          if (this.tema === 'claro') document.body.classList.add('theme-claro');
+          else document.body.classList.add('theme-escuro');
+          this.restaurarCacheLocal();
+          await this.verificarAutenticacao();
+          this.checarInstalacaoPWA();
+        },
+
+        abrirBusca() {
+          this.buscaAberta = true;
+          this.termoBusca = '';
+          setTimeout(() => { if (this.$refs && this.$refs.inputBusca) this.$refs.inputBusca.focus(); }, 100);
+        },
+
+        formatarParada(val) {
+          if (val === null || val === undefined) return '-';
+          if (val < 0) return '+' + Math.abs(val);
+          return val;
+        },
+
+        get entregasOrdenadasParaSacola() {
+          return [...this.entregas].sort((a, b) => a.ordem_entrega - b.ordem_entrega);
+        },
+
+        get entregasFiltradas() {
+          if (!this.termoBusca) return [];
+          const t = this.termoBusca.toLowerCase().trim();
+          return this.entregas.filter(e => (e.endereco && e.endereco.toLowerCase().includes(t)) || (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t)));
+        },
+
+        get entregasNoBairroRestantes() {
+          if (!this.entregaAtual) return 0;
+          const bAtual = (this.entregaAtual.bairro || '').toLowerCase().trim();
+          return this.naoEntregues.filter(e => (e.bairro || '').toLowerCase().trim() === bAtual).length;
+        },
+
+        restaurarCacheLocal() {
+          try {
+            const rotaCache = localStorage.getItem('drivexps_rota_ativa_id');
+            const entregasCache = localStorage.getItem('drivexps_entregas_cache');
+            if (rotaCache && entregasCache) {
+              this.rotaAtivaId = rotaCache === 'DEMO' ? 'DEMO' : parseInt(rotaCache);
+              this.entregas = JSON.parse(entregasCache);
+            }
+          } catch(e) {}
+        },
+
+        salvarCacheLocal() {
+          try {
+            if (this.rotaAtivaId) {
+              localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
+              localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
+            }
+          } catch(e) {}
+        },
+
+        getTextoStatusAssinatura() {
+          return this.statusAssinatura === 'ativo' ? 'Plano Ativo 🚀' : 'Período de Teste';
+        },
+
+        iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
+        abrirModalImportar() { this.modalImportar = true; },
+        irParaEntregaDireta(item) { this.entregaSelecionadaId = item.id; this.modo = 'rua'; },
+
+        async verificarAutenticacao() {
+          this.usuarioLogado = true; // Mantém a sessão ativa
+        },
+
+        checarInstalacaoPWA() {
+          this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+          const ua = window.navigator.userAgent.toLowerCase();
+          this.isIOS = /iphone|ipad|ipod/.test(ua);
+          this.isMobile = /android|iphone|ipad|ipod|mobile/i.test(ua);
+        },
+
+        async instalarPWA() {
+          if (window.pwaDeferredPrompt) {
+            window.pwaDeferredPrompt.prompt();
+            await window.pwaDeferredPrompt.userChoice;
+            window.pwaDeferredPrompt = null;
+          }
+        },
+
+        processarArquivoExcel(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const wb = XLSX.read(data, { type: 'array' });
+              const ws = wb.Sheets[wb.SheetNames[0]];
+              const json = XLSX.utils.sheet_to_json(ws);
+              this.pacotesExtraidos = json.map((p, idx) => ({
+                id: idx + 1,
+                ordem_entrega: idx + 1,
+                parada_shopee: p.Stop || idx + 1,
+                ordem_shopee: p.Sequence || idx + 1,
+                codigo_rastreio: p['SPX TN'] || 'SPX' + idx,
+                endereco: p['Destination Address'] || 'Rua sem nome',
+                bairro: p.Bairro || 'Centro',
+                cidade: p.City || 'Cidade',
+                latitude: parseFloat(p.Latitude) || -24.0085,
+                longitude: parseFloat(p.Longitude) || -46.4110,
+                status: 'pendente'
+              }));
+              this.modalImportar = false;
+              this.modalResumoImportacao = true;
+            } catch(err) { alert('Erro no arquivo: ' + err.message); }
+          };
+          reader.readAsArrayBuffer(file);
+        },
+
+        async enviarParaN8N() {
+          this.entregas = this.pacotesExtraidos;
+          this.rotaAtivaId = 101;
+          this.salvarCacheLocal();
+          this.modalResumoImportacao = false;
+          this.modo = 'rua';
+        },
+
+        async selecionarRotaHistorico(rotaId) {
+          this.rotaAtivaId = rotaId;
+          this.salvarCacheLocal();
+          this.modo = 'rua';
+        },
+
+        async abrirHistorico() {
+          this.modo = 'historico';
+        },
+
+        get naoEntregues() { return this.entregas.filter(e => e.status !== 'entregue'); },
+
+        get entregaAtual() {
+          if (this.entregaSelecionadaId) {
+            const sel = this.entregas.find(e => e.id === this.entregaSelecionadaId);
+            if (sel && sel.status !== 'entregue') return sel;
+          }
+          return this.entregas.find(e => e.status === 'pendente') || this.entregas.find(e => e.status === 'ausente') || null;
+        },
+
+        async pularEntrega(entrega) {
+          if (!entrega) return;
+          entrega.status = 'ausente';
+          this.salvarCacheLocal();
+        },
+
+        async concluirEntrega(entrega) {
+          if (!entrega) return;
+          entrega.status = 'entregue';
+          this.salvarCacheLocal();
+          if ('vibrate' in navigator) navigator.vibrate(40);
+        },
+
+        deslogar() {
+          localStorage.clear();
+          this.usuarioLogado = false;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
