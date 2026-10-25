@@ -15,7 +15,7 @@
   <style>
     [x-cloak] { display: none !important; }
 
-    /* MODO DIURNO (ALTO CONTRASTE CONTRA O REFLEXO DO SOL NO PARA-BRISA) */
+    /* MODO DIURNO (ALTO CONTRASTE) */
     body.theme-claro {
       background-color: #f1f5f9 !important;
       color: #0f172a !important;
@@ -85,7 +85,7 @@
     body.theme-claro .text-blue-400 { color: #1d4ed8 !important; }
     body.theme-claro .text-amber-400 { color: #b45309 !important; }
 
-    /* FILTRO DE MODO NOTURNO PARA O MAPA OPENSTREETMAP */
+    /* MODO NOTURNO DO MAPA OPENSTREETMAP */
     .theme-escuro #mapaContainer .leaflet-tile-pane,
     .theme-escuro #mapaNavegacao .leaflet-tile-pane {
       filter: brightness(0.68) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35);
@@ -103,25 +103,7 @@
     }
     .leaflet-popup-tip { background-color: #0f172a !important; }
 
-    /* === ESTILOS NAVEGADOR WAZE NATIVO (HEAD-UP) === */
-    .nav-viewport-full {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #0f172a;
-    }
-    .nav-map-rotator {
-      width: 250%;
-      height: 250%;
-      position: absolute;
-      left: -75%;
-      top: -75%;
-      transform-origin: 50% 50%;
-      transition: transform 0.4s ease-out;
-      will-change: transform;
-    }
+    /* ESTILOS NAVEGADOR ESTILO WAZE */
     .waze-speed-circle {
       width: 58px;
       height: 58px;
@@ -157,6 +139,7 @@
       position: relative;
       z-index: 2;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.75));
+      transition: transform 0.25s linear;
     }
     .fiorino-placa-rua {
       margin-top: 4px;
@@ -385,7 +368,6 @@
           <button @click="menuAberto = false" class="text-gray-400 hover:text-white text-2xl font-bold p-1 leading-none">&times;</button>
         </div>
 
-        <!-- STATUS DA ASSINATURA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2">
           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
           <div class="space-y-1">
@@ -394,7 +376,6 @@
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
-        <!-- SELETOR DE TEMA VISUAL -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência do App:</span>
@@ -415,7 +396,6 @@
           <p class="text-[9px] text-gray-400 text-center">O modo claro ativa cores de alto contraste contra o reflexo solar.</p>
         </div>
 
-        <!-- DADOS DO MOTORISTA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Dados do Motorista:</span>
@@ -787,7 +767,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE REAL (TRAJETO EXCLUSIVO ATÉ A ENTREGA) -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE REAL (TRAJETO EXCLUSIVO VIA RUA) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -825,11 +805,9 @@
          </div>
       </div>
       
-      <!-- MAPA NATIVO EM TELA CHEIA COM ROTAÇÃO SUAVE DO MAPA (HEAD-UP) -->
-      <div class="nav-viewport-full" id="navMapContainerWrapper">
-         <div class="nav-map-rotator" id="navMapRotator">
-            <div id="mapaNavegacao" class="w-full h-full"></div>
-         </div>
+      <!-- MAPA NATIVO EM TELA CHEIA -->
+      <div class="absolute inset-0 w-full h-full z-10" id="navMapContainerWrapper">
+         <div id="mapaNavegacao" class="w-full h-full"></div>
 
          <!-- VELOCÍMETRO ESTILO WAZE FLUTUANTE (CANTO INFERIOR ESQUERDO) -->
          <div class="absolute bottom-40 left-4 z-[500]">
@@ -1091,7 +1069,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM TRAÇADO DEDICADO DO CARRO ATÉ O DESTINO ESTILO WAZE) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM TRAÇADO RUA A RUA, SNAP TO ROAD E RECÁLCULO) -->
   <script>
     function entregaApp() {
       return {
@@ -1105,7 +1083,7 @@
         linhaRotaNav: null,
         marcadorDestinoNav: null,
         watchPositionId: null,
-        instrucaoAtual: 'Siga na via indicada',
+        instrucaoAtual: 'Calculando melhor trajeto...',
         distanciaProximaManobra: '',
         nomeProximaRua: '',
         nomeRuaAtualCarro: '',
@@ -1121,6 +1099,7 @@
         vozHabilitada: true,
         ultimaInstrucaoFalada: '',
         chegadaAnunciada: false,
+        coordenadasRotaAtual: [],
         // ===============================================
         
         menuAberto: false,
@@ -1347,35 +1326,42 @@
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
             this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-            this.instrucaoAtual = `Traçando rota para ${entrega.endereco}...`;
+            this.instrucaoAtual = `Iniciando trajeto para a Parada #${this.formatarParada(entrega?.parada_shopee)}...`;
             this.distanciaProximaManobra = '...';
-            this.nomeRuaAtualCarro = 'Calculando...';
+            this.nomeRuaAtualCarro = 'Localizando via...';
             this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
             this.iconeManobraNav = '⬆️';
             this.chegadaAnunciada = false;
             this.velocidadeGPS = 0;
             this.mapaArrastadoPeloUsuario = false;
+            this.coordenadasRotaAtual = [];
 
-            this.falarTexto(`Iniciando rota até ${entrega.endereco}`);
+            this.falarTexto(`Iniciando rota para ${entrega.endereco}`);
 
             setTimeout(() => { 
                 this.inicializarMapaNavegacao(); 
             }, 250);
 
-            // 1. Obtém posição GPS inicial e calcula a rota EXCLUSIVA do carro até a entrega
+            // 1. Obtém o GPS e trava o carro na rua oficial (Snap to Road)
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                const sLat = pos.coords.latitude;
-                const sLng = pos.coords.longitude;
+                let sLat = pos.coords.latitude;
+                let sLng = pos.coords.longitude;
+
+                // Snap to Road: Trava a coordenada no asfalto da rua
+                const pontoRua = await this.travarCoordenadaNaRua(sLat, sLng);
+                sLat = pontoRua.lat;
+                sLng = pontoRua.lng;
+
                 this.ultimaLatCarro = sLat;
                 this.ultimaLngCarro = sLng;
 
                 this.atualizarOuCriarMarcadorCarro(sLat, sLng, 0);
                 this.centralizarNoCarro(sLat, sLng);
 
-                // Chama o OSRM para traçar a rota exata da sua posição até a casa
-                await this.calcularRotaDedicadaOSRM(sLat, sLng, entrega.latitude, entrega.longitude);
+                // 2. Traça a rota rua a rua exatamente pelo asfalto
+                await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
-                // 2. Acompanhamento Contínuo
+                // 3. Acompanhamento Contínuo com Recálculo se errar a rua
                 this.watchPositionId = navigator.geolocation.watchPosition(
                     (novaPos) => this.processarPosicaoGPS(novaPos, entrega.latitude, entrega.longitude),
                     (err) => console.warn('Erro GPS (Watch):', err),
@@ -1409,8 +1395,27 @@
             this.mapaNav.invalidateSize(true);
         },
 
-        // CALCULA O TIRO EXATO: DO CARRO ATÉ O PORTÃO DA ENTREGA (IGUAL AO WAZE)
-        async calcularRotaDedicadaOSRM(sLat, sLng, eLat, eLng) {
+        // SNAP TO ROAD: NÃO DEIXA O CARRO DENTRO DA GARAGEM OU CASA, PUXA PARA O ASFALTO
+        async travarCoordenadaNaRua(lat, lng) {
+            try {
+                const url = `${this.OSRM_ROUTER_URL}/nearest/v1/driving/${lng},${lat}?number=1`;
+                const res = await fetch(url, { signal: AbortSignal.timeout(2000) });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.waypoints && data.waypoints.length > 0) {
+                        return {
+                            lat: data.waypoints[0].location[1],
+                            lng: data.waypoints[0].location[0],
+                            nomeRua: data.waypoints[0].name || ''
+                        };
+                    }
+                }
+            } catch(e) {}
+            return { lat, lng, nomeRua: '' };
+        },
+
+        // TRAÇA A ROTA CURVA A CURVA PELA RUA (NADA DE LINHA RETA OU HELICÓPTERO)
+        async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             try {
                 let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
                 let res = null;
@@ -1428,10 +1433,11 @@
                 if (data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
                     const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+                    this.coordenadasRotaAtual = coords;
                     
                     if (this.linhaRotaNav) this.mapaNav.removeLayer(this.linhaRotaNav);
                     
-                    // LINHA LARANJA OFICIAL ESTILO WAZE (#ea580c)
+                    // LINHA LARANJA OFICIAL ESTILO WAZE DOBRANDO AS RUAS
                     this.linhaRotaNav = L.polyline(coords, { 
                       color: '#ea580c', 
                       weight: 9, 
@@ -1440,17 +1446,24 @@
                       lineJoin: 'round' 
                     }).addTo(this.mapaNav);
 
-                    // Marcador de chegada na casa do cliente 🏁
+                    // PINO OFICIAL DE DESTINO NA CASA DO CLIENTE (COM IDENTIFICAÇÃO)
                     if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
                     const iconDest = L.divIcon({ 
                       className: 'dest-waze', 
-                      html: '<div style="font-size:38px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.85));">🏁</div>', 
-                      iconSize: [38,38], 
-                      iconAnchor: [19,38] 
+                      html: `
+                        <div style="display:flex; flex-direction:column; align-items:center;">
+                          <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.6);">
+                            #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
+                          </div>
+                          <div style="font-size:32px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));">📍</div>
+                        </div>
+                      `, 
+                      iconSize: [40, 52], 
+                      iconAnchor: [20, 52] 
                     });
                     this.marcadorDestinoNav = L.marker([eLat, eLng], { icon: iconDest }).addTo(this.mapaNav);
 
-                    // Distância real
+                    // Distância real calculada
                     const distanciaMetros = Math.round(route.distance);
                     this.distanciaProximaManobra = distanciaMetros > 1000 ? (distanciaMetros / 1000).toFixed(1) + ' km' : distanciaMetros + ' m';
 
@@ -1458,28 +1471,14 @@
                     this.passoAtualIndex = 0;
                     this.atualizarInstrucaoUI();
 
-                    // ALINHA O MAPA NA DIREÇÃO DA RUA (ESTILO WAZE: A RUA FICA VERTICAL NA TELA)
-                    if (coords.length > 1) {
-                        const bearingInicial = this.calcularBearing(coords[0][0], coords[0][1], coords[1][0], coords[1][1]);
-                        this.alinharMapaHeadUp(bearingInicial);
+                    // Ajusta a visão para acompanhar a rota dobrando quarteirões
+                    if (!this.mapaArrastadoPeloUsuario) {
+                      this.mapaNav.setView([sLat, sLng], 18, { animate: true });
                     }
                 }
             } catch (error) {
-                console.error('Erro de OSRM:', error);
-                // Fallback de linha reta do carro até a entrega
-                const coords = [[sLat, sLng], [eLat, eLng]];
-                if (this.linhaRotaNav) this.mapaNav.removeLayer(this.linhaRotaNav);
-                this.linhaRotaNav = L.polyline(coords, { color: '#ea580c', weight: 8, opacity: 0.9 }).addTo(this.mapaNav);
-                this.distanciaProximaManobra = Math.round(this.calcularDistancia(sLat, sLng, eLat, eLng)) + ' m';
-                this.instrucaoAtual = `Siga em frente até o destino`;
-            }
-        },
-
-        alinharMapaHeadUp(bearing) {
-            const rotEl = document.getElementById('navMapRotator');
-            if (rotEl) {
-               // Gira o mapa no ângulo inverso para a rua ficar sempre vertical na frente do carro
-               rotEl.style.transform = `rotate(${-bearing}deg)`;
+                console.error('Erro de traçado OSRM:', error);
+                this.instrucaoAtual = 'Aguardando traçado da via...';
             }
         },
 
@@ -1489,7 +1488,7 @@
             const iconHtml = `
               <div class="fiorino-container">
                 <div class="fiorino-aura"></div>
-                <div class="fiorino-svg-wrapper">
+                <div class="fiorino-svg-wrapper" style="transform: rotate(${heading}deg);">
                   <svg width="26" height="46" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
                     <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
                     <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
@@ -1536,11 +1535,29 @@
             }
         },
 
-        processarPosicaoGPS(pos, destLat, destLng) {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
+        // VERIFICA SE O MOTORISTA ERROU A RUA (OFF-ROUTE) E PRECISA DE RECÁLCULO IMEDIATO
+        verificarSeSaiuDaRota(cLat, cLng) {
+            if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length === 0) return false;
+            let menorDist = Infinity;
+            for (const pt of this.coordenadasRotaAtual) {
+                const d = this.calcularDistancia(cLat, cLng, pt[0], pt[1]);
+                if (d < menorDist) menorDist = d;
+            }
+            // Se estiver a mais de 35 metros do traçado previsto, errou a rua!
+            return menorDist > 35;
+        },
+
+        async processarPosicaoGPS(pos, destLat, destLng) {
+            let lat = pos.coords.latitude;
+            let lng = pos.coords.longitude;
             const speedKmh = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
             this.velocidadeGPS = speedKmh;
+
+            // Snap to road para manter o carro sempre no asfalto da rua
+            const pontoRua = await this.travarCoordenadaNaRua(lat, lng);
+            lat = pontoRua.lat;
+            lng = pontoRua.lng;
+            if (pontoRua.nomeRua) this.nomeRuaAtualCarro = pontoRua.nomeRua;
 
             let distanciaDesdeUltimo = 0;
             if (this.ultimaLatCarro && this.ultimaLngCarro) {
@@ -1558,15 +1575,11 @@
 
             if (headingCalculado !== null && !isNaN(headingCalculado)) {
                this.headingAtual = headingCalculado;
-               if (!this.mapaArrastadoPeloUsuario) {
-                  this.alinharMapaHeadUp(headingCalculado);
-               }
             }
 
-            // Atualiza a Fiorino cravada na rua
-            this.atualizarOuCriarMarcadorCarro(lat, lng, 0);
+            // Atualiza a Fiorino exatamente na rua com o ângulo de direção
+            this.atualizarOuCriarMarcadorCarro(lat, lng, this.headingAtual);
 
-            // Acompanha a navegação suavemente se o usuário não estiver explorando com o dedo
             if (!this.mapaArrastadoPeloUsuario) {
                 this.mapaNav.panTo([lat, lng], { animate: true, duration: 0.5 });
             }
@@ -1574,7 +1587,7 @@
             this.ultimaLatCarro = lat;
             this.ultimaLngCarro = lng;
 
-            // Distância em tempo real até a entrega
+            // Distância até o destino final
             const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
             this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
@@ -1589,9 +1602,25 @@
                 return;
             }
 
-            // Recalcula o traçado se o motorista se afastar mais de 50 metros da rota
-            if (distanciaDesdeUltimo > 40) {
-               this.calcularRotaDedicadaOSRM(lat, lng, destLat, destLng);
+            // RECÁLCULO INSTANTÂNEO SE ERRAR A RUA (ESTILO WAZE)
+            if (this.verificarSeSaiuDaRota(lat, lng)) {
+                this.falarTexto('Recalculando rota...');
+                await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
+                return;
+            }
+
+            // Atualização dos passos e manobras
+            if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
+                const stepAtual = this.passosRota[this.passoAtualIndex];
+                const manobraLat = stepAtual.maneuver.location[1];
+                const manobraLng = stepAtual.maneuver.location[0];
+                
+                const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
+                
+                if (distParaManobra < 18) { 
+                    this.passoAtualIndex++;
+                    this.atualizarInstrucaoUI();
+                }
             }
         },
 
@@ -1603,14 +1632,13 @@
             this.instrucaoAtual = info.texto;
             this.nomeProximaRua = info.rua;
             this.iconeManobraNav = info.icone;
-            this.nomeRuaAtualCarro = step.name || 'Via Atual';
 
             if (this.passosRota[this.passoAtualIndex + 1]) {
                const nextStep = this.passosRota[this.passoAtualIndex + 1];
                const nextInfo = this.interpretarManobraWaze(nextStep);
                this.subInstrucaoEmSeguida = `${nextInfo.icone} ${nextInfo.texto}`;
             } else {
-               this.subInstrucaoEmSeguida = '🏁 Chegada ao cliente';
+               this.subInstrucaoEmSeguida = '🏁 Destino final à frente';
             }
 
             if (this.ultimaInstrucaoFalada !== info.texto) {
@@ -1622,7 +1650,7 @@
         interpretarManobraWaze(step) {
             const type = step.maneuver.type;
             const modifier = step.maneuver.modifier || '';
-            const rua = step.name || 'próxima via';
+            const rua = step.name || 'sua rota';
 
             let icone = '⬆️';
             let texto = `Siga na ${rua}`;
@@ -1693,8 +1721,7 @@
                this.mapaNav.removeLayer(this.marcadorCarroNav);
                this.marcadorCarroNav = null;
             }
-            const rotEl = document.getElementById('navMapRotator');
-            if (rotEl) rotEl.style.transform = 'none';
+            this.coordenadasRotaAtual = [];
             this.mapaArrastadoPeloUsuario = false;
             this.modo = 'rua'; 
         },
