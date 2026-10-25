@@ -15,7 +15,7 @@
   <style>
     [x-cloak] { display: none !important; }
 
-    /* MODO DIURNO (ALTO CONTRASTE) */
+    /* MODO DIURNO (ALTO CONTRASTE CONTRA O REFLEXO DO SOL NO PARA-BRISA) */
     body.theme-claro {
       background-color: #f1f5f9 !important;
       color: #0f172a !important;
@@ -108,7 +108,7 @@
       width: 58px;
       height: 58px;
       border-radius: 50%;
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.9);
       border: 3px solid #38bdf8;
       display: flex;
       flex-direction: column;
@@ -122,36 +122,36 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 60px;
-      height: 70px;
+      width: 70px;
+      height: 80px;
       pointer-events: none;
     }
     .fiorino-aura {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: rgba(56, 189, 248, 0.28);
-      border: 2px solid rgba(56, 189, 248, 0.5);
+      border: 2px solid rgba(56, 189, 248, 0.55);
       position: absolute;
       z-index: 1;
     }
     .fiorino-svg-wrapper {
       position: relative;
       z-index: 2;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.7));
-      transition: transform 0.3s linear;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.75));
+      transition: transform 0.25s linear;
     }
     .fiorino-placa-rua {
       margin-top: 4px;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.92);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 9999px;
       padding: 2px 8px;
       font-size: 10px;
       font-weight: 900;
       white-space: nowrap;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
       z-index: 3;
     }
   </style>
@@ -251,7 +251,6 @@
         </p>
       </div>
 
-      <!-- Android / Chrome -->
       <div x-show="!isIOS" class="space-y-3 pt-1">
         <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
           <span>📲</span> Instalar Aplicativo no Celular
@@ -261,7 +260,6 @@
         </p>
       </div>
 
-      <!-- iPhone / iOS Safari -->
       <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs text-gray-300">
         <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
         <p>1. Toque no botão <strong>Compartilhar ⎋</strong> na barra do Safari.</p>
@@ -703,7 +701,7 @@
               <p class="text-sm text-gray-400 font-mono tracking-wider pt-0.5" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- BOTÕES DE NAVEGAÇÃO: NAVEGAR NO APP + WAZE -->
+            <!-- BOTÕES DE NAVEGAÇÃO REORGANIZADOS: NAVEGAR NO APP + WAZE -->
             <div class="grid grid-cols-2 gap-3 pt-2">
               <button @click="iniciarNavegacaoNativa(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">
                 <span class="text-2xl">🧭</span> Navegar no App
@@ -728,7 +726,7 @@
         </template>
       </main>
 
-      <!-- MODO 4: MAPA GERAL LEAFLET -->
+      <!-- MODO 4: MAPA VISUAL COM LEAFLET -->
       <main x-show="modo === 'mapa'" class="p-2 sm:p-4 max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-2">
         <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs">
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
@@ -787,7 +785,7 @@
                
                <div class="flex-1 min-w-0">
                   <div class="flex items-baseline gap-2">
-                     <span class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight leading-none" x-text="distanciaProximaManobra || 'GPS...'"></span>
+                     <span class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight leading-none" x-text="distanciaProximaManobra || '0 m'"></span>
                      <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">próxima via</span>
                   </div>
                   <h3 class="text-base sm:text-lg font-black text-cyan-400 truncate leading-tight mt-1" x-text="nomeProximaRua || instrucaoAtual"></h3>
@@ -1075,7 +1073,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM NAVEGAÇÃO 100% FUNCIONAL ESTILO WAZE) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM TRAÇADO INSTANTÂNEO PELA GEOMETRIA DO BANCO) -->
   <script>
     function entregaApp() {
       return {
@@ -1089,7 +1087,7 @@
         linhaRotaNav: null,
         marcadorDestinoNav: null,
         watchPositionId: null,
-        instrucaoAtual: 'Calculando melhor rota...',
+        instrucaoAtual: 'Siga na via indicada',
         distanciaProximaManobra: '',
         nomeProximaRua: '',
         nomeRuaAtualCarro: '',
@@ -1172,7 +1170,6 @@
 
         DIRECTUS_URL: 'https://banco.studiotesta.com.br',
         N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
-        // TÚNEL CLOUDFLARE HTTPS OFICIAL (100% OPERANTE NO 4G E WIFI)
         OSRM_ROUTER_URL: 'https://rotas.studiotesta.com.br',
 
         alternarTema(novoTema) {
@@ -1220,6 +1217,7 @@
         },
 
         decodePolyline(str, precision = 5) {
+          if (!str) return [];
           let index = 0, lat = 0, lng = 0, coordinates = [], shift = 0, result = 0, byte = null, latitude_change, longitude_change, factor = Math.pow(10, precision);
           while (index < str.length) {
             byte = null; shift = 0; result = 0;
@@ -1330,46 +1328,46 @@
             }
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
-            this.instrucaoAtual = 'Traçando rota com o servidor...';
-            this.distanciaProximaManobra = '';
-            this.nomeProximaRua = '';
-            this.nomeRuaAtualCarro = '';
-            this.subInstrucaoEmSeguida = '';
+            this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
+            this.instrucaoAtual = `Siga para a Parada #${this.formatarParada(entrega?.parada_shopee)}`;
+            this.distanciaProximaManobra = 'Calculando...';
+            this.nomeRuaAtualCarro = 'Você está aqui';
+            this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
             this.iconeManobraNav = '⬆️';
             this.chegadaAnunciada = false;
-            this.passosRota = [];
-            this.passoAtualIndex = 0;
             this.velocidadeGPS = 0;
             this.mapaArrastadoPeloUsuario = false;
 
-            this.falarTexto('Navegação DriveXPS iniciada.');
+            this.falarTexto(`Navegação iniciada. Siga para o endereço da parada.`);
 
-            // Inicializa e redimensiona o mapa para 100% da viewport
             setTimeout(() => { 
                 this.inicializarMapaNavegacao(); 
-            }, 250);
+                // MÁGICA DE VELOCIDADE: TRAÇA INSTANTANEAMENTE A ROTA PELA GEOMETRIA QUE JÁ ESTÁ NO BANCO!
+                this.tracarRotaInstantaneaPelaGeometria(entrega);
+            }, 200);
 
+            // Inicia leitura de GPS e acompanhamento
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const sLat = pos.coords.latitude;
                 const sLng = pos.coords.longitude;
-                const eLat = entrega.latitude;
-                const eLng = entrega.longitude;
-
                 this.ultimaLatCarro = sLat;
                 this.ultimaLngCarro = sLng;
 
-                await this.tracarRotaOSRM(sLat, sLng, eLat, eLng);
                 this.atualizarOuCriarMarcadorCarro(sLat, sLng, 0);
                 this.centralizarNoCarro(sLat, sLng);
+                this.calcularDistanciaAteEntrega(sLat, sLng, entrega.latitude, entrega.longitude);
+
+                // Opcional em segundo plano: consulta o servidor para pegar manobras curva a curva se disponível
+                this.buscarManobrasOSRMEmSegundoPlano(sLat, sLng, entrega.latitude, entrega.longitude);
 
                 this.watchPositionId = navigator.geolocation.watchPosition(
-                    (novaPos) => this.processarPosicaoGPS(novaPos, eLat, eLng),
+                    (novaPos) => this.processarPosicaoGPS(novaPos, entrega.latitude, entrega.longitude),
                     (err) => console.warn('Erro GPS (Watch):', err),
                     { enableHighAccuracy: true, maximumAge: 1000, timeout: 6000 }
                 );
             }, (err) => {
-                alert('Sinal de GPS fraco. Ative a localização com alta precisão.');
-                this.pararNavegacao();
+                // Se o GPS demorar, usa a coordenada da entrega para exibir o destino
+                this.centralizarNoCarro(entrega.latitude, entrega.longitude);
             }, { enableHighAccuracy: true });
         },
 
@@ -1387,7 +1385,6 @@
                   maxZoom: 19 
                 }).addTo(this.mapaNav);
 
-                // Detecta se o motorista arrastou o mapa com o dedo (modo livre estilo Waze)
                 this.mapaNav.on('dragstart', () => {
                     this.mapaArrastadoPeloUsuario = true;
                 });
@@ -1396,60 +1393,71 @@
             this.mapaNav.invalidateSize(true);
         },
 
-        async tracarRotaOSRM(sLat, sLng, eLat, eLng) {
+        // MÁGICA: USA A GEOMETRIA QUE O PRÓPRIO SERVIDOR SALVOU NA TABELA ROTAS (ZERO ESPERA!)
+        tracarRotaInstantaneaPelaGeometria(entrega) {
+            if (!this.mapaNav) return;
+
+            if (this.linhaRotaNav) {
+                this.mapaNav.removeLayer(this.linhaRotaNav);
+                this.linhaRotaNav = null;
+            }
+
+            let latlngs = [];
+
+            // 1. Tenta usar a geometria decodificada que veio da tabela 'rotas'
+            if (this.rotaGeometria && this.rotaGeometria.length > 5) {
+                latlngs = this.decodePolyline(this.rotaGeometria);
+            }
+
+            // 2. Se não houver geometria completa, liga as entregas em sequência viária
+            if (latlngs.length === 0 && this.entregas.length > 0) {
+                const entregasOrdenadas = [...this.entregas].sort((a, b) => a.ordem_entrega - b.ordem_entrega);
+                latlngs = entregasOrdenadas.map(e => [e.latitude, e.longitude]);
+            }
+
+            if (latlngs.length > 0) {
+                // LINHA LARANJA OFICIAL ESTILO WAZE COM ALTO CONTRASTE (#ea580c)
+                this.linhaRotaNav = L.polyline(latlngs, { 
+                  color: '#ea580c', 
+                  weight: 8, 
+                  opacity: 0.95, 
+                  lineCap: 'round', 
+                  lineJoin: 'round' 
+                }).addTo(this.mapaNav);
+            }
+
+            // Marcador da Parada (Destino) 🏁
+            if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
+            const iconDest = L.divIcon({ 
+              className: 'dest-waze', 
+              html: '<div style="font-size:38px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.85));">🏁</div>', 
+              iconSize: [38,38], 
+              iconAnchor: [19,38] 
+            });
+            this.marcadorDestinoNav = L.marker([entrega.latitude, entrega.longitude], { icon: iconDest }).addTo(this.mapaNav);
+        },
+
+        async buscarManobrasOSRMEmSegundoPlano(sLat, sLng, eLat, eLng) {
             try {
-                // Rota oficial traçada via Cloudflare Tunnel no servidor OSRM local
                 let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
                 let res = null;
-
                 try {
                   res = await fetch(url, { signal: AbortSignal.timeout(3000) });
                 } catch(e) {
-                  // Fallback seguro apenas em caso de instabilidade
                   url = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
                   res = await fetch(url);
                 }
 
-                if (!res || !res.ok) throw new Error('Falha OSRM');
+                if (!res || !res.ok) return;
                 const data = await res.json();
-
                 if (data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
-                    const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
-                    
-                    if (this.linhaRotaNav) this.mapaNav.removeLayer(this.linhaRotaNav);
-                    
-                    // LINHA OFICIAL LARANJA COM CONTORNO NÍTIDO ESTILO WAZE
-                    this.linhaRotaNav = L.polyline(coords, { 
-                      color: '#ea580c', 
-                      weight: 8, 
-                      opacity: 0.95, 
-                      lineCap: 'round', 
-                      lineJoin: 'round' 
-                    }).addTo(this.mapaNav);
-
-                    // Marcador de chegada na casa do cliente
-                    if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
-                    const iconDest = L.divIcon({ 
-                      className: 'dest-waze', 
-                      html: '<div style="font-size:38px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));">🏁</div>', 
-                      iconSize: [38,38], 
-                      iconAnchor: [19,38] 
-                    });
-                    this.marcadorDestinoNav = L.marker([eLat, eLng], { icon: iconDest }).addTo(this.mapaNav);
-
                     this.passosRota = route.legs[0].steps;
                     this.passoAtualIndex = 0;
                     this.atualizarInstrucaoUI();
-
-                    // Ajusta a visão para o trajeto
-                    this.mapaNav.fitBounds(this.linhaRotaNav.getBounds(), { padding: [80, 80] });
-                    this.mapaArrastadoPeloUsuario = false;
                 }
-            } catch (error) {
-                console.error('Erro de OSRM:', error);
-                this.instrucaoAtual = 'Siga em direção à parada';
-                this.nomeProximaRua = this.entregaNavegacao ? this.entregaNavegacao.endereco : 'Destino';
+            } catch(e) {
+                // Se falhar, o motorista não é prejudicado porque a rota laranja já está na tela
             }
         },
 
@@ -1482,8 +1490,8 @@
             const iconeCarro = L.divIcon({
               className: 'custom-fiorino-marker',
               html: iconHtml,
-              iconSize: [60, 70],
-              iconAnchor: [30, 35]
+              iconSize: [70, 80],
+              iconAnchor: [35, 40]
             });
 
             if (!this.marcadorCarroNav) {
@@ -1504,6 +1512,16 @@
             if (this.ultimaLatCarro && this.ultimaLngCarro) {
                 this.centralizarNoCarro(this.ultimaLatCarro, this.ultimaLngCarro);
             }
+        },
+
+        calcularDistanciaAteEntrega(cLat, cLng, dLat, dLng) {
+            const dist = this.calcularDistancia(cLat, cLng, dLat, dLng);
+            if (dist > 1000) {
+                this.distanciaProximaManobra = (dist / 1000).toFixed(1) + ' km';
+            } else {
+                this.distanciaProximaManobra = Math.round(dist) + ' m';
+            }
+            return dist;
         },
 
         processarPosicaoGPS(pos, destLat, destLng) {
@@ -1530,10 +1548,10 @@
                this.headingAtual = headingCalculado;
             }
 
-            // Atualiza a Fiorino exatamente na coordenada da rua
+            // Atualiza a Fiorino cravada na rua
             this.atualizarOuCriarMarcadorCarro(lat, lng, this.headingAtual);
 
-            // Se o motorista não arrastou a tela com o dedo, acompanha a navegação
+            // Se o motorista não arrastou a tela, o mapa acompanha suavemente
             if (!this.mapaArrastadoPeloUsuario) {
                 this.mapaNav.panTo([lat, lng], { animate: true, duration: 0.5 });
             }
@@ -1541,8 +1559,10 @@
             this.ultimaLatCarro = lat;
             this.ultimaLngCarro = lng;
 
-            // Fechamento automático ao aproximar-se (< 20m do endereço)
-            const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
+            // Calcula distância real até o pacote
+            const distDestinoFinal = this.calcularDistanciaAteEntrega(lat, lng, destLat, destLng);
+
+            // Fechamento automático ao aproximar-se (< 20 metros da casa)
             if (distDestinoFinal <= 20 && !this.chegadaAnunciada) {
                 this.chegadaAnunciada = true;
                 this.falarTexto('Você chegou ao destino!');
@@ -1553,7 +1573,7 @@
                 return;
             }
 
-            // Passos de conversão curva a curva
+            // Progressão das instruções caso OSRM tenha respondido
             if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
                 const stepAtual = this.passosRota[this.passoAtualIndex];
                 const manobraLat = stepAtual.maneuver.location[1];
@@ -1564,8 +1584,6 @@
                 if (distParaManobra < 18) { 
                     this.passoAtualIndex++;
                     this.atualizarInstrucaoUI();
-                } else {
-                    this.distanciaProximaManobra = distParaManobra > 1000 ? (distParaManobra/1000).toFixed(1) + ' km' : Math.round(distParaManobra) + ' m';
                 }
             }
         },
