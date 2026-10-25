@@ -112,15 +112,15 @@
       overflow: hidden;
       background: #0f172a;
     }
-    /* Contêiner de rotação suave: gira em torno do carro mantendo a rua na vertical */
+    /* Contêiner de rotação: gira em torno do carro mantendo a rua na vertical */
     .nav-map-rotator {
-      width: 250%;
-      height: 250%;
+      width: 260%;
+      height: 260%;
       position: absolute;
-      left: -75%;
-      top: -75%;
+      left: -80%;
+      top: -80%;
       transform-origin: 50% 68%;
-      transition: transform 0.35s ease-out;
+      transition: transform 0.4s ease-out;
       will-change: transform;
     }
     .waze-speed-circle {
@@ -577,7 +577,7 @@
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8) && passoTutorial !== 3, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8))}" class="hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">+ Rota</span>
+            <span class="text-xs font-black tracking-wide">Rota</span>
           </button>
           <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8))}" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
@@ -732,7 +732,7 @@
               <p class="text-sm text-gray-400 font-mono tracking-wider pt-0.5" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- BOTÕES DE NAVEGAÇÃO: NAVEGAR NO APP + WAZE -->
+            <!-- BOTÕES DE NAVEGAÇÃO REORGANIZADOS: NAVEGAR NO APP + WAZE -->
             <div class="grid grid-cols-2 gap-3 pt-2">
               <button @click="iniciarNavegacaoNativa(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">
                 <span class="text-2xl">🧭</span> Navegar
@@ -839,7 +839,7 @@
          </div>
       </div>
       
-      <!-- VIEWPORT EXPANDIDA: MAPA LEAFLET OFICIAL COM ROTAÇÃO SUAVE EM TORNO DO CARRO -->
+      <!-- VIEWPORT EXPANDIDA: MAPA LEAFLET COM ROTAÇÃO SUAVE EM TORNO DO CARRO -->
       <div class="nav-viewport-full" id="navMapContainerWrapper">
          <div class="nav-map-rotator" id="navMapRotator">
             <div id="mapaNavegacao" class="w-full h-full"></div>
@@ -1107,7 +1107,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (100% LEAFLET NATIVO COM TRAÇADO LARANJA E ROTAÇÃO HEAD-UP) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM TRAÇADO RUA A RUA, SNAP TO ROAD E RECÁLCULO) -->
   <script>
     function entregaApp() {
       return {
@@ -1412,7 +1412,7 @@
             if (!el) return;
 
             if (!this.mapaNav) {
-                // Leaflet nativo oficial - o mesmo que roda com 100% de sucesso na aba Mapa
+                // Leaflet nativo oficial com OpenStreetMap (Mesmo da aba Mapa)
                 this.mapaNav = L.map('mapaNavegacao', { 
                   zoomControl: false, 
                   attributionControl: false 
@@ -1451,13 +1451,14 @@
         // CALCULA E DESENHA O TRAÇADO LARANJA OFICIAL COM O MESMO MOTOR DA ABA MAPA
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             try {
-                let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
+                // Força overview=full e geometries=polyline para extração 100% garantida
+                let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&overview=full&language=pt`;
                 let res = null;
 
                 try {
                   res = await fetch(url, { signal: AbortSignal.timeout(3500) });
                 } catch(e) {
-                  url = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
+                  url = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&overview=full&language=pt`;
                   res = await fetch(url);
                 }
 
@@ -1468,11 +1469,13 @@
                     const route = data.routes[0];
                     let coordsLatLon = [];
 
-                    // O Leaflet precisa rigorosamente de [Lat, Lng]
-                    if (route.geometry && typeof route.geometry === 'object' && Array.isArray(route.geometry.coordinates)) {
-                        coordsLatLon = route.geometry.coordinates.map(c => [Number(c[1]), Number(c[0])]);
-                    } else if (typeof route.geometry === 'string') {
+                    // 1. Extração por Polyline codificada (formato padrão oficial do OSRM)
+                    if (typeof route.geometry === 'string') {
                         coordsLatLon = this.decodePolyline(route.geometry);
+                    } 
+                    // 2. Extração caso venha em GeoJSON [lng, lat]
+                    else if (route.geometry && typeof route.geometry === 'object' && Array.isArray(route.geometry.coordinates)) {
+                        coordsLatLon = route.geometry.coordinates.map(c => [Number(c[1]), Number(c[0])]);
                     }
 
                     if (coordsLatLon.length > 0) {
