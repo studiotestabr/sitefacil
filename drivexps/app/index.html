@@ -85,9 +85,13 @@
     body.theme-claro .text-blue-400 { color: #1d4ed8 !important; }
     body.theme-claro .text-amber-400 { color: #b45309 !important; }
 
-    /* FILTRO DE MODO NOTURNO PARA O MAPA LEAFLET */
-    .theme-escuro #mapaContainer .leaflet-tile-pane {
+    /* FILTRO DE MODO NOTURNO (IDÊNTICO NA ABA MAPA E NA NAVEGAÇÃO) */
+    .theme-escuro #mapaContainer .leaflet-tile-pane,
+    .theme-escuro #mapaNavegacao .leaflet-tile-pane {
       filter: brightness(0.68) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35);
+    }
+    .theme-claro #mapaNavegacao .leaflet-tile-pane {
+      filter: contrast(1.05) brightness(1.02);
     }
 
     .leaflet-popup-content-wrapper {
@@ -99,10 +103,29 @@
     }
     .leaflet-popup-tip { background-color: #0f172a !important; }
 
-    /* ESTILOS WAZE DO VELOCÍMETRO */
+    /* === CONTROLES ESTILO WAZE === */
+    .nav-viewport-full {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0f172a;
+    }
+    /* Contêiner de rotação suave: gira em torno do carro mantendo a rua na vertical */
+    .nav-map-rotator {
+      width: 250%;
+      height: 250%;
+      position: absolute;
+      left: -75%;
+      top: -75%;
+      transform-origin: 50% 68%;
+      transition: transform 0.35s ease-out;
+      will-change: transform;
+    }
     .waze-speed-circle {
-      width: 60px;
-      height: 60px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       background: rgba(15, 23, 42, 0.92);
       border: 3px solid #38bdf8;
@@ -113,13 +136,26 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(6px);
     }
+    .waze-mira-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid #ea580c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+    }
     .fiorino-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 60px;
-      height: 70px;
+      width: 70px;
+      height: 80px;
       pointer-events: none;
     }
     .fiorino-aura {
@@ -162,13 +198,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
 
-  <!-- Leaflet para a aba Mapa geral -->
+  <!-- Leaflet Oficial e Estável (O mesmo que já funciona na aba Mapa) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- MapLibre GL: Motor 3D com rotação nativa idêntico ao Waze (gratuito e open-source) -->
-  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
   <!-- Tailwind, Alpine.js e SheetJS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -297,7 +329,7 @@
           <span class="text-orange-500">👜</span><span>Separação em sacolas numeradas de 10 em 10</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-orange-500">🧭</span><span><strong>Navegador Nativo estilo Waze 3D</strong> sem sair do app</span>
+          <span class="text-orange-500">🧭</span><span><strong>Navegador Nativo estilo Waze</strong> sem sair do app</span>
         </div>
         <div class="flex items-center gap-2 pt-1 border-t border-gray-800">
           <span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis (começam na sua 1ª rota)!</span>
@@ -700,7 +732,7 @@
               <p class="text-sm text-gray-400 font-mono tracking-wider pt-0.5" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- BOTÕES DE NAVEGAÇÃO REORGANIZADOS: NAVEGAR NO APP + WAZE -->
+            <!-- BOTÕES DE NAVEGAÇÃO: NAVEGAR NO APP + WAZE -->
             <div class="grid grid-cols-2 gap-3 pt-2">
               <button @click="iniciarNavegacaoNativa(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">
                 <span class="text-2xl">🧭</span> Navegar
@@ -769,7 +801,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL NATIVO) -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 100% LEAFLET NATIVO -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -807,25 +839,30 @@
          </div>
       </div>
       
-      <!-- MAPA NATIVO 3D REAL (SEM CORTES, A CÂMERA INCLINA E GIRA NATIVAMENTE) -->
-      <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL">
-      </div>
+      <!-- VIEWPORT EXPANDIDA: MAPA LEAFLET OFICIAL COM ROTAÇÃO SUAVE EM TORNO DO CARRO -->
+      <div class="nav-viewport-full" id="navMapContainerWrapper">
+         <div class="nav-map-rotator" id="navMapRotator">
+            <div id="mapaNavegacao" class="w-full h-full"></div>
+         </div>
 
-      <!-- VELOCÍMETRO ESTILO WAZE FLUTUANTE (CANTO INFERIOR ESQUERDO) -->
-      <div class="absolute bottom-52 left-4 z-[500]">
-         <div class="waze-speed-circle">
-            <span class="text-xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
-            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
+         <!-- VELOCÍMETRO ESTILO WAZE FLUTUANTE (CANTO INFERIOR ESQUERDO) -->
+         <div class="absolute bottom-52 left-4 z-[500]">
+            <div class="waze-speed-circle">
+               <span class="text-xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
+               <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
+            </div>
+         </div>
+
+         <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE: APENAS ÍCONE DE MIRA CIRCULAR -->
+         <div class="absolute bottom-52 right-4 z-[500]">
+            <button @click="centralizarCarroManual()" 
+                    class="waze-mira-btn active:scale-90 transition"
+                    :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'"
+                    title="Re-centralizar na rota">
+               <span class="text-2xl">🎯</span>
+            </button>
          </div>
       </div>
-
-      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (CANTO INFERIOR DIREITO) -->
-      <button @click="centralizarCarroManual()" 
-              class="absolute bottom-52 right-4 z-[500] bg-gray-950/90 border-2 text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-black backdrop-blur-md active:scale-95 transition"
-              :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-700 text-gray-300'">
-         <span class="text-lg">🎯</span>
-         <span x-text="mapaArrastadoPeloUsuario ? 'Re-centralizar' : 'Centralizado'"></span>
-      </button>
 
       <!-- PAINEL INFERIOR FLUTUANTE COM OS 4 QUADRADOS DAS SACOLAS -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 shadow-[0_-12px_30px_rgba(0,0,0,0.9)] pb-6">
@@ -1070,7 +1107,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO COM MAPLIBRE GL 3D WAZE NATIVO -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (100% LEAFLET NATIVO COM TRAÇADO LARANJA E ROTAÇÃO HEAD-UP) -->
   <script>
     function entregaApp() {
       return {
@@ -1079,9 +1116,10 @@
         
         // ==== VARIÁVEIS NAVEGAÇÃO NATIVA ESTILO WAZE ====
         entregaNavegacao: null,
-        mapaNavGL: null,
-        marcadorCarroGL: null,
-        marcadorDestinoGL: null,
+        mapaNav: null,
+        marcadorCarroNav: null,
+        linhaRotaNav: null,
+        marcadorDestinoNav: null,
         watchPositionId: null,
         instrucaoAtual: 'Calculando melhor trajeto...',
         distanciaProximaManobra: '',
@@ -1296,7 +1334,7 @@
           }
         },
 
-        // ==== ENGINE NAVEGAÇÃO NATIVA 3D (MAPLIBRE GL ESTILO WAZE REAL) ====
+        // ==== ENGINE NAVEGAÇÃO NATIVA 100% LEAFLET (ESTILO WAZE REAL) ====
 
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1326,9 +1364,9 @@
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
             this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-            this.instrucaoAtual = `Iniciando trajeto para a Parada #${this.formatarParada(entrega?.parada_shopee)}...`;
+            this.instrucaoAtual = `Traçando rota para ${entrega.endereco}...`;
             this.distanciaProximaManobra = '...';
-            this.nomeRuaAtualCarro = 'Localizando via...';
+            this.nomeRuaAtualCarro = 'Calculando...';
             this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
             this.iconeManobraNav = '⬆️';
             this.chegadaAnunciada = false;
@@ -1339,59 +1377,9 @@
             this.falarTexto(`Iniciando rota para ${entrega.endereco}`);
 
             setTimeout(() => { 
-                this.inicializarMapaNavGL(entrega); 
-            }, 300);
-        },
+                this.inicializarMapaNavegacao(); 
+            }, 250);
 
-        inicializarMapaNavGL(entrega) {
-            const container = document.getElementById('mapaNavGL');
-            if (!container) return;
-
-            // Se já existia uma instância, removemos para recriar limpa
-            if (this.mapaNavGL) {
-                this.mapaNavGL.remove();
-                this.mapaNavGL = null;
-            }
-
-            // Inicializa MapLibre GL com visual 3D inclinado igual ao Waze (pitch: 58)
-            this.mapaNavGL = new maplibregl.Map({
-                container: 'mapaNavGL',
-                style: {
-                    version: 8,
-                    sources: {
-                        'osm-tiles': {
-                            type: 'raster',
-                            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                            tileSize: 256
-                        }
-                    },
-                    layers: [
-                        {
-                            id: 'osm-layer',
-                            type: 'raster',
-                            source: 'osm-tiles',
-                            minzoom: 0,
-                            maxzoom: 19
-                        }
-                    ]
-                },
-                center: [entrega.longitude, entrega.latitude],
-                zoom: 18,
-                pitch: 58,       // INCLINAÇÃO 3D DO WAZE
-                bearing: 0       // ROTAÇÃO DA RUA
-            });
-
-            this.mapaNavGL.on('dragstart', () => {
-                this.mapaArrastadoPeloUsuario = true;
-            });
-
-            this.mapaNavGL.on('load', () => {
-                // Inicia o GPS assim que o mapa carregar perfeitamente
-                this.iniciarGPSContinuoNavegacao(entrega);
-            });
-        },
-
-        iniciarGPSContinuoNavegacao(entrega) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 let sLat = pos.coords.latitude;
                 let sLng = pos.coords.longitude;
@@ -1403,10 +1391,9 @@
                 this.ultimaLatCarro = sLat;
                 this.ultimaLngCarro = sLng;
 
-                this.atualizarMarcadorCarroGL(sLat, sLng, 0);
-                this.centralizarNoCarroGL(sLat, sLng, 0);
+                this.atualizarOuCriarMarcadorCarro(sLat, sLng, 0);
+                this.centralizarNoCarro(sLat, sLng);
 
-                // Traça a rota oficial de carro
                 await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
                 this.watchPositionId = navigator.geolocation.watchPosition(
@@ -1418,6 +1405,29 @@
                 alert('Não foi possível obter o sinal de GPS.');
                 this.pararNavegacao();
             }, { enableHighAccuracy: true });
+        },
+
+        inicializarMapaNavegacao() {
+            const el = document.getElementById('mapaNavegacao');
+            if (!el) return;
+
+            if (!this.mapaNav) {
+                // Leaflet nativo oficial - o mesmo que roda com 100% de sucesso na aba Mapa
+                this.mapaNav = L.map('mapaNavegacao', { 
+                  zoomControl: false, 
+                  attributionControl: false 
+                }).setView([-24.1667, -46.7800], 19);
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+                  maxZoom: 19 
+                }).addTo(this.mapaNav);
+
+                this.mapaNav.on('dragstart', () => {
+                    this.mapaArrastadoPeloUsuario = true;
+                });
+            }
+
+            this.mapaNav.invalidateSize(true);
         },
 
         async travarCoordenadaNaRua(lat, lng) {
@@ -1438,7 +1448,7 @@
             return { lat, lng, nomeRua: '' };
         },
 
-        // TRAÇADO ROBUSTO: CONVERTE TANTO STRING POLILINHA QUANTO GEOJSON SEM FALHAS
+        // CALCULA E DESENHA O TRAÇADO LARANJA OFICIAL COM O MESMO MOTOR DA ABA MAPA
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             try {
                 let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
@@ -1456,62 +1466,48 @@
 
                 if (data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
-                    let coordsLngLat = [];
+                    let coordsLatLon = [];
 
-                    // O MapLibre usa GeoJSON [Lng, Lat] nativamente
+                    // O Leaflet precisa rigorosamente de [Lat, Lng]
                     if (route.geometry && typeof route.geometry === 'object' && Array.isArray(route.geometry.coordinates)) {
-                        coordsLngLat = route.geometry.coordinates.map(c => [Number(c[0]), Number(c[1])]);
+                        coordsLatLon = route.geometry.coordinates.map(c => [Number(c[1]), Number(c[0])]);
                     } else if (typeof route.geometry === 'string') {
-                        // Decodifica a string caso venha codificada
-                        const ptsLatLon = this.decodePolyline(route.geometry);
-                        coordsLngLat = ptsLatLon.map(p => [p[1], p[0]]);
+                        coordsLatLon = this.decodePolyline(route.geometry);
                     }
 
-                    if (coordsLngLat.length > 0) {
-                        this.coordenadasRotaAtual = coordsLngLat;
+                    if (coordsLatLon.length > 0) {
+                        this.coordenadasRotaAtual = coordsLatLon;
 
-                        // Adiciona ou atualiza a linha laranja (#ea580c) no MapLibre GL
-                        if (this.mapaNavGL.getSource('rota-source')) {
-                            this.mapaNavGL.getSource('rota-source').setData({
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'LineString',
-                                    coordinates: coordsLngLat
-                                }
-                            });
-                        } else {
-                            this.mapaNavGL.addSource('rota-source', {
-                                type: 'geojson',
-                                data: {
-                                    type: 'Feature',
-                                    geometry: {
-                                        type: 'LineString',
-                                        coordinates: coordsLngLat
-                                    }
-                                }
-                            });
-
-                            // Borda escura para dar contraste Waze
-                            this.mapaNavGL.addLayer({
-                                id: 'rota-borda',
-                                type: 'line',
-                                source: 'rota-source',
-                                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                                paint: { 'line-color': '#7c2d12', 'line-width': 12, 'line-opacity': 0.8 }
-                            });
-
-                            // Linha Laranja Oficial (#ea580c)
-                            this.mapaNavGL.addLayer({
-                                id: 'rota-linha',
-                                type: 'line',
-                                source: 'rota-source',
-                                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                                paint: { 'line-color': '#ea580c', 'line-width': 8, 'line-opacity': 1.0 }
-                            });
+                        if (this.linhaRotaNav) {
+                            this.mapaNav.removeLayer(this.linhaRotaNav);
+                            this.linhaRotaNav = null;
                         }
 
+                        // LINHA LARANJA OFICIAL IDÊNTICA À ABA MAPA (#ea580c) DE 10PX
+                        this.linhaRotaNav = L.polyline(coordsLatLon, { 
+                          color: '#ea580c', 
+                          weight: 10, 
+                          opacity: 0.98, 
+                          lineCap: 'round', 
+                          lineJoin: 'round' 
+                        }).addTo(this.mapaNav);
+
                         // Marcador oficial de destino (Pino na casa do cliente)
-                        this.atualizarMarcadorDestinoGL(eLat, eLng);
+                        if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
+                        const iconDest = L.divIcon({ 
+                          className: 'dest-waze', 
+                          html: `
+                            <div style="display:flex; flex-direction:column; align-items:center;">
+                              <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.6);">
+                                #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
+                              </div>
+                              <div style="font-size:32px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));">📍</div>
+                            </div>
+                          `, 
+                          iconSize: [40, 52], 
+                          iconAnchor: [20, 52] 
+                        });
+                        this.marcadorDestinoNav = L.marker([eLat, eLng], { icon: iconDest }).addTo(this.mapaNav);
 
                         const distanciaMetros = Math.round(route.distance);
                         this.distanciaProximaManobra = distanciaMetros > 1000 ? (distanciaMetros / 1000).toFixed(1) + ' km' : distanciaMetros + ' m';
@@ -1520,19 +1516,15 @@
                         this.passoAtualIndex = 0;
                         this.atualizarInstrucaoUI();
 
-                        // ALINHAMENTO IMEDIATO DA RUA NA VERTICAL (ESTILO WAZE)
-                        if (coordsLngLat.length > 1) {
-                            const bearingInicial = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
+                        // ALINHAMENTO AUTOMÁTICO DA RUA NA VERTICAL (HEAD-UP WAZE)
+                        if (coordsLatLon.length > 1) {
+                            const bearingInicial = this.calcularBearing(coordsLatLon[0][0], coordsLatLon[0][1], coordsLatLon[1][0], coordsLatLon[1][1]);
                             this.headingAtual = bearingInicial;
-                            if (!this.mapaArrastadoPeloUsuario) {
-                                this.mapaNavGL.easeTo({
-                                    center: [sLng, sLat],
-                                    bearing: bearingInicial, // RUA RETA PARA CIMA
-                                    pitch: 58,
-                                    zoom: 18,
-                                    duration: 600
-                                });
-                            }
+                            this.girarViewportWaze(bearingInicial);
+                        }
+
+                        if (!this.mapaArrastadoPeloUsuario) {
+                          this.mapaNav.setView([sLat, sLng], 19, { animate: true });
                         }
                     }
                 }
@@ -1542,80 +1534,66 @@
             }
         },
 
-        atualizarMarcadorDestinoGL(lat, lng) {
-            if (!this.mapaNavGL) return;
-            if (this.marcadorDestinoGL) {
-                this.marcadorDestinoGL.setLngLat([lng, lat]);
-                return;
+        // GIRA O VIEWPORT PARA DEIXAR A RUA VERTICAL E A FIORINO RETA PARA CIMA
+        girarViewportWaze(bearing) {
+            const rotEl = document.getElementById('navMapRotator');
+            if (rotEl) {
+               rotEl.style.transform = `rotate(${-bearing}deg)`;
             }
+        },
 
-            const el = document.createElement('div');
-            el.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center;">
-                  <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.7);">
-                    #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
-                  </div>
-                  <div style="font-size:34px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));">📍</div>
+        atualizarOuCriarMarcadorCarro(lat, lng, heading) {
+            if (!this.mapaNav) return;
+
+            // A Fiorino aponta para cima pois o mapa é quem gira por baixo
+            const iconHtml = `
+              <div class="fiorino-container">
+                <div class="fiorino-aura"></div>
+                <div class="fiorino-svg-wrapper">
+                  <svg width="28" height="50" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
+                    <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
+                    <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
+                    <rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/>
+                    <rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/>
+                    <rect x="10" y="60" width="20" height="3" fill="#333"/>
+                    <path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#1e293b"/>
+                    <rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/>
+                    <rect x="6" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
+                    <rect x="28" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
+                    <rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+                    <rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+                  </svg>
                 </div>
+                <div class="fiorino-placa-rua">${this.nomeRuaAtualCarro || 'Sua Posição'}</div>
+              </div>
             `;
 
-            this.marcadorDestinoGL = new maplibregl.Marker({ element: el, anchor: 'bottom' })
-                .setLngLat([lng, lat])
-                .addTo(this.mapaNavGL);
-        },
+            const iconeCarro = L.divIcon({
+              className: 'custom-fiorino-marker',
+              html: iconHtml,
+              iconSize: [70, 80],
+              iconAnchor: [35, 40]
+            });
 
-        atualizarMarcadorCarroGL(lat, lng, heading) {
-            if (!this.mapaNavGL) return;
-
-            if (!this.marcadorCarroGL) {
-                const el = document.createElement('div');
-                el.className = 'fiorino-container';
-                el.innerHTML = `
-                    <div class="fiorino-aura"></div>
-                    <div class="fiorino-svg-wrapper">
-                      <svg width="28" height="50" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
-                        <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
-                        <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
-                        <rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/>
-                        <rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/>
-                        <rect x="10" y="60" width="20" height="3" fill="#333"/>
-                        <path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#1e293b"/>
-                        <rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/>
-                        <rect x="6" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
-                        <rect x="28" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
-                        <rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
-                        <rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
-                      </svg>
-                    </div>
-                    <div class="fiorino-placa-rua" id="placaRuaCarro">${this.nomeRuaAtualCarro || 'Sua Posição'}</div>
-                `;
-
-                this.marcadorCarroGL = new maplibregl.Marker({ element: el, anchor: 'center' })
-                    .setLngLat([lng, lat])
-                    .addTo(this.mapaNavGL);
+            if (!this.marcadorCarroNav) {
+                this.marcadorCarroNav = L.marker([lat, lng], { icon: iconeCarro, zIndexOffset: 1000 }).addTo(this.mapaNav);
             } else {
-                this.marcadorCarroGL.setLngLat([lng, lat]);
-                const p = document.getElementById('placaRuaCarro');
-                if (p) p.innerText = this.nomeRuaAtualCarro || 'Sua Posição';
+                this.marcadorCarroNav.setLatLng([lat, lng]);
+                this.marcadorCarroNav.setIcon(iconeCarro);
             }
         },
 
-        centralizarNoCarroGL(lat, lng, bearing) {
-            if (!this.mapaNavGL) return;
-            this.mapaNavGL.easeTo({
-                center: [lng, lat],
-                bearing: bearing || this.headingAtual,
-                pitch: 58,
-                zoom: 18,
-                duration: 400
-            });
+        centralizarNoCarro(lat, lng) {
+            if (!this.mapaNav) return;
+            this.mapaNav.setView([lat, lng], 19, { animate: true });
         },
 
         centralizarCarroManual() {
             this.mapaArrastadoPeloUsuario = false;
             if (this.ultimaLatCarro && this.ultimaLngCarro) {
-                this.centralizarNoCarroGL(this.ultimaLatCarro, this.ultimaLngCarro, this.headingAtual);
+                this.centralizarNoCarro(this.ultimaLatCarro, this.ultimaLngCarro);
+                this.girarViewportWaze(this.headingAtual);
             }
         },
 
@@ -1623,7 +1601,7 @@
             if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length === 0) return false;
             let menorDist = Infinity;
             for (const pt of this.coordenadasRotaAtual) {
-                const d = this.calcularDistancia(cLat, cLng, pt[1], pt[0]);
+                const d = this.calcularDistancia(cLat, cLng, pt[0], pt[1]);
                 if (d < menorDist) menorDist = d;
             }
             return menorDist > 35;
@@ -1656,14 +1634,15 @@
 
             if (headingCalculado !== null && !isNaN(headingCalculado)) {
                this.headingAtual = headingCalculado;
+               if (!this.mapaArrastadoPeloUsuario) {
+                  this.girarViewportWaze(headingCalculado);
+               }
             }
 
-            // Atualiza a posição da Fiorino na coordenada real
-            this.atualizarMarcadorCarroGL(lat, lng, 0);
+            this.atualizarOuCriarMarcadorCarro(lat, lng, 0);
 
-            // Acompanha a câmera do Waze com a rua na vertical
             if (!this.mapaArrastadoPeloUsuario) {
-                this.centralizarNoCarroGL(lat, lng, this.headingAtual);
+                this.mapaNav.panTo([lat, lng], { animate: true, duration: 0.5 });
             }
 
             this.ultimaLatCarro = lat;
@@ -1683,14 +1662,12 @@
                 return;
             }
 
-            // Recálculo se errar a rua
             if (this.verificarSeSaiuDaRota(lat, lng)) {
                 this.falarTexto('Recalculando rota...');
                 await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
                 return;
             }
 
-            // Avanço das manobras
             if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
                 const stepAtual = this.passosRota[this.passoAtualIndex];
                 const manobraLat = stepAtual.maneuver.location[1];
@@ -1790,12 +1767,20 @@
             if ('speechSynthesis' in window) {
                window.speechSynthesis.cancel();
             }
-            if (this.mapaNavGL) {
-               this.mapaNavGL.remove();
-               this.mapaNavGL = null;
+            if (this.linhaRotaNav && this.mapaNav) {
+               this.mapaNav.removeLayer(this.linhaRotaNav);
+               this.linhaRotaNav = null;
             }
-            this.marcadorCarroGL = null;
-            this.marcadorDestinoGL = null;
+            if (this.marcadorDestinoNav && this.mapaNav) {
+               this.mapaNav.removeLayer(this.marcadorDestinoNav);
+               this.marcadorDestinoNav = null;
+            }
+            if (this.marcadorCarroNav && this.mapaNav) {
+               this.mapaNav.removeLayer(this.marcadorCarroNav);
+               this.marcadorCarroNav = null;
+            }
+            const rotEl = document.getElementById('navMapRotator');
+            if (rotEl) rotEl.style.transform = 'none';
             this.coordenadasRotaAtual = [];
             this.mapaArrastadoPeloUsuario = false;
             this.modo = 'rua'; 
@@ -2191,7 +2176,7 @@
                 plano_ativo: 'gratuito'
               };
               const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
-                method: 'POST', headers, credentials: 'include', body: JSON.stringify(novoRegistro)
+                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
               });
               const postData = await postRes.json();
               userSaas = postData.data;
