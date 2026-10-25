@@ -15,7 +15,7 @@
   <style>
     [x-cloak] { display: none !important; }
 
-    /* MODO DIURNO (ALTO CONTRASTE) */
+    /* MODO DIURNO (ALTO CONTRASTE CONTRA O REFLEXO DO SOL NO PARA-BRISA) */
     body.theme-claro {
       background-color: #f1f5f9 !important;
       color: #0f172a !important;
@@ -85,7 +85,7 @@
     body.theme-claro .text-blue-400 { color: #1d4ed8 !important; }
     body.theme-claro .text-amber-400 { color: #b45309 !important; }
 
-    /* MODO NOTURNO DO MAPA OPENSTREETMAP */
+    /* FILTRO DE MODO NOTURNO PARA O MAPA OPENSTREETMAP */
     .theme-escuro #mapaContainer .leaflet-tile-pane,
     .theme-escuro #mapaNavegacao .leaflet-tile-pane {
       filter: brightness(0.68) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35);
@@ -103,19 +103,38 @@
     }
     .leaflet-popup-tip { background-color: #0f172a !important; }
 
-    /* ESTILOS NAVEGADOR ESTILO WAZE */
+    /* === ESTILOS NAVEGADOR WAZE NATIVO (HEAD-UP E CONTROLES PERFEITOS) === */
+    .nav-viewport-full {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #090d16;
+    }
+    /* O mapa expandido roda em torno da traseira do carro garantindo visão vertical da rua */
+    .nav-map-rotator {
+      width: 250%;
+      height: 250%;
+      position: absolute;
+      left: -75%;
+      top: -75%;
+      transform-origin: 50% 68%;
+      transition: transform 0.35s ease-out;
+      will-change: transform;
+    }
     .waze-speed-circle {
-      width: 58px;
-      height: 58px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.92);
       border: 3px solid #38bdf8;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
     }
     .fiorino-container {
       display: flex;
@@ -139,7 +158,6 @@
       position: relative;
       z-index: 2;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.75));
-      transition: transform 0.25s linear;
     }
     .fiorino-placa-rua {
       margin-top: 4px;
@@ -269,7 +287,7 @@
     </div>
 
     <div class="pt-6 pb-2 text-center text-xs select-text">
-      <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </div>
   </div>
@@ -320,7 +338,7 @@
     </div>
 
     <div class="pt-6 pb-2 text-center text-xs select-text">
-      <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </div>
   </div>
@@ -368,6 +386,7 @@
           <button @click="menuAberto = false" class="text-gray-400 hover:text-white text-2xl font-bold p-1 leading-none">&times;</button>
         </div>
 
+        <!-- STATUS DA ASSINATURA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2">
           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
           <div class="space-y-1">
@@ -376,6 +395,7 @@
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
+        <!-- SELETOR DE TEMA VISUAL -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência do App:</span>
@@ -396,6 +416,7 @@
           <p class="text-[9px] text-gray-400 text-center">O modo claro ativa cores de alto contraste contra o reflexo solar.</p>
         </div>
 
+        <!-- DADOS DO MOTORISTA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Dados do Motorista:</span>
@@ -543,7 +564,7 @@
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8) && passoTutorial !== 3, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8))}" class="hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">Rota</span>
+            <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
           <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8))}" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
@@ -736,7 +757,7 @@
             🎯 Rota
           </button>
         </div>
-        <div class="w-full h-[70vh] sm:h-[62vh] rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
+        <div class="w-full h-[54vh] sm:h-[62vh] rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
           <div id="mapaContainer" class="w-full h-full z-10"></div>
         </div>
       </main>
@@ -767,7 +788,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE REAL (TRAJETO EXCLUSIVO VIA RUA) -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE REAL (LAYOUT E CONTROLES PERFEITOS) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -805,12 +826,14 @@
          </div>
       </div>
       
-      <!-- MAPA NATIVO EM TELA CHEIA -->
-      <div class="absolute inset-0 w-full h-full z-10" id="navMapContainerWrapper">
-         <div id="mapaNavegacao" class="w-full h-full"></div>
+      <!-- MAPA NATIVO EM TELA CHEIA (ROTACIONA O MAPA PARA FICAR VERTICAL / HEAD-UP) -->
+      <div class="nav-viewport-full" id="navMapContainerWrapper">
+         <div class="nav-map-rotator" id="navMapRotator">
+            <div id="mapaNavegacao" class="w-full h-full"></div>
+         </div>
 
          <!-- VELOCÍMETRO ESTILO WAZE FLUTUANTE (CANTO INFERIOR ESQUERDO) -->
-         <div class="absolute bottom-40 left-4 z-[500]">
+         <div class="absolute bottom-52 left-4 z-[500]">
             <div class="waze-speed-circle">
                <span class="text-xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
                <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
@@ -819,14 +842,14 @@
 
          <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (CANTO INFERIOR DIREITO) -->
          <button @click="centralizarCarroManual()" 
-                 class="absolute bottom-40 right-4 z-[500] bg-gray-950/90 border-2 text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-black backdrop-blur-md active:scale-95 transition"
+                 class="absolute bottom-52 right-4 z-[500] bg-gray-950/90 border-2 text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-black backdrop-blur-md active:scale-95 transition"
                  :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-700 text-gray-300'">
             <span class="text-lg">🎯</span>
             <span x-text="mapaArrastadoPeloUsuario ? 'Re-centralizar' : 'Centralizado'"></span>
          </button>
       </div>
 
-      <!-- PAINEL INFERIOR FLUTUANTE COM OS 4 QUADRADOS DAS SACOLAS -->
+      <!-- PAINEL INFERIOR FLUTUANTE COM OS 4 QUADRADOS DAS SACOLAS (COMPATÍVEL COM TELAS MOBILE) -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 shadow-[0_-12px_30px_rgba(0,0,0,0.9)] pb-6">
          <div class="grid grid-cols-4 gap-2 text-center">
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
@@ -861,7 +884,7 @@
 
     <!-- Assinatura StudioTesta -->
     <footer x-show="modo !== 'navegacao'" class="py-6 text-center text-xs select-text">
-      <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
+      <span class="text-blue-400/90 font-medium">Site criado e mantido por </span>
       <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </footer>
   </div>
@@ -1342,12 +1365,10 @@
                 this.inicializarMapaNavegacao(); 
             }, 250);
 
-            // 1. Obtém o GPS e trava o carro na rua oficial (Snap to Road)
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 let sLat = pos.coords.latitude;
                 let sLng = pos.coords.longitude;
 
-                // Snap to Road: Trava a coordenada no asfalto da rua
                 const pontoRua = await this.travarCoordenadaNaRua(sLat, sLng);
                 sLat = pontoRua.lat;
                 sLng = pontoRua.lng;
@@ -1358,10 +1379,8 @@
                 this.atualizarOuCriarMarcadorCarro(sLat, sLng, 0);
                 this.centralizarNoCarro(sLat, sLng);
 
-                // 2. Traça a rota rua a rua exatamente pelo asfalto
                 await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
-                // 3. Acompanhamento Contínuo com Recálculo se errar a rua
                 this.watchPositionId = navigator.geolocation.watchPosition(
                     (novaPos) => this.processarPosicaoGPS(novaPos, entrega.latitude, entrega.longitude),
                     (err) => console.warn('Erro GPS (Watch):', err),
@@ -1395,7 +1414,6 @@
             this.mapaNav.invalidateSize(true);
         },
 
-        // SNAP TO ROAD: NÃO DEIXA O CARRO DENTRO DA GARAGEM OU CASA, PUXA PARA O ASFALTO
         async travarCoordenadaNaRua(lat, lng) {
             try {
                 const url = `${this.OSRM_ROUTER_URL}/nearest/v1/driving/${lng},${lat}?number=1`;
@@ -1414,7 +1432,7 @@
             return { lat, lng, nomeRua: '' };
         },
 
-        // TRAÇA A ROTA CURVA A CURVA PELA RUA (NADA DE LINHA RETA OU HELICÓPTERO)
+        // CORREÇÃO CIRÚRGICA: DESENHO DA LINHA LARANJA E ALINHAMENTO VERTICAL DA RUA
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             try {
                 let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
@@ -1432,12 +1450,13 @@
 
                 if (data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
+                    // OSRM retorna [lng, lat]. O Leaflet polyline precisa de [lat, lng]. Inversão corrigida:
                     const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
                     this.coordenadasRotaAtual = coords;
                     
                     if (this.linhaRotaNav) this.mapaNav.removeLayer(this.linhaRotaNav);
                     
-                    // LINHA LARANJA OFICIAL ESTILO WAZE DOBRANDO AS RUAS
+                    // LINHA LARANJA OFICIAL ESTILO WAZE (#ea580c)
                     this.linhaRotaNav = L.polyline(coords, { 
                       color: '#ea580c', 
                       weight: 9, 
@@ -1446,7 +1465,7 @@
                       lineJoin: 'round' 
                     }).addTo(this.mapaNav);
 
-                    // PINO OFICIAL DE DESTINO NA CASA DO CLIENTE (COM IDENTIFICAÇÃO)
+                    // PINO DE DESTINO DESTACADO
                     if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
                     const iconDest = L.divIcon({ 
                       className: 'dest-waze', 
@@ -1463,7 +1482,6 @@
                     });
                     this.marcadorDestinoNav = L.marker([eLat, eLng], { icon: iconDest }).addTo(this.mapaNav);
 
-                    // Distância real calculada
                     const distanciaMetros = Math.round(route.distance);
                     this.distanciaProximaManobra = distanciaMetros > 1000 ? (distanciaMetros / 1000).toFixed(1) + ' km' : distanciaMetros + ' m';
 
@@ -1471,7 +1489,13 @@
                     this.passoAtualIndex = 0;
                     this.atualizarInstrucaoUI();
 
-                    // Ajusta a visão para acompanhar a rota dobrando quarteirões
+                    // ALINHAMENTO DA RUA NA VERTICAL (ESTILO WAZE)
+                    if (coords.length > 1) {
+                        const bearingInicial = this.calcularBearing(coords[0][0], coords[0][1], coords[1][0], coords[1][1]);
+                        this.headingAtual = bearingInicial;
+                        this.alinharMapaVertical(bearingInicial);
+                    }
+                    
                     if (!this.mapaArrastadoPeloUsuario) {
                       this.mapaNav.setView([sLat, sLng], 18, { animate: true });
                     }
@@ -1482,14 +1506,23 @@
             }
         },
 
+        // GIRA O MAPA PARA QUE A RUA FIQUE SEMPRE RETA PARA CIMA
+        alinharMapaVertical(bearing) {
+            const rotEl = document.getElementById('navMapRotator');
+            if (rotEl) {
+               rotEl.style.transform = `rotate(${-bearing}deg)`;
+            }
+        },
+
         atualizarOuCriarMarcadorCarro(lat, lng, heading) {
             if (!this.mapaNav) return;
 
+            // O carro aponta sempre para cima porque o mapa é quem gira por baixo
             const iconHtml = `
               <div class="fiorino-container">
                 <div class="fiorino-aura"></div>
-                <div class="fiorino-svg-wrapper" style="transform: rotate(${heading}deg);">
-                  <svg width="26" height="46" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
+                <div class="fiorino-svg-wrapper">
+                  <svg width="28" height="50" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
                     <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
                     <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
                     <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
@@ -1532,10 +1565,10 @@
             this.mapaArrastadoPeloUsuario = false;
             if (this.ultimaLatCarro && this.ultimaLngCarro) {
                 this.centralizarNoCarro(this.ultimaLatCarro, this.ultimaLngCarro);
+                this.alinharMapaVertical(this.headingAtual);
             }
         },
 
-        // VERIFICA SE O MOTORISTA ERROU A RUA (OFF-ROUTE) E PRECISA DE RECÁLCULO IMEDIATO
         verificarSeSaiuDaRota(cLat, cLng) {
             if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length === 0) return false;
             let menorDist = Infinity;
@@ -1543,7 +1576,6 @@
                 const d = this.calcularDistancia(cLat, cLng, pt[0], pt[1]);
                 if (d < menorDist) menorDist = d;
             }
-            // Se estiver a mais de 35 metros do traçado previsto, errou a rua!
             return menorDist > 35;
         },
 
@@ -1553,7 +1585,6 @@
             const speedKmh = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
             this.velocidadeGPS = speedKmh;
 
-            // Snap to road para manter o carro sempre no asfalto da rua
             const pontoRua = await this.travarCoordenadaNaRua(lat, lng);
             lat = pontoRua.lat;
             lng = pontoRua.lng;
@@ -1575,10 +1606,12 @@
 
             if (headingCalculado !== null && !isNaN(headingCalculado)) {
                this.headingAtual = headingCalculado;
+               if (!this.mapaArrastadoPeloUsuario) {
+                  this.alinharMapaVertical(headingCalculado);
+               }
             }
 
-            // Atualiza a Fiorino exatamente na rua com o ângulo de direção
-            this.atualizarOuCriarMarcadorCarro(lat, lng, this.headingAtual);
+            this.atualizarOuCriarMarcadorCarro(lat, lng, 0);
 
             if (!this.mapaArrastadoPeloUsuario) {
                 this.mapaNav.panTo([lat, lng], { animate: true, duration: 0.5 });
@@ -1587,11 +1620,9 @@
             this.ultimaLatCarro = lat;
             this.ultimaLngCarro = lng;
 
-            // Distância até o destino final
             const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
             this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
-            // Fechamento automático ao aproximar-se (< 20 metros da casa)
             if (distDestinoFinal <= 20 && !this.chegadaAnunciada) {
                 this.chegadaAnunciada = true;
                 this.falarTexto('Você chegou ao destino!');
@@ -1602,14 +1633,12 @@
                 return;
             }
 
-            // RECÁLCULO INSTANTÂNEO SE ERRAR A RUA (ESTILO WAZE)
             if (this.verificarSeSaiuDaRota(lat, lng)) {
                 this.falarTexto('Recalculando rota...');
                 await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
                 return;
             }
 
-            // Atualização dos passos e manobras
             if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
                 const stepAtual = this.passosRota[this.passoAtualIndex];
                 const manobraLat = stepAtual.maneuver.location[1];
@@ -1721,6 +1750,8 @@
                this.mapaNav.removeLayer(this.marcadorCarroNav);
                this.marcadorCarroNav = null;
             }
+            const rotEl = document.getElementById('navMapRotator');
+            if (rotEl) rotEl.style.transform = 'none';
             this.coordenadasRotaAtual = [];
             this.mapaArrastadoPeloUsuario = false;
             this.modo = 'rua'; 
