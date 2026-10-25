@@ -103,26 +103,7 @@
     }
     .leaflet-popup-tip { background-color: #0f172a !important; }
 
-    /* === ESTILOS NAVEGADOR WAZE NATIVO (HEAD-UP E CONTROLES PERFEITOS) === */
-    .nav-viewport-full {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #090d16;
-    }
-    /* O mapa expandido roda em torno da traseira do carro garantindo visão vertical da rua */
-    .nav-map-rotator {
-      width: 250%;
-      height: 250%;
-      position: absolute;
-      left: -75%;
-      top: -75%;
-      transform-origin: 50% 68%;
-      transition: transform 0.35s ease-out;
-      will-change: transform;
-    }
+    /* === ESTILOS NAVEGADOR WAZE NATIVO === */
     .waze-speed-circle {
       width: 60px;
       height: 60px;
@@ -188,6 +169,8 @@
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Plugin Oficial Leaflet Rotate: Gira o mapa suavemente sem quebrar o CSS -->
+  <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 
   <!-- Tailwind, Alpine.js e SheetJS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -826,11 +809,9 @@
          </div>
       </div>
       
-      <!-- MAPA NATIVO EM TELA CHEIA (ROTACIONA O MAPA PARA FICAR VERTICAL / HEAD-UP) -->
-      <div class="nav-viewport-full" id="navMapContainerWrapper">
-         <div class="nav-map-rotator" id="navMapRotator">
-            <div id="mapaNavegacao" class="w-full h-full"></div>
-         </div>
+      <!-- MAPA NATIVO EM TELA CHEIA -->
+      <div class="absolute inset-0 w-full h-full z-10" id="navMapContainerWrapper">
+         <div id="mapaNavegacao" class="w-full h-full"></div>
 
          <!-- VELOCÍMETRO ESTILO WAZE FLUTUANTE (CANTO INFERIOR ESQUERDO) -->
          <div class="absolute bottom-52 left-4 z-[500]">
@@ -849,7 +830,7 @@
          </button>
       </div>
 
-      <!-- PAINEL INFERIOR FLUTUANTE COM OS 4 QUADRADOS DAS SACOLAS (COMPATÍVEL COM TELAS MOBILE) -->
+      <!-- PAINEL INFERIOR FLUTUANTE COM OS 4 QUADRADOS DAS SACOLAS -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 shadow-[0_-12px_30px_rgba(0,0,0,0.9)] pb-6">
          <div class="grid grid-cols-4 gap-2 text-center">
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
@@ -1034,7 +1015,7 @@
         <p class="text-xs font-bold text-emerald-400">✅ PIX Gerado com Sucesso!</p>
         <template x-if="qrCodeBase64">
           <div class="flex justify-center py-1">
-            <img :src="qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`" alt="QR Code PIX" class="w-44 h-44 rounded-xl border-2 border-emerald-500/50 bg-white p-1">
+            <img :src="qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:imagepng;base64,${qrCodeBase64}`" alt="QR Code PIX" class="w-44 h-44 rounded-xl border-2 border-emerald-500/50 bg-white p-1">
           </div>
         </template>
         <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all text-left max-h-20 overflow-y-auto" x-text="codigoPixGerado"></div>
@@ -1092,7 +1073,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM TRAÇADO RUA A RUA, SNAP TO ROAD E RECÁLCULO) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (LEAFLET-ROTATE OFICIAL + TRAÇO LARANJA RESILIENTE) -->
   <script>
     function entregaApp() {
       return {
@@ -1349,9 +1330,9 @@
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
             this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-            this.instrucaoAtual = `Iniciando trajeto para a Parada #${this.formatarParada(entrega?.parada_shopee)}...`;
+            this.instrucaoAtual = `Traçando rota para ${entrega.endereco}...`;
             this.distanciaProximaManobra = '...';
-            this.nomeRuaAtualCarro = 'Localizando via...';
+            this.nomeRuaAtualCarro = 'Calculando...';
             this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
             this.iconeManobraNav = '⬆️';
             this.chegadaAnunciada = false;
@@ -1397,9 +1378,13 @@
             if (!el) return;
 
             if (!this.mapaNav) {
+                // Leaflet com plugin Rotate nativo para girar o mapa sem distorcer o CSS
                 this.mapaNav = L.map('mapaNavegacao', { 
                   zoomControl: false, 
-                  attributionControl: false 
+                  attributionControl: false,
+                  rotate: true,
+                  bearing: 0,
+                  touchRotate: false
                 }).setView([-24.1667, -46.7800], 18);
 
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { 
@@ -1432,7 +1417,7 @@
             return { lat, lng, nomeRua: '' };
         },
 
-        // CORREÇÃO CIRÚRGICA: DESENHO DA LINHA LARANJA E ALINHAMENTO VERTICAL DA RUA
+        // CORREÇÃO: PARSE ROBUSTO DA GEOMETRIA DO OSRM PARA GARANTIR O TRAÇO LARANJA NA RUA
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             try {
                 let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
@@ -1450,54 +1435,65 @@
 
                 if (data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
-                    // OSRM retorna [lng, lat]. O Leaflet polyline precisa de [lat, lng]. Inversão corrigida:
-                    const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
-                    this.coordenadasRotaAtual = coords;
-                    
-                    if (this.linhaRotaNav) this.mapaNav.removeLayer(this.linhaRotaNav);
-                    
-                    // LINHA LARANJA OFICIAL ESTILO WAZE (#ea580c)
-                    this.linhaRotaNav = L.polyline(coords, { 
-                      color: '#ea580c', 
-                      weight: 9, 
-                      opacity: 0.95, 
-                      lineCap: 'round', 
-                      lineJoin: 'round' 
-                    }).addTo(this.mapaNav);
+                    let coords = [];
 
-                    // PINO DE DESTINO DESTACADO
-                    if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
-                    const iconDest = L.divIcon({ 
-                      className: 'dest-waze', 
-                      html: `
-                        <div style="display:flex; flex-direction:column; align-items:center;">
-                          <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.6);">
-                            #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
-                          </div>
-                          <div style="font-size:32px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));">📍</div>
-                        </div>
-                      `, 
-                      iconSize: [40, 52], 
-                      iconAnchor: [20, 52] 
-                    });
-                    this.marcadorDestinoNav = L.marker([eLat, eLng], { icon: iconDest }).addTo(this.mapaNav);
-
-                    const distanciaMetros = Math.round(route.distance);
-                    this.distanciaProximaManobra = distanciaMetros > 1000 ? (distanciaMetros / 1000).toFixed(1) + ' km' : distanciaMetros + ' m';
-
-                    this.passosRota = route.legs[0].steps;
-                    this.passoAtualIndex = 0;
-                    this.atualizarInstrucaoUI();
-
-                    // ALINHAMENTO DA RUA NA VERTICAL (ESTILO WAZE)
-                    if (coords.length > 1) {
-                        const bearingInicial = this.calcularBearing(coords[0][0], coords[0][1], coords[1][0], coords[1][1]);
-                        this.headingAtual = bearingInicial;
-                        this.alinharMapaVertical(bearingInicial);
+                    // Suporta tanto GeoJSON [lng, lat] quanto Polyline codificada sem quebrar
+                    if (route.geometry && typeof route.geometry === 'object' && Array.isArray(route.geometry.coordinates)) {
+                        coords = route.geometry.coordinates.map(c => [Number(c[1]), Number(c[0])]);
+                    } else if (typeof route.geometry === 'string') {
+                        coords = this.decodePolyline(route.geometry);
                     }
-                    
-                    if (!this.mapaArrastadoPeloUsuario) {
-                      this.mapaNav.setView([sLat, sLng], 18, { animate: true });
+
+                    if (coords.length > 0) {
+                        this.coordenadasRotaAtual = coords;
+
+                        if (this.linhaRotaNav) {
+                            this.mapaNav.removeLayer(this.linhaRotaNav);
+                            this.linhaRotaNav = null;
+                        }
+
+                        // TRAÇADO LARANJA OFICIAL ESTILO WAZE (#ea580c) DE 10PX
+                        this.linhaRotaNav = L.polyline(coords, { 
+                          color: '#ea580c', 
+                          weight: 10, 
+                          opacity: 0.98, 
+                          lineCap: 'round', 
+                          lineJoin: 'round' 
+                        }).addTo(this.mapaNav);
+
+                        if (this.marcadorDestinoNav) this.mapaNav.removeLayer(this.marcadorDestinoNav);
+                        const iconDest = L.divIcon({ 
+                          className: 'dest-waze', 
+                          html: `
+                            <div style="display:flex; flex-direction:column; align-items:center;">
+                              <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.6);">
+                                #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
+                              </div>
+                              <div style="font-size:32px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));">📍</div>
+                            </div>
+                          `, 
+                          iconSize: [40, 52], 
+                          iconAnchor: [20, 52] 
+                        });
+                        this.marcadorDestinoNav = L.marker([eLat, eLng], { icon: iconDest }).addTo(this.mapaNav);
+
+                        const distanciaMetros = Math.round(route.distance);
+                        this.distanciaProximaManobra = distanciaMetros > 1000 ? (distanciaMetros / 1000).toFixed(1) + ' km' : distanciaMetros + ' m';
+
+                        this.passosRota = route.legs[0].steps;
+                        this.passoAtualIndex = 0;
+                        this.atualizarInstrucaoUI();
+
+                        // ALINHAMENTO NATIVO DO MAPA NA VERTICAL (RUA RETA PARA CIMA)
+                        if (coords.length > 1) {
+                            const bearingInicial = this.calcularBearing(coords[0][0], coords[0][1], coords[1][0], coords[1][1]);
+                            this.headingAtual = bearingInicial;
+                            this.girarMapaNativamente(bearingInicial);
+                        }
+
+                        if (!this.mapaArrastadoPeloUsuario) {
+                          this.mapaNav.setView([sLat, sLng], 18, { animate: true });
+                        }
                     }
                 }
             } catch (error) {
@@ -1506,18 +1502,20 @@
             }
         },
 
-        // GIRA O MAPA PARA QUE A RUA FIQUE SEMPRE RETA PARA CIMA
-        alinharMapaVertical(bearing) {
-            const rotEl = document.getElementById('navMapRotator');
-            if (rotEl) {
-               rotEl.style.transform = `rotate(${-bearing}deg)`;
+        // GIRA O MAPA NATIVAMENTE PELO LEAFLET PARA A RUA FICAR SEMPRE NA VERTICAL
+        girarMapaNativamente(bearing) {
+            if (!this.mapaNav) return;
+            if (typeof this.mapaNav.setBearing === 'function') {
+                this.mapaNav.setBearing(-bearing);
+            } else {
+                const el = document.getElementById('mapaNavegacao');
+                if (el) el.style.transform = `rotate(${-bearing}deg)`;
             }
         },
 
         atualizarOuCriarMarcadorCarro(lat, lng, heading) {
             if (!this.mapaNav) return;
 
-            // O carro aponta sempre para cima porque o mapa é quem gira por baixo
             const iconHtml = `
               <div class="fiorino-container">
                 <div class="fiorino-aura"></div>
@@ -1565,7 +1563,7 @@
             this.mapaArrastadoPeloUsuario = false;
             if (this.ultimaLatCarro && this.ultimaLngCarro) {
                 this.centralizarNoCarro(this.ultimaLatCarro, this.ultimaLngCarro);
-                this.alinharMapaVertical(this.headingAtual);
+                this.girarMapaNativamente(this.headingAtual);
             }
         },
 
@@ -1607,7 +1605,7 @@
             if (headingCalculado !== null && !isNaN(headingCalculado)) {
                this.headingAtual = headingCalculado;
                if (!this.mapaArrastadoPeloUsuario) {
-                  this.alinharMapaVertical(headingCalculado);
+                  this.girarMapaNativamente(headingCalculado);
                }
             }
 
@@ -1750,8 +1748,9 @@
                this.mapaNav.removeLayer(this.marcadorCarroNav);
                this.marcadorCarroNav = null;
             }
-            const rotEl = document.getElementById('navMapRotator');
-            if (rotEl) rotEl.style.transform = 'none';
+            if (this.mapaNav && typeof this.mapaNav.setBearing === 'function') {
+                this.mapaNav.setBearing(0);
+            }
             this.coordenadasRotaAtual = [];
             this.mapaArrastadoPeloUsuario = false;
             this.modo = 'rua'; 
