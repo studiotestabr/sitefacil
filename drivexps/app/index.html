@@ -560,7 +560,7 @@
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 3, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8) && passoTutorial !== 3, 'bg-white text-orange-600 shadow-md': !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8))}" class="hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">Rota</span>
+            <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
           <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="{'bg-white !text-orange-600 ring-4 ring-amber-300 shadow-[0_0_30px_rgba(245,158,11,1)] scale-110 z-20 font-black': tutorialAberto && passoTutorial === 4, 'opacity-25 pointer-events-none': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8) && passoTutorial !== 4, 'bg-black text-white shadow-inner border border-gray-700': modo === 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8)), 'bg-orange-700 text-orange-100': modo !== 'carregamento' && !(tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8))}" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
@@ -784,7 +784,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL + DARK MODE WAZE) -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL NATIVO) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -834,7 +834,7 @@
          </div>
       </div>
 
-      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (APENAS ÍCONE MIRA) -->
+      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (APENAS ÍCONE) -->
       <div class="absolute bottom-52 right-4 z-[500]">
          <button @click="centralizarCarroManual()" 
                  class="waze-mira-btn active:scale-90 transition"
@@ -954,7 +954,7 @@
         <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div><h3 class="text-2xl font-black text-white">Partida e Chegada</h3><p class="text-sm text-gray-200 leading-relaxed">Informe onde você inicia e termina a rota no modal de importação (ou use o GPS atual do seu celular).</p></div>
       </template>
       <template x-if="passoTutorial === 3">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div><h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3><p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p></div>
+        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div><h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3><p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"+ Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p></div>
       </template>
       <template x-if="passoTutorial === 4">
         <div class="space-y-3.5"><div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">👜</div><h3 class="text-2xl font-black text-white">2. Organização nas Sacolas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, confira os pacotes organizados de 10 em 10 e marque no canetão o número <strong>#CANETÃO</strong> nas caixas.</p></div>
@@ -1371,7 +1371,7 @@
                 this.mapaNavGL = null;
             }
 
-            // CARREGA O MAPA VETORIAL ESCURO (MUITO MAIS RÁPIDO QUE IMAGENS PNG) E IDÊNTICO À FOTO 1
+            // CARREGA O MAPA VETORIAL ESCURO OFICIAL (Sem ruas brancas finas, idêntico à Foto 1)
             this.mapaNavGL = new maplibregl.Map({
                 container: 'mapaNavGL',
                 style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -1382,8 +1382,7 @@
                 attributionControl: false
             });
 
-            // CRÍTICO: SOMENTE INTERAÇÕES HUMANAS (DEDO NA TELA) CANCELAM A CÂMERA!
-            // ISSO IMPEDE O MAPA DE FICAR TORTO ENQUANTO O GPS ATUALIZA
+            // A MÁGICA DA CÂMERA: Só cancela o Head-Up (vertical) se for DEDO HUMANO!
             this.mapaNavGL.on('dragstart', (e) => {
                 if (e.originalEvent) {
                     this.mapaArrastadoPeloUsuario = true;
@@ -1408,7 +1407,11 @@
                 this.ultimaLngCarro = sLng;
 
                 this.atualizarMarcadorCarroGL(sLat, sLng, 0);
-                this.centralizarNoCarroGL(sLat, sLng, 0);
+
+                // FORÇA O PRIMEIRO ALINHAMENTO VERTICAL ANTES MESMO DA ROTA DESCER DA INTERNET
+                const bearingInicial = this.calcularBearing(sLat, sLng, entrega.latitude, entrega.longitude);
+                this.headingAtual = bearingInicial;
+                this.centralizarNoCarroGL(sLat, sLng, bearingInicial);
 
                 await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
@@ -1447,38 +1450,48 @@
         desenharLinhaRotaMapLibre(coordsLngLat) {
             if (!this.mapaNavGL) return;
             
-            try {
-                if (this.mapaNavGL.getSource('rota-source')) {
-                    this.mapaNavGL.getSource('rota-source').setData({
-                        type: 'Feature',
-                        geometry: { type: 'LineString', coordinates: coordsLngLat }
-                    });
-                } else {
-                    this.mapaNavGL.addSource('rota-source', {
-                        type: 'geojson',
-                        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: coordsLngLat } }
-                    });
+            const aplicarLinha = () => {
+                try {
+                    if (this.mapaNavGL.getSource('rota-source')) {
+                        this.mapaNavGL.getSource('rota-source').setData({
+                            type: 'Feature',
+                            geometry: { type: 'LineString', coordinates: coordsLngLat }
+                        });
+                    } else {
+                        this.mapaNavGL.addSource('rota-source', {
+                            type: 'geojson',
+                            data: { type: 'Feature', geometry: { type: 'LineString', coordinates: coordsLngLat } }
+                        });
 
-                    // BORDA DA LINHA (AZUL ESCURO)
-                    this.mapaNavGL.addLayer({
-                        id: 'rota-borda',
-                        type: 'line',
-                        source: 'rota-source',
-                        layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: { 'line-color': '#0369a1', 'line-width': 16, 'line-opacity': 0.9 }
-                    });
+                        // BORDA DA LINHA (AZUL ESCURO)
+                        this.mapaNavGL.addLayer({
+                            id: 'rota-borda',
+                            type: 'line',
+                            source: 'rota-source',
+                            layout: { 'line-join': 'round', 'line-cap': 'round' },
+                            paint: { 'line-color': '#0369a1', 'line-width': 16, 'line-opacity': 0.9 }
+                        });
 
-                    // MIOLO DA LINHA (AZUL CIANO BRILHANTE ESTILO FOTO 1)
-                    this.mapaNavGL.addLayer({
-                        id: 'rota-linha',
-                        type: 'line',
-                        source: 'rota-source',
-                        layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: { 'line-color': '#38bdf8', 'line-width': 10, 'line-opacity': 1.0 }
-                    });
+                        // MIOLO DA LINHA (AZUL CIANO BRILHANTE ESTILO FOTO 1)
+                        this.mapaNavGL.addLayer({
+                            id: 'rota-linha',
+                            type: 'line',
+                            source: 'rota-source',
+                            layout: { 'line-join': 'round', 'line-cap': 'round' },
+                            paint: { 'line-color': '#38bdf8', 'line-width': 10, 'line-opacity': 1.0 }
+                        });
+                    }
+                } catch (e) {
+                    console.warn("Erro ao desenhar a linha:", e);
                 }
-            } catch (e) {
-                console.warn("Erro ao desenhar a linha:", e);
+            };
+
+            // ESSE IF/ELSE GARANTE QUE A LINHA ESPERE A RUA TERMINAR DE CARREGAR!
+            if (this.mapaNavGL.isStyleLoaded() || this.mapaNavGL.loaded()) {
+                aplicarLinha();
+            } else {
+                this.mapaNavGL.once('load', aplicarLinha);
+                this.mapaNavGL.once('styledata', aplicarLinha); // Backup fallback
             }
         },
 
@@ -1510,7 +1523,7 @@
                     if (coordsLngLat.length > 0) {
                         this.coordenadasRotaAtual = coordsLngLat;
                         
-                        // CHAMA A FUNÇÃO BLINDADA (A LINHA AZUL DESENHA IMEDIATAMENTE)
+                        // CHAMA A FUNÇÃO BLINDADA (A LINHA AZUL DESENHA IMEDIATAMENTE APÓS O MAPA CARREGAR)
                         this.desenharLinhaRotaMapLibre(coordsLngLat);
 
                         this.atualizarMarcadorDestinoGL(eLat, eLng);
