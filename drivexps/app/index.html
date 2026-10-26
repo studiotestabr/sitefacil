@@ -99,7 +99,7 @@
     }
     .leaflet-popup-tip { background-color: #0f172a !important; }
 
-    /* ESTILOS WAZE DO VELOCÍMETRO */
+    /* ESTILOS WAZE DO VELOCÍMETRO E MIRA */
     .waze-speed-circle {
       width: 60px;
       height: 60px;
@@ -114,7 +114,6 @@
       backdrop-filter: blur(6px);
     }
     
-    /* BOTÃO MIRA ESTILO WAZE (APENAS O ÍCONE) */
     .waze-mira-btn {
       width: 54px;
       height: 54px;
@@ -785,7 +784,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL NATIVO) -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL + DARK MODE WAZE) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -835,7 +834,7 @@
          </div>
       </div>
 
-      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (APENAS ÍCONE) -->
+      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (APENAS ÍCONE MIRA) -->
       <div class="absolute bottom-52 right-4 z-[500]">
          <button @click="centralizarCarroManual()" 
                  class="waze-mira-btn active:scale-90 transition"
@@ -1088,7 +1087,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (MAPLIBRE GL + CARTODB VOYAGER) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (MAPLIBRE GL + DARK MODE WAZE) -->
   <script>
     function entregaApp() {
       return {
@@ -1316,7 +1315,7 @@
           }
         },
 
-        // ==== ENGINE NAVEGAÇÃO NATIVA 3D (MAPLIBRE GL + CARTODB VOYAGER) ====
+        // ==== ENGINE NAVEGAÇÃO NATIVA 3D ====
 
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1372,10 +1371,10 @@
                 this.mapaNavGL = null;
             }
 
-            // CARREGA O MAPA VETORIAL GL ESTILO WAZE (BRANCO/CINZA CLARO)
+            // CARREGA O MAPA VETORIAL ESCURO (MUITO MAIS RÁPIDO QUE IMAGENS PNG) E IDÊNTICO À FOTO 1
             this.mapaNavGL = new maplibregl.Map({
                 container: 'mapaNavGL',
-                style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+                style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
                 center: [entrega.longitude, entrega.latitude],
                 zoom: 18.5,
                 pitch: 62,
@@ -1383,8 +1382,12 @@
                 attributionControl: false
             });
 
-            this.mapaNavGL.on('dragstart', () => {
-                this.mapaArrastadoPeloUsuario = true;
+            // CRÍTICO: SOMENTE INTERAÇÕES HUMANAS (DEDO NA TELA) CANCELAM A CÂMERA!
+            // ISSO IMPEDE O MAPA DE FICAR TORTO ENQUANTO O GPS ATUALIZA
+            this.mapaNavGL.on('dragstart', (e) => {
+                if (e.originalEvent) {
+                    this.mapaArrastadoPeloUsuario = true;
+                }
             });
 
             this.mapaNavGL.on('load', () => {
@@ -1422,7 +1425,6 @@
 
         async travarCoordenadaNaRua(lat, lng) {
             try {
-                // Timeout estendido para 6s no 4G
                 const url = `${this.OSRM_ROUTER_URL}/nearest/v1/driving/${lng},${lat}?number=1`;
                 const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
                 if (res.ok) {
@@ -1440,12 +1442,12 @@
         },
 
         // =========================================================================
-        // A MÁGICA QUE EVITA A LINHA INVISÍVEL (RACE CONDITION FIX) E COLORE IGUAL A FOTO 1
+        // A MÁGICA QUE EVITA A LINHA INVISÍVEL (RACE CONDITION FIX) 
         // =========================================================================
         desenharLinhaRotaMapLibre(coordsLngLat) {
             if (!this.mapaNavGL) return;
-
-            const aplicarLinhaNoMapa = () => {
+            
+            try {
                 if (this.mapaNavGL.getSource('rota-source')) {
                     this.mapaNavGL.getSource('rota-source').setData({
                         type: 'Feature',
@@ -1475,13 +1477,8 @@
                         paint: { 'line-color': '#38bdf8', 'line-width': 10, 'line-opacity': 1.0 }
                     });
                 }
-            };
-
-            // ESSE IF/ELSE GARANTE QUE A LINHA ESPERE A RUA TERMINAR DE CARREGAR!
-            if (this.mapaNavGL.isStyleLoaded()) {
-                aplicarLinhaNoMapa();
-            } else {
-                this.mapaNavGL.once('styledata', aplicarLinhaNoMapa);
+            } catch (e) {
+                console.warn("Erro ao desenhar a linha:", e);
             }
         },
 
@@ -1513,7 +1510,7 @@
                     if (coordsLngLat.length > 0) {
                         this.coordenadasRotaAtual = coordsLngLat;
                         
-                        // CHAMA A FUNÇÃO BLINDADA
+                        // CHAMA A FUNÇÃO BLINDADA (A LINHA AZUL DESENHA IMEDIATAMENTE)
                         this.desenharLinhaRotaMapLibre(coordsLngLat);
 
                         this.atualizarMarcadorDestinoGL(eLat, eLng);
@@ -1676,9 +1673,11 @@
             this.ultimaLngCarro = lng;
 
             const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
-            this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
+            
+            if (this.iconeManobraNav !== '📍') {
+                this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
+            }
 
-            // Fechamento automático ao aproximar-se (< 20 metros da casa)
             if (distDestinoFinal <= 20 && !this.chegadaAnunciada) {
                 this.chegadaAnunciada = true;
                 this.falarTexto('Você chegou ao destino!');
@@ -1689,7 +1688,7 @@
                 return;
             }
 
-            if (this.verificarSeSaiuDaRota(lat, lng)) {
+            if (this.iconeManobraNav !== '📍' && this.verificarSeSaiuDaRota(lat, lng)) {
                 this.falarTexto('Recalculando rota...');
                 await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
                 return;
