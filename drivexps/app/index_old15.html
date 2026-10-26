@@ -85,7 +85,7 @@
     body.theme-claro .text-blue-400 { color: #1d4ed8 !important; }
     body.theme-claro .text-amber-400 { color: #b45309 !important; }
 
-    /* FILTRO DE MODO NOTURNO PARA O MAPA LEAFLET */
+    /* FILTRO DE MODO NOTURNO PARA O MAPA LEAFLET DA ABA MAPA */
     .theme-escuro #mapaContainer .leaflet-tile-pane {
       filter: brightness(0.68) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35);
     }
@@ -99,10 +99,10 @@
     }
     .leaflet-popup-tip { background-color: #0f172a !important; }
 
-    /* ESTILOS WAZE DO VELOCÍMETRO */
+    /* ESTILOS WAZE DO VELOCÍMETRO E MIRA */
     .waze-speed-circle {
-      width: 60px;
-      height: 60px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       background: rgba(15, 23, 42, 0.92);
       border: 3px solid #38bdf8;
@@ -112,6 +112,19 @@
       justify-content: center;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(6px);
+    }
+    .waze-mira-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid #ea580c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
     }
     .fiorino-container {
       display: flex;
@@ -166,7 +179,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- MapLibre GL: Motor 3D com rotação nativa idêntico ao Waze (gratuito e open-source) -->
+  <!-- MapLibre GL: Motor 3D nativo do Waze (100% Free) -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
@@ -725,7 +738,7 @@
         </template>
       </main>
 
-      <!-- MODO 4: MAPA GERAL LEAFLET -->
+      <!-- MODO 4: MAPA VISUAL COM LEAFLET -->
       <main x-show="modo === 'mapa'" class="p-2 sm:p-4 max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-2">
         <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs">
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
@@ -769,7 +782,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL NATIVO) -->
+    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL + OPENSTREETMAP DIRETO) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -807,7 +820,7 @@
          </div>
       </div>
       
-      <!-- MAPA NATIVO 3D REAL (SEM CORTES, A CÂMERA INCLINA E GIRA NATIVAMENTE) -->
+      <!-- MAPA NATIVO 3D REAL -->
       <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL">
       </div>
 
@@ -819,13 +832,15 @@
          </div>
       </div>
 
-      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (CANTO INFERIOR DIREITO) -->
-      <button @click="centralizarCarroManual()" 
-              class="absolute bottom-52 right-4 z-[500] bg-gray-950/90 border-2 text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-black backdrop-blur-md active:scale-95 transition"
-              :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-700 text-gray-300'">
-         <span class="text-lg">🎯</span>
-         <span x-text="mapaArrastadoPeloUsuario ? 'Re-centralizar' : 'Centralizado'"></span>
-      </button>
+      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE: APENAS ÍCONE DE MIRA CIRCULAR -->
+      <div class="absolute bottom-52 right-4 z-[500]">
+         <button @click="centralizarCarroManual()" 
+                 class="waze-mira-btn active:scale-90 transition"
+                 :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'"
+                 title="Re-centralizar na rota">
+            <span class="text-2xl">🎯</span>
+         </button>
+      </div>
 
       <!-- PAINEL INFERIOR FLUTUANTE COM OS 4 QUADRADOS DAS SACOLAS -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 shadow-[0_-12px_30px_rgba(0,0,0,0.9)] pb-6">
@@ -1070,7 +1085,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO COM MAPLIBRE GL 3D WAZE NATIVO -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (MAPLIBRE GL + OPENSTREETMAP DIRETO + TEMPO ESTENDIDO 12S) -->
   <script>
     function entregaApp() {
       return {
@@ -1093,6 +1108,8 @@
         passosRota: [],
         passoAtualIndex: 0,
         headingAtual: 0,
+        minSpeedKmhNav: 4.5,
+        bearingSmoothFactor: 0.15,
         ultimaLatCarro: null,
         ultimaLngCarro: null,
         mapaArrastadoPeloUsuario: false,
@@ -1296,7 +1313,7 @@
           }
         },
 
-        // ==== ENGINE NAVEGAÇÃO NATIVA 3D (MAPLIBRE GL ESTILO WAZE REAL) ====
+        // ==== ENGINE NAVEGAÇÃO NATIVA 3D (MAPLIBRE GL + CARTODB VOYAGER) ====
 
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1347,46 +1364,29 @@
             const container = document.getElementById('mapaNavGL');
             if (!container) return;
 
-            // Se já existia uma instância, removemos para recriar limpa
             if (this.mapaNavGL) {
                 this.mapaNavGL.remove();
                 this.mapaNavGL = null;
             }
 
-            // Inicializa MapLibre GL com visual 3D inclinado igual ao Waze (pitch: 58)
+            // O SEGREDO DO VISUAL WAZE: Mapa Vetorial CartoDB Voyager GL
+            // 100% Gratuito, sem API Key, renderização ultrarrápida na GPU e visual idêntico ao Waze
             this.mapaNavGL = new maplibregl.Map({
                 container: 'mapaNavGL',
-                style: {
-                    version: 8,
-                    sources: {
-                        'osm-tiles': {
-                            type: 'raster',
-                            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                            tileSize: 256
-                        }
-                    },
-                    layers: [
-                        {
-                            id: 'osm-layer',
-                            type: 'raster',
-                            source: 'osm-tiles',
-                            minzoom: 0,
-                            maxzoom: 19
-                        }
-                    ]
-                },
+                style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
                 center: [entrega.longitude, entrega.latitude],
-                zoom: 18,
-                pitch: 58,       // INCLINAÇÃO 3D DO WAZE
-                bearing: 0       // ROTAÇÃO DA RUA
+                zoom: 18.5,               // Escala perfeita para visualização vetorial
+                pitch: 62,                // Inclinação 3D idêntica à do Waze
+                bearing: 0,
+                attributionControl: false // Remove os textos grandes do mapa para deixar a tela limpa
             });
 
             this.mapaNavGL.on('dragstart', () => {
                 this.mapaArrastadoPeloUsuario = true;
             });
 
+            // Só desenha a rota e busca o GPS APÓS o mapa vetorial estar 100% carregado e visível
             this.mapaNavGL.on('load', () => {
-                // Inicia o GPS assim que o mapa carregar perfeitamente
                 this.iniciarGPSContinuoNavegacao(entrega);
             });
         },
@@ -1406,7 +1406,6 @@
                 this.atualizarMarcadorCarroGL(sLat, sLng, 0);
                 this.centralizarNoCarroGL(sLat, sLng, 0);
 
-                // Traça a rota oficial de carro
                 await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
                 this.watchPositionId = navigator.geolocation.watchPosition(
@@ -1422,8 +1421,9 @@
 
         async travarCoordenadaNaRua(lat, lng) {
             try {
+                // Timeout estendido para 6s no 4G
                 const url = `${this.OSRM_ROUTER_URL}/nearest/v1/driving/${lng},${lat}?number=1`;
-                const res = await fetch(url, { signal: AbortSignal.timeout(2000) });
+                const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
                 if (res.ok) {
                     const data = await res.json();
                     if (data.waypoints && data.waypoints.length > 0) {
@@ -1438,17 +1438,18 @@
             return { lat, lng, nomeRua: '' };
         },
 
-        // TRAÇADO ROBUSTO: CONVERTE TANTO STRING POLILINHA QUANTO GEOJSON SEM FALHAS
+        // CALCULA E DESENHA O TRAÇADO LARANJA OFICIAL COM TIMEOUT ESTENDIDO PARA 12 SEGUNDOS NO 4G
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             try {
                 let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
                 let res = null;
 
                 try {
-                  res = await fetch(url, { signal: AbortSignal.timeout(3500) });
+                  // Aumentado para 12s para garantir o handshake no 4G sem cancelamento!
+                  res = await fetch(url, { signal: AbortSignal.timeout(12000) });
                 } catch(e) {
                   url = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
-                  res = await fetch(url);
+                  res = await fetch(url, { signal: AbortSignal.timeout(12000) });
                 }
 
                 if (!res || !res.ok) throw new Error('Falha OSRM');
@@ -1458,11 +1459,9 @@
                     const route = data.routes[0];
                     let coordsLngLat = [];
 
-                    // O MapLibre usa GeoJSON [Lng, Lat] nativamente
                     if (route.geometry && typeof route.geometry === 'object' && Array.isArray(route.geometry.coordinates)) {
                         coordsLngLat = route.geometry.coordinates.map(c => [Number(c[0]), Number(c[1])]);
                     } else if (typeof route.geometry === 'string') {
-                        // Decodifica a string caso venha codificada
                         const ptsLatLon = this.decodePolyline(route.geometry);
                         coordsLngLat = ptsLatLon.map(p => [p[1], p[0]]);
                     }
@@ -1497,16 +1496,16 @@
                                 type: 'line',
                                 source: 'rota-source',
                                 layout: { 'line-join': 'round', 'line-cap': 'round' },
-                                paint: { 'line-color': '#7c2d12', 'line-width': 12, 'line-opacity': 0.8 }
+                                paint: { 'line-color': '#0f172a', 'line-width': 14, 'line-opacity': 0.85 }
                             });
 
-                            // Linha Laranja Oficial (#ea580c)
+                            // Linha Laranja Oficial (#ea580c) de alta visibilidade
                             this.mapaNavGL.addLayer({
                                 id: 'rota-linha',
                                 type: 'line',
                                 source: 'rota-source',
                                 layout: { 'line-join': 'round', 'line-cap': 'round' },
-                                paint: { 'line-color': '#ea580c', 'line-width': 8, 'line-opacity': 1.0 }
+                                paint: { 'line-color': '#ea580c', 'line-width': 9, 'line-opacity': 1.0 }
                             });
                         }
 
@@ -1520,16 +1519,16 @@
                         this.passoAtualIndex = 0;
                         this.atualizarInstrucaoUI();
 
-                        // ALINHAMENTO IMEDIATO DA RUA NA VERTICAL (ESTILO WAZE)
+                        // ALINHAMENTO DA RUA NA VERTICAL (RUA RETA PARA CIMA IGUAL À FOTO 2)
                         if (coordsLngLat.length > 1) {
                             const bearingInicial = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
                             this.headingAtual = bearingInicial;
                             if (!this.mapaArrastadoPeloUsuario) {
                                 this.mapaNavGL.easeTo({
                                     center: [sLng, sLat],
-                                    bearing: bearingInicial, // RUA RETA PARA CIMA
-                                    pitch: 58,
-                                    zoom: 18,
+                                    bearing: bearingInicial, // ROTAÇÃO AUTOMÁTICA DA RUA PARA A VERTICAL
+                                    pitch: 62,
+                                    zoom: 18.5,              // ESCALA DA RUA PROPORCIONAL AO CARRO
                                     duration: 600
                                 });
                             }
@@ -1605,10 +1604,11 @@
             if (!this.mapaNavGL) return;
             this.mapaNavGL.easeTo({
                 center: [lng, lat],
-                bearing: bearing || this.headingAtual,
-                pitch: 58,
-                zoom: 18,
-                duration: 400
+                bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
+                pitch: 62,
+                zoom: 18.5,
+                duration: 900,
+                easing: (t) => t
             });
         },
 
@@ -1645,23 +1645,27 @@
                 distanciaDesdeUltimo = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
             }
 
+            // --- [INÍCIO DA NOVA LÓGICA DE ROTAÇÃO WAZE] ---
             let headingCalculado = pos.coords.heading;
+            
+            // Se o GPS não enviar heading, tentamos calcular pela matemática (se andou mais de 3m)
             if (headingCalculado === null || isNaN(headingCalculado)) {
                 if (distanciaDesdeUltimo > 3) {
                    headingCalculado = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
-                } else {
-                   headingCalculado = this.headingAtual;
                 }
             }
 
-            if (headingCalculado !== null && !isNaN(headingCalculado)) {
-               this.headingAtual = headingCalculado;
-            }
+            // SE TEMOS UM HEADING E O CARRO ESTÁ EM MOVIMENTO (ACIMA DA VELOCIDADE MÍNIMA)
+            if (headingCalculado !== null && !isNaN(headingCalculado) && this.velocidadeGPS >= this.minSpeedKmhNav) {
+               // Aplica o filtro de suavização cinematográfica
+               this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
+            } 
+            /* Se estiver devagar (< 4.5 km/h) ou parado, o IF acima é ignorado. 
+               O mapLibre manterá o último headingAtual gravado (o "bico" do carro não gira no semáforo). */
+            // --- [FIM DA NOVA LÓGICA DE ROTAÇÃO WAZE] ---
 
-            // Atualiza a posição da Fiorino na coordenada real
             this.atualizarMarcadorCarroGL(lat, lng, 0);
 
-            // Acompanha a câmera do Waze com a rua na vertical
             if (!this.mapaArrastadoPeloUsuario) {
                 this.centralizarNoCarroGL(lat, lng, this.headingAtual);
             }
@@ -1683,14 +1687,12 @@
                 return;
             }
 
-            // Recálculo se errar a rua
             if (this.verificarSeSaiuDaRota(lat, lng)) {
                 this.falarTexto('Recalculando rota...');
                 await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
                 return;
             }
 
-            // Avanço das manobras
             if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
                 const stepAtual = this.passosRota[this.passoAtualIndex];
                 const manobraLat = stepAtual.maneuver.location[1];
@@ -1780,6 +1782,13 @@
                       Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos((lon2 - lon1) * Math.PI / 180);
             const b = Math.atan2(y, x) * 180 / Math.PI;
             return (b + 360) % 360;
+        },
+
+        smoothHeadingApp(current, target, factor) {
+            let diff = target - current;
+            while (diff > 180) diff -= 360;
+            while (diff < -180) diff += 360;
+            return current + (diff * factor);
         },
 
         pararNavegacao() {
@@ -2191,7 +2200,7 @@
                 plano_ativo: 'gratuito'
               };
               const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
-                method: 'POST', headers, credentials: 'include', body: JSON.stringify(novoRegistro)
+                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
               });
               const postData = await postRes.json();
               userSaas = postData.data;
