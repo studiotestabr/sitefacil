@@ -181,7 +181,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- MapLibre GL: Motor 3D com rotação nativa idêntico ao Waze (gratuito e open-source) -->
+  <!-- MapLibre GL: Motor 3D nativo idêntico ao Waze -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
@@ -870,7 +870,8 @@
                <h4 class="text-sm font-black text-white truncate" x-text="entregaNavegacao ? entregaNavegacao.endereco : ''"></h4>
                <p class="text-xs text-gray-400 truncate" x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
             </div>
-            <button @click="concluirEntrega(entregaNavegacao); pararNavegacao();" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
+            <!-- O BOTÃO ENTREGUE AGORA NÃO FECHA O MAPA: AVANÇA DIRETO PRO PRÓXIMO PACOTE! -->
+            <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
                <span>✅</span> Entregue
             </button>
          </div>
@@ -1087,7 +1088,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (MAPLIBRE GL + DARK MODE WAZE) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (MAPLIBRE GL NATIVO COM ROTAS BLINDADAS) -->
   <script>
     function entregaApp() {
       return {
@@ -1110,8 +1111,8 @@
         passosRota: [],
         passoAtualIndex: 0,
         headingAtual: 0,
-        minSpeedKmhNav: 4.5,
-        bearingSmoothFactor: 0.15,
+        minSpeedKmhNav: 4.0,
+        bearingSmoothFactor: 0.65, // Giro rápido sem lag
         ultimaLatCarro: null,
         ultimaLngCarro: null,
         mapaArrastadoPeloUsuario: false,
@@ -1315,7 +1316,7 @@
           }
         },
 
-        // ==== ENGINE NAVEGAÇÃO NATIVA 3D ====
+        // ==== ENGINE NAVEGAÇÃO NATIVA 3D BLINDADA ====
 
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1345,7 +1346,7 @@
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
             this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-            this.instrucaoAtual = `Iniciando trajeto para a Parada #${this.formatarParada(entrega?.parada_shopee)}...`;
+            this.instrucaoAtual = `Iniciando rota para o Canetão #${entrega?.ordem_entrega}...`;
             this.distanciaProximaManobra = '...';
             this.nomeRuaAtualCarro = 'Localizando via...';
             this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
@@ -1355,11 +1356,11 @@
             this.mapaArrastadoPeloUsuario = false;
             this.coordenadasRotaAtual = [];
 
-            this.falarTexto(`Iniciando rota para ${entrega.endereco}`);
+            this.falarTexto(`Iniciando rota para o Canetão número ${entrega.ordem_entrega}`);
 
             setTimeout(() => { 
                 this.inicializarMapaNavGL(entrega); 
-            }, 300);
+            }, 250);
         },
 
         inicializarMapaNavGL(entrega) {
@@ -1371,7 +1372,7 @@
                 this.mapaNavGL = null;
             }
 
-            // CARREGA O MAPA VETORIAL ESCURO OFICIAL (Sem ruas brancas finas, idêntico à Foto 1)
+            // MAPA VETORIAL ESCURO WAZE (Dark Matter)
             this.mapaNavGL = new maplibregl.Map({
                 container: 'mapaNavGL',
                 style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -1382,14 +1383,35 @@
                 attributionControl: false
             });
 
-            // A MÁGICA DA CÂMERA: Só cancela o Head-Up (vertical) se for DEDO HUMANO!
+            // SÓ LIBERA ARRASTO MANUAL SE TOCAR O DEDO!
             this.mapaNavGL.on('dragstart', (e) => {
                 if (e.originalEvent) {
                     this.mapaArrastadoPeloUsuario = true;
                 }
             });
 
+            // NO CARREGAMENTO: CRIA A CAMADA DA LINHA IMEDIATAMENTE (SEM RACE CONDITION)
             this.mapaNavGL.on('load', () => {
+                if (!this.mapaNavGL.getSource('rota-source')) {
+                    this.mapaNavGL.addSource('rota-source', {
+                        type: 'geojson',
+                        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
+                    });
+                    this.mapaNavGL.addLayer({
+                        id: 'rota-borda',
+                        type: 'line',
+                        source: 'rota-source',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: { 'line-color': '#0369a1', 'line-width': 15, 'line-opacity': 0.95 }
+                    });
+                    this.mapaNavGL.addLayer({
+                        id: 'rota-linha',
+                        type: 'line',
+                        source: 'rota-source',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: { 'line-color': '#38bdf8', 'line-width': 9, 'line-opacity': 1.0 }
+                    });
+                }
                 this.iniciarGPSContinuoNavegacao(entrega);
             });
         },
@@ -1408,17 +1430,18 @@
 
                 this.atualizarMarcadorCarroGL(sLat, sLng, 0);
 
-                // FORÇA O PRIMEIRO ALINHAMENTO VERTICAL ANTES MESMO DA ROTA DESCER DA INTERNET
+                // GIRO INSTANTÂNEO: Alinha o mapa na vertical em direção ao destino
                 const bearingInicial = this.calcularBearing(sLat, sLng, entrega.latitude, entrega.longitude);
                 this.headingAtual = bearingInicial;
                 this.centralizarNoCarroGL(sLat, sLng, bearingInicial);
 
+                // Traça a rota oficial
                 await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
                 this.watchPositionId = navigator.geolocation.watchPosition(
                     (novaPos) => this.processarPosicaoGPS(novaPos, entrega.latitude, entrega.longitude),
                     (err) => console.warn('Erro GPS (Watch):', err),
-                    { enableHighAccuracy: true, maximumAge: 1000, timeout: 6000 }
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                 );
             }, (err) => {
                 alert('Não foi possível obter o sinal de GPS.');
@@ -1429,7 +1452,7 @@
         async travarCoordenadaNaRua(lat, lng) {
             try {
                 const url = `${this.OSRM_ROUTER_URL}/nearest/v1/driving/${lng},${lat}?number=1`;
-                const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+                const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
                 if (res.ok) {
                     const data = await res.json();
                     if (data.waypoints && data.waypoints.length > 0) {
@@ -1444,136 +1467,126 @@
             return { lat, lng, nomeRua: '' };
         },
 
-        // =========================================================================
-        // A MÁGICA QUE EVITA A LINHA INVISÍVEL (RACE CONDITION FIX) 
-        // =========================================================================
-        desenharLinhaRotaMapLibre(coordsLngLat) {
+        // ATUALIZAÇÃO DA LINHA AZUL NO MAPA (DIRETO E GARANTIDO)
+        atualizarLinhaNavGL(coordsLngLat) {
             if (!this.mapaNavGL) return;
-            
-            const aplicarLinha = () => {
-                try {
-                    if (this.mapaNavGL.getSource('rota-source')) {
-                        this.mapaNavGL.getSource('rota-source').setData({
-                            type: 'Feature',
-                            geometry: { type: 'LineString', coordinates: coordsLngLat }
-                        });
-                    } else {
-                        this.mapaNavGL.addSource('rota-source', {
-                            type: 'geojson',
-                            data: { type: 'Feature', geometry: { type: 'LineString', coordinates: coordsLngLat } }
-                        });
-
-                        // BORDA DA LINHA (AZUL ESCURO)
-                        this.mapaNavGL.addLayer({
-                            id: 'rota-borda',
-                            type: 'line',
-                            source: 'rota-source',
-                            layout: { 'line-join': 'round', 'line-cap': 'round' },
-                            paint: { 'line-color': '#0369a1', 'line-width': 16, 'line-opacity': 0.9 }
-                        });
-
-                        // MIOLO DA LINHA (AZUL CIANO BRILHANTE ESTILO FOTO 1)
-                        this.mapaNavGL.addLayer({
-                            id: 'rota-linha',
-                            type: 'line',
-                            source: 'rota-source',
-                            layout: { 'line-join': 'round', 'line-cap': 'round' },
-                            paint: { 'line-color': '#38bdf8', 'line-width': 10, 'line-opacity': 1.0 }
-                        });
-                    }
-                } catch (e) {
-                    console.warn("Erro ao desenhar a linha:", e);
-                }
-            };
-
-            // ESSE IF/ELSE GARANTE QUE A LINHA ESPERE A RUA TERMINAR DE CARREGAR!
-            if (this.mapaNavGL.isStyleLoaded() || this.mapaNavGL.loaded()) {
-                aplicarLinha();
+            const src = this.mapaNavGL.getSource('rota-source');
+            if (src) {
+                src.setData({
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: coordsLngLat }
+                });
             } else {
-                this.mapaNavGL.once('load', aplicarLinha);
-                this.mapaNavGL.once('styledata', aplicarLinha); // Backup fallback
+                this.mapaNavGL.addSource('rota-source', {
+                    type: 'geojson',
+                    data: { type: 'Feature', geometry: { type: 'LineString', coordinates: coordsLngLat } }
+                });
+                this.mapaNavGL.addLayer({
+                    id: 'rota-borda',
+                    type: 'line',
+                    source: 'rota-source',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#0369a1', 'line-width': 15, 'line-opacity': 0.95 }
+                });
+                this.mapaNavGL.addLayer({
+                    id: 'rota-linha',
+                    type: 'line',
+                    source: 'rota-source',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#38bdf8', 'line-width': 9, 'line-opacity': 1.0 }
+                });
             }
         },
 
+        // CÁLCULO DE ROTA COM FALLBACK TOTAL (NUNCA FICA SEM LINHA)
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
+            if (!sLat || !sLng || !eLat || !eLng) return;
+
+            let coordsLngLat = [];
+            let routeEncontrada = null;
+
+            // 1. Tenta o servidor local OSRM
             try {
-                let url = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
-                let res = null;
-                try {
-                  res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-                } catch(e) {
-                  url = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?steps=true&geometries=geojson&overview=full&language=pt`;
-                  res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-                }
-
-                if (!res || !res.ok) throw new Error('Falha OSRM');
-                const data = await res.json();
-
-                let coordsLngLat = [];
-                
-                if (data.routes && data.routes.length > 0) {
-                    const route = data.routes[0];
-                    if (route.geometry && typeof route.geometry === 'object' && Array.isArray(route.geometry.coordinates)) {
-                        coordsLngLat = route.geometry.coordinates.map(c => [Number(c[0]), Number(c[1])]);
-                    } else if (typeof route.geometry === 'string') {
-                        const ptsLatLon = this.decodePolyline(route.geometry);
-                        coordsLngLat = ptsLatLon.map(p => [p[1], p[0]]);
+                const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson`;
+                const resLocal = await fetch(urlLocal, { signal: AbortSignal.timeout(3500) });
+                if (resLocal.ok) {
+                    const dataLocal = await resLocal.json();
+                    if (dataLocal.routes && dataLocal.routes.length > 0) {
+                        routeEncontrada = dataLocal.routes[0];
                     }
+                }
+            } catch(e) {}
 
-                    if (coordsLngLat.length > 0) {
-                        this.coordenadasRotaAtual = coordsLngLat;
-                        
-                        // CHAMA A FUNÇÃO BLINDADA (A LINHA AZUL DESENHA IMEDIATAMENTE APÓS O MAPA CARREGAR)
-                        this.desenharLinhaRotaMapLibre(coordsLngLat);
-
-                        this.atualizarMarcadorDestinoGL(eLat, eLng);
-                        const distanciaMetros = Math.round(route.distance);
-                        this.distanciaProximaManobra = distanciaMetros > 1000 ? (distanciaMetros / 1000).toFixed(1) + ' km' : distanciaMetros + ' m';
-                        this.passosRota = route.legs[0].steps;
-                        this.passoAtualIndex = 0;
-                        this.atualizarInstrucaoUI();
-
-                        if (coordsLngLat.length > 1) {
-                            const bearingInicial = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
-                            this.headingAtual = bearingInicial;
-                            if (!this.mapaArrastadoPeloUsuario) {
-                                this.mapaNavGL.easeTo({
-                                    center: [sLng, sLat],
-                                    bearing: bearingInicial,
-                                    pitch: 62,
-                                    zoom: 18.5,
-                                    duration: 600
-                                });
-                            }
+            // 2. Se falhar, tenta o OSRM público mundial
+            if (!routeEncontrada) {
+                try {
+                    const urlPub = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson`;
+                    const resPub = await fetch(urlPub, { signal: AbortSignal.timeout(4000) });
+                    if (resPub.ok) {
+                        const dataPub = await resPub.json();
+                        if (dataPub.routes && dataPub.routes.length > 0) {
+                            routeEncontrada = dataPub.routes[0];
                         }
                     }
-                } else {
-                    // FALLBACK SE NÃO ACHAR ROTA: Desenha linha reta em Ciano!
-                    coordsLngLat = [ [sLng, sLat], [eLng, eLat] ];
-                    this.coordenadasRotaAtual = coordsLngLat;
-                    this.desenharLinhaRotaMapLibre(coordsLngLat);
-                    this.atualizarMarcadorDestinoGL(eLat, eLng);
+                } catch(e) {}
+            }
+
+            // 3. Extrai as curvas exatas da rua
+            if (routeEncontrada && routeEncontrada.geometry) {
+                if (typeof routeEncontrada.geometry === 'object' && Array.isArray(routeEncontrada.geometry.coordinates)) {
+                    coordsLngLat = routeEncontrada.geometry.coordinates.map(c => [Number(c[0]), Number(c[1])]);
+                } else if (typeof routeEncontrada.geometry === 'string') {
+                    const pts = this.decodePolyline(routeEncontrada.geometry);
+                    coordsLngLat = pts.map(p => [p[1], p[0]]);
                 }
-            } catch (error) {
-                console.error('Erro de traçado OSRM:', error);
-                this.instrucaoAtual = 'Aguardando traçado da via...';
+                const distMetros = Math.round(routeEncontrada.distance);
+                this.distanciaProximaManobra = distMetros > 1000 ? (distMetros / 1000).toFixed(1) + ' km' : distMetros + ' m';
+            }
+
+            // 4. Se a internet do chip cair totalmente, traça linha guia direta até o pino!
+            if (!coordsLngLat || coordsLngLat.length === 0) {
+                coordsLngLat = [[Number(sLng), Number(sLat)], [Number(eLng), Number(eLat)]];
+                const distReta = Math.round(this.calcularDistancia(sLat, sLng, eLat, eLng));
+                this.distanciaProximaManobra = distReta > 1000 ? (distReta / 1000).toFixed(1) + ' km' : distReta + ' m';
+            }
+
+            this.coordenadasRotaAtual = coordsLngLat;
+
+            // PINTA A LINHA AZUL NO MAPA
+            this.atualizarLinhaNavGL(coordsLngLat);
+
+            // FIXA O PINO COM O NÚMERO DO CANETÃO NO DESTINO
+            this.atualizarMarcadorDestinoGL(eLat, eLng);
+
+            // GIRA A CÂMERA NA VERTICAL DA VIA
+            if (coordsLngLat.length > 1) {
+                const bearingVia = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
+                this.headingAtual = bearingVia;
+                if (!this.mapaArrastadoPeloUsuario) {
+                    this.centralizarNoCarroGL(sLat, sLng, bearingVia);
+                }
             }
         },
 
+        // PINO DO CANETÃO NO DESTINO (IDÊNTICO À ABA MAPAS)
         atualizarMarcadorDestinoGL(lat, lng) {
-            if (!this.mapaNavGL) return;
+            if (!this.mapaNavGL || !lat || !lng) return;
+            const numeroCanetao = this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : '';
+
             if (this.marcadorDestinoGL) {
                 this.marcadorDestinoGL.setLngLat([lng, lat]);
+                const txt = document.getElementById('txtCanetaoPinNav');
+                if (txt) txt.innerText = `#${numeroCanetao}`;
                 return;
             }
 
             const el = document.createElement('div');
             el.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center;">
-                  <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:900; box-shadow:0 4px 10px rgba(0,0,0,0.7);">
-                    #${this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : ''}
+                <div style="display:flex; flex-direction:column; align-items:center; pointer-events:none;">
+                  <div style="background:#ea580c; color:#fff; border:2px solid #fff; border-radius:10px; padding:3px 8px; font-size:12px; font-weight:900; font-family:monospace; box-shadow:0 6px 16px rgba(0,0,0,0.85); white-space:nowrap;">
+                    <span id="txtCanetaoPinNav">#${numeroCanetao}</span> Canetão
                   </div>
-                  <div style="font-size:34px; line-height:1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));">📍</div>
+                  <div style="width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 10px solid #ea580c; margin-top: -1px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></div>
                 </div>
             `;
 
@@ -1619,6 +1632,7 @@
             }
         },
 
+        // CÂMERA RÁPIDA (350ms): ALINHA NA VERTICAL SEM LAG!
         centralizarNoCarroGL(lat, lng, bearing) {
             if (!this.mapaNavGL) return;
             this.mapaNavGL.easeTo({
@@ -1626,7 +1640,7 @@
                 bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
                 pitch: 62,
                 zoom: 18.5,
-                duration: 900,
+                duration: 350,
                 easing: (t) => t
             });
         },
@@ -1665,13 +1679,13 @@
             }
 
             let headingCalculado = pos.coords.heading;
-            
             if (headingCalculado === null || isNaN(headingCalculado)) {
-                if (distanciaDesdeUltimo > 3) {
+                if (distanciaDesdeUltimo > 2) {
                    headingCalculado = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
                 }
             }
 
+            // RESPOSTA RÁPIDA DE ROTAÇÃO: 0.65 FAZ O CARRO ALINHAR NA VIA NA HORA!
             if (headingCalculado !== null && !isNaN(headingCalculado) && this.velocidadeGPS >= this.minSpeedKmhNav) {
                this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
             } 
@@ -1686,98 +1700,46 @@
             this.ultimaLngCarro = lng;
 
             const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
-            
-            if (this.iconeManobraNav !== '📍') {
-                this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
-            }
+            this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
+            // ALERTA DE CHEGADA (SEM FECHAR A NAVEGAÇÃO!)
             if (distDestinoFinal <= 20 && !this.chegadaAnunciada) {
                 this.chegadaAnunciada = true;
-                this.falarTexto('Você chegou ao destino!');
-                if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
-                setTimeout(() => {
-                    this.pararNavegacao();
-                }, 1800);
-                return;
+                this.falarTexto(`Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}`);
+                if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
             }
 
-            if (this.iconeManobraNav !== '📍' && this.verificarSeSaiuDaRota(lat, lng)) {
+            if (this.verificarSeSaiuDaRota(lat, lng)) {
                 this.falarTexto('Recalculando rota...');
                 await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
                 return;
             }
-
-            if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
-                const stepAtual = this.passosRota[this.passoAtualIndex];
-                const manobraLat = stepAtual.maneuver.location[1];
-                const manobraLng = stepAtual.maneuver.location[0];
-                
-                const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
-                
-                if (distParaManobra < 18) { 
-                    this.passoAtualIndex++;
-                    this.atualizarInstrucaoUI();
-                }
-            }
         },
 
-        atualizarInstrucaoUI() {
-            if (this.passosRota.length === 0 || this.passoAtualIndex >= this.passosRota.length) return;
-            const step = this.passosRota[this.passoAtualIndex];
+        // TRANSIÇÃO DIRETA: CONCLUI O PACOTE E JÁ PULA PRO PRÓXIMO SEM SAIR DO MAPA!
+        async concluirEntregaPeloNav(entrega) {
+            if (!entrega) return;
+            await this.concluirEntrega(entrega);
             
-            const info = this.interpretarManobraWaze(step);
-            this.instrucaoAtual = info.texto;
-            this.nomeProximaRua = info.rua;
-            this.iconeManobraNav = info.icone;
-
-            if (this.passosRota[this.passoAtualIndex + 1]) {
-               const nextStep = this.passosRota[this.passoAtualIndex + 1];
-               const nextInfo = this.interpretarManobraWaze(nextStep);
-               this.subInstrucaoEmSeguida = `${nextInfo.icone} ${nextInfo.texto}`;
+            // Busca o próximo pacote pendente
+            const proxima = this.entregas.find(e => e.status !== 'entregue' && e.id !== entrega.id);
+            
+            if (proxima) {
+                this.entregaNavegacao = proxima;
+                this.chegadaAnunciada = false;
+                this.nomeProximaRua = proxima.endereco;
+                this.falarTexto(`Entregue! Próxima parada: ${proxima.endereco}, Canetão número ${proxima.ordem_entrega}`);
+                if ('vibrate' in navigator) navigator.vibrate([60, 40, 60]);
+                
+                // Puxa a rota pro novo destino imediatamente
+                if (this.ultimaLatCarro && this.ultimaLngCarro) {
+                    await this.calcularRotaRuaARua(this.ultimaLatCarro, this.ultimaLngCarro, proxima.latitude, proxima.longitude);
+                }
             } else {
-               this.subInstrucaoEmSeguida = '🏁 Destino final à frente';
+                this.falarTexto('Parabéns! Todas as entregas da carga foram concluídas!');
+                alert('🎉 Rota 100% Concluída com sucesso!');
+                this.pararNavegacao();
             }
-
-            if (this.ultimaInstrucaoFalada !== info.texto) {
-                this.falarTexto(info.texto);
-                this.ultimaInstrucaoFalada = info.texto;
-            }
-        },
-
-        interpretarManobraWaze(step) {
-            const type = step.maneuver.type;
-            const modifier = step.maneuver.modifier || '';
-            const rua = step.name || 'sua rota';
-
-            let icone = '⬆️';
-            let texto = `Siga na ${rua}`;
-
-            if (type === 'depart') {
-              icone = '⬆️';
-              texto = `Siga em frente na ${rua}`;
-            } else if (type === 'arrive') {
-              icone = '🏁';
-              texto = `Destino à frente`;
-            } else if (type === 'turn') {
-              if (modifier.includes('right')) {
-                icone = modifier.includes('slight') ? '↗️' : '⤴️';
-                texto = `Vire à direita na ${rua}`;
-              } else if (modifier.includes('left')) {
-                icone = modifier.includes('slight') ? '↖️' : '⤵️';
-                texto = `Vire à esquerda na ${rua}`;
-              } else {
-                icone = '⬆️';
-                texto = `Continue na ${rua}`;
-              }
-            } else if (type === 'roundabout') {
-              icone = '🔄';
-              texto = `Na rotatória, pegue a saída para ${rua}`;
-            } else if (type === 'end of road') {
-              icone = modifier.includes('right') ? '⤴️' : '⤵️';
-              texto = `No fim da rua, vire na ${rua}`;
-            }
-
-            return { icone, texto, rua };
         },
 
         calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -2214,7 +2176,7 @@
                 plano_ativo: 'gratuito'
               };
               const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
-                method: 'POST', headers, credentials: 'include', body: JSON.stringify(novoRegistro)
+                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
               });
               const postData = await postRes.json();
               userSaas = postData.data;
