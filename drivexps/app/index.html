@@ -181,7 +181,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- MapLibre GL: Motor 3D com rotação nativa idêntico ao Waze -->
+  <!-- MapLibre GL: Motor 3D nativo idêntico ao Waze -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
@@ -556,7 +556,7 @@
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">Rota</span>
+            <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
           <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
@@ -690,6 +690,7 @@
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
                 <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
               </p>
+              <p class="text-xs text-gray-300 font-medium leading-none">Confira todas as caixas antes de desembarcar:</p>
               <div class="space-y-2 pt-1">
                 <template x-for="p in pacotesMesmoLocal" :key="p.id">
                   <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
@@ -951,7 +952,7 @@
         <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div><h3 class="text-2xl font-black text-white">Partida e Chegada</h3><p class="text-sm text-gray-200 leading-relaxed">Informe onde você inicia e termina a rota no modal de importação (ou use o GPS atual do seu celular).</p></div>
       </template>
       <template x-if="passoTutorial === 3">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div><h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3><p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p></div>
+        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div><h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3><p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"+ Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p></div>
       </template>
       <template x-if="passoTutorial === 4">
         <div class="space-y-3.5"><div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">👜</div><h3 class="text-2xl font-black text-white">2. Organização nas Sacolas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, confira os pacotes organizados de 10 em 10 e marque no canetão o número <strong>#CANETÃO</strong> nas caixas.</p></div>
@@ -1082,7 +1083,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (MAPLIBRE GL NATIVO COM ROTAS BLINDADAS) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM AUTENTICAÇÃO E NAVEGAÇÃO REPARADAS) -->
   <script>
     function entregaApp() {
       return {
@@ -1106,7 +1107,7 @@
         passoAtualIndex: 0,
         headingAtual: 0,
         minSpeedKmhNav: 4.0,
-        bearingSmoothFactor: 0.65, // Giro rápido sem lag
+        bearingSmoothFactor: 0.65, // Resposta ágil de rotação
         ultimaLatCarro: null,
         ultimaLngCarro: null,
         mapaArrastadoPeloUsuario: false,
@@ -1218,7 +1219,6 @@
           if (!container) return;
 
           if (!this.mapaLeaflet) {
-            // Centro padrão neutro do Brasil
             this.mapaLeaflet = L.map('mapaContainer', { zoomControl: false }).setView([-15.7801, -47.9292], 4);
             L.control.zoom({ position: 'bottomright' }).addTo(this.mapaLeaflet);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.mapaLeaflet);
@@ -1296,7 +1296,6 @@
             L.marker(posCasa, { icon: iconeCasa }).bindPopup(`<strong>🏠 PONTO DE CHEGADA</strong>`).addTo(this.grupoMarcadores);
           }
 
-          // ROTA DA ABA MAPA AGORA SEGUE A MESMA COR AZUL CIANO (#38bdf8) DO GPS
           if (this.rotaGeometria && this.rotaGeometria.length > 5) {
             const latlngs = this.decodePolyline(this.rotaGeometria);
             this.linhaTrajeto = L.polyline(latlngs, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
@@ -1312,7 +1311,7 @@
           }
         },
 
-        // ==== ENGINE NAVEGAÇÃO NATIVA 3D ====
+        // ==== ENGINE NAVEGAÇÃO NATIVA 3D BLINDADA ====
 
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1379,14 +1378,13 @@
                 attributionControl: false
             });
 
-            // SÓ LIBERA ARRASTO MANUAL SE TOCAR O DEDO!
             this.mapaNavGL.on('dragstart', (e) => {
                 if (e.originalEvent) {
                     this.mapaArrastadoPeloUsuario = true;
                 }
             });
 
-            // CRIA A CAMADA DA LINHA IMEDIATAMENTE (SEM RACE CONDITION)
+            // CRIA A CAMADA DA LINHA ANTECIPADAMENTE (EVITA RACE CONDITION)
             this.mapaNavGL.on('load', () => {
                 if (!this.mapaNavGL.getSource('rota-source')) {
                     this.mapaNavGL.addSource('rota-source', {
@@ -1426,12 +1424,10 @@
 
                 this.atualizarMarcadorCarroGL(sLat, sLng, 0);
 
-                // GIRO INSTANTÂNEO: Alinha o mapa na vertical em direção ao destino
                 const bearingInicial = this.calcularBearing(sLat, sLng, entrega.latitude, entrega.longitude);
                 this.headingAtual = bearingInicial;
                 this.centralizarNoCarroGL(sLat, sLng, bearingInicial);
 
-                // Traça a rota oficial
                 await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
                 this.watchPositionId = navigator.geolocation.watchPosition(
@@ -1463,7 +1459,6 @@
             return { lat, lng, nomeRua: '' };
         },
 
-        // ATUALIZAÇÃO DA LINHA AZUL NO MAPA
         atualizarLinhaNavGL(coordsLngLat) {
             if (!this.mapaNavGL) return;
             const src = this.mapaNavGL.getSource('rota-source');
@@ -1494,14 +1489,13 @@
             }
         },
 
-        // CÁLCULO DE ROTA COM FALLBACK TOTAL (NUNCA FICA SEM LINHA)
         async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
             if (!sLat || !sLng || !eLat || !eLng) return;
 
             let coordsLngLat = [];
             let routeEncontrada = null;
 
-            // 1. Tenta o servidor local OSRM
+            // 1. Tenta OSRM local
             try {
                 const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
                 const resLocal = await fetch(urlLocal, { signal: AbortSignal.timeout(3500) });
@@ -1513,7 +1507,7 @@
                 }
             } catch(e) {}
 
-            // 2. Se falhar, tenta o OSRM público mundial
+            // 2. Se falhar, tenta OSRM público
             if (!routeEncontrada) {
                 try {
                     const urlPub = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
@@ -1527,7 +1521,7 @@
                 } catch(e) {}
             }
 
-            // 3. Extrai as curvas exatas da rua
+            // 3. Extrai traçado viário
             if (routeEncontrada && routeEncontrada.geometry) {
                 if (typeof routeEncontrada.geometry === 'object' && Array.isArray(routeEncontrada.geometry.coordinates)) {
                     coordsLngLat = routeEncontrada.geometry.coordinates.map(c => [Number(c[0]), Number(c[1])]);
@@ -1542,7 +1536,7 @@
                 this.atualizarInstrucaoUI();
             }
 
-            // 4. Se a internet falhar totalmente, traça linha direta guia
+            // 4. Fallback absoluto se a conexão oscilar totalmente
             if (!coordsLngLat || coordsLngLat.length === 0) {
                 coordsLngLat = [[Number(sLng), Number(sLat)], [Number(eLng), Number(eLat)]];
                 const distReta = Math.round(this.calcularDistancia(sLat, sLng, eLat, eLng));
@@ -1550,14 +1544,9 @@
             }
 
             this.coordenadasRotaAtual = coordsLngLat;
-
-            // PINTA A LINHA AZUL NO MAPA
             this.atualizarLinhaNavGL(coordsLngLat);
-
-            // FIXA O PINO CIRCULAR COM NÚMERO DO CANETÃO NO DESTINO (IGUAL ABA MAPAS)
             this.atualizarMarcadorDestinoGL(eLat, eLng);
 
-            // GIRA A CÂMERA NA VERTICAL DA VIA
             if (coordsLngLat.length > 1) {
                 const bearingVia = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
                 this.headingAtual = bearingVia;
@@ -1567,14 +1556,13 @@
             }
         },
 
-        // PINO CIRCULAR IGUAL À ABA MAPA (VERDE = PENDENTE, VERMELHO = ENTREGUE, AMARELO = AUSENTE)
         atualizarMarcadorDestinoGL(lat, lng) {
             if (!this.mapaNavGL || !lat || !lng) return;
             const numeroCanetao = this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : '';
             
-            let corFundo = '#10b981'; // Verde (Pendente)
-            if (this.entregaNavegacao?.status === 'entregue') corFundo = '#ef4444'; // Vermelho
-            if (this.entregaNavegacao?.status === 'ausente') corFundo = '#f59e0b'; // Amarelo
+            let corFundo = '#10b981';
+            if (this.entregaNavegacao?.status === 'entregue') corFundo = '#ef4444';
+            if (this.entregaNavegacao?.status === 'ausente') corFundo = '#f59e0b';
 
             if (this.marcadorDestinoGL) {
                 this.marcadorDestinoGL.setLngLat([lng, lat]);
@@ -1635,7 +1623,6 @@
             }
         },
 
-        // CÂMERA RÁPIDA (350ms): ALINHA NA VERTICAL SEM LAG!
         centralizarNoCarroGL(lat, lng, bearing) {
             if (!this.mapaNavGL) return;
             this.mapaNavGL.easeTo({
@@ -1688,7 +1675,6 @@
                 }
             }
 
-            // RESPOSTA RÁPIDA DE ROTAÇÃO: ACOMPANHA O VEÍCULO SEM ATRASO
             if (headingCalculado !== null && !isNaN(headingCalculado) && this.velocidadeGPS >= this.minSpeedKmhNav) {
                this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
             } 
@@ -1705,7 +1691,6 @@
             const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
             this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
-            // ALERTA DE CHEGADA (SEM FECHAR A NAVEGAÇÃO!)
             if (distDestinoFinal <= 20 && !this.chegadaAnunciada) {
                 this.chegadaAnunciada = true;
                 this.falarTexto(`Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}`);
@@ -1718,7 +1703,6 @@
                 return;
             }
 
-            // ANÚNCIO DE MANOBRAS E CURVAS CURVA A CURVA
             if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
                 const stepAtual = this.passosRota[this.passoAtualIndex];
                 const manobraLat = stepAtual.maneuver.location[1];
@@ -1791,12 +1775,10 @@
             return { icone, texto, rua };
         },
 
-        // TRANSIÇÃO DIRETA: CONCLUI O PACOTE E JÁ PULA PRO PRÓXIMO SEM SAIR DO MAPA!
         async concluirEntregaPeloNav(entrega) {
             if (!entrega) return;
             await this.concluirEntrega(entrega);
             
-            // Busca o próximo pacote pendente
             const proxima = this.entregas.find(e => e.status !== 'entregue' && e.id !== entrega.id);
             
             if (proxima) {
@@ -1806,7 +1788,6 @@
                 this.falarTexto(`Entregue! Próxima parada: ${proxima.endereco}, Canetão número ${proxima.ordem_entrega}`);
                 if ('vibrate' in navigator) navigator.vibrate([60, 40, 60]);
                 
-                // Puxa a rota pro novo destino imediatamente
                 if (this.ultimaLatCarro && this.ultimaLngCarro) {
                     await this.calcularRotaRuaARua(this.ultimaLatCarro, this.ultimaLngCarro, proxima.latitude, proxima.longitude);
                 }
@@ -1861,7 +1842,449 @@
             this.modo = 'rua'; 
         },
 
-        // GEOCODIFICAÇÃO PRECISA COM SUPORTE A NÚMERO EXATO DO IMÓVEL (NACIONAL)
+        async init() {
+          try {
+            if (this.tema === 'claro') {
+              document.body.classList.add('theme-claro');
+            } else {
+              document.body.classList.add('theme-escuro');
+            }
+
+            this.modalCadastroObrigatorio = false;
+            this.restaurarCacheLocal();
+            await this.verificarAutenticacao();
+            this.checarInstalacaoPWA();
+
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.addEventListener('message', async (event) => {
+                if (event.data && event.data.tipo === 'NOVO_ROMANEIO_COMPARTILHADO') {
+                  await this.processarRomaneioDoCache();
+                }
+              });
+            }
+
+            if (this.usuarioLogado) {
+              await this.sincronizarAssinaturaSaaS();
+              
+              if (!this.rotaAtivaId || this.entregas.length === 0) {
+                await this.carregarUltimaRota();
+              }
+
+              if (!localStorage.getItem('drivexps_tutorial_visto')) {
+                setTimeout(() => this.iniciarTutorial(), 600);
+              }
+
+              await this.processarRomaneioDoCache();
+
+              if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
+                launchQueue.setConsumer(async (launchParams) => {
+                  if (!launchParams.files.length) return;
+                  const fileHandle = launchParams.files[0];
+                  const file = await fileHandle.getFile();
+                  this.abrirModalImportar();
+                  this.processarArquivoDirecto(file);
+                });
+              }
+            } else {
+              this.modalCadastroObrigatorio = false;
+            }
+          } catch(e) {
+            console.error('Erro na inicialização:', e);
+          }
+        },
+
+        abrirBusca() {
+            this.buscaAberta = true;
+            this.termoBusca = '';
+            setTimeout(() => {
+                if(this.$refs && this.$refs.inputBusca) {
+                    this.$refs.inputBusca.focus();
+                }
+            }, 100);
+        },
+
+        formatarParada(val) {
+            if (val === null || val === undefined) return '-';
+            if (val < 0) return '+' + Math.abs(val);
+            return val;
+        },
+
+        get entregasOrdenadasParaSacola() {
+            return [...this.entregas].sort((a, b) => {
+                if (a.status === 'entregue' && b.status !== 'entregue') return 1;
+                if (a.status !== 'entregue' && b.status === 'entregue') return -1;
+                return a.ordem_entrega - b.ordem_entrega;
+            });
+        },
+
+        get entregasFiltradas() {
+            if (!this.termoBusca) return [];
+            const t = this.termoBusca.toLowerCase().trim();
+            const apenasNumeros = /^\d+$/.test(t);
+
+            return this.entregasOrdenadasParaSacola.filter(e => {
+                const paradaStr = this.formatarParada(e.parada_shopee).toString().toLowerCase();
+                const ordemStr = this.formatarParada(e.ordem_shopee).toString().toLowerCase();
+                const sacolaNum = Math.ceil(e.ordem_entrega / 10).toString();
+                const canetaoStr = e.ordem_entrega.toString();
+
+                if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
+                if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
+                if (t.startsWith('+') && t === paradaStr) return true;
+
+                if (apenasNumeros && t.length <= 3) {
+                    return false;
+                }
+
+                return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
+                       (e.bairro && e.bairro.toLowerCase().includes(t)) ||
+                       (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t));
+            });
+        },
+
+        get entregasNoBairroRestantes() {
+          if (!this.entregaAtual) return 0;
+          const bAtual = (this.entregaAtual.bairro || '').toLowerCase().trim();
+          return this.naoEntregues.filter(e => (e.bairro || '').toLowerCase().trim() === bAtual).length;
+        },
+
+        async processarRomaneioDoCache() {
+          const parametroUrl = window.location.search.includes('arquivo_compartilhado=true');
+          let tentativas = 0;
+          const maxTentativas = 6;
+
+          const tentarLer = async () => {
+            try {
+              const cache = await caches.open('drivexps-shared-files');
+              const res = await cache.match('ultimo-romaneio');
+
+              if (res) {
+                const blob = await res.blob();
+                const nomeHeader = res.headers.get('X-File-Name');
+                const nomeFinal = nomeHeader ? decodeURIComponent(nomeHeader) : 'romaneio_shopee.xlsx';
+                const file = new File([blob], nomeFinal, { type: blob.type });
+
+                await cache.delete('ultimo-romaneio');
+
+                if (parametroUrl) {
+                  window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                this.abrirModalImportar();
+                this.processarArquivoDirecto(file);
+                return true;
+              }
+            } catch (err) {}
+            return false;
+          };
+
+          const sucesso = await tentarLer();
+          if (!sucesso && parametroUrl) {
+            const intervalo = setInterval(async () => {
+              tentativas++;
+              const ok = await tentarLer();
+              if (ok || tentativas >= maxTentativas) {
+                clearInterval(intervalo);
+              }
+            }, 500);
+          }
+        },
+
+        restaurarCacheLocal() {
+          try {
+            const rotaCache = localStorage.getItem('drivexps_rota_ativa_id');
+            const entregasCache = localStorage.getItem('drivexps_entregas_cache');
+            const coordP = localStorage.getItem('drivexps_partida_coord');
+            const coordC = localStorage.getItem('drivexps_chegada_coord');
+            const geom = localStorage.getItem('drivexps_rota_geometria');
+            if (rotaCache && entregasCache) {
+              this.rotaAtivaId = parseInt(rotaCache);
+              this.entregas = JSON.parse(entregasCache);
+            }
+            if (coordP) this.coordPartidaSalva = JSON.parse(coordP);
+            if (coordC) this.coordChegadaSalva = JSON.parse(coordC);
+            if (geom) this.rotaGeometria = geom;
+          } catch(e) {}
+        },
+
+        salvarCacheLocal() {
+          try {
+            if (this.rotaAtivaId) {
+              localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
+              localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
+              if (this.coordPartidaSalva) localStorage.setItem('drivexps_partida_coord', JSON.stringify(this.coordPartidaSalva));
+              if (this.coordChegadaSalva) localStorage.setItem('drivexps_chegada_coord', JSON.stringify(this.coordChegadaSalva));
+              if (this.rotaGeometria) localStorage.setItem('drivexps_rota_geometria', this.rotaGeometria);
+            }
+          } catch(e) {}
+        },
+
+        getTextoStatusAssinatura() {
+          if (this.planoAtivo === 'vitalicio') return 'Acesso Vitalício 👑';
+          let nomePlano = 'Plano Semanal';
+          if (this.planoAtivo === 'mensal') nomePlano = 'Plano Mensal';
+          else if (this.planoAtivo === 'gratuito' || this.statusAssinatura === 'trial') nomePlano = 'Período de Teste';
+
+          if (!this.dataExpiracao) return 'Teste Grátis (Começa na 1ª rota)';
+          const exp = new Date(this.dataExpiracao);
+          const agora = new Date();
+          const diffDias = Math.ceil((exp - agora) / (1000 * 60 * 60 * 24));
+          if (diffDias <= 0) return 'Assinatura Expirada ⚠️';
+          return `${nomePlano} • Vence em ${exp.toLocaleDateString('pt-BR')} (${diffDias}d restantes)`;
+        },
+
+        async salvarDadosCompletosPerfil() {
+          if (!this.usuarioId) return;
+          this.salvandoPerfil = true;
+          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+            if (data.data && data.data[0]) {
+              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${data.data[0].id}`, {
+                method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ nome: this.usuarioNome, telefone: telLimpo })
+              });
+              alert('✅ Dados do perfil atualizados com sucesso!');
+            }
+          } catch(e) { alert('Falha ao salvar dados: ' + e.message); } 
+          finally { this.salvandoPerfil = false; }
+        },
+
+        async salvarCadastroObrigatorio() {
+          this.erroCadastroObrigatorio = '';
+          const nomeLimpo = (this.inputNome || '').trim();
+          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
+          const emailLimpo = (this.inputEmail || '').trim().toLowerCase();
+
+          if (!nomeLimpo || nomeLimpo.toLowerCase() === 'motorista' || nomeLimpo.length < 3) {
+            this.erroCadastroObrigatorio = 'Por favor, digite seu nome e sobrenome.';
+            return;
+          }
+
+          if (telLimpo.length < 10 || telLimpo.length > 11) {
+            this.erroCadastroObrigatorio = 'Informe um WhatsApp válido com DDD (10 ou 11 dígitos).';
+            return;
+          }
+
+          if (!emailLimpo || !emailLimpo.includes('@') || !emailLimpo.includes('.')) {
+            this.erroCadastroObrigatorio = 'Informe um e-mail válido.';
+            return;
+          }
+
+          this.salvandoPerfil = true;
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+
+            if (data.data && data.data[0]) {
+              const regId = data.data[0].id;
+              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${regId}`, {
+                method: 'PATCH',
+                headers,
+                credentials: 'include',
+                body: JSON.stringify({
+                  nome: nomeLimpo,
+                  telefone: telLimpo,
+                  email: emailLimpo
+                })
+              });
+
+              this.usuarioNome = nomeLimpo;
+              this.usuarioEmail = emailLimpo;
+              this.inputTelefone = telLimpo;
+              this.modalCadastroObrigatorio = false;
+            } else {
+              this.erroCadastroObrigatorio = 'Registro não encontrado. Tente recarregar a página.';
+            }
+          } catch(e) {
+            this.erroCadastroObrigatorio = 'Falha ao salvar: ' + e.message;
+          } finally {
+            this.salvandoPerfil = false;
+          }
+        },
+
+        iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
+        proximoPassoTutorial() { if (this.passoTutorial < 8) this.passoTutorial++; else this.concluirTutorial(); },
+        voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
+        concluirTutorial() { this.tutorialAberto = false; localStorage.setItem('drivexps_tutorial_visto', 'true'); },
+
+        abrirModalImportar() {
+          if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
+          this.modalImportar = true;
+        },
+
+        irParaEntregaDireta(item) {
+          this.entregaSelecionadaId = item.id;
+          this.modo = 'rua';
+        },
+
+        // =========================================================================
+        // AUTENTICAÇÃO COM INTERCEPTAÇÃO DE TOKEN NA URL (FIX DO LOOP DE LOGIN)
+        // =========================================================================
+        async verificarAutenticacao() {
+          if (localStorage.getItem('usuario_deslogado') === 'true') {
+            this.usuarioLogado = false;
+            this.modalCadastroObrigatorio = false;
+            return;
+          }
+
+          // 1. CAPTURAR TOKEN QUE O GOOGLE / DIRECTUS RETORNA NA URL DE REDIRECIONAMENTO
+          const searchParams = new URLSearchParams(window.location.search);
+          const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+          
+          const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
+          const refreshUrl = searchParams.get('refresh_token') || hashParams.get('refresh_token');
+
+          if (tokenUrl) {
+            localStorage.setItem('directus_token', tokenUrl);
+            this.tokenAcesso = tokenUrl;
+          }
+          if (refreshUrl) {
+            localStorage.setItem('directus_refresh_token', refreshUrl);
+          }
+
+          // 2. Limpar a URL visualmente após salvar o token com segurança
+          if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
+          const extrairDadosUsuario = (u) => {
+            this.usuarioId = u.id;
+            this.usuarioEmail = u.email || '';
+            const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
+            this.usuarioNome = n.trim() || u.email || '';
+            localStorage.setItem('directus_user_id', this.usuarioId);
+            this.usuarioLogado = true;
+          };
+
+          // 3. Testar via Bearer Token (Prioridade Máxima contra bloqueio de cookies)
+          const tokenAtivo = this.tokenAcesso || localStorage.getItem('directus_token');
+          if (tokenAtivo) {
+            try {
+              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { 
+                headers: { 'Authorization': `Bearer ${tokenAtivo}` } 
+              });
+              if (res.ok) { 
+                const data = await res.json(); 
+                if (data && data.data && data.data.id) {
+                  extrairDadosUsuario(data.data); 
+                  return; 
+                }
+              }
+            } catch(e) {}
+          }
+
+          // 4. Testar via Cookie de Sessão
+          try {
+            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
+            if (resSession.ok) {
+              const userData = await resSession.json();
+              if (userData && userData.data && userData.data.id) { 
+                extrairDadosUsuario(userData.data); 
+                return; 
+              }
+            }
+          } catch(e) {}
+          
+          this.usuarioLogado = false;
+          this.modalCadastroObrigatorio = false;
+        },
+
+        async sincronizarAssinaturaSaaS() {
+          if (!this.usuarioId || !this.usuarioLogado) return;
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+            const registros = data.data || [];
+
+            let userSaas = null;
+
+            if (registros.length === 0) {
+              const novoRegistro = {
+                user_id: this.usuarioId,
+                email: this.usuarioEmail || null,
+                nome: (this.usuarioNome && this.usuarioNome !== 'Motorista') ? this.usuarioNome : null,
+                telefone: null,
+                trial_expira_em: null,
+                status_assinatura: 'trial',
+                plano_ativo: 'gratuito'
+              };
+              const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
+                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
+              });
+              const postData = await postRes.json();
+              userSaas = postData.data;
+
+              this.trialIniciado = false;
+              this.diasRestantesTrial = 7;
+              this.statusAssinatura = 'trial';
+              this.planoAtivo = 'gratuito';
+              this.dataExpiracao = null;
+              this.assinaturaValida = true;
+            } else {
+              userSaas = registros[0];
+              this.statusAssinatura = userSaas.status_assinatura || 'trial';
+              this.planoAtivo = userSaas.plano_ativo || 'gratuito';
+              this.dataExpiracao = userSaas.trial_expira_em || null;
+
+              if (userSaas.nome && userSaas.nome !== 'Motorista') this.usuarioNome = userSaas.nome;
+              if (userSaas.email) this.usuarioEmail = userSaas.email;
+              if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
+
+              if (this.planoAtivo === 'vitalicio') {
+                this.assinaturaValida = true; this.trialIniciado = true; this.diasRestantesTrial = 9999;
+              } else if (!userSaas.trial_expira_em) {
+                this.trialIniciado = false; this.diasRestantesTrial = 7; this.assinaturaValida = true;
+              } else {
+                this.trialIniciado = true;
+                const agora = new Date(); const expira = new Date(userSaas.trial_expira_em);
+                const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
+                this.diasRestantesTrial = Math.max(0, diffDias);
+                if (diffDias > 0) { this.assinaturaValida = true; } 
+                else { this.assinaturaValida = false; this.modalAssinatura = true; }
+              }
+
+              if (this.intervaloPollingPagamento) {
+                const novaExpMs = userSaas.trial_expira_em ? new Date(userSaas.trial_expira_em).getTime() : 0;
+                if (novaExpMs > this.dataExpAntesDoPix) {
+                  clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null;
+                  this.modalAssinatura = false; this.codigoPixGerado = ''; this.qrCodeBase64 = '';
+                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado com sucesso.');
+                }
+              }
+            }
+
+            const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
+            const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
+            const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
+
+            if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
+              this.inputNome = (!nomeInvalido) ? userSaas.nome : (this.usuarioNome || '');
+              this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
+              this.inputTelefone = userSaas?.telefone || '';
+              this.erroCadastroObrigatorio = '';
+              this.modalCadastroObrigatorio = true;
+            } else {
+              this.modalCadastroObrigatorio = false;
+            }
+
+          } catch (err) {
+            console.error('Erro na sincronização SaaS:', err);
+          }
+        },
+
+        isGpsSuspeito(endereco) {
+            const lower = (endereco || '').toLowerCase();
+            return lower.includes('s/n') || lower.includes('marginal') || lower.includes('rodovia') || lower.includes(' km');
+        },
+
         async converterTextoParaCoord(texto) {
           if (!texto || texto.trim().length < 3) return null;
           const partes = texto.split(',');
@@ -1870,7 +2293,6 @@
           }
 
           try {
-            // Busca aprimorada no OpenStreetMap com prioridade para numeração predial
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&addressdetails=1&limit=1&countrycodes=br`;
             const res = await fetch(url, { headers: { 'Accept-Language': 'pt-BR' } });
             const data = await res.json();
@@ -1924,14 +2346,23 @@
         async deslogar() {
           if (this.intervaloPollingPagamento) clearInterval(this.intervaloPollingPagamento);
           localStorage.setItem('usuario_deslogado', 'true');
-          localStorage.removeItem('directus_token'); localStorage.removeItem('directus_user_id');
-          localStorage.removeItem('drivexps_rota_ativa_id'); localStorage.removeItem('drivexps_entregas_cache');
-          this.tokenAcesso = null; this.usuarioId = null; this.usuarioLogado = false;
+          localStorage.removeItem('directus_token'); 
+          localStorage.removeItem('directus_user_id');
+          localStorage.removeItem('directus_refresh_token');
+          localStorage.removeItem('drivexps_rota_ativa_id'); 
+          localStorage.removeItem('drivexps_entregas_cache');
+          this.tokenAcesso = null; 
+          this.usuarioId = null; 
+          this.usuarioLogado = false;
           this.modalCadastroObrigatorio = false;
-          this.entregas = []; this.rotaAtivaId = null;
+          this.entregas = []; 
+          this.rotaAtivaId = null;
           try {
             await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mode: 'session' })
+              method: 'POST', 
+              headers: { 'Content-Type': 'application/json' }, 
+              credentials: 'include', 
+              body: JSON.stringify({ mode: 'session' })
             });
           } catch(e) {}
         },
@@ -1944,7 +2375,8 @@
 
         checarInstalacaoPWA() {
           this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-          const userAgent = window.navigator.userAgent.toLowerCase(); this.isIOS = /iphone|ipad|ipod/.test(userAgent);
+          const userAgent = window.navigator.userAgent.toLowerCase(); 
+          this.isIOS = /iphone|ipad|ipod/.test(userAgent);
           this.isMobile = /android|iphone|ipad|ipod|mobile/i.test(userAgent);
           if (this.isStandalone) { this.mostrarPopupInstalar = false; return; }
           if (window.pwaDeferredPrompt) this.temPromptInstalacao = true;
@@ -1963,7 +2395,6 @@
           window.pwaDeferredPrompt = null; this.mostrarPopupInstalar = false;
         },
 
-        // PARSER DE PLANILHA SHOPEE (UNIVERSAL E NACIONAL)
         parseLinhasShopee(linhasMatriz) {
           this.msgErro = null;
           if (!linhasMatriz || linhasMatriz.length < 2) { this.msgErro = 'Planilha com poucas linhas.'; return []; }
