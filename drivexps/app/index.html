@@ -1083,7 +1083,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM NAVEGAÇÃO E AUTENTICAÇÃO ESTÁVEIS) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO -->
   <script>
     function entregaApp() {
       return {
@@ -1358,7 +1358,6 @@
             this.contadorForaDaRota = 0;
             this.recalculandoRota = false;
 
-            // FALA COMPLETA NA SAÍDA
             this.falarTexto(`Iniciando rota para Canetão número ${entrega.ordem_entrega}, na ${entrega.endereco}`);
 
             setTimeout(() => { 
@@ -1549,7 +1548,6 @@
             this.atualizarLinhaNavGL(coordsLngLat);
             this.atualizarMarcadorDestinoGL(eLat, eLng);
 
-            // SÓ FORÇA GIRO BRUSCO DA VIA SE O CARRO ESTIVER QUASE PARADO (< 4 km/h)
             if (coordsLngLat.length > 1 && this.velocidadeGPS < this.minSpeedKmhNav) {
                 const bearingVia = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
                 this.headingAtual = bearingVia;
@@ -1645,7 +1643,6 @@
             }
         },
 
-        // VERIFICAÇÃO INTELIGENTE: AUMENTADA PARA 65 METROS
         verificarSeSaiuDaRota(cLat, cLng) {
             if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) return false;
             let menorDist = Infinity;
@@ -1653,9 +1650,9 @@
                 const pt = this.coordenadasRotaAtual[i];
                 const d = this.calcularDistancia(cLat, cLng, pt[1], pt[0]);
                 if (d < menorDist) menorDist = d;
-                if (menorDist < 20) return false; // Está no asfalto da rota
+                if (menorDist < 20) return false;
             }
-            return menorDist > 65; // Tolerância estendida para GPS instável
+            return menorDist > 65;
         },
 
         async processarPosicaoGPS(pos, destLat, destLng) {
@@ -1681,7 +1678,6 @@
                 }
             }
 
-            // ACOMPANHAMENTO VETORIAL ÁGIL
             if (headingCalculado !== null && !isNaN(headingCalculado) && this.velocidadeGPS >= this.minSpeedKmhNav) {
                this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
             } 
@@ -1698,14 +1694,12 @@
             const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
             this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
-            // ALERTA DE CHEGADA COMPLETO
             if (distDestinoFinal <= 25 && !this.chegadaAnunciada) {
                 this.chegadaAnunciada = true;
                 this.falarTexto(`Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}, na ${this.entregaNavegacao?.endereco || ''}`);
                 if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
             }
 
-            // RECÁLCULO CONTROLADO (SEM TRAVAMENTO EM LOOP)
             const agora = Date.now();
             const fora = this.verificarSeSaiuDaRota(lat, lng);
             if (fora) {
@@ -1714,7 +1708,6 @@
                 this.contadorForaDaRota = 0;
             }
 
-            // Só recalcula se estiver comprovadamente fora da via por 3 segundos seguidos e com pausa de 8s
             if (this.contadorForaDaRota >= 3 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 8000)) {
                 this.recalculandoRota = true;
                 this.ultimoRecalculoTimestamp = agora;
@@ -1725,21 +1718,18 @@
                 return;
             }
 
-            // ANÚNCIO ANTECIPADO DE MANOBRAS (COM 50 METROS)
             if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
                 const stepAtual = this.passosRota[this.passoAtualIndex];
                 const manobraLat = stepAtual.maneuver.location[1];
                 const manobraLng = stepAtual.maneuver.location[0];
                 const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
 
-                // Avisa com antecedência
                 if (distParaManobra < 55 && !stepAtual._anunciado) {
                     stepAtual._anunciado = true;
                     const info = this.interpretarManobraWaze(stepAtual);
                     this.falarTexto(`A 50 metros, ${info.texto}`);
                 }
 
-                // Avança manobra após a curva
                 if (distParaManobra < 18) { 
                     this.passoAtualIndex++;
                     this.atualizarInstrucaoUI();
@@ -1866,6 +1856,243 @@
             this.coordenadasRotaAtual = [];
             this.mapaArrastadoPeloUsuario = false;
             this.modo = 'rua'; 
+        },
+
+        // =========================================================================
+        // FUNÇÕES RESTAURADAS DE CONTROLE DE PERFIL, CADASTRO E NAVEGAÇÃO
+        // =========================================================================
+        async salvarDadosCompletosPerfil() {
+          if (!this.usuarioId) return;
+          this.salvandoPerfil = true;
+          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+            if (data.data && data.data[0]) {
+              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${data.data[0].id}`, {
+                method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ nome: this.usuarioNome, telefone: telLimpo })
+              });
+              alert('✅ Dados do perfil atualizados com sucesso!');
+            }
+          } catch(e) { alert('Falha ao salvar dados: ' + e.message); } 
+          finally { this.salvandoPerfil = false; }
+        },
+
+        async salvarCadastroObrigatorio() {
+          this.erroCadastroObrigatorio = '';
+          const nomeLimpo = (this.inputNome || '').trim();
+          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
+          const emailLimpo = (this.inputEmail || '').trim().toLowerCase();
+
+          if (!nomeLimpo || nomeLimpo.toLowerCase() === 'motorista' || nomeLimpo.length < 3) {
+            this.erroCadastroObrigatorio = 'Por favor, digite seu nome e sobrenome.';
+            return;
+          }
+          if (telLimpo.length < 10 || telLimpo.length > 11) {
+            this.erroCadastroObrigatorio = 'Informe um WhatsApp válido com DDD (10 ou 11 dígitos).';
+            return;
+          }
+          if (!emailLimpo || !emailLimpo.includes('@') || !emailLimpo.includes('.')) {
+            this.erroCadastroObrigatorio = 'Informe um e-mail válido.';
+            return;
+          }
+
+          this.salvandoPerfil = true;
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+            if (data.data && data.data[0]) {
+              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${data.data[0].id}`, {
+                method: 'PATCH', headers, credentials: 'include',
+                body: JSON.stringify({ nome: nomeLimpo, telefone: telLimpo, email: emailLimpo })
+              });
+              this.usuarioNome = nomeLimpo;
+              this.usuarioEmail = emailLimpo;
+              this.inputTelefone = telLimpo;
+              this.modalCadastroObrigatorio = false;
+            }
+          } catch(e) {
+            this.erroCadastroObrigatorio = 'Falha ao salvar: ' + e.message;
+          } finally {
+            this.salvandoPerfil = false;
+          }
+        },
+
+        iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
+        proximoPassoTutorial() { if (this.passoTutorial < 8) this.passoTutorial++; else this.concluirTutorial(); },
+        voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
+        concluirTutorial() { this.tutorialAberto = false; localStorage.setItem('drivexps_tutorial_visto', 'true'); },
+
+        abrirModalImportar() {
+          if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
+          this.modalImportar = true;
+        },
+
+        irParaEntregaDireta(item) {
+          this.entregaSelecionadaId = item.id;
+          this.modo = 'rua';
+        },
+
+        // =========================================================================
+        // AUTENTICAÇÃO COM INTERCEPTAÇÃO DE TOKEN NA URL (CORRIGIDA)
+        // =========================================================================
+        async verificarAutenticacao() {
+          if (localStorage.getItem('usuario_deslogado') === 'true') {
+            this.usuarioLogado = false;
+            this.modalCadastroObrigatorio = false;
+            return;
+          }
+
+          const searchParams = new URLSearchParams(window.location.search);
+          const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+          const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
+          const refreshUrl = searchParams.get('refresh_token') || hashParams.get('refresh_token');
+
+          if (tokenUrl) {
+            localStorage.setItem('directus_token', tokenUrl);
+            this.tokenAcesso = tokenUrl;
+          }
+          if (refreshUrl) {
+            localStorage.setItem('directus_refresh_token', refreshUrl);
+          }
+
+          if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
+          const extrairDadosUsuario = (u) => {
+            this.usuarioId = u.id;
+            this.usuarioEmail = u.email || '';
+            const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
+            this.usuarioNome = n.trim() || u.email || '';
+            localStorage.setItem('directus_user_id', this.usuarioId);
+            this.usuarioLogado = true;
+          };
+
+          const tokenAtivo = this.tokenAcesso || localStorage.getItem('directus_token');
+          if (tokenAtivo) {
+            try {
+              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { 
+                headers: { 'Authorization': `Bearer ${tokenAtivo}` } 
+              });
+              if (res.ok) { 
+                const data = await res.json(); 
+                if (data && data.data && data.data.id) {
+                  extrairDadosUsuario(data.data); 
+                  return; 
+                }
+              }
+            } catch(e) {}
+          }
+
+          try {
+            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
+            if (resSession.ok) {
+              const userData = await resSession.json();
+              if (userData && userData.data && userData.data.id) { 
+                extrairDadosUsuario(userData.data); 
+                return; 
+              }
+            }
+          } catch(e) {}
+          
+          this.usuarioLogado = false;
+          this.modalCadastroObrigatorio = false;
+        },
+
+        async sincronizarAssinaturaSaaS() {
+          if (!this.usuarioId || !this.usuarioLogado) return;
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+            const registros = data.data || [];
+
+            let userSaas = null;
+
+            if (registros.length === 0) {
+              const novoRegistro = {
+                user_id: this.usuarioId,
+                email: this.usuarioEmail || null,
+                nome: (this.usuarioNome && this.usuarioNome !== 'Motorista') ? this.usuarioNome : null,
+                telefone: null,
+                trial_expira_em: null,
+                status_assinatura: 'trial',
+                plano_ativo: 'gratuito'
+              };
+              const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
+                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
+              });
+              const postData = await postRes.json();
+              userSaas = postData.data;
+
+              this.trialIniciado = false;
+              this.diasRestantesTrial = 7;
+              this.statusAssinatura = 'trial';
+              this.planoAtivo = 'gratuito';
+              this.dataExpiracao = null;
+              this.assinaturaValida = true;
+            } else {
+              userSaas = registros[0];
+              this.statusAssinatura = userSaas.status_assinatura || 'trial';
+              this.planoAtivo = userSaas.plano_ativo || 'gratuito';
+              this.dataExpiracao = userSaas.trial_expira_em || null;
+
+              if (userSaas.nome && userSaas.nome !== 'Motorista') this.usuarioNome = userSaas.nome;
+              if (userSaas.email) this.usuarioEmail = userSaas.email;
+              if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
+
+              if (this.planoAtivo === 'vitalicio') {
+                this.assinaturaValida = true; this.trialIniciado = true; this.diasRestantesTrial = 9999;
+              } else if (!userSaas.trial_expira_em) {
+                this.trialIniciado = false; this.diasRestantesTrial = 7; this.assinaturaValida = true;
+              } else {
+                this.trialIniciado = true;
+                const agora = new Date(); const expira = new Date(userSaas.trial_expira_em);
+                const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
+                this.diasRestantesTrial = Math.max(0, diffDias);
+                if (diffDias > 0) { this.assinaturaValida = true; } 
+                else { this.assinaturaValida = false; this.modalAssinatura = true; }
+              }
+
+              if (this.intervaloPollingPagamento) {
+                const novaExpMs = userSaas.trial_expira_em ? new Date(userSaas.trial_expira_em).getTime() : 0;
+                if (novaExpMs > this.dataExpAntesDoPix) {
+                  clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null;
+                  this.modalAssinatura = false; this.codigoPixGerado = ''; this.qrCodeBase64 = '';
+                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado com sucesso.');
+                }
+              }
+            }
+
+            const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
+            const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
+            const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
+
+            if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
+              this.inputNome = (!nomeInvalido) ? userSaas.nome : (this.usuarioNome || '');
+              this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
+              this.inputTelefone = userSaas?.telefone || '';
+              this.erroCadastroObrigatorio = '';
+              this.modalCadastroObrigatorio = true;
+            } else {
+              this.modalCadastroObrigatorio = false;
+            }
+
+          } catch (err) {
+            console.error('Erro na sincronização SaaS:', err);
+          }
+        },
+
+        isGpsSuspeito(endereco) {
+            const lower = (endereco || '').toLowerCase();
+            return lower.includes('s/n') || lower.includes('marginal') || lower.includes('rodovia') || lower.includes(' km');
         },
 
         async converterTextoParaCoord(texto) {
@@ -2262,160 +2489,6 @@
               method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ status: novoStatus })
             });
           } catch(e) {}
-        },
-
-        async verificarAutenticacao() {
-          if (localStorage.getItem('usuario_deslogado') === 'true') {
-            this.usuarioLogado = false;
-            this.modalCadastroObrigatorio = false;
-            return;
-          }
-
-          const searchParams = new URLSearchParams(window.location.search);
-          const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
-          const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
-          const refreshUrl = searchParams.get('refresh_token') || hashParams.get('refresh_token');
-
-          if (tokenUrl) {
-            localStorage.setItem('directus_token', tokenUrl);
-            this.tokenAcesso = tokenUrl;
-          }
-          if (refreshUrl) {
-            localStorage.setItem('directus_refresh_token', refreshUrl);
-          }
-
-          if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
-
-          const extrairDadosUsuario = (u) => {
-            this.usuarioId = u.id;
-            this.usuarioEmail = u.email || '';
-            const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
-            this.usuarioNome = n.trim() || u.email || '';
-            localStorage.setItem('directus_user_id', this.usuarioId);
-            this.usuarioLogado = true;
-          };
-
-          const tokenAtivo = this.tokenAcesso || localStorage.getItem('directus_token');
-          if (tokenAtivo) {
-            try {
-              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { 
-                headers: { 'Authorization': `Bearer ${tokenAtivo}` } 
-              });
-              if (res.ok) { 
-                const data = await res.json(); 
-                if (data && data.data && data.data.id) {
-                  extrairDadosUsuario(data.data); 
-                  return; 
-                }
-              }
-            } catch(e) {}
-          }
-
-          try {
-            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
-            if (resSession.ok) {
-              const userData = await resSession.json();
-              if (userData && userData.data && userData.data.id) { 
-                extrairDadosUsuario(userData.data); 
-                return; 
-              }
-            }
-          } catch(e) {}
-          
-          this.usuarioLogado = false;
-          this.modalCadastroObrigatorio = false;
-        },
-
-        async sincronizarAssinaturaSaaS() {
-          if (!this.usuarioId || !this.usuarioLogado) return;
-          const headers = { 'Content-Type': 'application/json' };
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-          try {
-            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
-            const data = await res.json();
-            const registros = data.data || [];
-
-            let userSaas = null;
-
-            if (registros.length === 0) {
-              const novoRegistro = {
-                user_id: this.usuarioId,
-                email: this.usuarioEmail || null,
-                nome: (this.usuarioNome && this.usuarioNome !== 'Motorista') ? this.usuarioNome : null,
-                telefone: null,
-                trial_expira_em: null,
-                status_assinatura: 'trial',
-                plano_ativo: 'gratuito'
-              };
-              const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
-                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
-              });
-              const postData = await postRes.json();
-              userSaas = postData.data;
-
-              this.trialIniciado = false;
-              this.diasRestantesTrial = 7;
-              this.statusAssinatura = 'trial';
-              this.planoAtivo = 'gratuito';
-              this.dataExpiracao = null;
-              this.assinaturaValida = true;
-            } else {
-              userSaas = registros[0];
-              this.statusAssinatura = userSaas.status_assinatura || 'trial';
-              this.planoAtivo = userSaas.plano_ativo || 'gratuito';
-              this.dataExpiracao = userSaas.trial_expira_em || null;
-
-              if (userSaas.nome && userSaas.nome !== 'Motorista') this.usuarioNome = userSaas.nome;
-              if (userSaas.email) this.usuarioEmail = userSaas.email;
-              if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
-
-              if (this.planoAtivo === 'vitalicio') {
-                this.assinaturaValida = true; this.trialIniciado = true; this.diasRestantesTrial = 9999;
-              } else if (!userSaas.trial_expira_em) {
-                this.trialIniciado = false; this.diasRestantesTrial = 7; this.assinaturaValida = true;
-              } else {
-                this.trialIniciado = true;
-                const agora = new Date(); const expira = new Date(userSaas.trial_expira_em);
-                const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
-                this.diasRestantesTrial = Math.max(0, diffDias);
-                if (diffDias > 0) { this.assinaturaValida = true; } 
-                else { this.assinaturaValida = false; this.modalAssinatura = true; }
-              }
-
-              if (this.intervaloPollingPagamento) {
-                const novaExpMs = userSaas.trial_expira_em ? new Date(userSaas.trial_expira_em).getTime() : 0;
-                if (novaExpMs > this.dataExpAntesDoPix) {
-                  clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null;
-                  this.modalAssinatura = false; this.codigoPixGerado = ''; this.qrCodeBase64 = '';
-                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado com sucesso.');
-                }
-              }
-            }
-
-            const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
-            const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
-            const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
-
-            if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
-              this.inputNome = (!nomeInvalido) ? userSaas.nome : (this.usuarioNome || '');
-              this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
-              this.inputTelefone = userSaas?.telefone || '';
-              this.erroCadastroObrigatorio = '';
-              this.modalCadastroObrigatorio = true;
-            } else {
-              this.modalCadastroObrigatorio = false;
-            }
-
-          } catch (err) {
-            console.error('Erro na sincronização SaaS:', err);
-          }
-        },
-
-        isGpsSuspeito(endereco) {
-            const lower = (endereco || '').toLowerCase();
-            return lower.includes('s/n') || lower.includes('marginal') || lower.includes('rodovia') || lower.includes(' km');
         },
 
         async init() {
