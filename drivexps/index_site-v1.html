@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriveXPS | Roteirizador Inteligente & Organizador para Shopee Express</title>
+  
+  <meta name="description" content="Pare de bater cabeça com ziguezague e queimar gasolina. O DriveXPS organiza seu romaneio da Shopee em sacolas de 10 em 10 e cria rotas contínuas na mão certa com visão completa no Mapa.">
+  <meta name="theme-color" content="#ea580c">
+  
+  <!-- REDIRECIONAMENTO INSTANTÂNEO: SE O MOTORISTA ABRIR PELO ATALHO DO CELULAR, ENTRA DIRETO NO APP -->
+  <script>
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      window.location.replace('https://studiotesta.com.br/drivexps/app/');
+    }
+  </script>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DriveXPS">
+  <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
+  <meta property="og:description" content="Economize até 2h de rua e R$ 25 de gasolina por dia com separação de carga no Canetão e Mapa Interativo.">
+  <meta property="og:image" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
+  <meta property="og:url" content="https://studiotesta.com.br/drivexps/">
+
+  <link rel="icon" type="image/png" href="https://studiotesta.com.br/drivexps/app/icon-192.png">
+
+  <!-- Fontes Google e Tailwind CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              orange: '#ea580c',
+              orangeHover: '#c2410c',
+              amber: '#f59e0b',
+              dark: '#080d18',
+              card: '#0f172a',
+              cardBorder: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #060913;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+    }
+    .bg-grid {
+      background-image: radial-gradient(rgba(249, 115, 22, 0.08) 1px, transparent 0);
+      background-size: 32px 32px;
+    }
+    .glow-orange {
+      box-shadow: 0 0 60px -15px rgba(234, 88, 12, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-grid antialiased selection:bg-orange-600 selection:text-white">
+
+  <!-- 1. BARRA SUPERIOR DE AVISO -->
+  <aside class="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 text-white text-[11px] sm:text-xs font-black tracking-wide py-2 px-4 text-center select-none shadow-md" aria-label="Aviso">
+    🎁 TESTE GRÁTIS POR 7 DIAS NA SUA 1ª ROTA • SEM CARTÃO DE CRÉDITO • CANCELE QUANDO QUISER
+  </aside>
+
+  <!-- 2. NAVBAR COMPACTA -->
+  <header class="sticky top-0 z-50 bg-[#060913]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5 group">
+        <img src="https://studiotesta.com.br/drivexps/app/icon-192.png" alt="DriveXPS" class="w-9 h-9 rounded-xl shadow-lg border border-orange-500/40 group-hover:scale-105 transition">
+        <div>
+          <span class="font-heading font-black text-xl text-white tracking-wider flex items-center">
+            Drive<span class="text-orange-500">XPS</span>
+          </span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300 uppercase tracking-wider">
+        <a href="#metodo" class="text-orange-400 hover:text-orange-300 transition">O Método Canetão</a>
+        <a href="#mapa-funcionalidade" class="hover:text-orange-400 transition">O Novo Mapa</a>
+        <a href="#comparativo" class="hover:text-orange-400 transition">Antes vs Depois</a>
+        <a href="#calculadora" class="hover:text-orange-400 transition">Economia</a>
+        <a href="#planos" class="hover:text-orange-400 transition">Planos</a>
+        <a href="#faq" class="hover:text-orange-400 transition">Dúvidas</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="https://studiotesta.com.br/drivexps/app/" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center gap-1.5">
+          <span>📲 Instalar App</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. HERO SECTION -->
+  <section class="relative pt-12 pb-20 overflow-hidden">
+    <div class="max-w-5xl mx-auto px-4 text-center space-y-6 relative z-10">
+      
+      <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 px-3.5 py-1.5 rounded-full text-orange-400 text-xs font-black uppercase tracking-wider">
+        <span>🚗</span> Desenvolvido por motorista de galpão para motoristas
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-heading font-black text-white tracking-tight leading-[1.1] max-w-4xl mx-auto">
+        Chega de ziguezague. Economize até <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-400">2h de rua e R$ 25 de gasolina</span> em cada rota.
+      </h1>
+
+      <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        Suba a planilha oficial da Shopee (<strong class="text-slate-200">.xlsx</strong>). O DriveXPS organiza suas sacolas de 10 em 10 pro <strong class="text-orange-400">Canetão</strong>, traça a rota contínua na mão certa com visão no mapa interativo e abre o Waze com 1 toque.
+      </p>
+
+      <!-- BOTÕES DE AÇÃO -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <a href="https://studiotesta.com.br/drivexps/app/" class="w-full sm:w-auto px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📲 Instalar & Testar 7 Dias Grátis</span>
+        </a>
+        <a href="https://wa.me/5513974251486?text=Fala%20Sidnei!%20Vim%20pelo%20site%20do%20DriveXPS%20e%20queria%20tirar%20uma%20d%C3%BAvida" target="_blank" class="w-full sm:w-auto px-6 py-4 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 font-bold text-xs uppercase tracking-wider rounded-2xl active:scale-95 transition flex items-center justify-center gap-2">
+          <span>💬 Falar com o Sidnei no WhatsApp</span>
+        </a>
+      </div>
+
+      <p class="text-[11px] text-slate-500 font-medium">
+        🔒 Sem cadastro de cartão de crédito • App oficial instalável no celular • Não altera sua conta na Shopee
+      </p>
+
+      <!-- CARD DEMO VISUAL -->
+      <div class="pt-8 max-w-xl mx-auto">
+        <div class="bg-[#0e1626] border-2 border-orange-500/50 rounded-3xl p-5 shadow-2xl glow-orange text-left space-y-4">
+          
+          <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-xs font-black uppercase text-slate-300">BAIRRO ATUAL: JUSSARA</span>
+            </div>
+            <span class="text-[10px] bg-orange-950 text-orange-400 border border-orange-800 px-2.5 py-0.5 rounded-full font-mono font-bold">18 restantes</span>
+          </div>
+
+          <div class="grid grid-cols-4 gap-2 text-center">
+            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-xl py-2">
+              <span class="text-[9px] text-orange-400 font-black block leading-none">CANETÃO</span>
+              <span class="text-2xl font-black text-orange-400 font-mono mt-0.5 block">#14</span>
+            </div>
+            <div class="bg-[#1c2430] border-2 border-slate-700 rounded-xl py-2">
+              <span class="text-[9px] text-slate-400 font-black block leading-none">PARADA</span>
+              <span class="text-2xl font-black text-white font-mono mt-0.5 block">12</span>
+            </div>
+            <div class="bg-[#1c2430] border-2 border-slate-700 rounded-xl py-2">
+              <span class="text-[9px] text-slate-400 font-black block leading-none">ORDEM</span>
+              <span class="text-2xl font-black text-white font-mono mt-0.5 block">15</span>
+            </div>
+            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-xl py-2">
+              <span class="text-[9px] text-orange-400 font-black block leading-none">SACOLA</span>
+              <span class="text-2xl font-black text-orange-400 font-mono mt-0.5 block">2</span>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <h4 class="text-lg font-black text-white leading-tight">Av. Adrião Dias, 1355</h4>
+            <p class="text-xs text-slate-400 font-bold">Jussara - Mongaguá</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div class="bg-blue-600 text-center py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 text-white">
+              🚗 Abrir no Waze
+            </div>
+            <div class="bg-emerald-600 text-center py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 text-white">
+              🗺️ Google Maps
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. A DOR DO GALPÃO (A HISTÓRIA DO UNO FIREFLY) -->
+  <section class="py-16 bg-[#0a0f1d] border-t border-b border-slate-800/80">
+    <div class="max-w-4xl mx-auto px-4 space-y-8">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">A Realidade da Rua</span>
+        <h2 class="text-2xl sm:text-3xl font-heading font-black text-white">Você já passou por isso no galpão?</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">⏳</span>
+          <h3 class="text-base font-black text-white">12 Horas na Rua</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Pegar 120 pacotes de manhã e só terminar às 21h porque a rota da Shopee te manda pra um bairro, volta pro centro e depois te joga no mesmo bairro de novo.
+          </p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">⛽</span>
+          <h3 class="text-base font-black text-white">Meio Tanque Queimado</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Gastar R$ 60 a R$ 80 de gasolina à toa só dando volta em avenida, fazendo retorno perigoso e cruzando canal/mureta de ferrovia.
+          </p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">📦</span>
+          <h3 class="text-base font-black text-white">Desespero no Porta-Malas</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Perder 5 minutos em cada parada revirando caixa por caixa debaixo de chuva ou sol quente procurando onde foi parar o pacote da vez.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-r from-orange-950/40 via-slate-900 to-slate-900 border border-orange-500/30 rounded-3xl p-6 flex flex-col sm:flex-row items-center gap-5">
+        <img src="https://studiotesta.com.br/drivexps/app/icon-192.png" alt="Sidnei Testa" class="w-16 h-16 rounded-2xl border border-orange-500/50 shrink-0">
+        <div class="space-y-1.5 text-center sm:text-left">
+          <p class="text-xs sm:text-sm text-slate-300 italic leading-relaxed">
+            "Na minha primeira rota com meu Uno Firefly 1.0, gastei meio tanque e 12 horas pra entregar 120 pacotes. Vi que o problema não era eu nem o carro, era a rota maluca da Shopee. Como sou programador, criei o DriveXPS pra mim mesmo. Hoje entrego tudo em 5h a 6h e sobra combustível no tanque."
+          </p>
+          <span class="block text-xs font-black text-orange-400">— Sidnei Testa, Motorista SPX & Desenvolvedor do DriveXPS</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🌟 5. O TUTORIAL COMPLETO: O MÉTODO CANETÃO 10 EM 10 (NOVO!) -->
+  <section id="metodo" class="py-20">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-orange-500/10 text-orange-400 border border-orange-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          ✍️ O Segredo da Velocidade
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Como funciona o Método Canetão de 10 em 10?
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          O DriveXPS não é apenas um GPS. Ele é um <strong>organizador físico de carga</strong> que transforma o carregamento caótico do galpão em um processo de 20 minutos.
+        </p>
+      </div>
+
+      <!-- OS 3 PASSOS DO CANETÃO -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Passo 1 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-orange-600/20 text-orange-400 border border-orange-500/40 flex items-center justify-center font-black text-xl">
+            1
+          </div>
+          <h3 class="text-lg font-black text-white">Suba o Romaneio (.xlsx)</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Ao receber a carga no galpão, baixe a planilha no app da Shopee e toque na aba <strong>+ Rota</strong> (com a seta verde ⬆️). O app lê todas as paradas em segundos.
+          </p>
+        </div>
+
+        <!-- Passo 2 -->
+        <div class="bg-slate-900 border-2 border-orange-500/60 rounded-3xl p-6 space-y-4 relative shadow-xl shadow-orange-500/5">
+          <span class="absolute top-4 right-4 text-xs bg-orange-500/20 text-orange-400 border border-orange-500/40 px-2 py-0.5 rounded-md font-black">CANETÃO</span>
+          <div class="w-12 h-12 rounded-2xl bg-orange-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-orange-600/30">
+            2
+          </div>
+          <h3 class="text-lg font-black text-white">Numere no Canetão</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Abra a aba <strong>Sacolas</strong>. O app já dividiu sua carga:
+            <br>• Pacotes <strong>#1 ao #10</strong> vão na <strong>Sacola 1</strong>.
+            <br>• Pacotes <strong>#11 ao #20</strong> vão na <strong>Sacola 2</strong>.
+            <br>Escreva apenas o número <strong>#1, #2, #3</strong> na caixa com canetão preto.
+          </p>
+        </div>
+
+        <!-- Passo 3 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-black text-xl">
+            3
+          </div>
+          <h3 class="text-lg font-black text-white">Rua Descomplicada</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            No carro, você só abre <strong>uma sacola por vez</strong>. Vai entregar o pacote #4? Ele está na sua mão, na frente do banco, sem revirar o porta-malas. É só descer e bipar!
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 6. O NOVO MAPA VISUAL COM PINOS INTELIGENTES (NOVO!) -->
+  <section id="mapa-funcionalidade" class="py-20 bg-[#0a0f1d] border-t border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-blue-500/10 text-blue-400 border border-blue-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          🗺️ Tecnologia Inédita no Brasil
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Aba Mapa: Veja a mancha da sua rota e nunca mais esqueça pacotes
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Desenvolvido com o motor viário <strong>VROOM + OpenStreetMap</strong> (sem travas de chave de API), o mapa do DriveXPS desenha sua jornada inteira com pinos coloridos em tempo real.
+        </p>
+      </div>
+
+      <!-- O GUIA DOS PINOS COLORIDOS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        
+        <!-- Pino Azul -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-blue-600 border-2 border-white flex items-center justify-center text-xs shadow-lg shadow-blue-600/40">🏭</span>
+            <strong class="text-sm text-white">Pinos Azuis</strong>
+          </div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-blue-400 block">CD & Sua Casa</span>
+          <p class="text-slate-400 leading-relaxed">
+            Marcam onde você pega a carga no galpão e onde você termina o dia na sua casa. O primeiro pacote da rota calcula a menor distância de onde o seu carro está.
+          </p>
+        </div>
+
+        <!-- Pino Verde -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center font-mono font-black text-[10px] text-black shadow-lg shadow-emerald-500/40">#12</span>
+            <strong class="text-sm text-white">Pinos Verdes</strong>
+          </div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-emerald-400 block">Fila de Entregas</span>
+          <p class="text-slate-400 leading-relaxed">
+            São as paradas pendentes. Dentro de cada pino aparece o número exato do <strong>#Canetão</strong>, permitindo que você visualize a ordem contínua da rua.
+          </p>
+        </div>
+
+        <!-- Pino Vermelho -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-red-500 border-2 border-white flex items-center justify-center font-mono font-black text-[10px] text-white shadow-lg shadow-red-500/40">#4</span>
+            <strong class="text-sm text-white">Pinos Vermelhos</strong>
+          </div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-red-400 block">Pacotes Entregues</span>
+          <p class="text-slate-400 leading-relaxed">
+            Ao dar baixa no app como "Entregue", o pino muda para vermelho instantaneamente. Você vê a mancha de entregas sumindo conforme avança no dia.
+          </p>
+        </div>
+
+        <!-- Pino Amarelo -->
+        <div class="bg-slate-900 border-2 border-yellow-500/50 p-5 rounded-2xl space-y-3 shadow-lg shadow-yellow-500/5">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-yellow-400 border-2 border-white flex items-center justify-center font-mono font-black text-[10px] text-black shadow-lg shadow-yellow-400/40">#35</span>
+            <strong class="text-sm text-white">Pinos Amarelos</strong>
+          </div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-yellow-400 block">Ausentes / O Resgate</span>
+          <p class="text-slate-300 leading-relaxed">
+            Cliente não atendeu e você pulou? O pino fica amarelo no mapa! No fim da tarde, você bate o olho e vê os amarelos no caminho de volta para tentar de novo sem desvio!
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Callout da Linha da Rota -->
+      <div class="bg-[#121824] border border-orange-500/30 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">🟠</span>
+          <div>
+            <h4 class="text-sm font-black text-white">A Linha da Rota Contínua (Sem Retornos Perigosos)</h4>
+            <p class="text-slate-400">O mapa traça a linha exata que o carro vai percorrer, evitando que você cruze avenidas perigosas ou fique dando voltas desnecessárias no quarteirão.</p>
+          </div>
+        </div>
+        <a href="https://studiotesta.com.br/drivexps/app/" class="px-5 py-3 bg-orange-600 hover:bg-orange-500 text-white font-black rounded-xl text-xs uppercase tracking-wider shrink-0 active:scale-95 transition">
+          Ver no Aplicativo
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 7. TABELA COMPARATIVA -->
+  <section id="comparativo" class="py-16">
+    <div class="max-w-4xl mx-auto px-4 space-y-8">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Comparativo Brutal</span>
+        <h2 class="text-3xl font-heading font-black text-white">Entregar no escuro vs. Entregar com DriveXPS</h2>
+      </div>
+
+      <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[10px]">
+            <tr>
+              <th class="p-4 sm:p-5">Situação na Rota</th>
+              <th class="p-4 sm:p-5 text-red-400">Shopee Nativa (Sem App)</th>
+              <th class="p-4 sm:p-5 text-emerald-400 font-black bg-orange-950/20">Com DriveXPS</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 font-medium text-slate-300">
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Organização no Galpão</td>
+              <td class="p-4 sm:p-5 text-red-400">Caixas jogadas, sem ordem real</td>
+              <td class="p-4 sm:p-5 text-emerald-400 bg-orange-950/10 font-bold">Sacolas numeradas de 10 em 10 no Canetão</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Percurso nas Ruas</td>
+              <td class="p-4 sm:p-5 text-red-400">Ziguezague caótico e retornos perigosos</td>
+              <td class="p-4 sm:p-5 text-emerald-400 bg-orange-950/10 font-bold">Varredura contínua na mão certa (sem vai-e-volta)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Visualização de Mapa</td>
+              <td class="p-4 sm:p-5 text-red-400">Pinos soltos sem linha de trajeto clara</td>
+              <td class="p-4 sm:p-5 text-emerald-400 bg-orange-950/10 font-bold">Mapa interativo com trajeto e pinos coloridos (#Canetão)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Múltiplos Pacotes na Mesma Casa</td>
+              <td class="p-4 sm:p-5 text-red-400">Você desce, entrega 1 e esquece o outro no porta-malas</td>
+              <td class="p-4 sm:p-5 text-emerald-400 bg-orange-950/10 font-bold">Celular vibra e avisa: "Atenção: 2 pacotes aqui!"</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Tempo Médio p/ 100 Pacotes</td>
+              <td class="p-4 sm:p-5 text-red-400">8h a 11 horas de volante</td>
+              <td class="p-4 sm:p-5 text-emerald-400 bg-orange-950/10 font-bold">5h a 6 horas (termina de tarde)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Gasto de Combustível</td>
+              <td class="p-4 sm:p-5 text-red-400">R$ 60 a R$ 90 por dia</td>
+              <td class="p-4 sm:p-5 text-emerald-400 bg-orange-950/10 font-bold">Economia de R$ 20 a R$ 25/dia</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. CALCULADORA DE ECONOMIA -->
+  <section id="calculadora" class="py-20 bg-[#0a0f1d] border-t border-b border-slate-800/80">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="bg-gradient-to-b from-slate-900 to-[#0e1626] border-2 border-orange-500/40 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div class="text-center space-y-1">
+          <span class="text-xs font-black uppercase text-orange-400 tracking-wider">Calculadora do Seu Bolso</span>
+          <h2 class="text-2xl font-heading font-black text-white">Quanto você deixa de queimar no tanque?</h2>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1.5">
+              <span class="text-slate-400">Quantos dias você roda por semana?</span>
+              <span id="diasTexto" class="text-orange-400 font-mono font-black text-sm">6 dias</span>
+            </div>
+            <input type="range" id="inputDias" min="1" max="7" value="6" oninput="atualizarCalculo()" class="w-full accent-orange-500 bg-slate-950 rounded-lg">
+          </div>
+
+          <div class="bg-black/60 p-5 rounded-2xl border border-slate-800 space-y-3 font-mono">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Gasolina economizada por mês:</span>
+              <span id="gasolinaMes" class="text-emerald-400 font-black text-base">R$ 520,00</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Horas a menos preso no trânsito:</span>
+              <span id="horasMes" class="text-amber-400 font-black text-base">36 horas</span>
+            </div>
+            <div class="flex justify-between items-center text-xs pt-2 border-t border-slate-800">
+              <span class="text-white font-sans font-bold">Custo do DriveXPS no Plano Mensal:</span>
+              <span class="text-slate-300 font-bold text-sm">R$ 19,90/mês</span>
+            </div>
+          </div>
+
+          <div class="bg-emerald-500/10 border border-emerald-500/30 p-3.5 rounded-xl text-center">
+            <span class="text-xs text-emerald-400 font-black block">
+              💰 Lucro limpo no seu bolso: + <span id="lucroLimpo">R$ 500,10</span> todo mês só de combustível salvo!
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. TABELA DE PLANOS CLARA E TRANSPARENTE -->
+  <section id="planos" class="py-16">
+    <div class="max-w-4xl mx-auto px-4 space-y-10">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Planos Sem Pegadinha</span>
+        <h2 class="text-3xl font-heading font-black text-white">Pague menos que o troco de um café por dia</h2>
+        <p class="text-xs text-slate-400">Comece com 7 dias grátis na sua primeira rota. Sem fidelidade, sem renovação forçada.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        
+        <!-- Plano Semanal -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 flex flex-col justify-between">
+          <div class="space-y-3">
+            <span class="text-[10px] font-black uppercase text-orange-400 bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20">Mais Flexível</span>
+            <h3 class="text-xl font-black text-white">Plano Semanal</h3>
+            <p class="text-xs text-slate-400">Ideal para testar na primeira semana de entregas no galpão.</p>
+            <div class="pt-2">
+              <span class="text-3xl font-black text-white">R$ 6,90</span>
+              <span class="text-xs text-slate-400 font-bold">/ semana</span>
+              <span class="block text-[11px] text-slate-500 mt-0.5">Apenas R$ 0,98 por dia</span>
+            </div>
+          </div>
+          <a href="https://studiotesta.com.br/drivexps/app/" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-orange-400 border border-orange-500/40 text-xs font-black uppercase tracking-wider rounded-xl text-center active:scale-95 transition">
+            📲 Instalar & Testar 7 Dias
+          </a>
+        </div>
+
+        <!-- Plano Mensal (Destaque) -->
+        <div class="bg-gradient-to-b from-[#131d31] to-slate-900 border-2 border-orange-500 rounded-3xl p-6 space-y-5 flex flex-col justify-between relative shadow-xl shadow-orange-500/10">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-600 to-amber-500 text-white text-[10px] font-black uppercase px-4 py-1 rounded-full tracking-wider shadow">
+            Maior Economia (Campeão)
+          </div>
+          <div class="space-y-3 pt-1">
+            <span class="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">Economize 30%</span>
+            <h3 class="text-xl font-black text-white">Plano Mensal</h3>
+            <p class="text-xs text-slate-400">Para o motorista que roda todo dia e quer máxima economia no mês.</p>
+            <div class="pt-2">
+              <span class="text-3xl font-black text-white">R$ 19,90</span>
+              <span class="text-xs text-slate-400 font-bold">/ mês</span>
+              <span class="block text-[11px] text-emerald-400 font-bold mt-0.5">Apenas R$ 0,66 por dia!</span>
+            </div>
+          </div>
+          <a href="https://studiotesta.com.br/drivexps/app/" class="w-full py-3.5 bg-orange-600 hover:bg-orange-500 text-white text-xs font-black uppercase tracking-wider rounded-xl text-center shadow-lg shadow-orange-600/30 active:scale-95 transition">
+            📲 Instalar & Testar 7 Dias
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. FAQ BLINDADO -->
+  <section id="faq" class="py-20 bg-[#0a0f1d] border-t border-b border-slate-800/80">
+    <div class="max-w-3xl mx-auto px-4 space-y-10">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Perguntas Frequentes</span>
+        <h2 class="text-3xl font-heading font-black text-white">Tire suas dúvidas antes de começar</h2>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>A Shopee pode bloquear ou banir minha conta por usar o DriveXPS?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>NÃO! De forma alguma.</strong> O DriveXPS não tem acesso à sua senha, não se conecta aos servidores internos da Shopee e não mexe no app oficial da SPX. Ele apenas lê o arquivo Excel (.xlsx) que você mesmo baixa publicamente no seu celular. É 100% legal, seguro e permitido.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Preciso cadastrar cartão de crédito para testar?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Não precisa.</strong> Seus 7 dias grátis começam assim que você gera sua 1ª rota no app. Quando os 7 dias acabarem, o app não cobra nada automático. Você só assina se quiser continuar economizando tempo e gasolina.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Por que preciso instalar o app no celular em vez de usar no navegador?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            O DriveXPS foi projetado para rodar em tela cheia como aplicativo no seu celular para garantir <strong>máxima velocidade</strong>, não gastar memória com abas do navegador, economizar bateria e permitir que você abra os romaneios da Shopee com 1 clique direto pelo botão "Compartilhar".
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Funciona no iPhone e no celular Android?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Sim!</strong> O DriveXPS é um aplicativo PWA ultraleve. No Android você instala direto pelo Chrome com 1 toque, e no iPhone você toca em "Compartilhar" e "Adicionar à Tela de Início".
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Não estou com planilha hoje, consigo testar mesmo assim?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Sim!</strong> Dentro do DriveXPS existe um botão chamado <em>"Carregar Carga de Demonstração (30 Pacotes)"</em>. Você pode testar agora mesmo do sofá da sua casa e ver a divisão das sacolas, o mapa e a rota funcionando sem precisar estar com romaneio real.
+          </p>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. CTA FINAL DE RODAPÉ -->
+  <section class="py-16 bg-gradient-to-t from-orange-950/40 to-transparent text-center">
+    <div class="max-w-2xl mx-auto px-4 space-y-5">
+      <h2 class="text-2xl sm:text-3xl font-heading font-black text-white">
+        Pronto para terminar suas rotas mais cedo hoje?
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-400">
+        Junte-se aos motoristas que pararam de sofrer com ziguezague e estão economizando combustível todo santo dia.
+      </p>
+      <div class="pt-2">
+        <a href="https://studiotesta.com.br/drivexps/app/" class="inline-flex items-center gap-2 px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/40 active:scale-95 transition">
+          <span>📲 Instalar o Aplicativo Agora (Grátis)</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. FOOTER -->
+  <footer class="py-8 bg-[#04060c] border-t border-slate-800 text-center text-xs text-slate-500 space-y-2">
+    <p>© 2026 DriveXPS • Sistema Independente de Otimização Logística.</p>
+    <p class="text-[10px] text-slate-600">
+      Desenvolvido e mantido por <a href="https://studiotesta.com.br/" target="_blank" class="text-amber-400 font-bold hover:underline">STUDIOTESTA</a> (CNPJ: 54.404.992/0001-41) • Mongaguá - SP.
+    </p>
+    <p class="text-[9px] text-slate-600 max-w-lg mx-auto">
+      Este aplicativo é uma ferramenta autônoma para entregadores e não possui vínculo corporativo ou institucional com a Shopee Express ou Sea Group.
+    </p>
+  </footer>
+
+  <!-- 13. BOTÃO FLUTUANTE DO WHATSAPP (FALAR COM O SIDNEI / IA) -->
+  <aside class="fixed bottom-5 right-5 z-50">
+    <a href="https://wa.me/5513974251486?text=Fala%20Sidnei!%20Vim%20pelo%20site%20do%20DriveXPS%20e%20queria%20tirar%20uma%20d%C3%BAvida" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl active:scale-95 transition-all">
+      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+      </svg>
+      <span class="text-xs hidden sm:inline">Dúvidas? Fale com o Sidnei</span>
+    </a>
+  </aside>
+
+  <!-- JAVASCRIPT DA CALCULADORA DE ECONOMIA -->
+  <script>
+    function atualizarCalculo() {
+      const dias = parseInt(document.getElementById('inputDias').value);
+      document.getElementById('diasTexto').innerText = dias + (dias === 1 ? ' dia' : ' dias');
+
+      const economiaDiariaReais = 21.70;
+      const horasDiariasSalvas = 1.5;
+
+      const diasNoMes = dias * 4;
+      const totalGasolina = diasNoMes * economiaDiariaReais;
+      const totalHoras = Math.round(diasNoMes * horasDiariasSalvas);
+      const lucroLimpo = totalGasolina - 19.90;
+
+      document.getElementById('gasolinaMes').innerText = 'R$ ' + totalGasolina.toFixed(2).replace('.', ',');
+      document.getElementById('horasMes').innerText = totalHoras + ' horas';
+      document.getElementById('lucroLimpo').innerText = 'R$ ' + lucroLimpo.toFixed(2).replace('.', ',');
+    }
+  </script>
+</body>
+</html>
