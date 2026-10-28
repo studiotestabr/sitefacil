@@ -164,6 +164,12 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
       z-index: 3;
     }
+
+    /* DESLIZAMENTO SUAVE DA FIORINO NO MAPLIBRE (ELIMINA OS SOQUINHOS) */
+    #mapaNavGL .maplibregl-marker {
+      transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.4, 1);
+      will-change: transform;
+    }
   </style>
 
   <meta property="og:type" content="website">
@@ -207,7 +213,7 @@
     }
   </script>
 </head>
-<body :class="tema === 'claro' ? 'theme-claro' : 'theme-escuro'" class="bg-gray-950 text-white font-sans pb-28 select-none flex flex-col min-h-screen justify-between transition-colors duration-300" x-data="entregaApp()">
+<body :class="[tema === 'claro' ? 'theme-claro' : 'theme-escuro', (modo === 'mapa' || modo === 'navegacao') ? 'pb-0 overflow-hidden' : 'pb-24']" class="bg-gray-950 text-white font-sans select-none flex flex-col min-h-screen justify-between transition-colors duration-300" x-data="entregaApp()">
 
   <!-- 1. SPLASH SCREEN -->
   <div id="splashScreen" 
@@ -284,7 +290,7 @@
 
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
-      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
+      <span class="font-black text-amber-400 tracking-wider">STUDIOTESTA</span>
     </div>
   </div>
 
@@ -335,7 +341,7 @@
 
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
-      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
+      <span class="font-black text-amber-400 tracking-wider">STUDIOTESTA</span>
     </div>
   </div>
 
@@ -447,7 +453,7 @@
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Versão 3.9 Pro Waze-Engine</p>
+        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Desenvolvido e mantido por STUDIOTESTA</p>
       </div>
     </div>
   </div>
@@ -556,7 +562,7 @@
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">Rota</span>
+            <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
           <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
@@ -736,9 +742,9 @@
         </template>
       </main>
 
-      <!-- MODO 4: MAPA GERAL LEAFLET (TRAÇADO CIANO E ALTURA FIXA SEM SCROLL) -->
-      <main x-show="modo === 'mapa'" class="p-2 sm:p-4 max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-2">
-        <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs">
+      <!-- MODO 4: MAPA GERAL LEAFLET (ALTURA TOTAL FIXA SEM SCROLL NA TELA) -->
+      <main x-show="modo === 'mapa'" class="p-2 sm:p-3 max-w-5xl mx-auto w-full flex-1 flex flex-col h-[calc(100vh-135px)] space-y-2">
+        <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs shrink-0">
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 border border-white shrink-0"></span> <strong class="text-slate-200">CD/Casa</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shrink-0"></span> <strong class="text-slate-200">Pendente</strong></span>
@@ -749,8 +755,8 @@
             🎯 Rota
           </button>
         </div>
-        <!-- ALTURA FIXA BLOQUEANDO O SCROLL INDESEJADO -->
-        <div class="w-full h-[calc(100vh-215px)] rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
+        <!-- MAPA OCUPANDO 100% DO RESTO DA TELA SEM SCROLL -->
+        <div class="w-full flex-1 rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
           <div id="mapaContainer" class="w-full h-full z-10"></div>
         </div>
       </main>
@@ -867,19 +873,13 @@
                <h4 class="text-sm font-black text-white truncate" x-text="entregaNavegacao ? entregaNavegacao.endereco : ''"></h4>
                <p class="text-xs text-gray-400 truncate" x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
             </div>
-            <!-- O BOTÃO ENTREGUE AGORA NÃO FECHA O MAPA: AVANÇA DIRETO PRO PRÓXIMO PACOTE! -->
+            <!-- O BOTÃO ENTREGUE AVANÇA DIRETO PRO PRÓXIMO PACOTE SEM SAIR DO MAPA -->
             <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
                <span>✅</span> Entregue
             </button>
          </div>
       </div>
     </main>
-
-    <!-- Assinatura StudioTesta -->
-    <footer x-show="modo !== 'navegacao'" class="py-6 text-center text-xs select-text">
-      <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
-      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
-    </footer>
   </div>
 
   <!-- MODAL DE RESUMO DE IMPORTAÇÃO -->
@@ -952,7 +952,7 @@
         <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div><h3 class="text-2xl font-black text-white">Partida e Chegada</h3><p class="text-sm text-gray-200 leading-relaxed">Informe onde você inicia e termina a rota no modal de importação (ou use o GPS atual do seu celular).</p></div>
       </template>
       <template x-if="passoTutorial === 3">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div><h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3><p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p></div>
+        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div><h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3><p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"+ Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p></div>
       </template>
       <template x-if="passoTutorial === 4">
         <div class="space-y-3.5"><div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">👜</div><h3 class="text-2xl font-black text-white">2. Organização nas Sacolas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, confira os pacotes organizados de 10 em 10 e marque no canetão o número <strong>#CANETÃO</strong> nas caixas.</p></div>
@@ -1083,7 +1083,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM AUTENTICAÇÃO E NAVEGAÇÃO REPARADAS) -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (COM NAVEGAÇÃO E AUTENTICAÇÃO ESTÁVEIS) -->
   <script>
     function entregaApp() {
       return {
@@ -1107,7 +1107,7 @@
         passoAtualIndex: 0,
         headingAtual: 0,
         minSpeedKmhNav: 4.0,
-        bearingSmoothFactor: 0.65, // Resposta ágil de rotação
+        bearingSmoothFactor: 0.65, // Giro rápido e responsivo
         ultimaLatCarro: null,
         ultimaLngCarro: null,
         mapaArrastadoPeloUsuario: false,
@@ -1115,6 +1115,11 @@
         ultimaInstrucaoFalada: '',
         chegadaAnunciada: false,
         coordenadasRotaAtual: [],
+        
+        // TRAVAS ANTI-RECALCULO EM LOOP
+        recalculandoRota: false,
+        contadorForaDaRota: 0,
+        ultimoRecalculoTimestamp: 0,
         // ===============================================
         
         menuAberto: false,
@@ -1311,7 +1316,7 @@
           }
         },
 
-        // ==== ENGINE NAVEGAÇÃO NATIVA 3D BLINDADA ====
+        // ==== ENGINE NAVEGAÇÃO NATIVA 3D ====
 
         falarTexto(texto) {
             if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1350,8 +1355,11 @@
             this.velocidadeGPS = 0;
             this.mapaArrastadoPeloUsuario = false;
             this.coordenadasRotaAtual = [];
+            this.contadorForaDaRota = 0;
+            this.recalculandoRota = false;
 
-            this.falarTexto(`Iniciando rota para o Canetão número ${entrega.ordem_entrega}`);
+            // FALA COMPLETA NA SAÍDA
+            this.falarTexto(`Iniciando rota para Canetão número ${entrega.ordem_entrega}, na ${entrega.endereco}`);
 
             setTimeout(() => { 
                 this.inicializarMapaNavGL(entrega); 
@@ -1367,7 +1375,6 @@
                 this.mapaNavGL = null;
             }
 
-            // MAPA VETORIAL ESCURO WAZE (Dark Matter)
             this.mapaNavGL = new maplibregl.Map({
                 container: 'mapaNavGL',
                 style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -1384,7 +1391,6 @@
                 }
             });
 
-            // CRIA A CAMADA DA LINHA ANTECIPADAMENTE (EVITA RACE CONDITION)
             this.mapaNavGL.on('load', () => {
                 if (!this.mapaNavGL.getSource('rota-source')) {
                     this.mapaNavGL.addSource('rota-source', {
@@ -1495,7 +1501,6 @@
             let coordsLngLat = [];
             let routeEncontrada = null;
 
-            // 1. Tenta OSRM local
             try {
                 const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
                 const resLocal = await fetch(urlLocal, { signal: AbortSignal.timeout(3500) });
@@ -1507,7 +1512,6 @@
                 }
             } catch(e) {}
 
-            // 2. Se falhar, tenta OSRM público
             if (!routeEncontrada) {
                 try {
                     const urlPub = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
@@ -1521,7 +1525,6 @@
                 } catch(e) {}
             }
 
-            // 3. Extrai traçado viário
             if (routeEncontrada && routeEncontrada.geometry) {
                 if (typeof routeEncontrada.geometry === 'object' && Array.isArray(routeEncontrada.geometry.coordinates)) {
                     coordsLngLat = routeEncontrada.geometry.coordinates.map(c => [Number(c[0]), Number(c[1])]);
@@ -1536,7 +1539,6 @@
                 this.atualizarInstrucaoUI();
             }
 
-            // 4. Fallback absoluto se a conexão oscilar totalmente
             if (!coordsLngLat || coordsLngLat.length === 0) {
                 coordsLngLat = [[Number(sLng), Number(sLat)], [Number(eLng), Number(eLat)]];
                 const distReta = Math.round(this.calcularDistancia(sLat, sLng, eLat, eLng));
@@ -1547,7 +1549,8 @@
             this.atualizarLinhaNavGL(coordsLngLat);
             this.atualizarMarcadorDestinoGL(eLat, eLng);
 
-            if (coordsLngLat.length > 1) {
+            // SÓ FORÇA GIRO BRUSCO DA VIA SE O CARRO ESTIVER QUASE PARADO (< 4 km/h)
+            if (coordsLngLat.length > 1 && this.velocidadeGPS < this.minSpeedKmhNav) {
                 const bearingVia = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
                 this.headingAtual = bearingVia;
                 if (!this.mapaArrastadoPeloUsuario) {
@@ -1630,7 +1633,7 @@
                 bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
                 pitch: 62,
                 zoom: 18.5,
-                duration: 350,
+                duration: 500,
                 easing: (t) => t
             });
         },
@@ -1642,14 +1645,17 @@
             }
         },
 
+        // VERIFICAÇÃO INTELIGENTE: AUMENTADA PARA 65 METROS
         verificarSeSaiuDaRota(cLat, cLng) {
-            if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length === 0) return false;
+            if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) return false;
             let menorDist = Infinity;
-            for (const pt of this.coordenadasRotaAtual) {
+            for (let i = 0; i < this.coordenadasRotaAtual.length; i++) {
+                const pt = this.coordenadasRotaAtual[i];
                 const d = this.calcularDistancia(cLat, cLng, pt[1], pt[0]);
                 if (d < menorDist) menorDist = d;
+                if (menorDist < 20) return false; // Está no asfalto da rota
             }
-            return menorDist > 35;
+            return menorDist > 65; // Tolerância estendida para GPS instável
         },
 
         async processarPosicaoGPS(pos, destLat, destLng) {
@@ -1675,6 +1681,7 @@
                 }
             }
 
+            // ACOMPANHAMENTO VETORIAL ÁGIL
             if (headingCalculado !== null && !isNaN(headingCalculado) && this.velocidadeGPS >= this.minSpeedKmhNav) {
                this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
             } 
@@ -1691,24 +1698,48 @@
             const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
             this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
-            if (distDestinoFinal <= 20 && !this.chegadaAnunciada) {
+            // ALERTA DE CHEGADA COMPLETO
+            if (distDestinoFinal <= 25 && !this.chegadaAnunciada) {
                 this.chegadaAnunciada = true;
-                this.falarTexto(`Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}`);
+                this.falarTexto(`Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}, na ${this.entregaNavegacao?.endereco || ''}`);
                 if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
             }
 
-            if (this.verificarSeSaiuDaRota(lat, lng)) {
+            // RECÁLCULO CONTROLADO (SEM TRAVAMENTO EM LOOP)
+            const agora = Date.now();
+            const fora = this.verificarSeSaiuDaRota(lat, lng);
+            if (fora) {
+                this.contadorForaDaRota++;
+            } else {
+                this.contadorForaDaRota = 0;
+            }
+
+            // Só recalcula se estiver comprovadamente fora da via por 3 segundos seguidos e com pausa de 8s
+            if (this.contadorForaDaRota >= 3 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 8000)) {
+                this.recalculandoRota = true;
+                this.ultimoRecalculoTimestamp = agora;
+                this.contadorForaDaRota = 0;
                 this.falarTexto('Recalculando rota...');
                 await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
+                this.recalculandoRota = false;
                 return;
             }
 
+            // ANÚNCIO ANTECIPADO DE MANOBRAS (COM 50 METROS)
             if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
                 const stepAtual = this.passosRota[this.passoAtualIndex];
                 const manobraLat = stepAtual.maneuver.location[1];
                 const manobraLng = stepAtual.maneuver.location[0];
-                
                 const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
+
+                // Avisa com antecedência
+                if (distParaManobra < 55 && !stepAtual._anunciado) {
+                    stepAtual._anunciado = true;
+                    const info = this.interpretarManobraWaze(stepAtual);
+                    this.falarTexto(`A 50 metros, ${info.texto}`);
+                }
+
+                // Avança manobra após a curva
                 if (distParaManobra < 18) { 
                     this.passoAtualIndex++;
                     this.atualizarInstrucaoUI();
@@ -1731,11 +1762,6 @@
                this.subInstrucaoEmSeguida = `${nextInfo.icone} ${nextInfo.texto}`;
             } else {
                this.subInstrucaoEmSeguida = '🏁 Destino final à frente';
-            }
-
-            if (this.ultimaInstrucaoFalada !== info.texto) {
-                this.falarTexto(info.texto);
-                this.ultimaInstrucaoFalada = info.texto;
             }
         },
 
@@ -1785,7 +1811,7 @@
                 this.entregaNavegacao = proxima;
                 this.chegadaAnunciada = false;
                 this.nomeProximaRua = proxima.endereco;
-                this.falarTexto(`Entregue! Próxima parada: ${proxima.endereco}, Canetão número ${proxima.ordem_entrega}`);
+                this.falarTexto(`Entregue! Próxima parada: Canetão número ${proxima.ordem_entrega}, na ${proxima.endereco}`);
                 if ('vibrate' in navigator) navigator.vibrate([60, 40, 60]);
                 
                 if (this.ultimaLatCarro && this.ultimaLngCarro) {
@@ -1840,449 +1866,6 @@
             this.coordenadasRotaAtual = [];
             this.mapaArrastadoPeloUsuario = false;
             this.modo = 'rua'; 
-        },
-
-        async init() {
-          try {
-            if (this.tema === 'claro') {
-              document.body.classList.add('theme-claro');
-            } else {
-              document.body.classList.add('theme-escuro');
-            }
-
-            this.modalCadastroObrigatorio = false;
-            this.restaurarCacheLocal();
-            await this.verificarAutenticacao();
-            this.checarInstalacaoPWA();
-
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.addEventListener('message', async (event) => {
-                if (event.data && event.data.tipo === 'NOVO_ROMANEIO_COMPARTILHADO') {
-                  await this.processarRomaneioDoCache();
-                }
-              });
-            }
-
-            if (this.usuarioLogado) {
-              await this.sincronizarAssinaturaSaaS();
-              
-              if (!this.rotaAtivaId || this.entregas.length === 0) {
-                await this.carregarUltimaRota();
-              }
-
-              if (!localStorage.getItem('drivexps_tutorial_visto')) {
-                setTimeout(() => this.iniciarTutorial(), 600);
-              }
-
-              await this.processarRomaneioDoCache();
-
-              if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
-                launchQueue.setConsumer(async (launchParams) => {
-                  if (!launchParams.files.length) return;
-                  const fileHandle = launchParams.files[0];
-                  const file = await fileHandle.getFile();
-                  this.abrirModalImportar();
-                  this.processarArquivoDirecto(file);
-                });
-              }
-            } else {
-              this.modalCadastroObrigatorio = false;
-            }
-          } catch(e) {
-            console.error('Erro na inicialização:', e);
-          }
-        },
-
-        abrirBusca() {
-            this.buscaAberta = true;
-            this.termoBusca = '';
-            setTimeout(() => {
-                if(this.$refs && this.$refs.inputBusca) {
-                    this.$refs.inputBusca.focus();
-                }
-            }, 100);
-        },
-
-        formatarParada(val) {
-            if (val === null || val === undefined) return '-';
-            if (val < 0) return '+' + Math.abs(val);
-            return val;
-        },
-
-        get entregasOrdenadasParaSacola() {
-            return [...this.entregas].sort((a, b) => {
-                if (a.status === 'entregue' && b.status !== 'entregue') return 1;
-                if (a.status !== 'entregue' && b.status === 'entregue') return -1;
-                return a.ordem_entrega - b.ordem_entrega;
-            });
-        },
-
-        get entregasFiltradas() {
-            if (!this.termoBusca) return [];
-            const t = this.termoBusca.toLowerCase().trim();
-            const apenasNumeros = /^\d+$/.test(t);
-
-            return this.entregasOrdenadasParaSacola.filter(e => {
-                const paradaStr = this.formatarParada(e.parada_shopee).toString().toLowerCase();
-                const ordemStr = this.formatarParada(e.ordem_shopee).toString().toLowerCase();
-                const sacolaNum = Math.ceil(e.ordem_entrega / 10).toString();
-                const canetaoStr = e.ordem_entrega.toString();
-
-                if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
-                if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
-                if (t.startsWith('+') && t === paradaStr) return true;
-
-                if (apenasNumeros && t.length <= 3) {
-                    return false;
-                }
-
-                return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
-                       (e.bairro && e.bairro.toLowerCase().includes(t)) ||
-                       (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t));
-            });
-        },
-
-        get entregasNoBairroRestantes() {
-          if (!this.entregaAtual) return 0;
-          const bAtual = (this.entregaAtual.bairro || '').toLowerCase().trim();
-          return this.naoEntregues.filter(e => (e.bairro || '').toLowerCase().trim() === bAtual).length;
-        },
-
-        async processarRomaneioDoCache() {
-          const parametroUrl = window.location.search.includes('arquivo_compartilhado=true');
-          let tentativas = 0;
-          const maxTentativas = 6;
-
-          const tentarLer = async () => {
-            try {
-              const cache = await caches.open('drivexps-shared-files');
-              const res = await cache.match('ultimo-romaneio');
-
-              if (res) {
-                const blob = await res.blob();
-                const nomeHeader = res.headers.get('X-File-Name');
-                const nomeFinal = nomeHeader ? decodeURIComponent(nomeHeader) : 'romaneio_shopee.xlsx';
-                const file = new File([blob], nomeFinal, { type: blob.type });
-
-                await cache.delete('ultimo-romaneio');
-
-                if (parametroUrl) {
-                  window.history.replaceState({}, document.title, window.location.pathname);
-                }
-
-                this.abrirModalImportar();
-                this.processarArquivoDirecto(file);
-                return true;
-              }
-            } catch (err) {}
-            return false;
-          };
-
-          const sucesso = await tentarLer();
-          if (!sucesso && parametroUrl) {
-            const intervalo = setInterval(async () => {
-              tentativas++;
-              const ok = await tentarLer();
-              if (ok || tentativas >= maxTentativas) {
-                clearInterval(intervalo);
-              }
-            }, 500);
-          }
-        },
-
-        restaurarCacheLocal() {
-          try {
-            const rotaCache = localStorage.getItem('drivexps_rota_ativa_id');
-            const entregasCache = localStorage.getItem('drivexps_entregas_cache');
-            const coordP = localStorage.getItem('drivexps_partida_coord');
-            const coordC = localStorage.getItem('drivexps_chegada_coord');
-            const geom = localStorage.getItem('drivexps_rota_geometria');
-            if (rotaCache && entregasCache) {
-              this.rotaAtivaId = parseInt(rotaCache);
-              this.entregas = JSON.parse(entregasCache);
-            }
-            if (coordP) this.coordPartidaSalva = JSON.parse(coordP);
-            if (coordC) this.coordChegadaSalva = JSON.parse(coordC);
-            if (geom) this.rotaGeometria = geom;
-          } catch(e) {}
-        },
-
-        salvarCacheLocal() {
-          try {
-            if (this.rotaAtivaId) {
-              localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
-              localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
-              if (this.coordPartidaSalva) localStorage.setItem('drivexps_partida_coord', JSON.stringify(this.coordPartidaSalva));
-              if (this.coordChegadaSalva) localStorage.setItem('drivexps_chegada_coord', JSON.stringify(this.coordChegadaSalva));
-              if (this.rotaGeometria) localStorage.setItem('drivexps_rota_geometria', this.rotaGeometria);
-            }
-          } catch(e) {}
-        },
-
-        getTextoStatusAssinatura() {
-          if (this.planoAtivo === 'vitalicio') return 'Acesso Vitalício 👑';
-          let nomePlano = 'Plano Semanal';
-          if (this.planoAtivo === 'mensal') nomePlano = 'Plano Mensal';
-          else if (this.planoAtivo === 'gratuito' || this.statusAssinatura === 'trial') nomePlano = 'Período de Teste';
-
-          if (!this.dataExpiracao) return 'Teste Grátis (Começa na 1ª rota)';
-          const exp = new Date(this.dataExpiracao);
-          const agora = new Date();
-          const diffDias = Math.ceil((exp - agora) / (1000 * 60 * 60 * 24));
-          if (diffDias <= 0) return 'Assinatura Expirada ⚠️';
-          return `${nomePlano} • Vence em ${exp.toLocaleDateString('pt-BR')} (${diffDias}d restantes)`;
-        },
-
-        async salvarDadosCompletosPerfil() {
-          if (!this.usuarioId) return;
-          this.salvandoPerfil = true;
-          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
-          const headers = { 'Content-Type': 'application/json' };
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-          try {
-            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
-            const data = await res.json();
-            if (data.data && data.data[0]) {
-              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${data.data[0].id}`, {
-                method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ nome: this.usuarioNome, telefone: telLimpo })
-              });
-              alert('✅ Dados do perfil atualizados com sucesso!');
-            }
-          } catch(e) { alert('Falha ao salvar dados: ' + e.message); } 
-          finally { this.salvandoPerfil = false; }
-        },
-
-        async salvarCadastroObrigatorio() {
-          this.erroCadastroObrigatorio = '';
-          const nomeLimpo = (this.inputNome || '').trim();
-          const telLimpo = (this.inputTelefone || '').replace(/\D/g, '');
-          const emailLimpo = (this.inputEmail || '').trim().toLowerCase();
-
-          if (!nomeLimpo || nomeLimpo.toLowerCase() === 'motorista' || nomeLimpo.length < 3) {
-            this.erroCadastroObrigatorio = 'Por favor, digite seu nome e sobrenome.';
-            return;
-          }
-
-          if (telLimpo.length < 10 || telLimpo.length > 11) {
-            this.erroCadastroObrigatorio = 'Informe um WhatsApp válido com DDD (10 ou 11 dígitos).';
-            return;
-          }
-
-          if (!emailLimpo || !emailLimpo.includes('@') || !emailLimpo.includes('.')) {
-            this.erroCadastroObrigatorio = 'Informe um e-mail válido.';
-            return;
-          }
-
-          this.salvandoPerfil = true;
-          const headers = { 'Content-Type': 'application/json' };
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-
-          try {
-            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
-            const data = await res.json();
-
-            if (data.data && data.data[0]) {
-              const regId = data.data[0].id;
-              await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${regId}`, {
-                method: 'PATCH',
-                headers,
-                credentials: 'include',
-                body: JSON.stringify({
-                  nome: nomeLimpo,
-                  telefone: telLimpo,
-                  email: emailLimpo
-                })
-              });
-
-              this.usuarioNome = nomeLimpo;
-              this.usuarioEmail = emailLimpo;
-              this.inputTelefone = telLimpo;
-              this.modalCadastroObrigatorio = false;
-            } else {
-              this.erroCadastroObrigatorio = 'Registro não encontrado. Tente recarregar a página.';
-            }
-          } catch(e) {
-            this.erroCadastroObrigatorio = 'Falha ao salvar: ' + e.message;
-          } finally {
-            this.salvandoPerfil = false;
-          }
-        },
-
-        iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
-        proximoPassoTutorial() { if (this.passoTutorial < 8) this.passoTutorial++; else this.concluirTutorial(); },
-        voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
-        concluirTutorial() { this.tutorialAberto = false; localStorage.setItem('drivexps_tutorial_visto', 'true'); },
-
-        abrirModalImportar() {
-          if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
-          this.modalImportar = true;
-        },
-
-        irParaEntregaDireta(item) {
-          this.entregaSelecionadaId = item.id;
-          this.modo = 'rua';
-        },
-
-        // =========================================================================
-        // AUTENTICAÇÃO COM INTERCEPTAÇÃO DE TOKEN NA URL (FIX DO LOOP DE LOGIN)
-        // =========================================================================
-        async verificarAutenticacao() {
-          if (localStorage.getItem('usuario_deslogado') === 'true') {
-            this.usuarioLogado = false;
-            this.modalCadastroObrigatorio = false;
-            return;
-          }
-
-          // 1. CAPTURAR TOKEN QUE O GOOGLE / DIRECTUS RETORNA NA URL DE REDIRECIONAMENTO
-          const searchParams = new URLSearchParams(window.location.search);
-          const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
-          
-          const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
-          const refreshUrl = searchParams.get('refresh_token') || hashParams.get('refresh_token');
-
-          if (tokenUrl) {
-            localStorage.setItem('directus_token', tokenUrl);
-            this.tokenAcesso = tokenUrl;
-          }
-          if (refreshUrl) {
-            localStorage.setItem('directus_refresh_token', refreshUrl);
-          }
-
-          // 2. Limpar a URL visualmente após salvar o token com segurança
-          if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
-
-          const extrairDadosUsuario = (u) => {
-            this.usuarioId = u.id;
-            this.usuarioEmail = u.email || '';
-            const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
-            this.usuarioNome = n.trim() || u.email || '';
-            localStorage.setItem('directus_user_id', this.usuarioId);
-            this.usuarioLogado = true;
-          };
-
-          // 3. Testar via Bearer Token (Prioridade Máxima contra bloqueio de cookies)
-          const tokenAtivo = this.tokenAcesso || localStorage.getItem('directus_token');
-          if (tokenAtivo) {
-            try {
-              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { 
-                headers: { 'Authorization': `Bearer ${tokenAtivo}` } 
-              });
-              if (res.ok) { 
-                const data = await res.json(); 
-                if (data && data.data && data.data.id) {
-                  extrairDadosUsuario(data.data); 
-                  return; 
-                }
-              }
-            } catch(e) {}
-          }
-
-          // 4. Testar via Cookie de Sessão
-          try {
-            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
-            if (resSession.ok) {
-              const userData = await resSession.json();
-              if (userData && userData.data && userData.data.id) { 
-                extrairDadosUsuario(userData.data); 
-                return; 
-              }
-            }
-          } catch(e) {}
-          
-          this.usuarioLogado = false;
-          this.modalCadastroObrigatorio = false;
-        },
-
-        async sincronizarAssinaturaSaaS() {
-          if (!this.usuarioId || !this.usuarioLogado) return;
-          const headers = { 'Content-Type': 'application/json' };
-          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-          try {
-            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
-            const data = await res.json();
-            const registros = data.data || [];
-
-            let userSaas = null;
-
-            if (registros.length === 0) {
-              const novoRegistro = {
-                user_id: this.usuarioId,
-                email: this.usuarioEmail || null,
-                nome: (this.usuarioNome && this.usuarioNome !== 'Motorista') ? this.usuarioNome : null,
-                telefone: null,
-                trial_expira_em: null,
-                status_assinatura: 'trial',
-                plano_ativo: 'gratuito'
-              };
-              const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
-                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
-              });
-              const postData = await postRes.json();
-              userSaas = postData.data;
-
-              this.trialIniciado = false;
-              this.diasRestantesTrial = 7;
-              this.statusAssinatura = 'trial';
-              this.planoAtivo = 'gratuito';
-              this.dataExpiracao = null;
-              this.assinaturaValida = true;
-            } else {
-              userSaas = registros[0];
-              this.statusAssinatura = userSaas.status_assinatura || 'trial';
-              this.planoAtivo = userSaas.plano_ativo || 'gratuito';
-              this.dataExpiracao = userSaas.trial_expira_em || null;
-
-              if (userSaas.nome && userSaas.nome !== 'Motorista') this.usuarioNome = userSaas.nome;
-              if (userSaas.email) this.usuarioEmail = userSaas.email;
-              if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
-
-              if (this.planoAtivo === 'vitalicio') {
-                this.assinaturaValida = true; this.trialIniciado = true; this.diasRestantesTrial = 9999;
-              } else if (!userSaas.trial_expira_em) {
-                this.trialIniciado = false; this.diasRestantesTrial = 7; this.assinaturaValida = true;
-              } else {
-                this.trialIniciado = true;
-                const agora = new Date(); const expira = new Date(userSaas.trial_expira_em);
-                const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
-                this.diasRestantesTrial = Math.max(0, diffDias);
-                if (diffDias > 0) { this.assinaturaValida = true; } 
-                else { this.assinaturaValida = false; this.modalAssinatura = true; }
-              }
-
-              if (this.intervaloPollingPagamento) {
-                const novaExpMs = userSaas.trial_expira_em ? new Date(userSaas.trial_expira_em).getTime() : 0;
-                if (novaExpMs > this.dataExpAntesDoPix) {
-                  clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null;
-                  this.modalAssinatura = false; this.codigoPixGerado = ''; this.qrCodeBase64 = '';
-                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado com sucesso.');
-                }
-              }
-            }
-
-            const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
-            const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
-            const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
-
-            if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
-              this.inputNome = (!nomeInvalido) ? userSaas.nome : (this.usuarioNome || '');
-              this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
-              this.inputTelefone = userSaas?.telefone || '';
-              this.erroCadastroObrigatorio = '';
-              this.modalCadastroObrigatorio = true;
-            } else {
-              this.modalCadastroObrigatorio = false;
-            }
-
-          } catch (err) {
-            console.error('Erro na sincronização SaaS:', err);
-          }
-        },
-
-        isGpsSuspeito(endereco) {
-            const lower = (endereco || '').toLowerCase();
-            return lower.includes('s/n') || lower.includes('marginal') || lower.includes('rodovia') || lower.includes(' km');
         },
 
         async converterTextoParaCoord(texto) {
@@ -2679,6 +2262,211 @@
               method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ status: novoStatus })
             });
           } catch(e) {}
+        },
+
+        async verificarAutenticacao() {
+          if (localStorage.getItem('usuario_deslogado') === 'true') {
+            this.usuarioLogado = false;
+            this.modalCadastroObrigatorio = false;
+            return;
+          }
+
+          const searchParams = new URLSearchParams(window.location.search);
+          const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+          const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
+          const refreshUrl = searchParams.get('refresh_token') || hashParams.get('refresh_token');
+
+          if (tokenUrl) {
+            localStorage.setItem('directus_token', tokenUrl);
+            this.tokenAcesso = tokenUrl;
+          }
+          if (refreshUrl) {
+            localStorage.setItem('directus_refresh_token', refreshUrl);
+          }
+
+          if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
+          const extrairDadosUsuario = (u) => {
+            this.usuarioId = u.id;
+            this.usuarioEmail = u.email || '';
+            const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
+            this.usuarioNome = n.trim() || u.email || '';
+            localStorage.setItem('directus_user_id', this.usuarioId);
+            this.usuarioLogado = true;
+          };
+
+          const tokenAtivo = this.tokenAcesso || localStorage.getItem('directus_token');
+          if (tokenAtivo) {
+            try {
+              const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { 
+                headers: { 'Authorization': `Bearer ${tokenAtivo}` } 
+              });
+              if (res.ok) { 
+                const data = await res.json(); 
+                if (data && data.data && data.data.id) {
+                  extrairDadosUsuario(data.data); 
+                  return; 
+                }
+              }
+            } catch(e) {}
+          }
+
+          try {
+            const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
+            if (resSession.ok) {
+              const userData = await resSession.json();
+              if (userData && userData.data && userData.data.id) { 
+                extrairDadosUsuario(userData.data); 
+                return; 
+              }
+            }
+          } catch(e) {}
+          
+          this.usuarioLogado = false;
+          this.modalCadastroObrigatorio = false;
+        },
+
+        async sincronizarAssinaturaSaaS() {
+          if (!this.usuarioId || !this.usuarioLogado) return;
+          const headers = { 'Content-Type': 'application/json' };
+          if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+          try {
+            const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+            const data = await res.json();
+            const registros = data.data || [];
+
+            let userSaas = null;
+
+            if (registros.length === 0) {
+              const novoRegistro = {
+                user_id: this.usuarioId,
+                email: this.usuarioEmail || null,
+                nome: (this.usuarioNome && this.usuarioNome !== 'Motorista') ? this.usuarioNome : null,
+                telefone: null,
+                trial_expira_em: null,
+                status_assinatura: 'trial',
+                plano_ativo: 'gratuito'
+              };
+              const postRes = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
+                method: 'POST', headers, credentials: 'include', body: JSON.stringify({ novoRegistro })
+              });
+              const postData = await postRes.json();
+              userSaas = postData.data;
+
+              this.trialIniciado = false;
+              this.diasRestantesTrial = 7;
+              this.statusAssinatura = 'trial';
+              this.planoAtivo = 'gratuito';
+              this.dataExpiracao = null;
+              this.assinaturaValida = true;
+            } else {
+              userSaas = registros[0];
+              this.statusAssinatura = userSaas.status_assinatura || 'trial';
+              this.planoAtivo = userSaas.plano_ativo || 'gratuito';
+              this.dataExpiracao = userSaas.trial_expira_em || null;
+
+              if (userSaas.nome && userSaas.nome !== 'Motorista') this.usuarioNome = userSaas.nome;
+              if (userSaas.email) this.usuarioEmail = userSaas.email;
+              if (userSaas.telefone) this.inputTelefone = userSaas.telefone;
+
+              if (this.planoAtivo === 'vitalicio') {
+                this.assinaturaValida = true; this.trialIniciado = true; this.diasRestantesTrial = 9999;
+              } else if (!userSaas.trial_expira_em) {
+                this.trialIniciado = false; this.diasRestantesTrial = 7; this.assinaturaValida = true;
+              } else {
+                this.trialIniciado = true;
+                const agora = new Date(); const expira = new Date(userSaas.trial_expira_em);
+                const diffDias = Math.ceil((expira - agora) / (1000 * 60 * 60 * 24));
+                this.diasRestantesTrial = Math.max(0, diffDias);
+                if (diffDias > 0) { this.assinaturaValida = true; } 
+                else { this.assinaturaValida = false; this.modalAssinatura = true; }
+              }
+
+              if (this.intervaloPollingPagamento) {
+                const novaExpMs = userSaas.trial_expira_em ? new Date(userSaas.trial_expira_em).getTime() : 0;
+                if (novaExpMs > this.dataExpAntesDoPix) {
+                  clearInterval(this.intervaloPollingPagamento); this.intervaloPollingPagamento = null;
+                  this.modalAssinatura = false; this.codigoPixGerado = ''; this.qrCodeBase64 = '';
+                  alert('🎉 Pagamento Aprovado! Seu plano foi renovado com sucesso.');
+                }
+              }
+            }
+
+            const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
+            const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
+            const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
+
+            if (this.usuarioLogado && (nomeInvalido || telInvalido || emailInvalido)) {
+              this.inputNome = (!nomeInvalido) ? userSaas.nome : (this.usuarioNome || '');
+              this.inputEmail = (!emailInvalido) ? userSaas.email : (this.usuarioEmail || '');
+              this.inputTelefone = userSaas?.telefone || '';
+              this.erroCadastroObrigatorio = '';
+              this.modalCadastroObrigatorio = true;
+            } else {
+              this.modalCadastroObrigatorio = false;
+            }
+
+          } catch (err) {
+            console.error('Erro na sincronização SaaS:', err);
+          }
+        },
+
+        isGpsSuspeito(endereco) {
+            const lower = (endereco || '').toLowerCase();
+            return lower.includes('s/n') || lower.includes('marginal') || lower.includes('rodovia') || lower.includes(' km');
+        },
+
+        async init() {
+          try {
+            if (this.tema === 'claro') {
+              document.body.classList.add('theme-claro');
+            } else {
+              document.body.classList.add('theme-escuro');
+            }
+
+            this.modalCadastroObrigatorio = false;
+            this.restaurarCacheLocal();
+            await this.verificarAutenticacao();
+            this.checarInstalacaoPWA();
+
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.addEventListener('message', async (event) => {
+                if (event.data && event.data.tipo === 'NOVO_ROMANEIO_COMPARTILHADO') {
+                  await this.processarRomaneioDoCache();
+                }
+              });
+            }
+
+            if (this.usuarioLogado) {
+              await this.sincronizarAssinaturaSaaS();
+              
+              if (!this.rotaAtivaId || this.entregas.length === 0) {
+                await this.carregarUltimaRota();
+              }
+
+              if (!localStorage.getItem('drivexps_tutorial_visto')) {
+                setTimeout(() => this.iniciarTutorial(), 600);
+              }
+
+              await this.processarRomaneioDoCache();
+
+              if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
+                launchQueue.setConsumer(async (launchParams) => {
+                  if (!launchParams.files.length) return;
+                  const fileHandle = launchParams.files[0];
+                  const file = await fileHandle.getFile();
+                  this.abrirModalImportar();
+                  this.processarArquivoDirecto(file);
+                });
+              }
+            } else {
+              this.modalCadastroObrigatorio = false;
+            }
+          } catch(e) {
+            console.error('Erro na inicialização:', e);
+          }
         },
 
         async enviarParaN8N() {
