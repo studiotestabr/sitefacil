@@ -5,32 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DriveXPS - Rotas Inteligentes Shopee Express</title>
   
-  <meta name="description" content="Roteirizador contínuo e organizador de carga para a Shopee Express. Economize até 2h e R$ 25 de gasolina por dia.">
+  <meta name="description" content="Roteirizador contínuo e organizador de carga para a Shopee Express.">
   <meta name="theme-color" content="#ea580c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DriveXPS">
 
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="DriveXPS">
-  <meta property="og:title" content="DriveXPS - Rotas Inteligentes Shopee Express">
-  <meta property="og:description" content="Varredura contínua por rua sem ziguezague com navegador nativo estilo Waze.">
-  <meta property="og:image" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
-  <meta property="og:url" content="https://studiotesta.com.br/drivexps/app/">
-
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
 
-  <!-- Folha de Estilos Modular DriveXPS -->
-  <link rel="stylesheet" href="./css/styles.css">
+  <!-- Estilos com Cache-Busting -->
+  <link rel="stylesheet" href="./css/styles.css?v=4.1.0">
 
-  <!-- Leaflet para a aba Mapa geral -->
+  <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- MapLibre GL: Motor 3D nativo idêntico ao Waze -->
+  <!-- MapLibre GL 3D -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
@@ -38,15 +31,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- Módulos JavaScript DriveXPS -->
-  <script src="./js/auth.js"></script>
-  <script src="./js/saas.js"></script>
-  <script src="./js/shopee.js"></script>
-  <script src="./js/mapa-geral.js"></script>
-  <script src="./js/waze-nav.js"></script>
-  <script src="./js/app.js"></script>
+  <!-- Script Principal com Cache-Busting -->
+  <script src="./js/app.js?v=4.1.0"></script>
 
-  <!-- Alpine.js (Carregado com defer após todos os módulos estarem prontos) -->
+  <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <script>
@@ -105,79 +93,59 @@
     }, 1500);
   </script>
 
-  <!-- 2. TELA DE BLOQUEIO OBRIGATÓRIA NO NAVEGADOR DO CELULAR -->
+  <!-- 2. TELA DE BLOQUEIO DO NAVEGADOR NO CELULAR -->
   <div x-show="isMobile && !isStandalone" class="fixed inset-0 bg-gray-950 z-[95] flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
     <div class="w-full"></div>
-
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
       <div class="flex justify-center">
         <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
       </div>
-
       <div class="space-y-2">
         <span class="inline-block bg-orange-500/10 text-orange-400 text-[10px] font-black uppercase px-3.5 py-1 rounded-full border border-orange-500/30">
           Instalação Obrigatória
         </span>
         <h2 class="text-2xl font-black text-white tracking-wide">Instale o DriveXPS</h2>
         <p class="text-xs text-gray-300 leading-relaxed">
-          Para garantir <strong>máxima velocidade</strong>, navegação nativa estilo Waze em tela cheia e abertura direta de planilhas da Shopee, o DriveXPS deve ser instalado no celular.
+          Para garantir <strong>máxima velocidade</strong>, navegação nativa estilo Waze em tela cheia e abertura direta de planilhas da Shopee, instale o app no celular.
         </p>
       </div>
-
       <div x-show="!isIOS" class="space-y-3 pt-1">
         <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
           <span>📲</span> Instalar Aplicativo no Celular
         </button>
-        <p class="text-[10px] text-gray-400 font-medium">
-          Após instalar, abra o app pelo ícone criado na sua tela inicial!
-        </p>
+        <p class="text-[10px] text-gray-400 font-medium">Após instalar, abra o app pelo ícone criado na tela inicial!</p>
       </div>
-
       <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs text-gray-300">
         <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
-        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> na barra do Safari.</p>
+        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> no Safari.</p>
         <p>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
-        <p>3. Abra o app pelo novo ícone na tela inicial!</p>
       </div>
     </div>
-
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
       <span class="font-black text-amber-400 tracking-wider">STUDIOTESTA</span>
     </div>
   </div>
 
-  <!-- 2.1 TELA DE LOGIN MINIMALISTA SAAS -->
+  <!-- 2.1 LOGIN GOOGLE -->
   <div x-show="!usuarioLogado && (!isMobile || isStandalone)" class="fixed inset-0 bg-gray-950 z-40 flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
     <div class="w-full"></div>
-
     <div class="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
       <div class="flex justify-center">
         <img src="./icon-192.png" alt="DriveXPS" class="w-20 h-20 rounded-3xl shadow-2xl border border-gray-800">
       </div>
-
       <div class="space-y-1.5">
         <h2 class="text-3xl font-black text-white tracking-wide">DriveXPS</h2>
         <p class="text-xs text-gray-400 font-medium leading-relaxed">
           Roteirizador contínuo e organizador de carga profissional com navegador nativo integrado.
         </p>
       </div>
-
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
-        <div class="flex items-center gap-2">
-          <span class="text-orange-500">✍️</span><span>Numeração contínua para marcar no <strong>Canetão</strong></span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-orange-500">👜</span><span>Separação em sacolas numeradas de 10 em 10</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-orange-500">🧭</span><span><strong>Navegador Nativo estilo Waze 3D</strong> sem sair do app</span>
-        </div>
-        <div class="flex items-center gap-2 pt-1 border-t border-gray-800">
-          <span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis (começam na sua 1ª rota)!</span>
-        </div>
+        <div class="flex items-center gap-2"><span class="text-orange-500">✍️</span><span>Numeração contínua para marcar no <strong>Canetão</strong></span></div>
+        <div class="flex items-center gap-2"><span class="text-orange-500">👜</span><span>Separação em sacolas numeradas de 10 em 10</span></div>
+        <div class="flex items-center gap-2"><span class="text-orange-500">🧭</span><span><strong>Navegador Nativo Waze 3D</strong> sem sair do app</span></div>
+        <div class="flex items-center gap-2 pt-1 border-t border-gray-800"><span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis (começam na 1ª rota)!</span></div>
       </div>
-
       <div class="space-y-3">
         <button @click="loginGoogle()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -189,45 +157,30 @@
           Continuar com o Google
         </button>
       </div>
-      <p class="text-[10px] text-gray-500 font-medium">Cadastro automático e seguro com sua conta Google.</p>
     </div>
-
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
       <span class="font-black text-amber-400 tracking-wider">STUDIOTESTA</span>
     </div>
   </div>
 
-  <!-- 3. POPUP DE INSTALAÇÃO DO APP -->
-  <div x-show="mostrarPopupInstalar" 
-       x-transition:enter="transition ease-out duration-300"
-       x-transition:enter-start="opacity-0 translate-y-10 scale-95"
-       x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-       class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
+  <!-- 3. POPUP INSTALAR PWA -->
+  <div x-show="mostrarPopupInstalar" class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-4" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
       <div class="flex justify-center"><img src="./icon-192.png" alt="DriveXPS" class="w-16 h-16 rounded-2xl shadow-xl border border-gray-700"></div>
       <div class="space-y-1.5">
         <h3 class="text-xl font-black text-white">Instalar o DriveXPS</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Instale o app para ter navegação fluida em tela cheia e abrir romaneios diretamente.</p>
+        <p class="text-xs text-gray-300 leading-relaxed">Instale para ter navegação fluida em tela cheia e abrir romaneios diretamente.</p>
       </div>
       <div x-show="!isIOS" class="space-y-2 pt-1">
         <button @click="instalarPWA()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition">📲 Instalar Aplicativo Agora</button>
         <button @click="mostrarPopupInstalar = false" class="text-xs text-gray-400 font-bold py-1">Continuar no navegador</button>
       </div>
-      <div x-show="isIOS" class="space-y-2.5 pt-1 text-left bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-gray-300">
-        <p class="font-bold text-orange-400 text-center text-xs">Instalação no iPhone:</p>
-        <p>1. Toque no botão <strong>Compartilhar ⎋</strong> no Safari.</p>
-        <p>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.</p>
-        <button @click="mostrarPopupInstalar = false" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">Entendido</button>
-      </div>
     </div>
   </div>
 
   <!-- 4. GAVETA DO MENU LATERAL -->
-  <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" 
-       x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-       x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
-    
+  <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-l border-gray-800 w-full max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto" @click.away="menuAberto = false">
       <div class="space-y-4">
         <div class="flex items-center justify-between border-b border-gray-800 pb-4">
@@ -241,42 +194,32 @@
           <button @click="menuAberto = false" class="text-gray-400 hover:text-white text-2xl font-bold p-1 leading-none">&times;</button>
         </div>
 
-        <!-- STATUS DA ASSINATURA -->
+        <!-- STATUS ASSINATURA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2">
           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
-          <div class="space-y-1">
-            <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
-          </div>
+          <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
-        <!-- SELETOR DE TEMA VISUAL -->
+        <!-- SELETOR DE TEMA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Aparência do App:</span>
             <span class="text-[10px] font-bold" :class="tema === 'claro' ? 'text-amber-500' : 'text-blue-400'" x-text="tema === 'claro' ? '☀️ Modo Sol (Dia)' : '🌙 Modo Noite (Escuro)'"></span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button @click="alternarTema('escuro')" 
-                    class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95"
-                    :class="tema === 'escuro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'">
+            <button @click="alternarTema('escuro')" class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95" :class="tema === 'escuro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700'">
               <span>🌙</span> Escuro / Noite
             </button>
-            <button @click="alternarTema('claro')" 
-                    class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95"
-                    :class="tema === 'claro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'">
+            <button @click="alternarTema('claro')" class="py-2.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 border transition active:scale-95" :class="tema === 'claro' ? 'bg-orange-600 text-white border-orange-500 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700'">
               <span>☀️</span> Claro / Sol
             </button>
           </div>
-          <p class="text-[9px] text-gray-400 text-center">O modo claro ativa cores de alto contraste contra o reflexo solar.</p>
         </div>
 
-        <!-- DADOS DO MOTORISTA -->
+        <!-- DADOS MOTORISTA -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Dados do Motorista:</span>
-            <span class="text-[10px] text-gray-500">Para suporte via WhatsApp</span>
-          </div>
+          <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Dados do Motorista:</span>
           <div class="space-y-2">
             <div>
               <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Nome Completo:</label>
@@ -296,9 +239,6 @@
           <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
             <span class="text-base">❓</span> Como Usar o App (Tutorial)
           </button>
-          <button x-show="!isStandalone" @click="menuAberto = false; acionarInstalacaoManual();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-orange-400 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
-            <span class="text-base">📲</span> Instalar Aplicativo no Celular
-          </button>
         </nav>
       </div>
 
@@ -311,128 +251,93 @@
     </div>
   </div>
 
-  <!-- 5. BANNER DO PERÍODO DE TESTE -->
-  <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" 
-       class="border-b px-4 py-2 flex justify-between items-center text-xs"
-       :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
+  <!-- 5. BANNER TESTE -->
+  <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" class="border-b px-4 py-2 flex justify-between items-center text-xs" :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
     <div>
-      <template x-if="!trialIniciado">
-        <span class="text-emerald-400 font-bold flex items-center gap-1.5">
-          <span>🎁</span> <strong>7 Dias Grátis:</strong> Começam ao gerar sua 1ª rota!
-        </span>
-      </template>
-      <template x-if="trialIniciado">
-        <span class="text-amber-400 font-bold flex items-center gap-1.5">
-          <span>⏳</span> Teste Ativo: <strong x-text="`${diasRestantesTrial} dia(s) restante(s)`"></strong>
-        </span>
-      </template>
+      <template x-if="!trialIniciado"><span class="text-emerald-400 font-bold flex items-center gap-1.5"><span>🎁</span> <strong>7 Dias Grátis:</strong> Começam ao gerar sua 1ª rota!</span></template>
+      <template x-if="trialIniciado"><span class="text-amber-400 font-bold flex items-center gap-1.5"><span>⏳</span> Teste Ativo: <strong x-text="`${diasRestantesTrial} dia(s) restante(s)`"></strong></span></template>
     </div>
-    <button @click="modalAssinatura = true" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-[11px] px-3 py-1 rounded-full transition active:scale-95 shadow-md">
-      Ver Planos
-    </button>
+    <button @click="modalAssinatura = true" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-[11px] px-3 py-1 rounded-full transition active:scale-95 shadow-md">Ver Planos</button>
   </div>
 
   <!-- APLICAÇÃO PRINCIPAL -->
   <div x-show="usuarioLogado && (!isMobile || isStandalone)" class="flex-1 flex flex-col justify-between" x-cloak>
     
-    <!-- 🔍 MODAL DE BUSCA GLOBAL -->
-    <div x-show="buscaAberta"
-         class="absolute inset-0 bg-gray-950 z-[200] flex flex-col transition-all"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 translate-y-10"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 translate-y-10" x-cloak>
-         
-         <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
-            <div class="flex-1 relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
-                <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..."
-                       class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors">
-            </div>
-            <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
-         </div>
+    <!-- 🔍 BUSCA GLOBAL -->
+    <div x-show="buscaAberta" class="absolute inset-0 bg-gray-950 z-[200] flex flex-col transition-all" x-cloak>
+      <div class="p-4 bg-gray-900 border-b border-gray-800 flex gap-3 items-center pt-6">
+        <div class="flex-1 relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-lg">🔍</span>
+          <input type="text" x-model="termoBusca" x-ref="inputBusca" placeholder="Rua, Rastreio, Parada, Canetão..." class="w-full bg-black border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-colors">
+        </div>
+        <button @click="buscaAberta = false" class="text-orange-500 font-bold text-sm px-2 active:scale-95 transition">Cancelar</button>
+      </div>
 
-         <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
-             <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
-                 <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
-             </template>
-             <template x-for="item in entregasFiltradas" :key="item.id">
-                 <div @click="irParaEntregaDireta(item); buscaAberta = false" 
-                      class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer active:scale-95 transition-transform shadow-lg">
-                     <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0">
-                         <span class="text-[9px] font-black uppercase leading-none opacity-80">Canetão</span>
-                         <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
-                     </div>
-                     <div class="flex-1 overflow-hidden">
-                         <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
-                         <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
-                         <div class="flex gap-2 mt-1.5">
-                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
-                             <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
-                         </div>
-                     </div>
-                 </div>
-             </template>
-             <template x-if="termoBusca.length === 0">
-                 <div class="text-center text-gray-600 mt-10 text-xs">Digite algo para buscar no romaneio atual...</div>
-             </template>
-         </div>
+      <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+        <template x-if="termoBusca.length > 0 && entregasFiltradas.length === 0">
+          <div class="text-center text-gray-500 mt-10 text-sm font-medium">Nenhum pacote encontrado.</div>
+        </template>
+        <template x-for="item in entregasFiltradas" :key="item.id">
+          <div @click="irParaEntregaDireta(item); buscaAberta = false" class="bg-[#121824] rounded-2xl border border-gray-800 p-3.5 flex items-center gap-3.5 cursor-pointer active:scale-95 transition-transform shadow-lg">
+            <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0">
+              <span class="text-[9px] font-black uppercase leading-none opacity-80">Canetão</span>
+              <span class="text-xl font-black leading-tight mt-0.5" x-text="`#${item.ordem_entrega}`"></span>
+            </div>
+            <div class="flex-1 overflow-hidden">
+              <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
+              <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
+              <div class="flex gap-2 mt-1.5">
+                <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
+                <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
     </div>
 
-    <!-- CABEÇALHO DO APLICATIVO -->
+    <!-- CABEÇALHO -->
     <div>
-      <header class="bg-orange-600 px-3 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 transition-all z-30"
-              :class="{'!z-[105] relative shadow-[0_10px_35px_rgba(0,0,0,0.8)]': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8)}">
-        
-        <div class="flex justify-between items-center transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8)}">
+      <header class="bg-orange-600 px-3 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 z-30">
+        <div class="flex justify-between items-center">
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">DriveXPS</h1>
-          
           <div class="flex items-center gap-2">
-            <button @click="abrirBusca()" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Buscar Pacote">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
+            <button @click="abrirBusca()" class="text-white flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
             </button>
-            <button @click="menuAberto = true" class="text-white hover:text-orange-200 flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition" title="Menu">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
+            <button @click="menuAberto = true" class="text-white flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
           </div>
         </div>
 
-        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2 transition-opacity" :class="{'opacity-25': tutorialAberto && (passoTutorial >= 3 && passoTutorial <= 8)}">
-          <div class="flex items-center gap-1.5">
-            <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider text-orange-400"
-                  x-text="rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA'"></span>
-          </div>
+        <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2">
+          <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider text-orange-400" x-text="rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA'"></span>
           <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
         </div>
 
-        <!-- 5 ABAS DE NAVEGAÇÃO -->
+        <!-- 5 ABAS -->
         <nav class="grid grid-cols-5 gap-1 pt-1">
-          <button id="btnTourRota" @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md hover:bg-orange-50 font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+          <button @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">Rota</span>
+            <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
-          <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+          <button @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
           </button>
-          <button id="btnTourRua" @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+          <button @click="modo = 'rua'" :class="modo === 'rua' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">🚗</span><span class="text-xs font-black tracking-wide">Rua</span>
           </button>
-          <button id="btnTourMapa" @click="abrirAbaMapa()" :class="modo === 'mapa' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+          <button @click="abrirAbaMapa()" :class="modo === 'mapa' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">🗺️</span><span class="text-[11px] font-black tracking-wide">Mapa</span>
           </button>
-          <button id="btnTourHistorico" @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
+          <button @click="abrirHistorico()" :class="modo === 'historico' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">📜</span><span class="text-xs font-black tracking-wide">Histórico</span>
           </button>
         </nav>
       </header>
 
-      <!-- MODO 1: CARREGAMENTO EM SACOLAS -->
+      <!-- MODO 1: SACOLAS -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
@@ -468,13 +373,11 @@
                 </div>
               </div>
 
-              <!-- TAGS VISUAIS -->
               <div class="flex flex-wrap gap-2 pt-1">
                 <span x-show="item.gps_suspeito" class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">❓ Verificar GPS</span>
                 <span x-show="item.total_no_local > 1" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px]" x-text="`⚠️ ${item.total_no_local} PACOTES NA PARADA`"></span>
               </div>
 
-              <!-- ENDEREÇO E BAIRRO AMPLIADOS -->
               <div class="space-y-1 pt-0.5">
                 <h3 class="font-black text-lg sm:text-xl text-white leading-snug break-words" :class="{'line-through': item.status === 'entregue'}" x-text="item.endereco"></h3>
                 <p class="text-base font-bold text-gray-300" x-text="`${item.bairro} - ${item.cidade}`"></p>
@@ -494,7 +397,6 @@
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
             
-            <!-- INDICADOR VISUAL DO BAIRRO ATUAL -->
             <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300 shadow-md">
               <div class="flex items-center gap-2 truncate pr-2">
                 <span class="text-base shrink-0">📍</span>
@@ -544,12 +446,11 @@
               <span class="text-lg">🚶</span><span>ESTA CASA FICA NA MESMA RUA! Apenas avance alguns metros (não precisa de Waze).</span>
             </div>
 
-            <!-- ALERTA DE MÚLTIPLOS PACOTES -->
+            <!-- ALERTA MÚLTIPLOS PACOTES -->
             <div x-show="pacotesMesmoLocal.length > 1" class="bg-yellow-500/10 border-2 border-yellow-500/60 rounded-2xl p-4 space-y-2.5">
               <p class="text-sm font-black text-yellow-400 flex items-center gap-2 leading-none">
                 <span class="text-lg">⚠️</span> ATENÇÃO: HÁ <span class="text-base underline" x-text="pacotesMesmoLocal.length"></span> PACOTES NESTA PARADA!
               </p>
-              <p class="text-xs text-gray-300 font-medium leading-none">Confira todas as caixas antes de desembarcar:</p>
               <div class="space-y-2 pt-1">
                 <template x-for="p in pacotesMesmoLocal" :key="p.id">
                   <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
@@ -563,14 +464,11 @@
               </div>
             </div>
 
-            <!-- ENDEREÇO E BAIRRO -->
             <div class="space-y-1.5 pt-1">
               <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight break-words" x-text="entregaAtual.endereco"></h2>
               <p class="text-lg sm:text-xl text-gray-200 font-black" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
-              <p class="text-sm text-gray-400 font-mono tracking-wider pt-0.5" x-text="`CEP: ${entregaAtual.cep || 'S/N'}`"></p>
             </div>
 
-            <!-- BOTÕES DE NAVEGAÇÃO: NAVEGAR NO APP + WAZE -->
             <div class="grid grid-cols-2 gap-3 pt-2">
               <button @click="iniciarNavegacaoNativa(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">
                 <span class="text-2xl">🧭</span> Navegar
@@ -595,8 +493,8 @@
         </template>
       </main>
 
-      <!-- MODO 4: MAPA GERAL LEAFLET (ALTURA TOTAL FIXA SEM SCROLL NA TELA) -->
-      <main x-show="modo === 'mapa'" class="p-2 sm:p-3 max-w-5xl mx-auto w-full flex-1 flex flex-col h-[calc(100dvh-150px)] space-y-2">
+      <!-- MODO 4: MAPA GERAL LEAFLET (ALTURA AJUSTADA PARA NÃO CORTAR EMBAIXO) -->
+      <main x-show="modo === 'mapa'" class="p-2 sm:p-3 max-w-5xl mx-auto w-full flex-1 flex flex-col h-[calc(100dvh-175px)] space-y-2">
         <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs shrink-0">
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 border border-white shrink-0"></span> <strong class="text-slate-200">CD/Casa</strong></span>
@@ -608,7 +506,6 @@
             🎯 Rota
           </button>
         </div>
-        <!-- MAPA OCUPANDO 100% DO RESTO DA TELA SEM SCROLL -->
         <div class="w-full flex-1 rounded-2xl overflow-hidden border-2 border-orange-500/40 shadow-2xl relative">
           <div id="mapaContainer" class="w-full h-full z-10"></div>
         </div>
@@ -629,7 +526,7 @@
               </div>
               <div class="flex items-center gap-2 pt-1">
                 <button @click="selecionarRotaHistorico(r.id)" class="flex-1 bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700 active:scale-95 transition">Reabrir Detalhes Desta Rota</button>
-                <button @click="apagarRota(r.id)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 p-3 rounded-xl active:scale-95 transition flex items-center justify-center shrink-0" title="Apagar Rota e Pacotes do Banco">
+                <button @click="apagarRota(r.id)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 p-3 rounded-xl active:scale-95 transition flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
               </div>
@@ -640,299 +537,147 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO NATIVA ESTILO WAZE 3D REAL (MAPLIBRE GL NATIVO) -->
+    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
-      
-      <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
       <div class="absolute top-0 left-0 right-0 z-[600] bg-black/90 backdrop-blur-md text-white px-4 pt-4 pb-3 shadow-2xl border-b border-gray-800/80">
-         <div class="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-2 opacity-60"></div>
-         
-         <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 flex-1 min-w-0">
-               <div class="w-14 h-14 bg-gray-900 border border-gray-800 rounded-2xl flex items-center justify-center text-3xl font-black text-cyan-400 shrink-0 shadow-lg" x-text="iconeManobraNav">
-               </div>
-               
-               <div class="flex-1 min-w-0">
-                  <div class="flex items-baseline gap-2">
-                     <span class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight leading-none" x-text="distanciaProximaManobra || '0 m'"></span>
-                     <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">até o destino</span>
-                  </div>
-                  <h3 class="text-base sm:text-lg font-black text-cyan-400 truncate leading-tight mt-1" x-text="nomeProximaRua || entregaNavegacao?.endereco"></h3>
-               </div>
+        <div class="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-2 opacity-60"></div>
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <div class="w-14 h-14 bg-gray-900 border border-gray-800 rounded-2xl flex items-center justify-center text-3xl font-black text-cyan-400 shrink-0 shadow-lg" x-text="iconeManobraNav"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight leading-none" x-text="distanciaProximaManobra || '0 m'"></span>
+                <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">até o destino</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-black text-cyan-400 truncate leading-tight mt-1" x-text="nomeProximaRua || entregaNavegacao?.endereco"></h3>
             </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-               <button @click="alternarVoz()" class="w-11 h-11 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center text-lg active:scale-95 transition">
-                  <span x-show="vozHabilitada">🔊</span>
-                  <span x-show="!vozHabilitada">🔈</span>
-               </button>
-               <button @click="pararNavegacao()" class="w-11 h-11 rounded-2xl bg-red-600/30 border border-red-500/50 text-red-300 flex items-center justify-center text-lg font-black active:scale-95 transition">
-                  ✕
-               </button>
-            </div>
-         </div>
-         
-         <div x-show="subInstrucaoEmSeguida" class="mt-2 pt-2 border-t border-gray-900 flex items-center gap-2 text-xs text-gray-400">
-            <span class="font-bold">Próximo pacote:</span>
-            <span class="text-gray-200 font-semibold truncate" x-text="subInstrucaoEmSeguida"></span>
-         </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button @click="alternarVoz()" class="w-11 h-11 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center text-lg active:scale-95 transition">
+              <span x-show="vozHabilitada">🔊</span><span x-show="!vozHabilitada">🔈</span>
+            </button>
+            <button @click="pararNavegacao()" class="w-11 h-11 rounded-2xl bg-red-600/30 border border-red-500/50 text-red-300 flex items-center justify-center text-lg font-black active:scale-95 transition">✕</button>
+          </div>
+        </div>
       </div>
       
-      <!-- MAPA NATIVO 3D REAL -->
-      <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL">
-      </div>
+      <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL"></div>
 
-      <!-- VELOCÍMETRO ESTILO WAZE FLUTUANTE (CANTO INFERIOR ESQUERDO) -->
+      <!-- VELOCÍMETRO -->
       <div class="absolute bottom-52 left-4 z-[500]">
-         <div class="waze-speed-circle">
-            <span class="text-xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
-            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
-         </div>
+        <div class="waze-speed-circle">
+          <span class="text-xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
+          <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
+        </div>
       </div>
 
-      <!-- BOTÃO RE-CENTRALIZAR ESTILO WAZE FLUTUANTE (APENAS ÍCONE MIRA) -->
+      <!-- MIRA CENTRALIZADORA -->
       <div class="absolute bottom-52 right-4 z-[500]">
-         <button @click="centralizarCarroManual()" 
-                 class="waze-mira-btn active:scale-90 transition"
-                 :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse shadow-[0_0_15px_rgba(234,88,12,0.6)]' : 'border-gray-600 text-white'"
-                 title="Re-centralizar na rota">
-            <span class="text-2xl">🎯</span>
-         </button>
+        <button @click="centralizarCarroManual()" class="waze-mira-btn active:scale-90 transition" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'">
+          <span class="text-2xl">🎯</span>
+        </button>
       </div>
 
-      <!-- PAINEL INFERIOR FLUTUANTE COM OS 4 QUADRADOS DAS SACOLAS -->
-      <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 shadow-[0_-12px_30px_rgba(0,0,0,0.9)] pb-6">
-         <div class="grid grid-cols-4 gap-2 text-center">
-            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
-               <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
-            </div>
-            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-               <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
-               <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.parada_shopee : null)"></span>
-            </div>
-            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-               <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
-               <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.ordem_shopee : null)"></span>
-            </div>
-            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-               <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="entregaNavegacao ? Math.ceil(entregaNavegacao.ordem_entrega / 10) : '-'"></span>
-            </div>
-         </div>
+      <!-- PAINEL INFERIOR -->
+      <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 pb-6">
+        <div class="grid grid-cols-4 gap-2 text-center">
+          <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+            <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+            <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
+          </div>
+          <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+            <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
+            <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.parada_shopee : null)"></span>
+          </div>
+          <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+            <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
+            <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.ordem_shopee : null)"></span>
+          </div>
+          <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+            <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+            <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="entregaNavegacao ? Math.ceil(entregaNavegacao.ordem_entrega / 10) : '-'"></span>
+          </div>
+        </div>
 
-         <div class="flex items-center justify-between gap-3 pt-1">
-            <div class="flex-1 min-w-0">
-               <h4 class="text-sm font-black text-white truncate" x-text="entregaNavegacao ? entregaNavegacao.endereco : ''"></h4>
-               <p class="text-xs text-gray-400 truncate" x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
-            </div>
-            <!-- O BOTÃO ENTREGUE AVANÇA DIRETO PRO PRÓXIMO PACOTE SEM SAIR DO MAPA -->
-            <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
-               <span>✅</span> Entregue
-            </button>
-         </div>
+        <div class="flex items-center justify-between gap-3 pt-1">
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-black text-white truncate" x-text="entregaNavegacao ? entregaNavegacao.endereco : ''"></h4>
+            <p class="text-xs text-gray-400 truncate" x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
+          </div>
+          <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
+            <span>✅</span> Entregue
+          </button>
+        </div>
       </div>
     </main>
   </div>
 
-  <!-- MODAL DE RESUMO DE IMPORTAÇÃO -->
+  <!-- MODAL IMPORTAÇÃO RESUMO -->
   <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6 transform transition-all">
-      <div class="pt-6 pb-2 flex justify-center">
-        <div class="w-20 h-20 bg-orange-500/20 text-orange-400 rounded-full flex items-center justify-center shadow-lg border border-orange-500/40">
-          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6">
+      <div class="p-6 space-y-5 text-left">
+        <h2 class="text-2xl font-black text-white text-center">Planilha Importada</h2>
+        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+          <span class="text-base font-bold text-gray-300">Total de Pacotes</span>
+          <span class="text-3xl font-black text-white" x-text="pacotesExtraidos.length"></span>
         </div>
-      </div>
-      <div class="p-6 space-y-6 text-left">
-        <div class="text-center space-y-1.5">
-          <h2 class="text-3xl font-black text-white tracking-tight">Planilha Importada</h2>
-          <p class="text-base text-gray-400 font-medium">Pronta para otimização.</p>
-        </div>
-        <div class="bg-orange-500/10 p-4 rounded-2xl border border-orange-500/30 flex items-start gap-3">
-          <span class="text-orange-400 text-xl mt-0.5">ℹ️</span>
-          <p class="text-sm text-orange-200 leading-relaxed font-bold">O sistema irá organizar as ruas e corrigir mãos de direção automaticamente.</p>
-        </div>
-        
-        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs">
-          <div class="flex items-center justify-between border-b border-gray-800/80 pb-1.5">
-            <span class="text-orange-400 font-bold uppercase text-[10px]">📍 Partida Real:</span>
-            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoPartidaTexto || 'CD / Coordenada Atual'"></span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-emerald-400 font-bold uppercase text-[10px]">🏠 Chegada Real:</span>
-            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoChegadaTexto || 'Residência / Ponto Final'"></span>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between border-b border-gray-800 pb-5">
-          <div class="flex items-center gap-2.5">
-            <span class="text-2xl">📦</span>
-            <span class="text-lg font-black text-gray-200">Total de Pacotes</span>
-          </div>
-          <span class="text-4xl font-black text-white" x-text="pacotesExtraidos.length"></span>
-        </div>
-        <div class="space-y-4 text-sm sm:text-base font-bold pl-2">
-          <div class="flex items-center gap-3 text-gray-300">
-            <span class="text-emerald-400 text-lg">✔</span> <span x-text="`${Math.ceil(pacotesExtraidos.length / 10)} Sacolas para organizar`"></span>
-          </div>
-          <div class="flex items-center gap-3 text-gray-300">
-            <span class="text-emerald-400 text-lg">✔</span> <span x-text="`${new Set(pacotesExtraidos.map(p=>p.parada_shopee)).size} Paradas Únicas`"></span>
-          </div>
-          <div class="flex items-center gap-3 text-red-400 bg-red-500/10 p-2 rounded-xl border border-red-500/20" x-show="pacotesExtraidos.filter(p=>p.gps_suspeito).length > 0">
-            <span class="text-lg">❓</span> <span x-text="`${pacotesExtraidos.filter(p=>p.gps_suspeito).length} GPS Suspeitos (Marginais/S-N)`"></span>
-          </div>
-        </div>
-        <div class="pt-2 space-y-3">
-          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
-            <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
-            <span x-show="carregandoProcesso">⏳ Calculando vias...</span>
-          </button>
-          <button @click="modalResumoImportacao = false; pacotesExtraidos = [];" class="w-full text-sm text-gray-500 hover:text-white font-bold py-3 transition">
-            Cancelar Importação
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TUTORIAL INTERATIVO -->
-  <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
-      <template x-if="passoTutorial === 1">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👋</div><h3 class="text-2xl font-black text-white">Bem-vindo ao DriveXPS!</h3><p class="text-sm text-gray-200 leading-relaxed">Vamos te ensinar em 30 segundos como acabar com o ziguezague, economizar gasolina e terminar suas entregas muito mais rápido.</p><div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 text-xs text-emerald-400 font-bold">🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!</div></div>
-      </template>
-      <template x-if="passoTutorial === 2">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div><h3 class="text-2xl font-black text-white">Partida e Chegada</h3><p class="text-sm text-gray-200 leading-relaxed">Informe onde você inicia e termina a rota no modal de importação (ou use o GPS atual do seu celular).</p></div>
-      </template>
-      <template x-if="passoTutorial === 3">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div><h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3><p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p></div>
-      </template>
-      <template x-if="passoTutorial === 4">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">👜</div><h3 class="text-2xl font-black text-white">2. Organização nas Sacolas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Sacolas"</strong>, confira os pacotes organizados de 10 em 10 e marque no canetão o número <strong>#CANETÃO</strong> nas caixas.</p></div>
-      </template>
-      <template x-if="passoTutorial === 5">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🚗</div><h3 class="text-2xl font-black text-white">3. Na Rua</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Rua"</strong>, você vê a entrega atual e abre a <strong>Navegação Nativa estilo Waze</strong> com 1 único toque. O celular vibra se houver mais de 1 pacote no mesmo endereço!</p></div>
-      </template>
-      <template x-if="passoTutorial === 6">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">🗺️</div><h3 class="text-2xl font-black text-white">4. Mapa Visual das Entregas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Mapa"</strong>, você vê a rota inteira desenhada! Pinos <strong>azuis</strong> (CD/Casa), <strong>verdes</strong> (pendentes), <strong>vermelhos</strong> (entregues) e <strong>amarelos</strong> (ausentes/pulados para entregar na volta).</p></div>
-      </template>
-      <template x-if="passoTutorial === 7">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">📜</div><h3 class="text-2xl font-black text-white">5. Histórico de Rotas</h3><p class="text-sm text-gray-200 leading-relaxed">Na aba <strong>"Histórico"</strong>, você visualiza todas as rotas anteriores que já fez, podendo reabri-las ou apagá-las do banco.</p></div>
-      </template>
-      <template x-if="passoTutorial === 8">
-        <div class="space-y-3.5"><div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div><h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3><p class="text-sm text-gray-200 leading-relaxed">Agora é com você. Importe sua primeira rota, organize suas sacolas e aproveite uma entrega rápida e sem estresse.</p></div>
-      </template>
-
-      <div class="flex items-center justify-between pt-3 border-t border-gray-800">
-        <div>
-          <button x-show="passoTutorial === 1" @click="concluirTutorial()" class="text-xs text-gray-400 hover:text-white font-bold py-2 px-2.5">Pular</button>
-          <button x-show="passoTutorial > 1" @click="voltarPassoTutorial()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-2 px-3 rounded-xl active:scale-95 transition">← Voltar</button>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <template x-for="p in 8" :key="p"><span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span></template>
-        </div>
-        <button @click="proximoPassoTutorial()" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-4 rounded-xl active:scale-95 transition shadow-lg shadow-orange-600/30">
-          <span x-text="passoTutorial === 8 ? 'Começar!' : 'Avançar →'"></span>
+        <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-base shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
+          <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
+          <span x-show="carregandoProcesso">⏳ Otimizando vias...</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL DE ASSINATURA -->
+  <!-- TUTORIAL -->
+  <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
+      <h3 class="text-2xl font-black text-white">Bem-vindo ao DriveXPS!</h3>
+      <p class="text-sm text-gray-200">Organize suas entregas no canetão e navegue de rua em rua com Waze nativo.</p>
+      <button @click="concluirTutorial()" class="w-full bg-orange-600 text-white font-black py-3 rounded-2xl text-xs active:scale-95 transition">Começar a Usar!</button>
+    </div>
+  </div>
+
+  <!-- MODAL ASSINATURA -->
   <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
-      <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">DriveXPS Ilimitado</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong>.</p>
+      <h3 class="text-xl font-black text-white">Assinatura DriveXPS</h3>
+      <div x-show="!codigoPixGerado" class="space-y-2.5">
+        <button @click="gerarPixAssinatura()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm active:scale-95 transition">💠 Gerar PIX Imediato</button>
+        <button @click="fecharModalAssinatura()" class="text-xs text-gray-400 font-bold">Fechar</button>
       </div>
-      <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
-        <div @click="planoEscolhido = 'semanal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Mais Flexível</span>
-            <span class="text-sm font-black text-white">Plano Semanal</span>
-            <span class="text-[10px] text-gray-400 block mt-0.5">Apenas R$ 0,98 / dia</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-orange-400">R$ 6,90</span>
-            <span class="text-[10px] text-gray-500 block">por semana</span>
-          </div>
-        </div>
-        <div @click="planoEscolhido = 'mensal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'mensal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
-          <div>
-            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Maior Economia</span>
-            <span class="text-sm font-black text-white">Plano Mensal</span>
-            <span class="text-[11px] text-emerald-400 font-bold block mt-0.5">Apenas R$ 0,66 / dia!</span>
-          </div>
-          <div class="text-right">
-            <span class="text-lg font-black text-white">R$ 19,90</span>
-            <span class="text-[10px] text-gray-500 block">por mês</span>
-          </div>
-        </div>
-      </div>
-      <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
-        <button @click="gerarPixAssinatura()" :disabled="carregandoPix" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
-          <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span><span x-show="carregandoPix">⏳ Gerando PIX Oficial Pushin Pay...</span>
-        </button>
-        <button @click="fecharModalAssinatura()" class="text-xs text-gray-400 hover:text-white pt-1 font-bold">Fechar</button>
-      </div>
-      <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-center bg-black/80 p-4 rounded-2xl border border-gray-800">
-        <p class="text-xs font-bold text-emerald-400">✅ PIX Gerado com Sucesso!</p>
-        <template x-if="qrCodeBase64">
-          <div class="flex justify-center py-1">
-            <img :src="qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`" alt="QR Code PIX" class="w-44 h-44 rounded-xl border-2 border-emerald-500/50 bg-white p-1">
-          </div>
-        </template>
-        <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] font-mono text-gray-300 break-all select-all text-left max-h-20 overflow-y-auto" x-text="codigoPixGerado"></div>
-        <button @click="copiarCodigoPix()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-2">📋 Copiar Código PIX</button>
-        <div class="flex items-center justify-center gap-2 text-[11px] text-amber-400 animate-pulse pt-1"><span>⏳</span> Aguardando seu pagamento no banco...</div>
-        <button @click="resetarPix()" class="text-[11px] text-gray-500 hover:text-gray-400 underline block mx-auto pt-1">Voltar e escolher outro plano</button>
+      <div x-show="codigoPixGerado" class="space-y-3">
+        <template x-if="qrCodeBase64"><img :src="qrCodeBase64.startsWith('data:') ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`" class="w-44 h-44 mx-auto rounded-xl"></template>
+        <button @click="copiarCodigoPix()" class="w-full bg-orange-600 text-white font-bold py-3 rounded-xl text-xs">📋 Copiar Código PIX</button>
       </div>
     </div>
   </div>
 
-  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO -->
+  <!-- MODAL CADASTRO OBRIGATÓRIO -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">📋</div>
-      <div class="space-y-1">
-        <h3 class="text-xl font-black text-white">Complete seu Cadastro</h3>
-        <p class="text-xs text-gray-300 leading-relaxed">Dados do seu login Google carregados! Confirme seu WhatsApp para liberar as rotas:</p>
-      </div>
+    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+      <h3 class="text-xl font-black text-white text-center">Complete seu Cadastro</h3>
       <div class="space-y-3 text-left">
-        <div><label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">Nome Completo *</label><input type="text" x-model="inputNome" placeholder="Seu Nome Completo" class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium"></div>
-        <div><label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">WhatsApp (com DDD) *</label><input type="tel" x-model="inputTelefone" placeholder="Ex: 11985519666" maxlength="15" class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono"></div>
-        <div><label class="text-[10px] font-black text-orange-400 uppercase tracking-wider block mb-1">Seu E-mail *</label><input type="email" x-model="inputEmail" placeholder="seuemail@gmail.com" class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium"></div>
-        <p x-show="erroCadastroObrigatorio" class="text-xs text-red-400 font-bold text-center pt-1" x-text="erroCadastroObrigatorio"></p>
+        <div><label class="text-[10px] text-orange-400 font-bold block mb-1">Nome Completo *</label><input type="text" x-model="inputNome" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white"></div>
+        <div><label class="text-[10px] text-orange-400 font-bold block mb-1">WhatsApp com DDD *</label><input type="tel" x-model="inputTelefone" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white"></div>
+        <div><label class="text-[10px] text-orange-400 font-bold block mb-1">E-mail *</label><input type="email" x-model="inputEmail" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white"></div>
       </div>
-      <div class="pt-2">
-        <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2"><span x-show="!salvandoPerfil">✅ Concluir e Acessar o App</span><span x-show="salvandoPerfil">⏳ Gravando seus dados...</span></button>
-      </div>
+      <button @click="salvarCadastroObrigatorio()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-xs active:scale-95 transition">Salvar Dados</button>
     </div>
   </div>
 
-  <!-- 11. MODAL DE IMPORTAR PLANILHA -->
+  <!-- MODAL IMPORTAR ARQUIVO -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
+    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <h2 class="font-black text-lg text-orange-500">IMPORTAR ROMANEIO</h2>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
-      <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs">
-        <div class="flex justify-between items-center">
-          <span class="font-black text-orange-400 uppercase tracking-wider text-[11px]">📍 Ponto de Partida e Chegada</span>
-          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-gray-700 active:scale-95 transition">📍 Usar Meu GPS Atual</button>
-        </div>
-        <div class="space-y-2">
-          <div><label class="text-[10px] text-gray-400 font-bold block mb-1">Partida (Onde você pega a carga / CD ou sua rua):</label><input type="text" x-model="inputPartidaModal" placeholder="Ex: Av. Principal, 100 ou Nome do CD" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500"></div>
-          <div><label class="text-[10px] text-gray-400 font-bold block mb-1">Chegada (Onde a rota termina / Sua casa):</label><input type="text" x-model="inputChegadaModal" placeholder="Ex: Rua das Flores, 500 ou sua residência" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500"></div>
-        </div>
-      </div>
-      <div class="space-y-3">
-        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
-          <span class="text-3xl block mb-1.5">📊</span><span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span><input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
-        </label>
-      </div>
+      <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 transition">
+        <span class="text-3xl block mb-1.5">📊</span>
+        <span class="text-sm font-black block text-white">Escolher arquivo .XLSX</span>
+        <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
+      </label>
     </div>
   </div>
 
