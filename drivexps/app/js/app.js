@@ -1,6 +1,6 @@
 /* ==========================================================================
-   DriveXPS Pro 4.1 - Núcleo Completo e Reativo da Aplicação
-   Arquivo: /js/app.js (Corrigido)
+   DriveXPS Pro 4.1.3 - Núcleo Completo e Reativo da Aplicação
+   Arquivo: /js/app.js
    ========================================================================== */
 
 function entregaApp() {
@@ -118,12 +118,10 @@ function entregaApp() {
         const aEntregue = a.status === 'entregue' ? 1 : 0;
         const bEntregue = b.status === 'entregue' ? 1 : 0;
 
-        // Entregues vão para o final
         if (aEntregue !== bEntregue) {
           return aEntregue - bEntregue;
         }
 
-        // Mantém ordem sequencial do Canetão
         return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
       });
     },
@@ -221,7 +219,6 @@ function entregaApp() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
 
-      // Restaura caches locais
       const cacheEntregas = localStorage.getItem('drivexps_entregas_cache');
       if (cacheEntregas) {
         try { this.entregas = JSON.parse(cacheEntregas); } catch(e) {}
@@ -281,7 +278,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET (PINOS CD/CASA E CURVAS REAIS)
+    // MAPA GERAL LEAFLET
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -345,9 +342,9 @@ function entregaApp() {
         const coord = [p.latitude, p.longitude];
         pontosWaypoints.push(coord);
 
-        let corFundo = '#10b981'; // Verde (Pendente)
-        if (p.status === 'entregue') corFundo = '#ef4444'; // Vermelho (Entregue)
-        if (p.status === 'ausente') corFundo = '#f59e0b'; // Amarelo (Ausente)
+        let corFundo = '#10b981';
+        if (p.status === 'entregue') corFundo = '#ef4444';
+        if (p.status === 'ausente') corFundo = '#f59e0b';
 
         const iconePacote = L.divIcon({
           className: 'custom-pin-pacote',
@@ -955,9 +952,6 @@ function entregaApp() {
       if ('vibrate' in navigator) navigator.vibrate(40);
     },
 
-    /**
-     * Reabre uma entrega marcada acidentalmente como entregue (Volta para Pendente)
-     */
     async reabrirEntrega(entrega) {
       if (!entrega) return;
       await this.atualizarStatus(entrega.id, 'pendente');
