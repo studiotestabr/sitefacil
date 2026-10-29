@@ -12,7 +12,7 @@ function entregaApp() {
 
     // 2. TEMA E MODOS DE VISUALIZAÇÃO
     tema: localStorage.getItem('drivexps_tema') || 'escuro',
-    modo: 'carregamento', // Inicia focado em Sacolas
+    modo: 'carregamento',
     
     // 3. ESTADOS DE INTERFACE E MODAIS
     menuAberto: false,
@@ -99,7 +99,7 @@ function entregaApp() {
     statusAssinatura: 'trial',
     assinaturaValida: true,
 
-    // Tutorial e PWA
+    // Tutorial de 8 Passos e PWA
     tutorialAberto: false,
     passoTutorial: 1,
     mostrarPopupInstalar: false,
@@ -109,11 +109,23 @@ function entregaApp() {
     isMobile: false,
 
     // =========================================================================
-    // GETTERS REATIVOS (Agora 100% integrados e reativos)
+    // GETTERS REATIVOS (Entregues vão para o fim da fila)
     // =========================================================================
     get entregasOrdenadasParaSacola() {
       if (!this.entregas || this.entregas.length === 0) return [];
-      return [...this.entregas].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
+      
+      return [...this.entregas].sort((a, b) => {
+        const aEntregue = a.status === 'entregue' ? 1 : 0;
+        const bEntregue = b.status === 'entregue' ? 1 : 0;
+
+        // Pedidos entregues vão automaticamente para o final da fila
+        if (aEntregue !== bEntregue) {
+          return aEntregue - bEntregue;
+        }
+
+        // Mantém a ordem numérica do Canetão em cada grupo
+        return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
+      });
     },
 
     get naoEntregues() {
@@ -125,7 +137,7 @@ function entregaApp() {
       if (!this.entregas || this.entregas.length === 0) return null;
       if (this.entregaSelecionadaId) {
         const sel = this.entregas.find(e => e.id === this.entregaSelecionadaId);
-        if (sel && sel.status !== 'entregue') return sel;
+        if (sel) return sel;
       }
       const primeiroPendente = this.entregas.find(e => e.status === 'pendente');
       if (primeiroPendente) return primeiroPendente;
@@ -203,16 +215,26 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // INICIALIZAÇÃO
+    // INICIALIZAÇÃO E CACHE
     // =========================================================================
     async init() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
 
-      // Recupera cache
+      // Restaura caches locais
       const cacheEntregas = localStorage.getItem('drivexps_entregas_cache');
       if (cacheEntregas) {
         try { this.entregas = JSON.parse(cacheEntregas); } catch(e) {}
+      }
+
+      const cachePartida = localStorage.getItem('drivexps_coord_partida');
+      if (cachePartida) {
+        try { this.coordPartidaSalva = JSON.parse(cachePartida); } catch(e) {}
+      }
+
+      const cacheChegada = localStorage.getItem('drivexps_coord_chegada');
+      if (cacheChegada) {
+        try { this.coordChegadaSalva = JSON.parse(cacheChegada); } catch(e) {}
       }
 
       await this.verificarAutenticacao();
@@ -220,7 +242,6 @@ function entregaApp() {
       if (this.usuarioLogado) {
         await this.sincronizarAssinaturaSaaS();
         
-        // Sempre carrega a rota ativa e a geometria oficial das ruas
         if (this.rotaAtivaId) {
           await this.carregarEntregasPorId(this.rotaAtivaId);
         } else {
@@ -255,10 +276,12 @@ function entregaApp() {
       if (this.rotaAtivaId) localStorage.setItem('drivexps_rota_ativa_id', this.rotaAtivaId);
       if (this.entregas && this.entregas.length > 0) localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
       if (this.rotaGeometria) localStorage.setItem('drivexps_rota_geometria', this.rotaGeometria);
+      if (this.coordPartidaSalva) localStorage.setItem('drivexps_coord_partida', JSON.stringify(this.coordPartidaSalva));
+      if (this.coordChegadaSalva) localStorage.setItem('drivexps_coord_chegada', JSON.stringify(this.coordChegadaSalva));
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET COM CONTORNO DAS RUAS
+    // MAPA GERAL LEAFLET (PINOS CD/CASA E CURVAS REAIS)
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -303,28 +326,28 @@ function entregaApp() {
 
       const pontosWaypoints = [];
 
-      // 1. CD
+      // 1. PINO CD (PARTIDA)
       if (this.coordPartidaSalva && this.coordPartidaSalva.latitude) {
         const posCD = [this.coordPartidaSalva.latitude, this.coordPartidaSalva.longitude];
         pontosWaypoints.push(posCD);
         const iconeCD = L.divIcon({ 
           className: 'custom-pin-cd', 
-          html: `<div style="background-color: #3b82f6; color: #fff; font-size: 15px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(59,130,246,0.8);">🏭</div>`, 
-          iconSize: [34, 34], iconAnchor: [17, 17] 
+          html: `<div style="background-color: #3b82f6; color: #fff; font-size: 16px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(59,130,246,0.9);">🏭</div>`, 
+          iconSize: [36, 36], iconAnchor: [18, 18] 
         });
-        L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 PONTO DE PARTIDA</strong>`).addTo(this.grupoMarcadores);
+        L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 CD / PONTO DE PARTIDA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 2. Entregas
-      const ordenadas = this.entregasOrdenadasParaSacola;
+      // 2. PINOS DAS ENTREGAS
+      const ordenadas = [...this.entregas].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
       ordenadas.forEach(p => {
         if (!p.latitude || !p.longitude) return;
         const coord = [p.latitude, p.longitude];
         pontosWaypoints.push(coord);
 
-        let corFundo = '#10b981';
-        if (p.status === 'entregue') corFundo = '#ef4444';
-        if (p.status === 'ausente') corFundo = '#f59e0b';
+        let corFundo = '#10b981'; // Verde (Pendente)
+        if (p.status === 'entregue') corFundo = '#ef4444'; // Vermelho (Entregue)
+        if (p.status === 'ausente') corFundo = '#f59e0b'; // Amarelo (Ausente)
 
         const iconePacote = L.divIcon({
           className: 'custom-pin-pacote',
@@ -346,26 +369,24 @@ function entregaApp() {
         L.marker(coord, { icon: iconePacote }).bindPopup(popupContent).addTo(this.grupoMarcadores);
       });
 
-      // 3. Chegada
+      // 3. PINO CASA (CHEGADA)
       if (this.coordChegadaSalva && this.coordChegadaSalva.latitude) {
         const posCasa = [this.coordChegadaSalva.latitude, this.coordChegadaSalva.longitude];
         pontosWaypoints.push(posCasa);
         const iconeCasa = L.divIcon({ 
           className: 'custom-pin-casa', 
-          html: `<div style="background-color: #3b82f6; color: #fff; font-size: 15px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(59,130,246,0.8);">🏠</div>`, 
-          iconSize: [34, 34], iconAnchor: [17, 17] 
+          html: `<div style="background-color: #3b82f6; color: #fff; font-size: 16px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(59,130,246,0.9);">🏠</div>`, 
+          iconSize: [36, 36], iconAnchor: [18, 18] 
         });
-        L.marker(posCasa, { icon: iconeCasa }).bindPopup(`<strong>🏠 PONTO DE CHEGADA</strong>`).addTo(this.grupoMarcadores);
+        L.marker(posCasa, { icon: iconeCasa }).bindPopup(`<strong>🏠 RETORNO / PONTO DE CHEGADA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 4. DESENHO DA ROTA PELAS RUAS (Sem passar por cima das casas)
+      // 4. TRAÇADO CONTORNANDO AS RUAS
       if (this.rotaGeometria && this.rotaGeometria.length > 10) {
         const latlngs = this.decodePolyline(this.rotaGeometria);
         this.linhaTrajeto = L.polyline(latlngs, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
       } else if (pontosWaypoints.length >= 2) {
-        // Se não tiver geometria salva no banco, consulta o OSRM na hora pelas coordenadas reais das ruas!
         try {
-          // Limita waypoints para não exceder URL se for muito grande
           const coordsStr = pontosWaypoints.slice(0, 70).map(pt => `${pt[1]},${pt[0]}`).join(';');
           const urlOSRM = `${this.OSRM_ROUTER_URL}/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`;
           const res = await fetch(urlOSRM);
@@ -375,7 +396,6 @@ function entregaApp() {
             this.linhaTrajeto = L.polyline(coordsOSRM, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
           }
         } catch(e) {
-          // Fallback apenas em caso de falha de conexão
           this.linhaTrajeto = L.polyline(pontosWaypoints, { color: '#38bdf8', weight: 4, opacity: 0.85, dashArray: '6, 8' }).addTo(this.mapaLeaflet);
         }
       }
@@ -824,7 +844,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // ROTAS, HISTÓRICO E PLANILHAS
+    // ROTAS, HISTÓRICO E REABERTURA DE ENTREGAS
     // =========================================================================
     async carregarUltimaRota() {
       try {
@@ -851,7 +871,17 @@ function entregaApp() {
 
         if (data.data && data.data.length > 0) {
           this.entregas = data.data;
-          this.rotaGeometria = dataR?.data?.geometria || null;
+
+          if (dataR?.data) {
+            this.rotaGeometria = dataR.data.geometria || null;
+            if (dataR.data.cd_lat && dataR.data.cd_lng) {
+              this.coordPartidaSalva = { latitude: parseFloat(dataR.data.cd_lat), longitude: parseFloat(dataR.data.cd_lng) };
+            }
+            if (dataR.data.casa_lat && dataR.data.casa_lng) {
+              this.coordChegadaSalva = { latitude: parseFloat(dataR.data.casa_lat), longitude: parseFloat(dataR.data.casa_lng) };
+            }
+          }
+
           this.salvarCacheLocal();
           if (this.modo === 'mapa') {
             this.$nextTick(() => this.desenharPinosERotaNoMapa());
@@ -865,8 +895,8 @@ function entregaApp() {
       try {
         const headers = {};
         if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-        const res = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
-        const data = await res.json();
+        const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
+        const data = await resClock = await resRota.json();
         this.rotasHistorico = data.data || [];
       } catch (e) {}
     },
@@ -890,9 +920,13 @@ function entregaApp() {
             this.rotaAtivaId = null;
             this.entregas = [];
             this.rotaGeometria = null;
+            this.coordPartidaSalva = null;
+            this.coordChegadaSalva = null;
             localStorage.removeItem('drivexps_rota_ativa_id');
             localStorage.removeItem('drivexps_entregas_cache');
             localStorage.removeItem('drivexps_rota_geometria');
+            localStorage.removeItem('drivexps_coord_partida');
+            localStorage.removeItem('drivexps_coord_chegada');
             await this.carregarUltimaRota();
           }
           alert(`Rota #${rotaId} apagada!`);
@@ -919,6 +953,16 @@ function entregaApp() {
       this.entregaSelecionadaId = null;
       await this.atualizarStatus(entrega.id, 'entregue');
       if ('vibrate' in navigator) navigator.vibrate(40);
+    },
+
+    /**
+     * Reabre uma entrega marcada acidentalmente como entregue (Volta para Pendente)
+     */
+    async reabrirEntrega(entrega) {
+      if (!entrega) return;
+      await this.atualizarStatus(entrega.id, 'pendente');
+      this.entregaSelecionadaId = entrega.id;
+      if ('vibrate' in navigator) navigator.vibrate([50, 50]);
     },
 
     async atualizarStatus(id, novoStatus) {
@@ -1337,8 +1381,11 @@ function entregaApp() {
       localStorage.removeItem('drivexps_rota_ativa_id');
       localStorage.removeItem('drivexps_entregas_cache');
       localStorage.removeItem('drivexps_rota_geometria');
+      localStorage.removeItem('drivexps_coord_partida');
+      localStorage.removeItem('drivexps_coord_chegada');
       this.tokenAcesso = null; this.usuarioId = null; this.usuarioLogado = false;
       this.entregas = []; this.rotaAtivaId = null; this.rotaGeometria = null;
+      this.coordPartidaSalva = null; this.coordChegadaSalva = null;
       try {
         await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mode: 'session' })
