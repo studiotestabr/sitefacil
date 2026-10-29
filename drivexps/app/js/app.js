@@ -1,6 +1,6 @@
 /* ==========================================================================
    DriveXPS Pro 4.1 - Núcleo Completo e Reativo da Aplicação
-   Arquivo: /js/app.js
+   Arquivo: /js/app.js (Corrigido)
    ========================================================================== */
 
 function entregaApp() {
@@ -118,12 +118,12 @@ function entregaApp() {
         const aEntregue = a.status === 'entregue' ? 1 : 0;
         const bEntregue = b.status === 'entregue' ? 1 : 0;
 
-        // Pedidos entregues vão automaticamente para o final da fila
+        // Entregues vão para o final
         if (aEntregue !== bEntregue) {
           return aEntregue - bEntregue;
         }
 
-        // Mantém a ordem numérica do Canetão em cada grupo
+        // Mantém ordem sequencial do Canetão
         return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
       });
     },
@@ -896,7 +896,7 @@ function entregaApp() {
         const headers = {};
         if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
         const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
-        const data = await resClock = await resRota.json();
+        const data = await resRota.json();
         this.rotasHistorico = data.data || [];
       } catch (e) {}
     },
