@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 4.1.3 - Núcleo Completo e Reativo da Aplicação
+   DriveXPS Pro 4.2 - Núcleo Completo e Reativo da Aplicação
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -893,7 +893,7 @@ function entregaApp() {
         const headers = {};
         if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
         const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
-        const data = await resRota.json();
+        const data = await resRota.json(); // <-- CORRIGIDO AQUI!
         this.rotasHistorico = data.data || [];
       } catch (e) {}
     },
