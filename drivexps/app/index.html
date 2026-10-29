@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=4.2.0">
+  <link rel="stylesheet" href="./css/styles.css?v=4.3.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -31,8 +31,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- Script Principal Unificado com Cache-Busting -->
-  <script src="./js/app.js?v=4.2.0"></script>
+  <!-- Script Principal Unificado -->
+  <script src="./js/app.js?v=4.3.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -93,7 +93,7 @@
     }, 1500);
   </script>
 
-  <!-- 2. TELA DE BLOQUEIO NO CELULAR -->
+  <!-- 2. TELA DE BLOQUEIO NO NAVEGADOR DO CELULAR -->
   <div x-show="isMobile && !isStandalone" class="fixed inset-0 bg-gray-950 z-[95] flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
     <div class="w-full"></div>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
@@ -321,7 +321,7 @@
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">Rota</span>
+            <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
           <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
@@ -398,11 +398,9 @@
                   <span class="font-mono font-black text-xs sm:text-sm text-orange-400 bg-black/90 px-2.5 py-1 rounded-xl border border-gray-800 tracking-wider shadow-inner" x-text="item.codigo_rastreio || 'SPX-REGISTRADO'"></span>
                 </div>
 
-                <!-- BOTÃO REABRIR COM 1 TOQUE -->
                 <button x-show="item.status === 'entregue'" 
                         @click.stop="reabrirEntrega(item)" 
-                        class="bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md"
-                        title="Desfazer baixa e marcar como pendente novamente">
+                        class="bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md">
                   <span>↩️</span> Reabrir
                 </button>
               </div>
@@ -513,7 +511,7 @@
         </template>
       </main>
 
-      <!-- MODO 4: MAPA GERAL LEAFLET (ALTURA CORRIGIDA PARA NÃO CORTAR EMBAIXO) -->
+      <!-- MODO 4: MAPA GERAL LEAFLET -->
       <main x-show="modo === 'mapa'" class="p-2 sm:p-3 max-w-5xl mx-auto w-full flex-1 flex flex-col h-[calc(100dvh-175px)] space-y-2">
         <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs shrink-0">
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
@@ -531,10 +529,16 @@
         </div>
       </main>
 
-      <!-- MODO 5: HISTÓRICO -->
+      <!-- MODO 5: HISTÓRICO DE ROTAS -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full">
-        <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
+          <button @click="abrirHistorico()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-3 py-1.5 rounded-xl border border-gray-700 active:scale-95 transition">🔄 Atualizar</button>
+        </div>
         <div class="space-y-3">
+          <template x-if="rotasHistorico.length === 0">
+            <div class="text-center py-12 text-gray-500 text-xs">Carregando histórico ou nenhuma rota gravada...</div>
+          </template>
           <template x-for="r in rotasHistorico" :key="r.id">
             <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 space-y-3 shadow-md">
               <div class="flex justify-between items-center">
@@ -632,19 +636,62 @@
     </main>
   </div>
 
-  <!-- MODAL IMPORTAÇÃO RESUMO -->
+  <!-- MODAL DE RESUMO DE IMPORTAÇÃO (COMPLETO) -->
   <div x-show="modalResumoImportacao" class="fixed inset-0 bg-black/90 z-[150] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6">
-      <div class="p-6 space-y-5 text-left">
-        <h2 class="text-2xl font-black text-white text-center">Planilha Importada</h2>
-        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-          <span class="text-base font-bold text-gray-300">Total de Pacotes</span>
-          <span class="text-3xl font-black text-white" x-text="pacotesExtraidos.length"></span>
+    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm text-center shadow-2xl overflow-hidden pb-6 transform transition-all">
+      <div class="pt-6 pb-2 flex justify-center">
+        <div class="w-20 h-20 bg-orange-500/20 text-orange-400 rounded-full flex items-center justify-center shadow-lg border border-orange-500/40">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-base shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
-          <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
-          <span x-show="carregandoProcesso">⏳ Otimizando vias...</span>
-        </button>
+      </div>
+      <div class="p-6 space-y-6 text-left">
+        <div class="text-center space-y-1.5">
+          <h2 class="text-3xl font-black text-white tracking-tight">Planilha Importada</h2>
+          <p class="text-base text-gray-400 font-medium">Pronta para otimização.</p>
+        </div>
+        <div class="bg-orange-500/10 p-4 rounded-2xl border border-orange-500/30 flex items-start gap-3">
+          <span class="text-orange-400 text-xl mt-0.5">ℹ️</span>
+          <p class="text-sm text-orange-200 leading-relaxed font-bold">O sistema irá organizar as ruas e corrigir mãos de direção automaticamente.</p>
+        </div>
+        
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs">
+          <div class="flex items-center justify-between border-b border-gray-800/80 pb-1.5">
+            <span class="text-orange-400 font-bold uppercase text-[10px]">📍 Partida Real:</span>
+            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoPartidaTexto || 'CD / Coordenada Atual'"></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-emerald-400 font-bold uppercase text-[10px]">🏠 Chegada Real:</span>
+            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoChegadaTexto || 'Residência / Ponto Final'"></span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between border-b border-gray-800 pb-5">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">📦</span>
+            <span class="text-lg font-black text-gray-200">Total de Pacotes</span>
+          </div>
+          <span class="text-4xl font-black text-white" x-text="pacotesExtraidos.length"></span>
+        </div>
+        <div class="space-y-4 text-sm sm:text-base font-bold pl-2">
+          <div class="flex items-center gap-3 text-gray-300">
+            <span class="text-emerald-400 text-lg">✔</span> <span x-text="`${Math.ceil(pacotesExtraidos.length / 10)} Sacolas para organizar`"></span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-300">
+            <span class="text-emerald-400 text-lg">✔</span> <span x-text="`${new Set(pacotesExtraidos.map(p=>p.parada_shopee)).size} Paradas Únicas`"></span>
+          </div>
+          <div class="flex items-center gap-3 text-red-400 bg-red-500/10 p-2 rounded-xl border border-red-500/20" x-show="pacotesExtraidos.filter(p=>p.gps_suspeito).length > 0">
+            <span class="text-lg">❓</span> <span x-text="`${pacotesExtraidos.filter(p=>p.gps_suspeito).length} GPS Suspeitos (Marginais/S-N)`"></span>
+          </div>
+        </div>
+        <div class="pt-2 space-y-3">
+          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+            <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
+            <span x-show="carregandoProcesso">⏳ Calculando vias...</span>
+          </button>
+          <button @click="modalResumoImportacao = false; pacotesExtraidos = [];" class="w-full text-sm text-gray-500 hover:text-white font-bold py-3 transition">
+            Cancelar Importação
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -673,7 +720,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div>
           <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"+ Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
         </div>
       </template>
 
@@ -762,18 +809,40 @@
     </div>
   </div>
 
-  <!-- MODAL IMPORTAR ARQUIVO -->
+  <!-- 11. MODAL COMPLETO DE IMPORTAR PLANILHA (COM PARTIDA, CHEGADA E GPS) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl">
+    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <h2 class="font-black text-lg text-orange-500">IMPORTAR ROMANEIO</h2>
         <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
       </div>
-      <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 transition">
-        <span class="text-3xl block mb-1.5">📊</span>
-        <span class="text-sm font-black block text-white">Escolher arquivo .XLSX</span>
-        <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
-      </label>
+
+      <!-- SEÇÃO PONTO DE PARTIDA E CHEGADA COM GPS -->
+      <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs">
+        <div class="flex justify-between items-center">
+          <span class="font-black text-orange-400 uppercase tracking-wider text-[11px]">📍 Ponto de Partida e Chegada</span>
+          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-gray-700 active:scale-95 transition">📍 Usar Meu GPS Atual</button>
+        </div>
+        <div class="space-y-2">
+          <div>
+            <label class="text-[10px] text-gray-400 font-bold block mb-1">Partida (Onde você pega a carga / CD ou sua rua):</label>
+            <input type="text" x-model="inputPartidaModal" placeholder="Ex: Av. Principal, 100 ou Nome do CD" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+          </div>
+          <div>
+            <label class="text-[10px] text-gray-400 font-bold block mb-1">Chegada (Onde a rota termina / Sua casa):</label>
+            <input type="text" x-model="inputChegadaModal" placeholder="Ex: Rua das Flores, 500 ou sua residência" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- ESCOLHER ARQUIVO .XLSX -->
+      <div class="space-y-3">
+        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
+          <span class="text-3xl block mb-1.5">📊</span>
+          <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
+          <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
+        </label>
+      </div>
     </div>
   </div>
 
