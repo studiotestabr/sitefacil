@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 4.2 - Núcleo da Aplicação
+   DriveXPS Pro 4.3 - Núcleo da Aplicação (Suporte a Adicionais +1, +2 Shopee)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -99,7 +99,7 @@ function entregaApp() {
     statusAssinatura: 'trial',
     assinaturaValida: true,
 
-    // 7. TUTORIAL OFICIAL COMPLETO (8 PASSOS)
+    // 7. TUTORIAL
     tutorialAberto: false,
     passoTutorial: 1,
 
@@ -113,12 +113,6 @@ function entregaApp() {
     // =========================================================================
     // GETTERS REATIVOS
     // =========================================================================
-    
-    /**
-     * Ordenação inteligente das Sacolas:
-     * - Não entregues (Pendentes e Ausentes) no início, por ordem de entrega
-     * - Entregues vão para o FINAL da fila, mantendo a sequência do Canetão
-     */
     get entregasOrdenadasParaSacola() {
       if (!this.entregas || this.entregas.length === 0) return [];
       return [...this.entregas].sort((a, b) => {
@@ -180,18 +174,35 @@ function entregaApp() {
     get entregasFiltradas() {
       if (!this.termoBusca || this.termoBusca.trim() === '') return [];
       const t = this.termoBusca.toLowerCase().trim();
-      return this.entregas.filter(e => 
-        (e.endereco && e.endereco.toLowerCase().includes(t)) ||
-        (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t)) ||
-        (e.bairro && e.bairro.toLowerCase().includes(t)) ||
-        (e.ordem_entrega && String(e.ordem_entrega) === t) ||
-        (e.parada_shopee && String(e.parada_shopee) === t)
-      );
+      return this.entregas.filter(e => {
+        const paradaStr = String(this.formatarParada(e.parada_shopee)).toLowerCase();
+        const ordemStr = String(this.formatarParada(e.ordem_shopee)).toLowerCase();
+        return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
+          (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t)) ||
+          (e.bairro && e.bairro.toLowerCase().includes(t)) ||
+          (e.ordem_entrega && String(e.ordem_entrega) === t) ||
+          paradaStr === t ||
+          ordemStr === t ||
+          (e.parada_shopee && String(e.parada_shopee) === t) ||
+          (e.ordem_shopee && String(e.ordem_shopee) === t);
+      });
     },
 
+    /**
+     * FORMATAÇÃO EXATA DA ETIQUETA SHOPEE (+1, +2, +3...):
+     * Converte números negativos armazenados (-1, -2) em "+1", "+2"
+     */
     formatarParada(val) {
-      if (val === null || val === undefined || val === '' || Number(val) < 0) return '-';
-      return val;
+      if (val === null || val === undefined || val === '') return '-';
+      const num = Number(val);
+      if (!isNaN(num)) {
+        if (num < 0) return `+${Math.abs(num)}`;
+        if (num === 0) return '-';
+        return num;
+      }
+      const str = String(val).trim();
+      if (str === '-' || str === '- -') return '-';
+      return str;
     },
 
     getFaixaPacotes(ordem) {
@@ -317,7 +328,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET (COM PINOS CD / CASA GARANTIDOS)
+    // MAPA GERAL LEAFLET
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -363,12 +374,11 @@ function entregaApp() {
       const pontosWaypoints = [];
       let latlngsOficiais = [];
 
-      // Decodifica geometria se já existir
       if (this.rotaGeometria && this.rotaGeometria.length > 10) {
         latlngsOficiais = this.decodePolyline(this.rotaGeometria);
       }
 
-      // 1. PIN DO CD / PARTIDA (Garante que apareça na ponta da linha azul)
+      // 1. PIN DO CD / PARTIDA
       let posCD = null;
       if (this.coordPartidaSalva && this.coordPartidaSalva.latitude) {
         posCD = [this.coordPartidaSalva.latitude, this.coordPartidaSalva.longitude];
@@ -417,7 +427,7 @@ function entregaApp() {
         L.marker(coord, { icon: iconePacote }).bindPopup(popupContent).addTo(this.grupoMarcadores);
       });
 
-      // 3. PIN DA CHEGADA / RESIDÊNCIA
+      // 3. PIN DA CHEGADA
       let posCasa = null;
       if (this.coordChegadaSalva && this.coordChegadaSalva.latitude) {
         posCasa = [this.coordChegadaSalva.latitude, this.coordChegadaSalva.longitude];
@@ -924,7 +934,6 @@ function entregaApp() {
           this.entregas = data.data;
           this.rotaGeometria = dataR?.data?.geometria || null;
 
-          // Se a rota no banco tiver as coordenadas de CD e Casa registradas, restaura
           if (dataR?.data?.cd_lat && dataR?.data?.cd_lng) {
             this.coordPartidaSalva = { latitude: dataR.data.cd_lat, longitude: dataR.data.cd_lng };
           }
@@ -946,8 +955,8 @@ function entregaApp() {
         const headers = {};
         if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
         const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
-        const data = await res.json();
-        this.rotasHistorico = data.data || [];
+        const dataRota = await resRota.json();
+        this.rotasHistorico = dataRota.data || [];
       } catch (e) {}
     },
 
@@ -980,6 +989,10 @@ function entregaApp() {
       } catch(e) {}
     },
 
+    /**
+     * LEITOR INTELIGENTE DE PLANILHAS SHOPEE EXPRESS:
+     * Identifica pacotes avulsos e adicionais com "-" e sequencia como -1, -2, -3...
+     */
     parseLinhasShopee(linhasMatriz) {
       this.msgErro = null;
       if (!linhasMatriz || linhasMatriz.length < 2) return [];
@@ -1023,9 +1036,20 @@ function entregaApp() {
         const rawSeq = iSequence !== -1 ? String(cols[iSequence] || '').trim() : '';
         const rawStop = iStop !== -1 ? String(cols[iStop] || '').trim() : '';
         
-        let seqVal = (rawSeq === '-' || rawStop === '-') ? -contadorExtra : (parseInt(rawSeq) || null);
-        let stpVal = (rawSeq === '-' || rawStop === '-') ? -contadorExtra : (parseInt(rawStop) || null);
-        if (rawSeq === '-' || rawStop === '-') contadorExtra++;
+        // Se for "-" ou vazio, é pacote adicional (+1, +2, +3...)
+        const ehExtra = !rawSeq || rawSeq === '-' || rawSeq === '- -' || !rawStop || rawStop === '-' || isNaN(parseInt(rawSeq));
+
+        let seqVal = null;
+        let stpVal = null;
+
+        if (ehExtra) {
+          seqVal = -contadorExtra;
+          stpVal = -contadorExtra;
+          contadorExtra++;
+        } else {
+          seqVal = parseInt(rawSeq) || null;
+          stpVal = parseInt(rawStop) || null;
+        }
 
         const rawTN = (iTN !== -1 && cols[iTN]) ? String(cols[iTN]).trim() : '';
         const rastreioFinal = (rawTN && rawTN !== '-') ? rawTN : `BR${Math.floor(100000000000 + Math.random() * 900000000000)}S`;
@@ -1038,7 +1062,7 @@ function entregaApp() {
           ordem_shopee: seqVal,
           parada_shopee: stpVal,
           codigo_rastreio: rastreioFinal,
-          destinatario: stpVal ? `Parada #${stpVal}` : 'Destinatário',
+          destinatario: ehExtra ? `Parada +${contadorExtra - 1}` : (stpVal ? `Parada #${stpVal}` : 'Destinatário'),
           telefone: '',
           endereco: addr,
           numero: numero,
