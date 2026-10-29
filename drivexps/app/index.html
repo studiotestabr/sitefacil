@@ -1083,7 +1083,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO E ÍNTEGRO -->
+  <!-- SCRIPT COMPLETO E ÍNTEGRO (DECLARAÇÕES ÚNICAS E REFRESH ATIVO) -->
   <script>
     function entregaApp() {
       return {
@@ -1107,7 +1107,7 @@
         passoAtualIndex: 0,
         headingAtual: 0,
         minSpeedKmhNav: 4.0,
-        bearingSmoothFactor: 0.65, // Giro rápido e responsivo
+        bearingSmoothFactor: 0.65,
         ultimaLatCarro: null,
         ultimaLngCarro: null,
         mapaArrastadoPeloUsuario: false,
@@ -1116,7 +1116,6 @@
         chegadaAnunciada: false,
         coordenadasRotaAtual: [],
         
-        // TRAVAS ANTI-RECALCULO EM LOOP
         recalculandoRota: false,
         contadorForaDaRota: 0,
         ultimoRecalculoTimestamp: 0,
@@ -1207,10 +1206,10 @@
               const latLngStr = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
               this.inputPartidaModal = latLngStr;
               this.inputChegadaModal = latLngStr;
-              alert('📍 Sua localização atual foi gravada no Ponto de Partida e Chegada!');
+              alert('📍 Localização atual gravada na Partida e Chegada!');
             }, err => alert('Erro no GPS: ' + err.message));
           } else {
-            alert('Geolocalização não suportada pelo seu navegador.');
+            alert('Geolocalização não suportada pelo navegador.');
           }
         },
 
@@ -1341,7 +1340,7 @@
 
         async iniciarNavegacaoNativa(entrega) {
             if (!navigator.geolocation) {
-                alert('GPS não suportado no seu aparelho.'); return;
+                alert('GPS não suportado no aparelho.'); return;
             }
             this.entregaNavegacao = entrega;
             this.modo = 'navegacao';
@@ -1859,7 +1858,7 @@
         },
 
         // =========================================================================
-        // FUNÇÕES RESTAURADAS DE CONTROLE DE PERFIL, CADASTRO E NAVEGAÇÃO
+        // CONTROLES DE PERFIL E CADASTRO
         // =========================================================================
         async salvarDadosCompletosPerfil() {
           if (!this.usuarioId) return;
@@ -1939,7 +1938,7 @@
         },
 
         // =========================================================================
-        // AUTENTICAÇÃO COM INTERCEPTAÇÃO DE TOKEN NA URL (CORRIGIDA)
+        // AUTENTICAÇÃO COM REFRESH ATIVO CONTRA O LOOP DE LOGIN
         // =========================================================================
         async verificarAutenticacao() {
           if (localStorage.getItem('usuario_deslogado') === 'true') {
@@ -1948,6 +1947,7 @@
             return;
           }
 
+          // 1. CAPTURA TOKEN CASO RETORNADO POR URL
           const searchParams = new URLSearchParams(window.location.search);
           const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
           const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
@@ -1974,6 +1974,25 @@
             this.usuarioLogado = true;
           };
 
+          // 2. SE NÃO TIVER TOKEN, CHAMA O REFRESH OFICIAL DO DIRECTUS PARA RESGATAR A SESSÃO DO COOKIE
+          if (!this.tokenAcesso && !localStorage.getItem('directus_token')) {
+            try {
+              const resRefresh = await fetch(`${this.DIRECTUS_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+              });
+              if (resRefresh.ok) {
+                const dataRefresh = await resRefresh.json();
+                if (dataRefresh && dataRefresh.data && dataRefresh.data.access_token) {
+                  this.tokenAcesso = dataRefresh.data.access_token;
+                  localStorage.setItem('directus_token', this.tokenAcesso);
+                }
+              }
+            } catch(e) {}
+          }
+
+          // 3. CONSULTA O USUÁRIO PELO TOKEN
           const tokenAtivo = this.tokenAcesso || localStorage.getItem('directus_token');
           if (tokenAtivo) {
             try {
@@ -1990,6 +2009,7 @@
             } catch(e) {}
           }
 
+          // 4. FALLBACK FINAL POR COOKIE DE SESSÃO
           try {
             const resSession = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
             if (resSession.ok) {
@@ -2489,57 +2509,6 @@
               method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ status: novoStatus })
             });
           } catch(e) {}
-        },
-
-        async init() {
-          try {
-            if (this.tema === 'claro') {
-              document.body.classList.add('theme-claro');
-            } else {
-              document.body.classList.add('theme-escuro');
-            }
-
-            this.modalCadastroObrigatorio = false;
-            this.restaurarCacheLocal();
-            await this.verificarAutenticacao();
-            this.checarInstalacaoPWA();
-
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.addEventListener('message', async (event) => {
-                if (event.data && event.data.tipo === 'NOVO_ROMANEIO_COMPARTILHADO') {
-                  await this.processarRomaneioDoCache();
-                }
-              });
-            }
-
-            if (this.usuarioLogado) {
-              await this.sincronizarAssinaturaSaaS();
-              
-              if (!this.rotaAtivaId || this.entregas.length === 0) {
-                await this.carregarUltimaRota();
-              }
-
-              if (!localStorage.getItem('drivexps_tutorial_visto')) {
-                setTimeout(() => this.iniciarTutorial(), 600);
-              }
-
-              await this.processarRomaneioDoCache();
-
-              if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
-                launchQueue.setConsumer(async (launchParams) => {
-                  if (!launchParams.files.length) return;
-                  const fileHandle = launchParams.files[0];
-                  const file = await fileHandle.getFile();
-                  this.abrirModalImportar();
-                  this.processarArquivoDirecto(file);
-                });
-              }
-            } else {
-              this.modalCadastroObrigatorio = false;
-            }
-          } catch(e) {
-            console.error('Erro na inicialização:', e);
-          }
         },
 
         async enviarParaN8N() {
