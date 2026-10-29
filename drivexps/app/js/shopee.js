@@ -134,6 +134,9 @@ function shopeeModule() {
       if (this.entregas && this.entregas.length > 0) {
         localStorage.setItem('drivexps_entregas_cache', JSON.stringify(this.entregas));
       }
+      if (this.rotaGeometria) {
+        localStorage.setItem('drivexps_rota_geometria', this.rotaGeometria);
+      }
     },
 
     /**

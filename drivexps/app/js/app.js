@@ -3,23 +3,28 @@
    Arquivo: /js/app.js
    ========================================================================== */
 
-function entregaApp() {
-  return {
-    // 1. COMPOSIÇÃO DOS SUBMÓDULOS
-    ...authModule(),
-    ...saasModule(),
-    ...shopeeModule(),
-    ...mapaGeralModule(),
-    ...wazeNavModule(),
+/**
+ * Utilitário para unir submódulos preservando Getters e Setters reativos
+ */
+function mergeModules(target, ...sources) {
+  for (const source of sources) {
+    if (!source) continue;
+    const descriptors = Object.getOwnPropertyDescriptors(source);
+    Object.defineProperties(target, descriptors);
+  }
+  return target;
+}
 
-    // 2. CONFIGURAÇÕES E ENDPOINTS DE PRODUÇÃO
+function entregaApp() {
+  const baseApp = {
+    // 1. CONFIGURAÇÕES E ENDPOINTS DE PRODUÇÃO
     DIRECTUS_URL: 'https://banco.studiotesta.com.br',
     N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
     OSRM_ROUTER_URL: 'https://rotas.studiotesta.com.br',
 
-    // 3. ESTADOS GERAIS DA INTERFACE
+    // 2. ESTADOS GERAIS DA INTERFACE
     tema: localStorage.getItem('drivexps_tema') || 'escuro',
-    modo: 'rua', // 'carregamento' (Sacolas), 'rua' (Cockpit), 'mapa' (Leaflet), 'historico', 'navegacao' (Waze 3D)
+    modo: 'carregamento', // Inicia focado em conferência de sacolas
     
     menuAberto: false,
     buscaAberta: false,
@@ -42,13 +47,10 @@ function entregaApp() {
      * Ciclo de Vida: Inicialização do Alpine.js
      */
     async init() {
-      // Aplica classe de tema ao carregar
       this.aplicarTemaVisual();
-
-      // Checa ambiente PWA
       this.checarInstalacaoPWA();
 
-      // Restaura dados do cache local offline para carregamento instantâneo
+      // 1. Restaura entregas e traçado de ruas do cache local imediato
       const cacheEntregas = localStorage.getItem('drivexps_entregas_cache');
       if (cacheEntregas) {
         try {
@@ -56,28 +58,32 @@ function entregaApp() {
         } catch (e) {}
       }
 
-      // Autenticação e sincronização SaaS
+      const cacheGeo = localStorage.getItem('drivexps_rota_geometria');
+      if (cacheGeo) {
+        this.rotaGeometria = cacheGeo;
+      }
+
+      // 2. Autenticação e sincronização com o banco
       await this.verificarAutenticacao();
+
       if (this.usuarioLogado) {
         await this.sincronizarAssinaturaSaaS();
         
-        if (!this.entregas || this.entregas.length === 0) {
+        // Sempre busca os dados e o traçado oficial das ruas da rota ativa no servidor
+        if (this.rotaAtivaId) {
+          await this.carregarEntregasPorId(this.rotaAtivaId);
+        } else {
           await this.carregarUltimaRota();
         }
       }
 
-      // Intercepta arquivos compartilhados via Service Worker (PWA Share Target)
       this.escutarArquivosCompartilhados();
 
-      // Exibe tutorial na 1ª visita caso nunca tenha visto
       if (!localStorage.getItem('drivexps_tutorial_visto') && this.usuarioLogado) {
         this.iniciarTutorial();
       }
     },
 
-    /**
-     * Alternância de Temas (Alto contraste para Sol vs Noturno)
-     */
     alternarTema(novoTema) {
       this.tema = novoTema;
       localStorage.setItem('drivexps_tema', novoTema);
@@ -94,9 +100,6 @@ function entregaApp() {
       }
     },
 
-    /**
-     * Captura GPS para definir partida/chegada rápida
-     */
     capturarGPSModal() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
@@ -118,9 +121,6 @@ function entregaApp() {
       this.modalImportar = true;
     },
 
-    /**
-     * Abertura e foco da busca global
-     */
     abrirBusca() {
       this.buscaAberta = true;
       this.termoBusca = '';
@@ -134,9 +134,6 @@ function entregaApp() {
       this.modo = 'rua';
     },
 
-    /**
-     * Tutorial Interativo
-     */
     iniciarTutorial() { 
       this.passoTutorial = 1; 
       this.tutorialAberto = true; 
@@ -153,9 +150,6 @@ function entregaApp() {
       localStorage.setItem('drivexps_tutorial_visto', 'true'); 
     },
 
-    /**
-     * Tratamento de PWA e Instalação no Celular
-     */
     checarInstalacaoPWA() {
       this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
       const userAgent = window.navigator.userAgent.toLowerCase(); 
@@ -184,7 +178,7 @@ function entregaApp() {
     async instalarPWA() {
       const prompt = window.pwaDeferredPrompt;
       if (!prompt) { 
-        alert('Para instalar: abra o menu do navegador (3 pontinhos ou compartilhar) e toque em "Adicionar à tela inicial" ou "Instalar Aplicativo".'); 
+        alert('Para instalar: abra o menu do navegador e toque em "Adicionar à tela inicial" ou "Instalar Aplicativo".'); 
         return; 
       }
       prompt.prompt(); 
@@ -193,9 +187,6 @@ function entregaApp() {
       this.mostrarPopupInstalar = false;
     },
 
-    /**
-     * Monitoramento de romaneios compartilhados pelo sistema operacional
-     */
     escutarArquivosCompartilhados() {
       if (window.location.search.includes('arquivo_compartilhado=true')) {
         this.carregarArquivoCompartilhadoCache();
@@ -226,4 +217,14 @@ function entregaApp() {
       }
     }
   };
+
+  // Une todos os submódulos mantendo Getters reativos
+  return mergeModules(
+    baseApp,
+    authModule(),
+    saasModule(),
+    shopeeModule(),
+    mapaGeralModule(),
+    wazeNavModule()
+  );
 }
