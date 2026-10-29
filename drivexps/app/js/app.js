@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 4.2 - Núcleo Completo e Reativo da Aplicação
+   DriveXPS Pro 4.1 - Núcleo Completo e Reativo da Aplicação
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -118,10 +118,12 @@ function entregaApp() {
         const aEntregue = a.status === 'entregue' ? 1 : 0;
         const bEntregue = b.status === 'entregue' ? 1 : 0;
 
+        // Pedidos entregues vão automaticamente para o final da fila
         if (aEntregue !== bEntregue) {
           return aEntregue - bEntregue;
         }
 
+        // Mantém a ordem numérica do Canetão em cada grupo
         return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
       });
     },
@@ -219,6 +221,7 @@ function entregaApp() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
 
+      // Restaura caches locais
       const cacheEntregas = localStorage.getItem('drivexps_entregas_cache');
       if (cacheEntregas) {
         try { this.entregas = JSON.parse(cacheEntregas); } catch(e) {}
@@ -278,7 +281,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET
+    // MAPA GERAL LEAFLET (PINOS CD/CASA E CURVAS REAIS)
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -342,9 +345,9 @@ function entregaApp() {
         const coord = [p.latitude, p.longitude];
         pontosWaypoints.push(coord);
 
-        let corFundo = '#10b981';
-        if (p.status === 'entregue') corFundo = '#ef4444';
-        if (p.status === 'ausente') corFundo = '#f59e0b';
+        let corFundo = '#10b981'; // Verde (Pendente)
+        if (p.status === 'entregue') corFundo = '#ef4444'; // Vermelho (Entregue)
+        if (p.status === 'ausente') corFundo = '#f59e0b'; // Amarelo (Ausente)
 
         const iconePacote = L.divIcon({
           className: 'custom-pin-pacote',
@@ -893,7 +896,7 @@ function entregaApp() {
         const headers = {};
         if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
         const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
-        const data = await resRota.json(); // <-- CORRIGIDO AQUI!
+        const data = await resClock = await resRota.json();
         this.rotasHistorico = data.data || [];
       } catch (e) {}
     },
@@ -952,6 +955,9 @@ function entregaApp() {
       if ('vibrate' in navigator) navigator.vibrate(40);
     },
 
+    /**
+     * Reabre uma entrega marcada acidentalmente como entregue (Volta para Pendente)
+     */
     async reabrirEntrega(entrega) {
       if (!entrega) return;
       await this.atualizarStatus(entrega.id, 'pendente');
