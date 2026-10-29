@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 4.3 - Núcleo da Aplicação (Suporte a Adicionais +1, +2 Shopee)
+   DriveXPS Pro 4.3 - Núcleo da Aplicação (Com Auto-Refresh & Importação Completa)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -111,6 +111,64 @@ function entregaApp() {
     isMobile: false,
 
     // =========================================================================
+    // COMUNICAÇÃO ROBUSTA COM O DIRECTUS (AUTO-REFRESH DE TOKEN 401)
+    // =========================================================================
+    async fetchDirectus(path, options = {}) {
+      const url = path.startsWith('http') ? path : `${this.DIRECTUS_URL}${path}`;
+      const headers = options.headers || {};
+      headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+
+      const token = this.tokenAcesso || localStorage.getItem('directus_token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const fetchOpts = {
+        ...options,
+        headers,
+        credentials: 'include'
+      };
+
+      let res = await fetch(url, fetchOpts);
+
+      // Se o token expirou (401), renova automaticamente e refaz a requisição
+      if (res.status === 401) {
+        const renovou = await this.tentarRenovarTokenDirectus();
+        if (renovou) {
+          headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+          res = await fetch(url, { ...fetchOpts, headers });
+        }
+      }
+
+      return res;
+    },
+
+    async tentarRenovarTokenDirectus() {
+      const refreshToken = localStorage.getItem('directus_refresh_token');
+      try {
+        const bodyPayload = refreshToken ? { refresh_token: refreshToken, mode: 'json' } : { mode: 'session' };
+        const res = await fetch(`${this.DIRECTUS_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(bodyPayload)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.data?.access_token) {
+            this.tokenAcesso = data.data.access_token;
+            localStorage.setItem('directus_token', this.tokenAcesso);
+            if (data.data.refresh_token) {
+              localStorage.setItem('directus_refresh_token', data.data.refresh_token);
+            }
+            return true;
+          }
+        }
+      } catch (e) {
+        console.warn('Erro ao tentar renovar token Directus:', e);
+      }
+      return false;
+    },
+
+    // =========================================================================
     // GETTERS REATIVOS
     // =========================================================================
     get entregasOrdenadasParaSacola() {
@@ -189,7 +247,7 @@ function entregaApp() {
     },
 
     /**
-     * FORMATAÇÃO EXATA DA ETIQUETA SHOPEE (+1, +2, +3...):
+     * FORMATAÇÃO OFICIAL DA ETIQUETA SHOPEE:
      * Converte números negativos armazenados (-1, -2) em "+1", "+2"
      */
     formatarParada(val) {
@@ -236,6 +294,11 @@ function entregaApp() {
       const cacheEntregas = localStorage.getItem('drivexps_entregas_cache');
       if (cacheEntregas) {
         try { this.entregas = JSON.parse(cacheEntregas); } catch(e) {}
+      }
+
+      const cacheHistorico = localStorage.getItem('drivexps_rotas_historico_cache');
+      if (cacheHistorico) {
+        try { this.rotasHistorico = JSON.parse(cacheHistorico); } catch(e) {}
       }
 
       await this.verificarAutenticacao();
@@ -318,11 +381,10 @@ function entregaApp() {
         this.salvarCacheLocal();
         if (this.modo === 'mapa') this.desenharPinosERotaNoMapa();
       }
-      const headers = { 'Content-Type': 'application/json' };
-      if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
       try {
-        await fetch(`${this.DIRECTUS_URL}/items/entregas/${id}`, {
-          method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ status: novoStatus })
+        await this.fetchDirectus(`/items/entregas/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: novoStatus })
         });
       } catch (e) {}
     },
@@ -909,25 +971,23 @@ function entregaApp() {
     // =========================================================================
     async carregarUltimaRota() {
       try {
-        const headers = {};
-        if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-        const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=1`, { headers, credentials: 'include' });
-        const dataRota = await resRota.json();
-        if (dataRota.data && dataRota.data.length > 0) {
-          this.rotaAtivaId = dataRota.data[0].id;
-          await this.carregarEntregasPorId(this.rotaAtivaId);
+        const resRota = await this.fetchDirectus('/items/rotas?sort=-id&limit=1');
+        if (resRota.ok) {
+          const dataRota = await resRota.json();
+          if (dataRota.data && dataRota.data.length > 0) {
+            this.rotaAtivaId = dataRota.data[0].id;
+            await this.carregarEntregasPorId(this.rotaAtivaId);
+          }
         }
       } catch (e) {}
     },
 
     async carregarEntregasPorId(rotaId) {
       try {
-        const headers = {};
-        if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-        const res = await fetch(`${this.DIRECTUS_URL}/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`, { headers, credentials: 'include' });
+        const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`);
         const data = await res.json();
         
-        const resR = await fetch(`${this.DIRECTUS_URL}/items/rotas/${rotaId}`, { headers, credentials: 'include' });
+        const resR = await this.fetchDirectus(`/items/rotas/${rotaId}`);
         const dataR = await resR.json();
 
         if (data.data && data.data.length > 0) {
@@ -952,12 +1012,23 @@ function entregaApp() {
     async abrirHistorico() {
       this.modo = 'historico';
       try {
-        const headers = {};
-        if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-        const resRota = await fetch(`${this.DIRECTUS_URL}/items/rotas?sort=-id&limit=30`, { headers, credentials: 'include' });
-        const dataRota = await resRota.json();
-        this.rotasHistorico = dataRota.data || [];
-      } catch (e) {}
+        const resRota = await this.fetchDirectus('/items/rotas?sort=-id&limit=30');
+        if (resRota.ok) {
+          const dataRota = await resRota.json();
+          this.rotasHistorico = dataRota.data || [];
+          localStorage.setItem('drivexps_rotas_historico_cache', JSON.stringify(this.rotasHistorico));
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar histórico:', e);
+      }
+      
+      // Fallback: se estiver offline, resgata histórico em cache
+      if (!this.rotasHistorico || this.rotasHistorico.length === 0) {
+        const cache = localStorage.getItem('drivexps_rotas_historico_cache');
+        if (cache) {
+          try { this.rotasHistorico = JSON.parse(cache); } catch(err) {}
+        }
+      }
     },
 
     async selecionarRotaHistorico(rotaId) {
@@ -970,11 +1041,10 @@ function entregaApp() {
     async apagarRota(rotaId) {
       if (!confirm(`Deseja apagar a Rota #${rotaId}?`)) return;
       try {
-        const headers = {};
-        if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-        const res = await fetch(`${this.DIRECTUS_URL}/items/rotas/${rotaId}`, { method: 'DELETE', headers, credentials: 'include' });
+        const res = await this.fetchDirectus(`/items/rotas/${rotaId}`, { method: 'DELETE' });
         if (res.ok || res.status === 204) {
           this.rotasHistorico = this.rotasHistorico.filter(r => r.id !== rotaId);
+          localStorage.setItem('drivexps_rotas_historico_cache', JSON.stringify(this.rotasHistorico));
           if (this.rotaAtivaId === rotaId) {
             this.rotaAtivaId = null;
             this.entregas = [];
@@ -1143,6 +1213,18 @@ function entregaApp() {
       if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
       this.carregandoProcesso = true;
       try {
+        // Garante que o usuário ativo seja identificado antes do envio
+        if (!this.usuarioId) {
+          const resMe = await this.fetchDirectus('/users/me');
+          if (resMe.ok) {
+            const ud = await resMe.json();
+            if (ud?.data?.id) {
+              this.usuarioId = ud.data.id;
+              localStorage.setItem('directus_user_id', this.usuarioId);
+            }
+          }
+        }
+
         let cPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
         let cChegada = null;
         if (this.inputChegadaModal) {
@@ -1163,24 +1245,42 @@ function entregaApp() {
         };
 
         const res = await fetch(this.N8N_WEBHOOK_URL, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify(payload)
         });
 
         if (res.ok) {
           const resJson = await res.json();
+          if (resJson.bloqueado) {
+            alert(resJson.mensagem || 'Assinatura necessária.');
+            this.modalAssinatura = true;
+            return;
+          }
+
           this.modalResumoImportacao = false;
           this.pacotesExtraidos = [];
+          this.nomeArquivo = '';
+
+          await this.sincronizarAssinaturaSaaS();
+
           if (resJson && resJson.rota_id) {
             this.rotaAtivaId = resJson.rota_id;
             await this.carregarEntregasPorId(this.rotaAtivaId);
           } else {
             await this.carregarUltimaRota();
           }
+
           this.salvarCacheLocal();
           this.modo = 'carregamento';
-        } else { alert('Erro no servidor ao otimizar rota.'); }
-      } catch(e) { alert('Erro de conexão: ' + e.message); } 
-      finally { this.carregandoProcesso = false; }
+        } else { 
+          alert('Erro no servidor ao otimizar rota.'); 
+        }
+      } catch(e) { 
+        alert('Erro de conexão: ' + e.message); 
+      } finally { 
+        this.carregandoProcesso = false; 
+      }
     },
 
     // =========================================================================
@@ -1215,50 +1315,20 @@ function entregaApp() {
         this.usuarioLogado = true;
       };
 
-      if (!this.tokenAcesso && !localStorage.getItem('directus_token')) {
-        try {
-          const res = await fetch(`${this.DIRECTUS_URL}/auth/refresh`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include'
-          });
-          if (res.ok) {
-            const d = await res.json();
-            if (d?.data?.access_token) {
-              this.tokenAcesso = d.data.access_token;
-              localStorage.setItem('directus_token', this.tokenAcesso);
-            }
-          }
-        } catch(e) {}
+      const res = await this.fetchDirectus('/users/me');
+      if (res.ok) {
+        const d = await res.json();
+        if (d?.data?.id) { extrair(d.data); return; }
       }
-
-      const tokenAtivo = this.tokenAcesso || localStorage.getItem('directus_token');
-      if (tokenAtivo) {
-        try {
-          const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { headers: { 'Authorization': `Bearer ${tokenAtivo}` } });
-          if (res.ok) {
-            const d = await res.json();
-            if (d?.data?.id) { extrair(d.data); return; }
-          }
-        } catch(e) {}
-      }
-
-      try {
-        const res = await fetch(`${this.DIRECTUS_URL}/users/me`, { credentials: 'include' });
-        if (res.ok) {
-          const d = await res.json();
-          if (d?.data?.id) { extrair(d.data); return; }
-        }
-      } catch(e) {}
 
       this.usuarioLogado = false;
     },
 
     async sincronizarAssinaturaSaaS() {
       if (!this.usuarioId || !this.usuarioLogado) return;
-      const headers = { 'Content-Type': 'application/json' };
-      if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
 
       try {
-        const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+        const res = await this.fetchDirectus(`/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`);
         const data = await res.json();
         const registros = data.data || [];
         let userSaas = registros[0] || null;
@@ -1269,8 +1339,8 @@ function entregaApp() {
             nome: (this.usuarioNome && this.usuarioNome !== 'Motorista') ? this.usuarioNome : null,
             telefone: null, trial_expira_em: null, status_assinatura: 'trial', plano_ativo: 'gratuito'
           };
-          const p = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users`, {
-            method: 'POST', headers, credentials: 'include', body: JSON.stringify(novo)
+          const p = await this.fetchDirectus('/items/drivexps_users', {
+            method: 'POST', body: JSON.stringify(novo)
           });
           const pd = await p.json();
           userSaas = pd.data;
@@ -1314,14 +1384,12 @@ function entregaApp() {
       if (!this.usuarioId) return;
       this.salvandoPerfil = true;
       const tel = (this.inputTelefone || '').replace(/\D/g, '');
-      const headers = { 'Content-Type': 'application/json' };
-      if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
       try {
-        const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+        const res = await this.fetchDirectus(`/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`);
         const d = await res.json();
         if (d.data && d.data[0]) {
-          await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${d.data[0].id}`, {
-            method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ nome: this.usuarioNome, telefone: tel })
+          await this.fetchDirectus(`/items/drivexps_users/${d.data[0].id}`, {
+            method: 'PATCH', body: JSON.stringify({ nome: this.usuarioNome, telefone: tel })
           });
           alert('✅ Dados salvos com sucesso!');
         }
@@ -1340,15 +1408,12 @@ function entregaApp() {
       if (!email.includes('@')) { this.erroCadastroObrigatorio = 'E-mail inválido.'; return; }
 
       this.salvandoPerfil = true;
-      const headers = { 'Content-Type': 'application/json' };
-      if (this.tokenAcesso) headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
-
       try {
-        const res = await fetch(`${this.DIRECTUS_URL}/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`, { headers, credentials: 'include' });
+        const res = await this.fetchDirectus(`/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`);
         const d = await res.json();
         if (d.data && d.data[0]) {
-          await fetch(`${this.DIRECTUS_URL}/items/drivexps_users/${d.data[0].id}`, {
-            method: 'PATCH', headers, credentials: 'include', body: JSON.stringify({ nome, telefone: tel, email })
+          await this.fetchDirectus(`/items/drivexps_users/${d.data[0].id}`, {
+            method: 'PATCH', body: JSON.stringify({ nome, telefone: tel, email })
           });
           this.usuarioNome = nome; this.usuarioEmail = email; this.inputTelefone = tel;
           this.modalCadastroObrigatorio = false;
@@ -1406,8 +1471,9 @@ function entregaApp() {
       localStorage.removeItem('drivexps_rota_geometria');
       localStorage.removeItem('drivexps_coord_partida');
       localStorage.removeItem('drivexps_coord_chegada');
+      localStorage.removeItem('drivexps_rotas_historico_cache');
       this.tokenAcesso = null; this.usuarioId = null; this.usuarioLogado = false;
-      this.entregas = []; this.rotaAtivaId = null; this.rotaGeometria = null;
+      this.entregas = []; this.rotaAtivaId = null; this.rotaGeometria = null; this.rotasHistorico = [];
       try {
         await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mode: 'session' })
@@ -1438,8 +1504,9 @@ function entregaApp() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           const latLng = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-          this.inputPartidaModal = latLng; this.inputChegadaModal = latLng;
-          alert('📍 Localização capturada!');
+          this.inputPartidaModal = latLng; 
+          this.inputChegadaModal = latLng;
+          alert('📍 Localização atual gravada na Partida e Chegada!');
         }, err => alert('Erro GPS: ' + err.message));
       }
     },
