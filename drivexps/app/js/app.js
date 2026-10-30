@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 4.5 - Núcleo com Snap-to-Route Local & Glide Suave 60fps
+   DriveXPS Pro 4.6 - Núcleo Completo (Câmera, Escala e Visão Aberta Estilo Waze)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -522,7 +522,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (SNAP-TO-ROUTE LOCAL & GLIDE SUAVE 60FPS)
+    // NAVEGAÇÃO 3D (CÂMERA, ÂNGULO E ESCALA WAZE)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -540,8 +540,7 @@ function entregaApp() {
     },
 
     /**
-     * SNAP-TO-ROUTE LOCAL (0ms de latência e sem contramão na rodovia):
-     * Projeta a coordenada bruta do GPS diretamente no segmento mais próximo da rota ativa.
+     * Snap-to-Route Local: Projeta coordenada bruta diretamente na linha ativa da rota
      */
     projetarPontoNaRota(lat, lng) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
@@ -552,7 +551,6 @@ function entregaApp() {
       let pontoProjetado = { lat, lng };
       let headingDoSegmento = null;
 
-      // Fatores de conversão métrica no equador local
       const rad = Math.PI / 180;
       const cosLat = Math.cos(lat * rad);
       const mPorLng = 111320 * cosLat;
@@ -592,7 +590,6 @@ function entregaApp() {
         }
       }
 
-      // Tolerância: até 45m na rodovia / 35m na cidade projeta na linha; acima disso usa GPS bruto
       const limiteSnap = this.velocidadeGPS > 60 ? 45 : 35;
       if (menorDist <= limiteSnap) {
         return {
@@ -627,6 +624,10 @@ function entregaApp() {
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
 
+    /**
+     * INICIALIZAÇÃO DA CÂMERA IDÊNTICA AO WAZE:
+     * Zoom 16.8 panorâmico + Pitch suave 42°
+     */
     inicializarMapaNavGL(entrega) {
       const container = document.getElementById('mapaNavGL');
       if (!container) return;
@@ -636,7 +637,10 @@ function entregaApp() {
         container: 'mapaNavGL',
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
         center: [entrega.longitude, entrega.latitude],
-        zoom: 18.5, pitch: 62, bearing: 0, attributionControl: false
+        zoom: 16.8,  // Zoom aberto panorâmico estilo Waze
+        pitch: 42,   // Inclinação 3D suave (não deita a tela e deixa os nomes retos)
+        bearing: 0,
+        attributionControl: false
       });
 
       this.mapaNavGL.on('dragstart', (e) => {
@@ -649,15 +653,16 @@ function entregaApp() {
             type: 'geojson',
             data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
           });
+          // Linhas com espessura proporcional à largura das ruas
           this.mapaNavGL.addLayer({
             id: 'rota-borda', type: 'line', source: 'rota-source',
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': '#0369a1', 'line-width': 15, 'line-opacity': 0.95 }
+            paint: { 'line-color': '#0369a1', 'line-width': 11, 'line-opacity': 0.95 }
           });
           this.mapaNavGL.addLayer({
             id: 'rota-linha', type: 'line', source: 'rota-source',
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': '#38bdf8', 'line-width': 9, 'line-opacity': 1.0 }
+            paint: { 'line-color': '#38bdf8', 'line-width': 7, 'line-opacity': 1.0 }
           });
         }
         this.iniciarGPSContinuoNavegacao(entrega);
@@ -764,7 +769,7 @@ function entregaApp() {
 
       const el = document.createElement('div');
       el.innerHTML = `
-        <div id="pinDestinoNav" style="background-color: ${corFundo}; color: #000; font-weight: 900; font-family: monospace; font-size: 13px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.85); cursor: pointer;">
+        <div id="pinDestinoNav" style="background-color: ${corFundo}; color: #000; font-weight: 900; font-family: monospace; font-size: 11px; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid #ffffff; box-shadow: 0 3px 10px rgba(0,0,0,0.85); cursor: pointer;">
           #${numCanetao}
         </div>
       `;
@@ -779,7 +784,7 @@ function entregaApp() {
         el.innerHTML = `
           <div class="fiorino-aura"></div>
           <div class="fiorino-svg-wrapper">
-            <svg width="28" height="50" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
+            <svg width="24" height="42" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
               <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
               <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
@@ -804,15 +809,31 @@ function entregaApp() {
       }
     },
 
+    /**
+     * CÂMERA DINÂMICA ESTILO WAZE:
+     * - Carro enquadrado no 1/3 inferior da tela (padding bottom: 230)
+     * - Zoom adaptativo inteligente que recua na estrada e abre na manobra
+     */
     centralizarNoCarroGL(lat, lng, bearing, duracao = 1000) {
       if (!this.mapaNavGL) return;
+
+      let zoomDinamico = 16.8; // Base Waze: enxerga quarteirões vizinhos
+      if (this.velocidadeGPS > 75) {
+        zoomDinamico = 15.5; // Rodovia: abre o horizonte
+      } else if (this.velocidadeGPS > 35) {
+        zoomDinamico = 16.2; // Avenidas rápidas
+      } else {
+        zoomDinamico = 16.8; // Velocidade de manobra/bairro (Foto 2)
+      }
+
       this.mapaNavGL.easeTo({
         center: [lng, lat],
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
-        pitch: 62, 
-        zoom: 18.5, 
-        duration: duracao, 
-        easing: (t) => t // Linear puro: elimina os soquinhos e faz a tela deslizar contínua
+        pitch: 42, // Ângulo de inclinação suave que mantém nomes legíveis
+        zoom: zoomDinamico,
+        padding: { top: 90, bottom: 230, left: 0, right: 0 }, // Carro no 1/3 inferior
+        duration: duracao,
+        easing: (t) => t // Deslize linear contínuo (zero soquinhos)
       });
     },
 
@@ -824,19 +845,19 @@ function entregaApp() {
     },
 
     /**
-     * PROCESSAMENTO DO GPS COM SNAP-TO-ROUTE & ALERTAS ANTECIPADOS
+     * PROCESSAMENTO DE POSIÇÃO GPS CONTÍNUO
      */
     async processarPosicaoGPS(pos, destLat, destLng) {
       const rawLat = pos.coords.latitude;
       const rawLng = pos.coords.longitude;
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
 
-      // 1. Projeção local na rota ativa (0ms e sem contramão na pista contrária)
+      // 1. Projeção Snap-to-Route local (sem contramão)
       const snap = this.projetarPontoNaRota(rawLat, rawLng);
       const lat = snap.lat;
       const lng = snap.lng;
 
-      // 2. Cálculo angular suave (heading)
+      // 2. Heading angular suave
       let headingCalculado = pos.coords.heading;
       if (snap.headingSegmento !== null && this.velocidadeGPS >= this.minSpeedKmhNav) {
         headingCalculado = snap.headingSegmento;
@@ -853,7 +874,7 @@ function entregaApp() {
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
       }
 
-      // 3. Atualiza marcador e câmera suavemente
+      // 3. Atualiza veículo e câmera no terço inferior
       this.atualizarMarcadorCarroGL(lat, lng, 0);
 
       if (!this.mapaArrastadoPeloUsuario) {
@@ -863,7 +884,7 @@ function entregaApp() {
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
-      // 4. Distância total até o destino
+      // 4. Distância até o destino
       const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
@@ -873,7 +894,7 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // 5. Verificação de recálculo (só dispara se realmente errou o caminho por mais de 65m)
+      // 5. Verificação de recálculo
       const fora = snap.distRota > 65;
       if (fora) this.contadorForaDaRota++;
       else this.contadorForaDaRota = 0;
@@ -889,7 +910,7 @@ function entregaApp() {
         return;
       }
 
-      // 6. ALERTAS ANTECIPADOS NA RODOVIA (500m e 150m) E NA CIDADE (200m e 50m)
+      // 6. Alertas antecipados na rodovia (500m/150m) e na cidade (200m/60m)
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepAtual = this.passosRota[this.passoAtualIndex];
         const manobraLat = stepAtual.maneuver.location[1];
@@ -901,20 +922,17 @@ function entregaApp() {
         const distAvisoLonge = isAltaVelocidade ? 550 : 220;
         const distAvisoPerto = isAltaVelocidade ? 160 : 65;
 
-        // Aviso 1: Longa distância (ex: a 500m na rodovia para ter tempo de ir pra faixa da direita)
         if (distParaManobra <= distAvisoLonge && distParaManobra > distAvisoPerto && !stepAtual._avisoLongeFalado) {
           stepAtual._avisoLongeFalado = true;
           const distFmt = isAltaVelocidade ? '500 metros' : '200 metros';
           this.falarTexto(`A ${distFmt}, ${info.texto}`);
         }
 
-        // Aviso 2: Curta distância (no ponto da saída/conversão)
         if (distParaManobra <= distAvisoPerto && distParaManobra > 25 && !stepAtual._avisoPertoFalado) {
           stepAtual._avisoPertoFalado = true;
           this.falarTexto(info.texto);
         }
 
-        // Passou pela manobra, avança para a próxima
         if (distParaManobra < 20) { 
           this.passoAtualIndex++;
           this.atualizarInstrucaoUI();
@@ -938,10 +956,6 @@ function entregaApp() {
       }
     },
 
-    /**
-     * INTERPRETADOR WAZE COMPLETO:
-     * Reconhece saídas de rodovia (off ramp), bifurcações (fork) e conversões
-     */
     interpretarManobraWaze(step) {
       const type = step.maneuver.type;
       const modifier = step.maneuver.modifier || '';
@@ -1198,7 +1212,6 @@ function entregaApp() {
         const rawSeq = iSequence !== -1 ? String(cols[iSequence] || '').trim() : '';
         const rawStop = iStop !== -1 ? String(cols[iStop] || '').trim() : '';
         
-        // Se for "-" ou vazio, é pacote adicional (+1, +2, +3...)
         const ehExtra = !rawSeq || rawSeq === '-' || rawSeq === '- -' || !rawStop || rawStop === '-' || isNaN(parseInt(rawSeq));
 
         let seqVal = null;
