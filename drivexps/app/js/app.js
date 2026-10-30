@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 4.9 - Núcleo com Vias Largas Estilo Waze & Nome da Rua Real
+   DriveXPS Pro 5.0 - Motor Waze: Head-Up Fixo, Carro no Rodapé & Giro Fluido
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -58,7 +58,7 @@ function entregaApp() {
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE / MAPLIBRE GL)
+    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP PERSPECTIVE)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
@@ -74,11 +74,11 @@ function entregaApp() {
     passosRota: [],
     passoAtualIndex: 0,
     headingAtual: 0,
-    minSpeedKmhNav: 4.0,
-    bearingSmoothFactor: 0.65,
+    minSpeedKmhNav: 2.5,
     ultimaLatCarro: null,
     ultimaLngCarro: null,
     mapaArrastadoPeloUsuario: false,
+    timeoutRecentralizar: null,
     vozHabilitada: true,
     chegadaAnunciada: false,
     coordenadasRotaAtual: [],
@@ -237,9 +237,7 @@ function entregaApp() {
         if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
         if (t.startsWith('+') && t === paradaStr) return true;
 
-        if (apenasNumeros && t.length <= 3) {
-          return false;
-        }
+        if (apenasNumeros && t.length <= 3) return false;
 
         return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
                (e.bairro && e.bairro.toLowerCase().includes(t)) ||
@@ -379,7 +377,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET 2D (COM ROTA OFICIAL DO VROOM SEM ZIGUEZAGUE)
+    // MAPA GERAL LEAFLET 2D (COM ROTA OFICIAL VROOM)
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -424,7 +422,6 @@ function entregaApp() {
 
       const pontosLinha = [];
 
-      // 1. PIN DO CD / PARTIDA
       let posCD = null;
       if (this.coordPartidaSalva && this.coordPartidaSalva.latitude) {
         posCD = [this.coordPartidaSalva.latitude, this.coordPartidaSalva.longitude];
@@ -443,7 +440,6 @@ function entregaApp() {
         L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 PONTO DE PARTIDA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 2. PINOS DAS ENTREGAS
       const entregasOrdenadas = [...this.entregas].sort((a, b) => a.ordem_entrega - b.ordem_entrega);
 
       entregasOrdenadas.forEach(p => {
@@ -475,7 +471,6 @@ function entregaApp() {
         L.marker(coord, { icon: iconePacote }).bindPopup(popupContent).addTo(this.grupoMarcadores);
       });
 
-      // 3. PIN DA CHEGADA
       let posCasa = null;
       if (this.coordChegadaSalva && this.coordChegadaSalva.latitude) {
         posCasa = [this.coordChegadaSalva.latitude, this.coordChegadaSalva.longitude];
@@ -494,7 +489,6 @@ function entregaApp() {
         L.marker(posCasa, { icon: iconeCasa }).bindPopup(`<strong>🏠 PONTO DE CHEGADA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 4. DESENHO DA GEOMETRIA OFICIAL VROOM (SEM ZIGUEZAGUE)
       if (this.rotaGeometria && this.rotaGeometria.length > 5) {
         const latlngs = this.decodePolyline(this.rotaGeometria);
         this.linhaTrajeto = L.polyline(latlngs, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
@@ -512,7 +506,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (VIAS LARGAS, PALETA DE ASFALTO WAZE & CÂMERA ABERTA)
+    // NAVEGAÇÃO 3D (MOTOR WAZE NATIVO - HEAD-UP RIGOROSO & AUTO-RECENTER)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -529,6 +523,11 @@ function entregaApp() {
       else window.speechSynthesis.cancel();
     },
 
+    /**
+     * SNAP-TO-ROUTE LOCAL COM DIREÇÃO VETORIAL DA VIA:
+     * Identifica em qual pedaço de asfalto o carro está e extrai o rumo (bearing)
+     * exato do segmento para alinhar a rua para o topo da tela imediatamente.
+     */
     projetarPontoNaRota(lat, lng) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
         return { lat, lng, distRota: 0, headingSegmento: null };
@@ -573,6 +572,7 @@ function entregaApp() {
             lat: latA + t * (latB - latA),
             lng: lngA + t * (lngB - lngA)
           };
+          // Ângulo exato da rua para o Head-Up Waze
           headingDoSegmento = this.calcularBearing(latA, lngA, latB, lngB);
         }
       }
@@ -595,7 +595,7 @@ function entregaApp() {
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
       this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-      this.nomeRuaAtualCarro = entrega?.endereco?.split(',')[0] || 'Localizando via...';
+      this.nomeRuaAtualCarro = entrega?.endereco?.split(',')[0] || 'Iniciando...';
       this.instrucaoAtual = `Iniciando trajeto para o Canetão #${entrega?.ordem_entrega}...`;
       this.distanciaProximaManobra = '...';
       this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
@@ -603,6 +603,7 @@ function entregaApp() {
       this.chegadaAnunciada = false;
       this.velocidadeGPS = 0;
       this.mapaArrastadoPeloUsuario = false;
+      if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
       this.coordenadasRotaAtual = [];
       this.contadorForaDaRota = 0;
       this.recalculandoRota = false;
@@ -612,7 +613,7 @@ function entregaApp() {
     },
 
     /**
-     * MOTOR GRÁFICO 3D (COM ALARGAMENTO DE ASFALTO & CORES DO WAZE NOTURNO)
+     * MOTOR MAPLIBRE GL 3D (PITCH 45°, ZOOM WAZE & LARGURA DE RUAS)
      */
     inicializarMapaNavGL(entrega) {
       const container = document.getElementById('mapaNavGL');
@@ -624,23 +625,30 @@ function entregaApp() {
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
         center: [entrega.longitude, entrega.latitude],
         zoom: 16.8, // Panorama aberto Waze
-        pitch: 42,  // Inclinação 3D suave da Foto 1 Waze
+        pitch: 45,  // Inclinação 3D da Foto 2 Waze
         bearing: 0,
         attributionControl: false
       });
 
+      // Retorno automático à centralização caso o usuário toque na tela
       this.mapaNavGL.on('dragstart', (e) => {
-        if (e.originalEvent) this.mapaArrastadoPeloUsuario = true;
+        if (e.originalEvent) {
+          this.mapaArrastadoPeloUsuario = true;
+          if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
+          // Volta a acompanhar automaticamente após 5 segundos sem toques
+          this.timeoutRecentralizar = setTimeout(() => {
+            this.mapaArrastadoPeloUsuario = false;
+          }, 5000);
+        }
       });
 
       this.mapaNavGL.on('load', () => {
         try {
-          // 1. Fundo azul-marinho dos quarteirões Waze
           if (this.mapaNavGL.getLayer('background')) {
             this.mapaNavGL.setPaintProperty('background', 'background-color', '#141c2b');
           }
 
-          // 2. ALARGAMENTO DAS RUAS E COR DE ASFALTO DO WAZE
+          // Alargamento das ruas para ficarem grossas como asfalto do Waze
           const layers = this.mapaNavGL.getStyle().layers || [];
           layers.forEach(l => {
             const id = l.id.toLowerCase();
@@ -649,30 +657,21 @@ function entregaApp() {
             if (l.type === 'line' && isRoad) {
               try {
                 if (id.includes('casing')) {
-                  // Borda das vias
                   this.mapaNavGL.setPaintProperty(l.id, 'line-color', '#182436');
                   this.mapaNavGL.setPaintProperty(l.id, 'line-width', [
                     'interpolate', ['linear'], ['zoom'],
-                    13, 2,
-                    15, 8,
-                    16.8, 16,
-                    18.5, 24
+                    13, 2, 15, 8, 16.8, 16, 18.5, 24
                   ]);
                 } else {
-                  // Asfalto Waze Noturno (Foto 1)
                   this.mapaNavGL.setPaintProperty(l.id, 'line-color', '#25334a');
                   this.mapaNavGL.setPaintProperty(l.id, 'line-width', [
                     'interpolate', ['linear'], ['zoom'],
-                    13, 1.5,
-                    15, 6,
-                    16.8, 13,
-                    18.5, 20
+                    13, 1.5, 15, 6, 16.8, 13, 18.5, 20
                   ]);
                 }
               } catch(err) {}
             }
 
-            // Realce nítido nos nomes de ruas vizinhas
             if (l.type === 'symbol' && (id.includes('label') || id.includes('name'))) {
               try {
                 this.mapaNavGL.setPaintProperty(l.id, 'text-color', '#cbd5e1');
@@ -683,7 +682,6 @@ function entregaApp() {
           });
         } catch(e) {}
 
-        // Camada do traçado da rota
         if (!this.mapaNavGL.getSource('rota-source')) {
           this.mapaNavGL.addSource('rota-source', {
             type: 'geojson',
@@ -781,7 +779,7 @@ function entregaApp() {
       this.atualizarLinhaNavGL(coordsLngLat);
       this.atualizarMarcadorDestinoGL(eLat, eLng);
 
-      if (coordsLngLat.length > 1 && this.velocidadeGPS < this.minSpeedKmhNav) {
+      if (coordsLngLat.length > 1) {
         const bearingVia = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
         this.headingAtual = bearingVia;
         if (!this.mapaArrastadoPeloUsuario) this.centralizarNoCarroGL(sLat, sLng, bearingVia, 500);
@@ -811,7 +809,11 @@ function entregaApp() {
       this.marcadorDestinoGL = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(this.mapaNavGL);
     },
 
-    atualizarMarcadorCarroGL(lat, lng, heading) {
+    /**
+     * FIORINO SEMPRE APONTADA PARA CIMA NO VISOR:
+     * O mapa gira no chão embaixo do carro, mantendo a frente da Fiorino reta para o topo do celular!
+     */
+    atualizarMarcadorCarroGL(lat, lng, headingRelativo = 0) {
       if (!this.mapaNavGL) return;
       if (!this.marcadorCarroGL) {
         const el = document.createElement('div');
@@ -836,7 +838,9 @@ function entregaApp() {
           </div>
           <div class="fiorino-placa-rua" id="placaRuaCarro">${this.nomeRuaAtualCarro || 'Sua Posição'}</div>
         `;
-        this.marcadorCarroGL = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(this.mapaNavGL);
+        this.marcadorCarroGL = new maplibregl.Marker({ element: el, anchor: 'center', rotationAlignment: 'viewport' })
+          .setLngLat([lng, lat])
+          .addTo(this.mapaNavGL);
       } else {
         this.marcadorCarroGL.setLngLat([lng, lat]);
         const p = document.getElementById('placaRuaCarro');
@@ -844,64 +848,78 @@ function entregaApp() {
       }
     },
 
-    centralizarNoCarroGL(lat, lng, bearing, duracao = 1000) {
+    /**
+     * ENQUADRAMENTO EXATO DO WAZE:
+     * Carro próximo ao rodapé da tela, liberando o horizonte à frente,
+     * e o mapa girando para manter a via 100% reta para o topo do celular.
+     */
+    centralizarNoCarroGL(lat, lng, bearing, duracao = 800) {
       if (!this.mapaNavGL) return;
 
       let zoomDinamico = 16.8;
-      if (this.velocidadeGPS > 75) {
-        zoomDinamico = 15.5; // Rodovia
-      } else if (this.velocidadeGPS > 35) {
-        zoomDinamico = 16.2; // Avenidas
-      } else {
-        zoomDinamico = 16.8; // Bairro (Foto 1 e 2 Waze)
-      }
+      if (this.velocidadeGPS > 75) zoomDinamico = 15.5;
+      else if (this.velocidadeGPS > 35) zoomDinamico = 16.2;
+      else zoomDinamico = 16.8;
+
+      // Ponto de visão à frente: projeta a câmera ligeiramente adiante na direção do carro
+      const distOffsetMetros = 85;
+      const rad = (bearing !== undefined && bearing !== null ? bearing : this.headingAtual) * Math.PI / 180;
+      const dLat = (distOffsetMetros * Math.cos(rad)) / 111111;
+      const dLng = (distOffsetMetros * Math.sin(rad)) / (111111 * Math.cos(lat * Math.PI / 180));
+
+      const centerFocal = [lng + dLng, lat + dLat];
 
       this.mapaNavGL.easeTo({
-        center: [lng, lat],
+        center: centerFocal,
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
-        pitch: 42,
+        pitch: 45, // Perspectiva 3D suave da Foto 2 Waze
         zoom: zoomDinamico,
-        padding: { top: 90, bottom: 230, left: 0, right: 0 }, // Carro no 1/3 inferior da tela
         duration: duracao,
-        easing: (t) => t // Deslize linear suave sem soquinhos
+        easing: (t) => t // Deslize linear suave e contínuo
       });
     },
 
     centralizarCarroManual() {
       this.mapaArrastadoPeloUsuario = false;
+      if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
       if (this.ultimaLatCarro && this.ultimaLngCarro) {
         this.centralizarNoCarroGL(this.ultimaLatCarro, this.ultimaLngCarro, this.headingAtual, 400);
       }
     },
 
+    /**
+     * LOOP DE POSIÇÃO GPS (Giro imediato ao virar a esquina)
+     */
     async processarPosicaoGPS(pos, destLat, destLng) {
       const rawLat = pos.coords.latitude;
       const rawLng = pos.coords.longitude;
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
 
-      // 1. Projeção local na rota ativa (sem contramão)
+      // 1. Projeção Snap-to-Route local
       const snap = this.projetarPontoNaRota(rawLat, rawLng);
       const lat = snap.lat;
       const lng = snap.lng;
 
-      // 2. Heading angular suave
-      let headingCalculado = pos.coords.heading;
-      if (snap.headingSegmento !== null && this.velocidadeGPS >= this.minSpeedKmhNav) {
-        headingCalculado = snap.headingSegmento;
-      } else if (headingCalculado === null || isNaN(headingCalculado)) {
-        if (this.ultimaLatCarro && this.ultimaLngCarro) {
-          const dist = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
-          if (dist > 2) {
-            headingCalculado = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
-          }
+      // 2. ROTAÇÃO IMEDIATA DO MAPA (Sem efeito caranguejo):
+      // Quando entra na rua, o mapa vira junto com o segmento da via
+      let headingAlvo = null;
+      if (snap.headingSegmento !== null) {
+        headingAlvo = snap.headingSegmento;
+      } else if (pos.coords.heading !== null && !isNaN(pos.coords.heading) && this.velocidadeGPS >= this.minSpeedKmhNav) {
+        headingAlvo = pos.coords.heading;
+      } else if (this.ultimaLatCarro && this.ultimaLngCarro) {
+        const dist = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
+        if (dist > 1.8) {
+          headingAlvo = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
         }
       }
 
-      if (headingCalculado !== null && !isNaN(headingCalculado) && this.velocidadeGPS >= this.minSpeedKmhNav) {
-        this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
+      if (headingAlvo !== null && !isNaN(headingAlvo)) {
+        // Giro ágil sem delay para a rua virar para cima no exato momento da curva
+        this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.40);
       }
 
-      // 3. Atualiza o nome da via atual para exibir na cápsula da Fiorino (Adeus "Localizando via...")
+      // 3. Atualiza o nome da rua real na cápsula embaixo do carro
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepAtual = this.passosRota[this.passoAtualIndex];
         const ruaDetectada = stepAtual.name || stepAtual.ref || (this.entregaNavegacao ? this.entregaNavegacao.endereco.split(',')[0] : '');
@@ -910,17 +928,18 @@ function entregaApp() {
         this.nomeRuaAtualCarro = this.entregaNavegacao.endereco.split(',')[0];
       }
 
-      // 4. Atualiza veículo e câmera no terço inferior
+      // 4. Move o carro suavemente
       this.atualizarMarcadorCarroGL(lat, lng, 0);
 
+      // 5. Câmera acompanha sempre se o usuário não estiver manipulando o mapa
       if (!this.mapaArrastadoPeloUsuario) {
-        this.centralizarNoCarroGL(lat, lng, this.headingAtual, 1000);
+        this.centralizarNoCarroGL(lat, lng, this.headingAtual, 900);
       }
 
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
-      // 5. Distância até o destino
+      // 6. Distância até o destino
       const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
@@ -930,7 +949,7 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // 6. Verificação de recálculo (apenas se errar a rota por mais de 65m)
+      // 7. Recálculo genuíno
       const fora = snap.distRota > 65;
       if (fora) this.contadorForaDaRota++;
       else this.contadorForaDaRota = 0;
@@ -946,7 +965,7 @@ function entregaApp() {
         return;
       }
 
-      // 7. Alertas antecipados (500m/150m na rodovia, 200m/60m na cidade)
+      // 8. Alertas sonoros antecipados
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepAtual = this.passosRota[this.passoAtualIndex];
         const manobraLat = stepAtual.maneuver.location[1];
@@ -1105,6 +1124,7 @@ function entregaApp() {
         this.watchPositionId = null;
       }
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
       if (this.mapaNavGL) { this.mapaNavGL.remove(); this.mapaNavGL = null; }
       this.marcadorCarroGL = null;
       this.marcadorDestinoGL = null;
@@ -1365,16 +1385,9 @@ function entregaApp() {
 
         let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
         let coordChegada = null;
-        const pStr = this.inputPartidaModal.trim();
-        const cStr = this.inputChegadaModal.trim();
-
-        if (pStr) coordPartida = await this.converterTextoParaCoord(pStr);
-        if (cStr) {
-          if (cStr.toLowerCase() === pStr.toLowerCase()) {
-            coordChegada = coordPartida;
-          } else {
-            coordChegada = await this.converterTextoParaCoord(cStr);
-          }
+        if (this.inputChegadaModal) {
+          if (this.inputChegadaModal.toLowerCase() === this.inputPartidaModal.toLowerCase()) coordChegada = coordPartida;
+          else coordChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
         }
 
         this.coordPartidaSalva = coordPartida;

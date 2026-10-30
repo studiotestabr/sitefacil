@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 4.3 - Núcleo da Aplicação (Com Auto-Refresh & Importação Completa)
+   DriveXPS Pro 4.9 - Núcleo com Vias Largas Estilo Waze & Nome da Rua Real
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -64,7 +64,7 @@ function entregaApp() {
     marcadorCarroGL: null,
     marcadorDestinoGL: null,
     watchPositionId: null,
-    instrucaoAtual: 'Calculando trajeto...',
+    instrucaoAtual: 'Calculando melhor trajeto...',
     distanciaProximaManobra: '',
     nomeProximaRua: '',
     nomeRuaAtualCarro: '',
@@ -111,7 +111,7 @@ function entregaApp() {
     isMobile: false,
 
     // =========================================================================
-    // COMUNICAÇÃO ROBUSTA COM O DIRECTUS (AUTO-REFRESH DE TOKEN 401)
+    // COMUNICAÇÃO DIRECTUS COM AUTO-REFRESH DE TOKEN (401)
     // =========================================================================
     async fetchDirectus(path, options = {}) {
       const url = path.startsWith('http') ? path : `${this.DIRECTUS_URL}${path}`;
@@ -121,15 +121,9 @@ function entregaApp() {
       const token = this.tokenAcesso || localStorage.getItem('directus_token');
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const fetchOpts = {
-        ...options,
-        headers,
-        credentials: 'include'
-      };
-
+      const fetchOpts = { ...options, headers, credentials: 'include' };
       let res = await fetch(url, fetchOpts);
 
-      // Se o token expirou (401), renova automaticamente e refaz a requisição
       if (res.status === 401) {
         const renovou = await this.tentarRenovarTokenDirectus();
         if (renovou) {
@@ -137,7 +131,6 @@ function entregaApp() {
           res = await fetch(url, { ...fetchOpts, headers });
         }
       }
-
       return res;
     },
 
@@ -162,32 +155,32 @@ function entregaApp() {
             return true;
           }
         }
-      } catch (e) {
-        console.warn('Erro ao tentar renovar token Directus:', e);
-      }
+      } catch (e) {}
       return false;
     },
 
     // =========================================================================
-    // GETTERS REATIVOS
+    // GETTERS REATIVOS (LÓGICA OFICIAL INDEX_OLD13)
     // =========================================================================
+    formatarParada(val) {
+      if (val === null || val === undefined) return '-';
+      if (val < 0) return '+' + Math.abs(val);
+      return val;
+    },
+
     get entregasOrdenadasParaSacola() {
-      if (!this.entregas || this.entregas.length === 0) return [];
       return [...this.entregas].sort((a, b) => {
-        const aEntregue = a.status === 'entregue' ? 1 : 0;
-        const bEntregue = b.status === 'entregue' ? 1 : 0;
-        if (aEntregue !== bEntregue) return aEntregue - bEntregue;
-        return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
+        if (a.status === 'entregue' && b.status !== 'entregue') return 1;
+        if (a.status !== 'entregue' && b.status === 'entregue') return -1;
+        return a.ordem_entrega - b.ordem_entrega;
       });
     },
 
     get naoEntregues() {
-      if (!this.entregas || this.entregas.length === 0) return [];
       return this.entregas.filter(e => e.status !== 'entregue');
     },
 
     get entregaAtual() {
-      if (!this.entregas || this.entregas.length === 0) return null;
       if (this.entregaSelecionadaId) {
         const sel = this.entregas.find(e => e.id === this.entregaSelecionadaId);
         if (sel && sel.status !== 'entregue') return sel;
@@ -224,43 +217,34 @@ function entregaApp() {
     },
 
     get entregasNoBairroRestantes() {
-      if (!this.entregaAtual || !this.entregaAtual.bairro) return 0;
-      const bairroAlvo = this.entregaAtual.bairro.toLowerCase().trim();
-      return this.naoEntregues.filter(e => (e.bairro || '').toLowerCase().trim() === bairroAlvo).length;
+      if (!this.entregaAtual) return 0;
+      const bAtual = (this.entregaAtual.bairro || '').toLowerCase().trim();
+      return this.naoEntregues.filter(e => (e.bairro || '').toLowerCase().trim() === bAtual).length;
     },
 
     get entregasFiltradas() {
-      if (!this.termoBusca || this.termoBusca.trim() === '') return [];
+      if (!this.termoBusca) return [];
       const t = this.termoBusca.toLowerCase().trim();
-      return this.entregas.filter(e => {
-        const paradaStr = String(this.formatarParada(e.parada_shopee)).toLowerCase();
-        const ordemStr = String(this.formatarParada(e.ordem_shopee)).toLowerCase();
-        return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
-          (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t)) ||
-          (e.bairro && e.bairro.toLowerCase().includes(t)) ||
-          (e.ordem_entrega && String(e.ordem_entrega) === t) ||
-          paradaStr === t ||
-          ordemStr === t ||
-          (e.parada_shopee && String(e.parada_shopee) === t) ||
-          (e.ordem_shopee && String(e.ordem_shopee) === t);
-      });
-    },
+      const apenasNumeros = /^\d+$/.test(t);
 
-    /**
-     * FORMATAÇÃO OFICIAL DA ETIQUETA SHOPEE:
-     * Converte números negativos armazenados (-1, -2) em "+1", "+2"
-     */
-    formatarParada(val) {
-      if (val === null || val === undefined || val === '') return '-';
-      const num = Number(val);
-      if (!isNaN(num)) {
-        if (num < 0) return `+${Math.abs(num)}`;
-        if (num === 0) return '-';
-        return num;
-      }
-      const str = String(val).trim();
-      if (str === '-' || str === '- -') return '-';
-      return str;
+      return this.entregasOrdenadasParaSacola.filter(e => {
+        const paradaStr = this.formatarParada(e.parada_shopee).toString().toLowerCase();
+        const ordemStr = this.formatarParada(e.ordem_shopee).toString().toLowerCase();
+        const sacolaNum = Math.ceil(e.ordem_entrega / 10).toString();
+        const canetaoStr = e.ordem_entrega.toString();
+
+        if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
+        if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
+        if (t.startsWith('+') && t === paradaStr) return true;
+
+        if (apenasNumeros && t.length <= 3) {
+          return false;
+        }
+
+        return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
+               (e.bairro && e.bairro.toLowerCase().includes(t)) ||
+               (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t));
+      });
     },
 
     getFaixaPacotes(ordem) {
@@ -276,12 +260,17 @@ function entregaApp() {
     },
 
     getTextoStatusAssinatura() {
-      if (this.statusAssinatura === 'ativo') return `Assinatura Ativa (${this.planoAtivo.toUpperCase()})`;
-      if (this.planoAtivo === 'vitalicio') return 'Acesso Vitalício Liberado';
-      if (this.trialIniciado) {
-        return this.diasRestantesTrial > 0 ? `Período de Teste: ${this.diasRestantesTrial} dia(s)` : 'Período de Teste Expirado';
-      }
-      return '7 Dias Grátis (Começam na 1ª rota)';
+      if (this.planoAtivo === 'vitalicio') return 'Assinatura Ativa (VITALICIO)';
+      let nomePlano = 'Plano Semanal';
+      if (this.planoAtivo === 'mensal') nomePlano = 'Plano Mensal';
+      else if (this.planoAtivo === 'gratuito' || this.statusAssinatura === 'trial') nomePlano = 'Período de Teste';
+
+      if (!this.dataExpiracao) return 'Teste Grátis (Começa na 1ª rota)';
+      const exp = new Date(this.dataExpiracao);
+      const agora = new Date();
+      const diffDias = Math.ceil((exp - agora) / (1000 * 60 * 60 * 24));
+      if (diffDias <= 0) return 'Assinatura Expirada ⚠️';
+      return `${nomePlano} • Vence em ${exp.toLocaleDateString('pt-BR')} (${diffDias}d restantes)`;
     },
 
     // =========================================================================
@@ -390,7 +379,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET
+    // MAPA GERAL LEAFLET 2D (COM ROTA OFICIAL DO VROOM SEM ZIGUEZAGUE)
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -402,7 +391,7 @@ function entregaApp() {
       if (!container) return;
 
       if (!this.mapaLeaflet) {
-        this.mapaLeaflet = L.map('mapaContainer', { zoomControl: false }).setView([-15.7801, -47.9292], 4);
+        this.mapaLeaflet = L.map('mapaContainer', { zoomControl: false }).setView([-24.1667, -46.7800], 13);
         L.control.zoom({ position: 'bottomright' }).addTo(this.mapaLeaflet);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.mapaLeaflet);
         this.grupoMarcadores = L.featureGroup().addTo(this.mapaLeaflet);
@@ -428,42 +417,39 @@ function entregaApp() {
       return coordinates;
     },
 
-    async desenharPinosERotaNoMapa() {
+    desenharPinosERotaNoMapa() {
       if (!this.mapaLeaflet || !this.grupoMarcadores) return;
       this.grupoMarcadores.clearLayers();
       if (this.linhaTrajeto) { this.mapaLeaflet.removeLayer(this.linhaTrajeto); this.linhaTrajeto = null; }
 
-      const pontosWaypoints = [];
-      let latlngsOficiais = [];
-
-      if (this.rotaGeometria && this.rotaGeometria.length > 10) {
-        latlngsOficiais = this.decodePolyline(this.rotaGeometria);
-      }
+      const pontosLinha = [];
 
       // 1. PIN DO CD / PARTIDA
       let posCD = null;
       if (this.coordPartidaSalva && this.coordPartidaSalva.latitude) {
         posCD = [this.coordPartidaSalva.latitude, this.coordPartidaSalva.longitude];
-      } else if (latlngsOficiais.length > 0) {
-        posCD = [latlngsOficiais[0][0], latlngsOficiais[0][1]];
+      } else if (this.rotaGeometria && this.rotaGeometria.length > 10) {
+        const decoded = this.decodePolyline(this.rotaGeometria);
+        if (decoded.length > 0) posCD = decoded[0];
       }
 
       if (posCD) {
-        pontosWaypoints.push(posCD);
+        pontosLinha.push(posCD);
         const iconeCD = L.divIcon({ 
           className: 'custom-pin-cd', 
           html: `<div style="background-color: #3b82f6; color: #fff; font-size: 15px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(59,130,246,0.8);">🏭</div>`, 
           iconSize: [34, 34], iconAnchor: [17, 17] 
         });
-        L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 PONTO DE PARTIDA (CD)</strong>`).addTo(this.grupoMarcadores);
+        L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 PONTO DE PARTIDA</strong>`).addTo(this.grupoMarcadores);
       }
 
       // 2. PINOS DAS ENTREGAS
-      const ordenadas = [...this.entregas].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
-      ordenadas.forEach(p => {
+      const entregasOrdenadas = [...this.entregas].sort((a, b) => a.ordem_entrega - b.ordem_entrega);
+
+      entregasOrdenadas.forEach(p => {
         if (!p.latitude || !p.longitude) return;
         const coord = [p.latitude, p.longitude];
-        pontosWaypoints.push(coord);
+        pontosLinha.push(coord);
 
         let corFundo = '#10b981';
         if (p.status === 'entregue') corFundo = '#ef4444';
@@ -493,12 +479,13 @@ function entregaApp() {
       let posCasa = null;
       if (this.coordChegadaSalva && this.coordChegadaSalva.latitude) {
         posCasa = [this.coordChegadaSalva.latitude, this.coordChegadaSalva.longitude];
-      } else if (latlngsOficiais.length > 0) {
-        posCasa = [latlngsOficiais[latlngsOficiais.length - 1][0], latlngsOficiais[latlngsOficiais.length - 1][1]];
+      } else if (this.rotaGeometria && this.rotaGeometria.length > 10) {
+        const decoded = this.decodePolyline(this.rotaGeometria);
+        if (decoded.length > 0) posCasa = decoded[decoded.length - 1];
       }
 
       if (posCasa) {
-        pontosWaypoints.push(posCasa);
+        pontosLinha.push(posCasa);
         const iconeCasa = L.divIcon({ 
           className: 'custom-pin-casa', 
           html: `<div style="background-color: #3b82f6; color: #fff; font-size: 15px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 15px rgba(59,130,246,0.8);">🏠</div>`, 
@@ -507,22 +494,12 @@ function entregaApp() {
         L.marker(posCasa, { icon: iconeCasa }).bindPopup(`<strong>🏠 PONTO DE CHEGADA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 4. DESENHO DA ROTA PELAS RUAS
-      if (latlngsOficiais.length > 0) {
-        this.linhaTrajeto = L.polyline(latlngsOficiais, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
-      } else if (pontosWaypoints.length >= 2) {
-        try {
-          const coordsStr = pontosWaypoints.slice(0, 70).map(pt => `${pt[1]},${pt[0]}`).join(';');
-          const urlOSRM = `${this.OSRM_ROUTER_URL}/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`;
-          const res = await fetch(urlOSRM);
-          const data = await res.json();
-          if (data.routes && data.routes[0]) {
-            const coordsOSRM = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-            this.linhaTrajeto = L.polyline(coordsOSRM, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
-          }
-        } catch(e) {
-          this.linhaTrajeto = L.polyline(pontosWaypoints, { color: '#38bdf8', weight: 4, opacity: 0.85, dashArray: '6, 8' }).addTo(this.mapaLeaflet);
-        }
+      // 4. DESENHO DA GEOMETRIA OFICIAL VROOM (SEM ZIGUEZAGUE)
+      if (this.rotaGeometria && this.rotaGeometria.length > 5) {
+        const latlngs = this.decodePolyline(this.rotaGeometria);
+        this.linhaTrajeto = L.polyline(latlngs, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
+      } else if (pontosLinha.length > 1) {
+        this.linhaTrajeto = L.polyline(pontosLinha, { color: '#38bdf8', weight: 4, opacity: 0.85, dashArray: '6, 8' }).addTo(this.mapaLeaflet);
       }
 
       this.centralizarMapaNaCarga();
@@ -530,12 +507,12 @@ function entregaApp() {
 
     centralizarMapaNaCarga() {
       if (this.mapaLeaflet && this.grupoMarcadores && this.grupoMarcadores.getLayers().length > 0) {
-        this.mapaLeaflet.fitBounds(this.grupoMarcadores.getBounds(), { padding: [35, 35] });
+        this.mapaLeaflet.fitBounds(this.grupoMarcadores.getBounds(), { padding: [40, 40] });
       }
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (WAZE MAPLIBRE GL)
+    // NAVEGAÇÃO 3D (VIAS LARGAS, PALETA DE ASFALTO WAZE & CÂMERA ABERTA)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -552,14 +529,75 @@ function entregaApp() {
       else window.speechSynthesis.cancel();
     },
 
+    projetarPontoNaRota(lat, lng) {
+      if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
+        return { lat, lng, distRota: 0, headingSegmento: null };
+      }
+
+      let menorDist = Infinity;
+      let pontoProjetado = { lat, lng };
+      let headingDoSegmento = null;
+
+      const rad = Math.PI / 180;
+      const cosLat = Math.cos(lat * rad);
+      const mPorLng = 111320 * cosLat;
+      const mPorLat = 110540;
+
+      for (let i = 0; i < this.coordenadasRotaAtual.length - 1; i++) {
+        const pA = this.coordenadasRotaAtual[i];
+        const pB = this.coordenadasRotaAtual[i + 1];
+
+        const lngA = pA[0], latA = pA[1];
+        const lngB = pB[0], latB = pB[1];
+
+        const dx = (lngB - lngA) * mPorLng;
+        const dy = (latB - latA) * mPorLat;
+        const L2 = dx * dx + dy * dy;
+
+        if (L2 === 0) continue;
+
+        const px = (lng - lngA) * mPorLng;
+        const py = (lat - latA) * mPorLat;
+
+        let t = (px * dx + py * dy) / L2;
+        t = Math.max(0, Math.min(1, t));
+
+        const projX = t * dx;
+        const projY = t * dy;
+
+        const distM = Math.sqrt((px - projX) * (px - projX) + (py - projY) * (py - projY));
+
+        if (distM < menorDist) {
+          menorDist = distM;
+          pontoProjetado = {
+            lat: latA + t * (latB - latA),
+            lng: lngA + t * (lngB - lngA)
+          };
+          headingDoSegmento = this.calcularBearing(latA, lngA, latB, lngB);
+        }
+      }
+
+      const limiteSnap = this.velocidadeGPS > 60 ? 45 : 35;
+      if (menorDist <= limiteSnap) {
+        return {
+          lat: pontoProjetado.lat,
+          lng: pontoProjetado.lng,
+          distRota: menorDist,
+          headingSegmento: headingDoSegmento
+        };
+      }
+
+      return { lat, lng, distRota: menorDist, headingSegmento: null };
+    },
+
     async iniciarNavegacaoNativa(entrega) {
       if (!navigator.geolocation) { alert('GPS não suportado.'); return; }
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
       this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-      this.instrucaoAtual = `Iniciando rota para o Canetão #${entrega?.ordem_entrega}...`;
+      this.nomeRuaAtualCarro = entrega?.endereco?.split(',')[0] || 'Localizando via...';
+      this.instrucaoAtual = `Iniciando trajeto para o Canetão #${entrega?.ordem_entrega}...`;
       this.distanciaProximaManobra = '...';
-      this.nomeRuaAtualCarro = 'Localizando via...';
       this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
       this.iconeManobraNav = '⬆️';
       this.chegadaAnunciada = false;
@@ -573,6 +611,9 @@ function entregaApp() {
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
 
+    /**
+     * MOTOR GRÁFICO 3D (COM ALARGAMENTO DE ASFALTO & CORES DO WAZE NOTURNO)
+     */
     inicializarMapaNavGL(entrega) {
       const container = document.getElementById('mapaNavGL');
       if (!container) return;
@@ -582,7 +623,10 @@ function entregaApp() {
         container: 'mapaNavGL',
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
         center: [entrega.longitude, entrega.latitude],
-        zoom: 18.5, pitch: 62, bearing: 0, attributionControl: false
+        zoom: 16.8, // Panorama aberto Waze
+        pitch: 42,  // Inclinação 3D suave da Foto 1 Waze
+        bearing: 0,
+        attributionControl: false
       });
 
       this.mapaNavGL.on('dragstart', (e) => {
@@ -590,6 +634,56 @@ function entregaApp() {
       });
 
       this.mapaNavGL.on('load', () => {
+        try {
+          // 1. Fundo azul-marinho dos quarteirões Waze
+          if (this.mapaNavGL.getLayer('background')) {
+            this.mapaNavGL.setPaintProperty('background', 'background-color', '#141c2b');
+          }
+
+          // 2. ALARGAMENTO DAS RUAS E COR DE ASFALTO DO WAZE
+          const layers = this.mapaNavGL.getStyle().layers || [];
+          layers.forEach(l => {
+            const id = l.id.toLowerCase();
+            const isRoad = id.includes('road') || id.includes('highway') || id.includes('transportation') || id.includes('street') || id.includes('tunnel') || id.includes('bridge');
+
+            if (l.type === 'line' && isRoad) {
+              try {
+                if (id.includes('casing')) {
+                  // Borda das vias
+                  this.mapaNavGL.setPaintProperty(l.id, 'line-color', '#182436');
+                  this.mapaNavGL.setPaintProperty(l.id, 'line-width', [
+                    'interpolate', ['linear'], ['zoom'],
+                    13, 2,
+                    15, 8,
+                    16.8, 16,
+                    18.5, 24
+                  ]);
+                } else {
+                  // Asfalto Waze Noturno (Foto 1)
+                  this.mapaNavGL.setPaintProperty(l.id, 'line-color', '#25334a');
+                  this.mapaNavGL.setPaintProperty(l.id, 'line-width', [
+                    'interpolate', ['linear'], ['zoom'],
+                    13, 1.5,
+                    15, 6,
+                    16.8, 13,
+                    18.5, 20
+                  ]);
+                }
+              } catch(err) {}
+            }
+
+            // Realce nítido nos nomes de ruas vizinhas
+            if (l.type === 'symbol' && (id.includes('label') || id.includes('name'))) {
+              try {
+                this.mapaNavGL.setPaintProperty(l.id, 'text-color', '#cbd5e1');
+                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-color', '#0f172a');
+                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-width', 2);
+              } catch(err) {}
+            }
+          });
+        } catch(e) {}
+
+        // Camada do traçado da rota
         if (!this.mapaNavGL.getSource('rota-source')) {
           this.mapaNavGL.addSource('rota-source', {
             type: 'geojson',
@@ -598,12 +692,12 @@ function entregaApp() {
           this.mapaNavGL.addLayer({
             id: 'rota-borda', type: 'line', source: 'rota-source',
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': '#0369a1', 'line-width': 15, 'line-opacity': 0.95 }
+            paint: { 'line-color': '#0369a1', 'line-width': 12, 'line-opacity': 0.95 }
           });
           this.mapaNavGL.addLayer({
             id: 'rota-linha', type: 'line', source: 'rota-source',
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': '#38bdf8', 'line-width': 9, 'line-opacity': 1.0 }
+            paint: { 'line-color': '#38bdf8', 'line-width': 8, 'line-opacity': 1.0 }
           });
         }
         this.iniciarGPSContinuoNavegacao(entrega);
@@ -612,16 +706,15 @@ function entregaApp() {
 
     iniciarGPSContinuoNavegacao(entrega) {
       navigator.geolocation.getCurrentPosition(async (pos) => {
-        let sLat = pos.coords.latitude;
-        let sLng = pos.coords.longitude;
-        const pontoRua = await this.travarCoordenadaNaRua(sLat, sLng);
-        sLat = pontoRua.lat; sLng = pontoRua.lng;
-        this.ultimaLatCarro = sLat; this.ultimaLngCarro = sLng;
+        const sLat = pos.coords.latitude;
+        const sLng = pos.coords.longitude;
+        this.ultimaLatCarro = sLat; 
+        this.ultimaLngCarro = sLng;
 
         this.atualizarMarcadorCarroGL(sLat, sLng, 0);
         const bearingInicial = this.calcularBearing(sLat, sLng, entrega.latitude, entrega.longitude);
         this.headingAtual = bearingInicial;
-        this.centralizarNoCarroGL(sLat, sLng, bearingInicial);
+        this.centralizarNoCarroGL(sLat, sLng, bearingInicial, 0);
 
         await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
 
@@ -634,24 +727,6 @@ function entregaApp() {
         alert('Não foi possível obter sinal de GPS.');
         this.pararNavegacao();
       }, { enableHighAccuracy: true });
-    },
-
-    async travarCoordenadaNaRua(lat, lng) {
-      try {
-        const url = `${this.OSRM_ROUTER_URL}/nearest/v1/driving/${lng},${lat}?number=1`;
-        const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.waypoints && data.waypoints.length > 0) {
-            return {
-              lat: data.waypoints[0].location[1],
-              lng: data.waypoints[0].location[0],
-              nomeRua: data.waypoints[0].name || ''
-            };
-          }
-        }
-      } catch (e) {}
-      return { lat, lng, nomeRua: '' };
     },
 
     atualizarLinhaNavGL(coordsLngLat) {
@@ -709,7 +784,7 @@ function entregaApp() {
       if (coordsLngLat.length > 1 && this.velocidadeGPS < this.minSpeedKmhNav) {
         const bearingVia = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
         this.headingAtual = bearingVia;
-        if (!this.mapaArrastadoPeloUsuario) this.centralizarNoCarroGL(sLat, sLng, bearingVia);
+        if (!this.mapaArrastadoPeloUsuario) this.centralizarNoCarroGL(sLat, sLng, bearingVia, 500);
       }
     },
 
@@ -729,7 +804,7 @@ function entregaApp() {
 
       const el = document.createElement('div');
       el.innerHTML = `
-        <div id="pinDestinoNav" style="background-color: ${corFundo}; color: #000; font-weight: 900; font-family: monospace; font-size: 13px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.85); cursor: pointer;">
+        <div id="pinDestinoNav" style="background-color: ${corFundo}; color: #000; font-weight: 900; font-family: monospace; font-size: 11px; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid #ffffff; box-shadow: 0 3px 10px rgba(0,0,0,0.85); cursor: pointer;">
           #${numCanetao}
         </div>
       `;
@@ -744,7 +819,7 @@ function entregaApp() {
         el.innerHTML = `
           <div class="fiorino-aura"></div>
           <div class="fiorino-svg-wrapper">
-            <svg width="28" height="50" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
+            <svg width="24" height="42" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
               <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
               <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
@@ -769,66 +844,83 @@ function entregaApp() {
       }
     },
 
-    centralizarNoCarroGL(lat, lng, bearing) {
+    centralizarNoCarroGL(lat, lng, bearing, duracao = 1000) {
       if (!this.mapaNavGL) return;
+
+      let zoomDinamico = 16.8;
+      if (this.velocidadeGPS > 75) {
+        zoomDinamico = 15.5; // Rodovia
+      } else if (this.velocidadeGPS > 35) {
+        zoomDinamico = 16.2; // Avenidas
+      } else {
+        zoomDinamico = 16.8; // Bairro (Foto 1 e 2 Waze)
+      }
+
       this.mapaNavGL.easeTo({
         center: [lng, lat],
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
-        pitch: 62, zoom: 18.5, duration: 500, easing: (t) => t
+        pitch: 42,
+        zoom: zoomDinamico,
+        padding: { top: 90, bottom: 230, left: 0, right: 0 }, // Carro no 1/3 inferior da tela
+        duration: duracao,
+        easing: (t) => t // Deslize linear suave sem soquinhos
       });
     },
 
     centralizarCarroManual() {
       this.mapaArrastadoPeloUsuario = false;
       if (this.ultimaLatCarro && this.ultimaLngCarro) {
-        this.centralizarNoCarroGL(this.ultimaLatCarro, this.ultimaLngCarro, this.headingAtual);
+        this.centralizarNoCarroGL(this.ultimaLatCarro, this.ultimaLngCarro, this.headingAtual, 400);
       }
-    },
-
-    verificarSeSaiuDaRota(cLat, cLng) {
-      if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) return false;
-      let menorDist = Infinity;
-      for (let i = 0; i < this.coordenadasRotaAtual.length; i++) {
-        const pt = this.coordenadasRotaAtual[i];
-        const d = this.calcularDistancia(cLat, cLng, pt[1], pt[0]);
-        if (d < menorDist) menorDist = d;
-        if (menorDist < 20) return false;
-      }
-      return menorDist > 65;
     },
 
     async processarPosicaoGPS(pos, destLat, destLng) {
-      let lat = pos.coords.latitude;
-      let lng = pos.coords.longitude;
+      const rawLat = pos.coords.latitude;
+      const rawLng = pos.coords.longitude;
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
 
-      const pontoRua = await this.travarCoordenadaNaRua(lat, lng);
-      lat = pontoRua.lat; lng = pontoRua.lng;
-      if (pontoRua.nomeRua) this.nomeRuaAtualCarro = pontoRua.nomeRua;
+      // 1. Projeção local na rota ativa (sem contramão)
+      const snap = this.projetarPontoNaRota(rawLat, rawLng);
+      const lat = snap.lat;
+      const lng = snap.lng;
 
-      let distDesdeUltimo = 0;
-      if (this.ultimaLatCarro && this.ultimaLngCarro) {
-        distDesdeUltimo = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
-      }
-
+      // 2. Heading angular suave
       let headingCalculado = pos.coords.heading;
-      if ((headingCalculado === null || isNaN(headingCalculado)) && distDesdeUltimo > 2) {
-        headingCalculado = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
+      if (snap.headingSegmento !== null && this.velocidadeGPS >= this.minSpeedKmhNav) {
+        headingCalculado = snap.headingSegmento;
+      } else if (headingCalculado === null || isNaN(headingCalculado)) {
+        if (this.ultimaLatCarro && this.ultimaLngCarro) {
+          const dist = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
+          if (dist > 2) {
+            headingCalculado = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
+          }
+        }
       }
 
       if (headingCalculado !== null && !isNaN(headingCalculado) && this.velocidadeGPS >= this.minSpeedKmhNav) {
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingCalculado, this.bearingSmoothFactor);
-      } 
+      }
 
+      // 3. Atualiza o nome da via atual para exibir na cápsula da Fiorino (Adeus "Localizando via...")
+      if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
+        const stepAtual = this.passosRota[this.passoAtualIndex];
+        const ruaDetectada = stepAtual.name || stepAtual.ref || (this.entregaNavegacao ? this.entregaNavegacao.endereco.split(',')[0] : '');
+        if (ruaDetectada) this.nomeRuaAtualCarro = ruaDetectada;
+      } else if (this.entregaNavegacao) {
+        this.nomeRuaAtualCarro = this.entregaNavegacao.endereco.split(',')[0];
+      }
+
+      // 4. Atualiza veículo e câmera no terço inferior
       this.atualizarMarcadorCarroGL(lat, lng, 0);
 
       if (!this.mapaArrastadoPeloUsuario) {
-        this.centralizarNoCarroGL(lat, lng, this.headingAtual);
+        this.centralizarNoCarroGL(lat, lng, this.headingAtual, 1000);
       }
 
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
+      // 5. Distância até o destino
       const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
@@ -838,32 +930,46 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      const agora = Date.now();
-      const fora = this.verificarSeSaiuDaRota(lat, lng);
+      // 6. Verificação de recálculo (apenas se errar a rota por mais de 65m)
+      const fora = snap.distRota > 65;
       if (fora) this.contadorForaDaRota++;
       else this.contadorForaDaRota = 0;
 
-      if (this.contadorForaDaRota >= 3 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 8000)) {
+      const agora = Date.now();
+      if (this.contadorForaDaRota >= 4 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 10000)) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
         this.contadorForaDaRota = 0;
         this.falarTexto('Recalculando rota...');
-        await this.calcularRotaRuaARua(lat, lng, destLat, destLng);
+        await this.calcularRotaRuaARua(rawLat, rawLng, destLat, destLng);
         this.recalculandoRota = false;
         return;
       }
 
+      // 7. Alertas antecipados (500m/150m na rodovia, 200m/60m na cidade)
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepAtual = this.passosRota[this.passoAtualIndex];
-        const distParaManobra = this.calcularDistancia(lat, lng, stepAtual.maneuver.location[1], stepAtual.maneuver.location[0]);
+        const manobraLat = stepAtual.maneuver.location[1];
+        const manobraLng = stepAtual.maneuver.location[0];
+        const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
+        const info = this.interpretarManobraWaze(stepAtual);
 
-        if (distParaManobra < 55 && !stepAtual._anunciado) {
-          stepAtual._anunciado = true;
-          const info = this.interpretarManobraWaze(stepAtual);
-          this.falarTexto(`A 50 metros, ${info.texto}`);
+        const isAltaVelocidade = this.velocidadeGPS > 60;
+        const distAvisoLonge = isAltaVelocidade ? 550 : 220;
+        const distAvisoPerto = isAltaVelocidade ? 160 : 65;
+
+        if (distParaManobra <= distAvisoLonge && distParaManobra > distAvisoPerto && !stepAtual._avisoLongeFalado) {
+          stepAtual._avisoLongeFalado = true;
+          const distFmt = isAltaVelocidade ? '500 metros' : '200 metros';
+          this.falarTexto(`A ${distFmt}, ${info.texto}`);
         }
 
-        if (distParaManobra < 18) { 
+        if (distParaManobra <= distAvisoPerto && distParaManobra > 25 && !stepAtual._avisoPertoFalado) {
+          stepAtual._avisoPertoFalado = true;
+          this.falarTexto(info.texto);
+        }
+
+        if (distParaManobra < 20) { 
           this.passoAtualIndex++;
           this.atualizarInstrucaoUI();
         }
@@ -889,21 +995,62 @@ function entregaApp() {
     interpretarManobraWaze(step) {
       const type = step.maneuver.type;
       const modifier = step.maneuver.modifier || '';
-      const rua = step.name || 'sua rota';
+      const rua = step.name ? `na ${step.name}` : (step.ref ? `na ${step.ref}` : 'à frente');
 
       let icone = '⬆️';
-      let texto = `Siga na ${rua}`;
+      let texto = `Continue ${rua}`;
 
-      if (type === 'depart') { icone = '⬆️'; texto = `Siga em frente na ${rua}`; }
-      else if (type === 'arrive') { icone = '🏁'; texto = `Destino à frente`; }
-      else if (type === 'turn') {
-        if (modifier.includes('right')) { icone = modifier.includes('slight') ? '↗️' : '⤴️'; texto = `Vire à direita na ${rua}`; }
-        else if (modifier.includes('left')) { icone = modifier.includes('slight') ? '↖️' : '⤵️'; texto = `Vire à esquerda na ${rua}`; }
-        else { icone = '⬆️'; texto = `Continue na ${rua}`; }
-      } else if (type === 'roundabout') { icone = '🔄'; texto = `Na rotatória, pegue a saída para ${rua}`; }
-      else if (type === 'end of road') { icone = modifier.includes('right') ? '⤴️' : '⤵️'; texto = `No fim da rua, vire na ${rua}`; }
+      if (type === 'depart') {
+        icone = '⬆️';
+        texto = `Siga em frente ${rua}`;
+      } else if (type === 'arrive') {
+        icone = '🏁';
+        texto = `Destino à frente`;
+      } else if (type === 'off ramp' || type === 'on ramp') {
+        if (modifier.includes('right')) {
+          icone = '↗️';
+          texto = `Pegue a saída à direita para ${step.name || 'a alça de acesso'}`;
+        } else if (modifier.includes('left')) {
+          icone = '↖️';
+          texto = `Pegue a saída à esquerda para ${step.name || 'a alça de acesso'}`;
+        } else {
+          icone = '↗️';
+          texto = `Pegue a saída para ${step.name || 'a via lateral'}`;
+        }
+      } else if (type === 'fork') {
+        if (modifier.includes('right')) {
+          icone = '↗️';
+          texto = `Mantenha-se à direita na bifurcação`;
+        } else if (modifier.includes('left')) {
+          icone = '↖️';
+          texto = `Mantenha-se à esquerda na bifurcação`;
+        } else {
+          icone = '⬆️';
+          texto = `Siga na bifurcação`;
+        }
+      } else if (type === 'merge') {
+        icone = '⬆️';
+        texto = `Junte-se à via ${rua}`;
+      } else if (type === 'turn') {
+        if (modifier.includes('right')) {
+          icone = modifier.includes('slight') ? '↗️' : '⤴️';
+          texto = `Vire à direita ${rua}`;
+        } else if (modifier.includes('left')) {
+          icone = modifier.includes('slight') ? '↖️' : '⤵️';
+          texto = `Vire à esquerda ${rua}`;
+        } else {
+          icone = '⬆️';
+          texto = `Continue ${rua}`;
+        }
+      } else if (type === 'roundabout' || type === 'rotary') {
+        icone = '🔄';
+        texto = `Na rotatória, pegue a saída para ${step.name || 'sua rota'}`;
+      } else if (type === 'end of road') {
+        icone = modifier.includes('right') ? '⤴️' : '⤵️';
+        texto = `No fim da via, vire ${modifier.includes('right') ? 'à direita' : 'à esquerda'} ${rua}`;
+      }
 
-      return { icone, texto, rua };
+      return { icone, texto, rua: step.name || step.ref || this.entregaNavegacao?.endereco || 'Rota' };
     },
 
     async concluirEntregaPeloNav(entrega) {
@@ -967,7 +1114,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // ROTAS, HISTÓRICO E PLANILHAS
+    // ROTAS, HISTÓRICO E PLANILHAS (COM VROOM PURO DO INDEX_OLD13)
     // =========================================================================
     async carregarUltimaRota() {
       try {
@@ -1022,7 +1169,6 @@ function entregaApp() {
         console.warn('Erro ao carregar histórico:', e);
       }
       
-      // Fallback: se estiver offline, resgata histórico em cache
       if (!this.rotasHistorico || this.rotasHistorico.length === 0) {
         const cache = localStorage.getItem('drivexps_rotas_historico_cache');
         if (cache) {
@@ -1059,10 +1205,6 @@ function entregaApp() {
       } catch(e) {}
     },
 
-    /**
-     * LEITOR INTELIGENTE DE PLANILHAS SHOPEE EXPRESS:
-     * Identifica pacotes avulsos e adicionais com "-" e sequencia como -1, -2, -3...
-     */
     parseLinhasShopee(linhasMatriz) {
       this.msgErro = null;
       if (!linhasMatriz || linhasMatriz.length < 2) return [];
@@ -1106,13 +1248,10 @@ function entregaApp() {
         const rawSeq = iSequence !== -1 ? String(cols[iSequence] || '').trim() : '';
         const rawStop = iStop !== -1 ? String(cols[iStop] || '').trim() : '';
         
-        // Se for "-" ou vazio, é pacote adicional (+1, +2, +3...)
-        const ehExtra = !rawSeq || rawSeq === '-' || rawSeq === '- -' || !rawStop || rawStop === '-' || isNaN(parseInt(rawSeq));
-
         let seqVal = null;
         let stpVal = null;
 
-        if (ehExtra) {
+        if (rawSeq === '-' || rawStop === '-') {
           seqVal = -contadorExtra;
           stpVal = -contadorExtra;
           contadorExtra++;
@@ -1132,12 +1271,12 @@ function entregaApp() {
           ordem_shopee: seqVal,
           parada_shopee: stpVal,
           codigo_rastreio: rastreioFinal,
-          destinatario: ehExtra ? `Parada +${contadorExtra - 1}` : (stpVal ? `Parada #${stpVal}` : 'Destinatário'),
-          telefone: '',
+          destinatario: stpVal ? `Parada #${stpVal}` : 'Destinatário',
+          telefone: '13999999999',
           endereco: addr,
           numero: numero,
           bairro: iBairro !== -1 && cols[iBairro] ? String(cols[iBairro]).trim() : '',
-          cidade: iCity !== -1 && cols[iCity] ? String(cols[iCity]).trim() : '',
+          cidade: iCity !== -1 && cols[iCity] ? String(cols[iCity]).trim() : 'Mongaguá',
           cep: iCep !== -1 && cols[iCep] ? String(cols[iCep]).trim() : '',
           latitude: lat,
           longitude: lng,
@@ -1201,8 +1340,8 @@ function entregaApp() {
         return { latitude: parseFloat(partes[0]), longitude: parseFloat(partes[1]) };
       }
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&addressdetails=1&limit=1&countrycodes=br`;
-        const res = await fetch(url, { headers: { 'Accept-Language': 'pt-BR' } });
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&limit=1&countrycodes=br`;
+        const res = await fetch(url);
         const data = await res.json();
         if (data && data.length > 0) return { latitude: parseFloat(data[0].lat), longitude: parseFloat(data[0].lon) };
       } catch(e) {}
@@ -1213,7 +1352,6 @@ function entregaApp() {
       if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
       this.carregandoProcesso = true;
       try {
-        // Garante que o usuário ativo seja identificado antes do envio
         if (!this.usuarioId) {
           const resMe = await this.fetchDirectus('/users/me');
           if (resMe.ok) {
@@ -1225,23 +1363,30 @@ function entregaApp() {
           }
         }
 
-        let cPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
-        let cChegada = null;
-        if (this.inputChegadaModal) {
-          if (this.inputChegadaModal.toLowerCase() === this.inputPartidaModal.toLowerCase()) cChegada = cPartida;
-          else cChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
+        let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
+        let coordChegada = null;
+        const pStr = this.inputPartidaModal.trim();
+        const cStr = this.inputChegadaModal.trim();
+
+        if (pStr) coordPartida = await this.converterTextoParaCoord(pStr);
+        if (cStr) {
+          if (cStr.toLowerCase() === pStr.toLowerCase()) {
+            coordChegada = coordPartida;
+          } else {
+            coordChegada = await this.converterTextoParaCoord(cStr);
+          }
         }
 
-        this.coordPartidaSalva = cPartida;
-        this.coordChegadaSalva = cChegada;
+        this.coordPartidaSalva = coordPartida;
+        this.coordChegadaSalva = coordChegada;
 
         const payload = {
           entregas: this.pacotesExtraidos,
           user_id: this.usuarioId,
-          cd_lat: cPartida ? cPartida.latitude : (this.pacotesExtraidos[0]?.latitude || -15.7801),
-          cd_lng: cPartida ? cPartida.longitude : (this.pacotesExtraidos[0]?.longitude || -47.9292),
-          casa_lat: cChegada ? cChegada.latitude : (cPartida ? cPartida.latitude : -15.7801),
-          casa_lng: cChegada ? cChegada.longitude : (cPartida ? cPartida.longitude : -47.9292)
+          cd_lat: coordPartida ? coordPartida.latitude : (this.pacotesExtraidos[0]?.latitude || -24.1667),
+          cd_lng: coordPartida ? coordPartida.longitude : (this.pacotesExtraidos[0]?.longitude || -46.7800),
+          casa_lat: coordChegada ? coordChegada.latitude : (coordPartida ? coordPartida.latitude : -24.1739),
+          casa_lng: coordChegada ? coordChegada.longitude : (coordPartida ? coordPartida.longitude : -46.7816)
         };
 
         const res = await fetch(this.N8N_WEBHOOK_URL, {
@@ -1506,12 +1651,13 @@ function entregaApp() {
           const latLng = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
           this.inputPartidaModal = latLng; 
           this.inputChegadaModal = latLng;
-          alert('📍 Localização atual gravada na Partida e Chegada!');
-        }, err => alert('Erro GPS: ' + err.message));
+          alert('📍 Sua localização atual foi gravada no Ponto de Partida e Chegada!');
+        }, err => alert('Erro no GPS: ' + err.message));
+      } else {
+        alert('Geolocalização não suportada pelo seu navegador.');
       }
     },
 
-    // TUTORIAL 8 PASSOS
     iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
     proximoPassoTutorial() { if (this.passoTutorial < 8) this.passoTutorial++; else this.concluirTutorial(); },
     voltarPassoTutorial() { if (this.passoTutorial > 1) this.passoTutorial--; },
