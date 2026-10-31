@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 5.7 - Núcleo Estabilizado: Rua Atual Real, Bipes & Recálculo Ágil
+   DriveXPS Pro 5.8 - VROOM Puro (Sem Ziguezague) + Waze Engine Estabilizado
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -65,7 +65,7 @@ function entregaApp() {
     marcadorCarroGL: null,
     marcadorDestinoGL: null,
     watchPositionId: null,
-    instrucaoAtual: 'Calculando trajeto...',
+    instrucaoAtual: 'Calculando melhor trajeto...',
     distanciaProximaManobra: '',
     nomeProximaRua: '',
     nomeRuaAtualCarro: '',
@@ -226,7 +226,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // GETTERS REATIVOS (LÓGICA OFICIAL INDEX_OLD13)
+    // GETTERS REATIVOS (ORDENAÇÃO VROOM PURA DO INDEX_OLD13)
     // =========================================================================
     formatarParada(val) {
       if (val === null || val === undefined) return '-';
@@ -238,7 +238,7 @@ function entregaApp() {
       return [...this.entregas].sort((a, b) => {
         if (a.status === 'entregue' && b.status !== 'entregue') return 1;
         if (a.status !== 'entregue' && b.status === 'entregue') return -1;
-        return a.ordem_entrega - b.ordem_entrega;
+        return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
       });
     },
 
@@ -433,7 +433,7 @@ function entregaApp() {
           const osc = this.audioContextBipe.createOscillator();
           const gain = this.audioContextBipe.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(880, this.audioContextBipe.currentTime); // Tom claro de atenção
+          osc.frequency.setValueAtTime(880, this.audioContextBipe.currentTime);
           gain.gain.setValueAtTime(0.18, this.audioContextBipe.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.01, this.audioContextBipe.currentTime + 0.15);
           osc.connect(gain);
@@ -480,13 +480,11 @@ function entregaApp() {
         const acimaLimite = this.velocidadeGPS > velLimite;
         this.radarExcessoVelocidade = acimaLimite;
 
-        // Dispara aviso de voz na aproximação
         if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 450) {
           this.radarVozAnunciadaId = radarMaisProximo.id;
           this.falarTexto(`Atenção: Radar à frente, limite ${velLimite} por hora`);
         }
 
-        // Se estiver acima do limite, emite bipe rítmico contínuo e vibração
         if (acimaLimite) {
           if (!this.intervaloBipeExcesso) {
             this.tocarBipeExcessoVelocidade();
@@ -555,7 +553,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET 2D
+    // MAPA GERAL LEAFLET 2D (COM ROTA OFICIAL VROOM SEM ZIGUEZAGUE)
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -600,6 +598,7 @@ function entregaApp() {
 
       const pontosLinha = [];
 
+      // 1. PIN DO CD / PARTIDA
       let posCD = null;
       if (this.coordPartidaSalva && this.coordPartidaSalva.latitude) {
         posCD = [this.coordPartidaSalva.latitude, this.coordPartidaSalva.longitude];
@@ -618,7 +617,8 @@ function entregaApp() {
         L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 PONTO DE PARTIDA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      const entregasOrdenadas = [...this.entregas].sort((a, b) => a.ordem_entrega - b.ordem_entrega);
+      // 2. PINOS DAS ENTREGAS (ORDEM ESTRITA DO VROOM: ordem_entrega)
+      const entregasOrdenadas = [...this.entregas].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
 
       entregasOrdenadas.forEach(p => {
         if (!p.latitude || !p.longitude) return;
@@ -649,6 +649,7 @@ function entregaApp() {
         L.marker(coord, { icon: iconePacote }).bindPopup(popupContent).addTo(this.grupoMarcadores);
       });
 
+      // 3. PIN DA CHEGADA
       let posCasa = null;
       if (this.coordChegadaSalva && this.coordChegadaSalva.latitude) {
         posCasa = [this.coordChegadaSalva.latitude, this.coordChegadaSalva.longitude];
@@ -667,6 +668,7 @@ function entregaApp() {
         L.marker(posCasa, { icon: iconeCasa }).bindPopup(`<strong>🏠 PONTO DE CHEGADA</strong>`).addTo(this.grupoMarcadores);
       }
 
+      // 4. DESENHO DA GEOMETRIA OFICIAL VROOM (SEM ZIGUEZAGUE)
       if (this.rotaGeometria && this.rotaGeometria.length > 5) {
         const latlngs = this.decodePolyline(this.rotaGeometria);
         this.linhaTrajeto = L.polyline(latlngs, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
@@ -684,7 +686,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (CÂMERA ESTÁVEL, RECÁLCULO ÁGIL & BUFFER DE RUA ATUAL)
+    // NAVEGAÇÃO 3D (WAZE ENGINE: VIA ATUAL REAL & PRÓXIMA MANOBRA NO TOPO)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -751,7 +753,6 @@ function entregaApp() {
         }
       }
 
-      // Se a distância for menor que 32 metros, projeta no centro da faixa
       if (menorDist <= 32) {
         return {
           lat: pontoProjetado.lat,
@@ -762,7 +763,6 @@ function entregaApp() {
         };
       }
 
-      // Passou reto ou errou a entrada: solta o carro e usa GPS real para não dar efeito biruta
       return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: indiceMaisProximo };
     },
 
@@ -771,7 +771,7 @@ function entregaApp() {
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
       this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-      this.nomeRuaAtualCarro = 'Localizando via...';
+      this.nomeRuaAtualCarro = 'Calculando via atual...';
       this.nomeRuaPisoAtual = '';
       this.instrucaoAtual = `Iniciando trajeto para o Canetão #${entrega?.ordem_entrega}...`;
       this.distanciaProximaManobra = '...';
@@ -945,7 +945,6 @@ function entregaApp() {
         this.passosRota = routeEncontrada.legs[0].steps || [];
         this.passoAtualIndex = 0;
 
-        // Atribui a via onde o carro está iniciando a perna
         if (this.passosRota.length > 0) {
           const viaInicial = this.passosRota[0].name || this.passosRota[0].ref || 'Sua Rota';
           this.nomeRuaPisoAtual = viaInicial;
@@ -1063,12 +1062,6 @@ function entregaApp() {
       }
     },
 
-    /**
-     * PROCESSAMENTO GPS EM TEMPO REAL:
-     * - Head-Up estável sem oscilações
-     * - Recálculo ágil em 3 segundos
-     * - Pílula da Fiorino com a via real onde o pneu está pisando
-     */
     async processarPosicaoGPS(pos, destLat, destLng) {
       const rawLat = pos.coords.latitude;
       const rawLng = pos.coords.longitude;
@@ -1096,7 +1089,7 @@ function entregaApp() {
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.40);
       }
 
-      // 3. Atualização da Pílula da Rua Atual (Nome da via onde o carro está agora)
+      // 3. Atualização da Pílula da Rua Atual
       if (this.nomeRuaPisoAtual && this.nomeRuaPisoAtual.trim() !== '') {
         this.nomeRuaAtualCarro = this.nomeRuaPisoAtual;
       } else if (this.passosRota.length > 0) {
@@ -1127,7 +1120,7 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // 8. RECÁLCULO ÁGIL (Dispara em 3 segundos se errar a entrada)
+      // 8. Recálculo ágil em 3 segundos
       const agora = Date.now();
       const fora = snap.distRota > 35;
       if (fora) {
@@ -1169,7 +1162,6 @@ function entregaApp() {
           this.falarTexto(info.texto);
         }
 
-        // Quando efetivamente passar pela manobra (< 15 metros), assume a nova rua na pílula!
         if (distParaManobra < 15) {
           if (stepManobra.name && stepManobra.name.trim() !== '') {
             this.nomeRuaPisoAtual = stepManobra.name;
@@ -1260,11 +1252,6 @@ function entregaApp() {
       return { icone, texto, rua: step.name || step.ref || this.entregaNavegacao?.endereco || 'Rota' };
     },
 
-    /**
-     * CONCLUSÃO DE ENTREGA:
-     * - Se houver próxima entrega: avança automaticamente.
-     * - Se for o último pacote da carga: toca mensagem festiva e exibe a tela de ROTA 100% CONCLUÍDA!
-     */
     async concluirEntregaPeloNav(entrega) {
       if (!entrega) return;
       await this.concluirEntrega(entrega);
@@ -1282,11 +1269,10 @@ function entregaApp() {
           await this.calcularRotaRuaARua(this.ultimaLatCarro, this.ultimaLngCarro, proxima.latitude, proxima.longitude);
         }
       } else {
-        // ÚLTIMA ENTREGA DA CARGA FINALIZADA COM SUCESSO!
         this.falarTexto('Parabéns! Todos os pacotes da carga foram entregues com sucesso!');
         if ('vibrate' in navigator) navigator.vibrate([150, 80, 150, 80, 200]);
         this.pararNavegacao();
-        this.modo = 'rua'; // Abre a tela comemorativa com a bandeira 🏁
+        this.modo = 'rua';
       }
     },
 
