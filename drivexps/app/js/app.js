@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 5.5 - Botão Unificado, Seletor de GPS & Rua Atual Calibrada
+   DriveXPS Pro 5.7 - Núcleo Estabilizado: Rua Atual Real, Bipes & Recálculo Ágil
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -13,7 +13,7 @@ function entregaApp() {
     // 2. TEMA, MODOS E PREFERÊNCIAS DE NAVEGAÇÃO
     tema: localStorage.getItem('drivexps_tema') || 'escuro',
     modo: 'carregamento',
-    appNavegacaoEscolhido: localStorage.getItem('drivexps_nav_app') || 'drivexps', // 'drivexps', 'waze', 'maps'
+    appNavegacaoEscolhido: localStorage.getItem('drivexps_nav_app') || 'drivexps',
     
     // 3. ESTADOS DE INTERFACE E MODAIS
     menuAberto: false,
@@ -65,10 +65,11 @@ function entregaApp() {
     marcadorCarroGL: null,
     marcadorDestinoGL: null,
     watchPositionId: null,
-    instrucaoAtual: 'Calculando melhor trajeto...',
+    instrucaoAtual: 'Calculando trajeto...',
     distanciaProximaManobra: '',
     nomeProximaRua: '',
     nomeRuaAtualCarro: '',
+    nomeRuaPisoAtual: '',
     subInstrucaoEmSeguida: '',
     iconeManobraNav: '⬆️',
     velocidadeGPS: 0,
@@ -87,12 +88,14 @@ function entregaApp() {
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
 
-    // Motor de Radares
+    // Motor de Radares & Alertas Sonoros
     listaRadares: [],
     radarProximoAlerta: null,
     distanciaRadarTexto: '',
     radarExcessoVelocidade: false,
     radarVozAnunciadaId: null,
+    audioContextBipe: null,
+    intervaloBipeExcesso: null,
 
     // 6. USUÁRIO E SAAS
     usuarioLogado: false,
@@ -119,7 +122,7 @@ function entregaApp() {
     isMobile: false,
 
     // =========================================================================
-    // CONTROLES DE ESCOLHA DO NAVEGADOR PADRÃO (NOVO)
+    // NAVEGADOR PADRÃO (DRIVEXPS / WAZE / MAPS)
     // =========================================================================
     selecionarAppNavegacao(appKey) {
       this.appNavegacaoEscolhido = appKey;
@@ -161,7 +164,6 @@ function entregaApp() {
       }
 
       if (this.appNavegacaoEscolhido === 'maps') {
-        // Tenta abrir direto no app do Maps no celular com fallback web
         const isAndroid = /android/i.test(navigator.userAgent);
         if (isAndroid) {
           window.location.href = `google.navigation:q=${entrega.latitude},${entrega.longitude}`;
@@ -171,7 +173,6 @@ function entregaApp() {
         return;
       }
 
-      // Padrão: Navegação 3D Nativa com Alerta de Radares
       this.iniciarNavegacaoNativa(entrega);
     },
 
@@ -402,7 +403,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MOTOR DE RADARES (DIRECTUS + CACHE LOCAL)
+    // MOTOR DE RADARES & BIPE SONORO DE ADVERTÊNCIA NATIVO
     // =========================================================================
     async carregarRadaresDoBanco() {
       try {
@@ -419,10 +420,35 @@ function entregaApp() {
       }
     },
 
+    tocarBipeExcessoVelocidade() {
+      try {
+        if (!this.audioContextBipe) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) this.audioContextBipe = new AudioContextClass();
+        }
+        if (this.audioContextBipe && this.audioContextBipe.state === 'suspended') {
+          this.audioContextBipe.resume();
+        }
+        if (this.audioContextBipe) {
+          const osc = this.audioContextBipe.createOscillator();
+          const gain = this.audioContextBipe.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, this.audioContextBipe.currentTime); // Tom claro de atenção
+          gain.gain.setValueAtTime(0.18, this.audioContextBipe.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.audioContextBipe.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(this.audioContextBipe.destination);
+          osc.start();
+          osc.stop(this.audioContextBipe.currentTime + 0.16);
+        }
+      } catch (e) {}
+    },
+
     verificarRadaresProximos(lat, lng, headingCarro) {
       if (!this.listaRadares || this.listaRadares.length === 0) {
         this.radarProximoAlerta = null;
         this.radarExcessoVelocidade = false;
+        if (this.intervaloBipeExcesso) { clearInterval(this.intervaloBipeExcesso); this.intervaloBipeExcesso = null; }
         return;
       }
 
@@ -451,19 +477,34 @@ function entregaApp() {
           : radarMaisProximo.distMetros + ' m';
 
         const velLimite = Number(radarMaisProximo.velocidade) || 60;
-        this.radarExcessoVelocidade = this.velocidadeGPS > velLimite;
+        const acimaLimite = this.velocidadeGPS > velLimite;
+        this.radarExcessoVelocidade = acimaLimite;
 
+        // Dispara aviso de voz na aproximação
         if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 450) {
           this.radarVozAnunciadaId = radarMaisProximo.id;
           this.falarTexto(`Atenção: Radar à frente, limite ${velLimite} por hora`);
-          if (this.radarExcessoVelocidade && 'vibrate' in navigator) {
-            navigator.vibrate([120, 60, 120]);
+        }
+
+        // Se estiver acima do limite, emite bipe rítmico contínuo e vibração
+        if (acimaLimite) {
+          if (!this.intervaloBipeExcesso) {
+            this.tocarBipeExcessoVelocidade();
+            if ('vibrate' in navigator) navigator.vibrate([80, 50, 80]);
+            this.intervaloBipeExcesso = setInterval(() => {
+              if (this.radarExcessoVelocidade) {
+                this.tocarBipeExcessoVelocidade();
+              }
+            }, 900);
           }
+        } else {
+          if (this.intervaloBipeExcesso) { clearInterval(this.intervaloBipeExcesso); this.intervaloBipeExcesso = null; }
         }
       } else {
         this.radarProximoAlerta = null;
         this.radarExcessoVelocidade = false;
         this.radarVozAnunciadaId = null;
+        if (this.intervaloBipeExcesso) { clearInterval(this.intervaloBipeExcesso); this.intervaloBipeExcesso = null; }
       }
     },
 
@@ -643,7 +684,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (WAZE ENGINE: VIA ATUAL REAL & PRÓXIMA MANOBRA NO TOPO)
+    // NAVEGAÇÃO 3D (CÂMERA ESTÁVEL, RECÁLCULO ÁGIL & BUFFER DE RUA ATUAL)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -710,8 +751,8 @@ function entregaApp() {
         }
       }
 
-      const limiteSnap = this.velocidadeGPS > 60 ? 45 : 35;
-      if (menorDist <= limiteSnap) {
+      // Se a distância for menor que 32 metros, projeta no centro da faixa
+      if (menorDist <= 32) {
         return {
           lat: pontoProjetado.lat,
           lng: pontoProjetado.lng,
@@ -721,7 +762,8 @@ function entregaApp() {
         };
       }
 
-      return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: 0 };
+      // Passou reto ou errou a entrada: solta o carro e usa GPS real para não dar efeito biruta
+      return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: indiceMaisProximo };
     },
 
     async iniciarNavegacaoNativa(entrega) {
@@ -729,7 +771,8 @@ function entregaApp() {
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
       this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-      this.nomeRuaAtualCarro = 'Calculando via atual...';
+      this.nomeRuaAtualCarro = 'Localizando via...';
+      this.nomeRuaPisoAtual = '';
       this.instrucaoAtual = `Iniciando trajeto para o Canetão #${entrega?.ordem_entrega}...`;
       this.distanciaProximaManobra = '...';
       this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
@@ -901,13 +944,14 @@ function entregaApp() {
         this.distanciaProximaManobra = distMetros > 1000 ? (distMetros / 1000).toFixed(1) + ' km' : distMetros + ' m';
         this.passosRota = routeEncontrada.legs[0].steps || [];
         this.passoAtualIndex = 0;
-        
-        // Atribui o nome da via onde você está iniciando
+
+        // Atribui a via onde o carro está iniciando a perna
         if (this.passosRota.length > 0) {
-          const stepSaida = this.passosRota[0];
-          this.nomeRuaAtualCarro = stepSaida.name || stepSaida.ref || 'Via Atual';
+          const viaInicial = this.passosRota[0].name || this.passosRota[0].ref || 'Sua Rota';
+          this.nomeRuaPisoAtual = viaInicial;
+          this.nomeRuaAtualCarro = viaInicial;
         }
-        
+
         this.atualizarInstrucaoUI();
       }
 
@@ -1020,21 +1064,24 @@ function entregaApp() {
     },
 
     /**
-     * LOOP DE POSIÇÃO GPS (COM ATRIBUIÇÃO DA RUA ONDE O CARRO ESTÁ AGORA)
+     * PROCESSAMENTO GPS EM TEMPO REAL:
+     * - Head-Up estável sem oscilações
+     * - Recálculo ágil em 3 segundos
+     * - Pílula da Fiorino com a via real onde o pneu está pisando
      */
     async processarPosicaoGPS(pos, destLat, destLng) {
       const rawLat = pos.coords.latitude;
       const rawLng = pos.coords.longitude;
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
 
-      // 1. Projeção Snap-to-Route local
+      // 1. Projeção Snap-to-Route
       const snap = this.projetarPontoNaRota(rawLat, rawLng);
       const lat = snap.lat;
       const lng = snap.lng;
 
-      // 2. Rotação do mapa (Head-Up imediato na curva)
+      // 2. Rotação Head-Up fluida
       let headingAlvo = null;
-      if (snap.headingSegmento !== null) {
+      if (snap.headingSegmento !== null && snap.distRota <= 30) {
         headingAlvo = snap.headingSegmento;
       } else if (pos.coords.heading !== null && !isNaN(pos.coords.heading) && this.velocidadeGPS >= this.minSpeedKmhNav) {
         headingAlvo = pos.coords.heading;
@@ -1049,22 +1096,20 @@ function entregaApp() {
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.40);
       }
 
-      // 3. ATRIBUIÇÃO DA RUA ATUAL CORRETA (ONDE O PNEU ESTÁ PISANDO AGORA):
-      if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
-        const stepCorrente = this.passosRota[this.passoAtualIndex];
-        const nomeVia = stepCorrente.name || stepCorrente.ref;
-        if (nomeVia && nomeVia.trim() !== '') {
-          this.nomeRuaAtualCarro = nomeVia;
-        }
+      // 3. Atualização da Pílula da Rua Atual (Nome da via onde o carro está agora)
+      if (this.nomeRuaPisoAtual && this.nomeRuaPisoAtual.trim() !== '') {
+        this.nomeRuaAtualCarro = this.nomeRuaPisoAtual;
+      } else if (this.passosRota.length > 0) {
+        this.nomeRuaAtualCarro = this.passosRota[0].name || this.passosRota[0].ref || 'Sua Rota';
       }
 
-      // 4. VERIFICAÇÃO DE RADARES
+      // 4. Verificação de Radares & Alertas Sonoros
       this.verificarRadaresProximos(lat, lng, this.headingAtual);
 
       // 5. Move o carro
       this.atualizarMarcadorCarroGL(lat, lng, 0);
 
-      // 6. Câmera acompanha no rodapé
+      // 6. Câmera acompanha o carro
       if (!this.mapaArrastadoPeloUsuario) {
         this.centralizarNoCarroGL(lat, lng, this.headingAtual, 900);
       }
@@ -1082,13 +1127,16 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // 8. Recálculo genuíno
-      const fora = snap.distRota > 65;
-      if (fora) this.contadorForaDaRota++;
-      else this.contadorForaDaRota = 0;
-
+      // 8. RECÁLCULO ÁGIL (Dispara em 3 segundos se errar a entrada)
       const agora = Date.now();
-      if (this.contadorForaDaRota >= 4 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 10000)) {
+      const fora = snap.distRota > 35;
+      if (fora) {
+        this.contadorForaDaRota++;
+      } else {
+        this.contadorForaDaRota = 0;
+      }
+
+      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 5000)) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
         this.contadorForaDaRota = 0;
@@ -1098,40 +1146,41 @@ function entregaApp() {
         return;
       }
 
-      // 9. Manobra seguinte: calcula distância até a próxima conversão
+      // 9. Manobras & Transição da Rua Atual após virar a esquina
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
-        const stepAtual = this.passosRota[this.passoAtualIndex];
-        const manobraLat = stepAtual.maneuver.location[1];
-        const manobraLng = stepAtual.maneuver.location[0];
+        const stepManobra = this.passosRota[this.passoAtualIndex];
+        const manobraLat = stepManobra.maneuver.location[1];
+        const manobraLng = stepManobra.maneuver.location[0];
         const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
-        const info = this.interpretarManobraWaze(stepAtual);
+        const info = this.interpretarManobraWaze(stepManobra);
 
         const isAltaVelocidade = this.velocidadeGPS > 60;
         const distAvisoLonge = isAltaVelocidade ? 550 : 220;
         const distAvisoPerto = isAltaVelocidade ? 160 : 65;
 
-        if (distParaManobra <= distAvisoLonge && distParaManobra > distAvisoPerto && !stepAtual._avisoLongeFalado) {
-          stepAtual._avisoLongeFalado = true;
+        if (distParaManobra <= distAvisoLonge && distParaManobra > distAvisoPerto && !stepManobra._avisoLongeFalado) {
+          stepManobra._avisoLongeFalado = true;
           const distFmt = isAltaVelocidade ? '500 metros' : '200 metros';
           this.falarTexto(`A ${distFmt}, ${info.texto}`);
         }
 
-        if (distParaManobra <= distAvisoPerto && distParaManobra > 25 && !stepAtual._avisoPertoFalado) {
-          stepAtual._avisoPertoFalado = true;
+        if (distParaManobra <= distAvisoPerto && distParaManobra > 25 && !stepManobra._avisoPertoFalado) {
+          stepManobra._avisoPertoFalado = true;
           this.falarTexto(info.texto);
         }
 
-        // Quando efetivamente passar pela esquina (< 20m), avança o passo e a pílula do carro assume o nome da nova rua!
-        if (distParaManobra < 20) { 
+        // Quando efetivamente passar pela manobra (< 15 metros), assume a nova rua na pílula!
+        if (distParaManobra < 15) {
+          if (stepManobra.name && stepManobra.name.trim() !== '') {
+            this.nomeRuaPisoAtual = stepManobra.name;
+            this.nomeRuaAtualCarro = stepManobra.name;
+          }
           this.passoAtualIndex++;
           this.atualizarInstrucaoUI();
         }
       }
     },
 
-    /**
-     * CABEÇALHO SUPERIOR (PRÓXIMA RUA ONDE VOCÊ VAI VIRAR)
-     */
     atualizarInstrucaoUI() {
       if (this.passosRota.length === 0 || this.passoAtualIndex >= this.passosRota.length) return;
       
@@ -1211,9 +1260,15 @@ function entregaApp() {
       return { icone, texto, rua: step.name || step.ref || this.entregaNavegacao?.endereco || 'Rota' };
     },
 
+    /**
+     * CONCLUSÃO DE ENTREGA:
+     * - Se houver próxima entrega: avança automaticamente.
+     * - Se for o último pacote da carga: toca mensagem festiva e exibe a tela de ROTA 100% CONCLUÍDA!
+     */
     async concluirEntregaPeloNav(entrega) {
       if (!entrega) return;
       await this.concluirEntrega(entrega);
+      
       const proxima = this.entregas.find(e => e.status !== 'entregue' && e.id !== entrega.id);
       
       if (proxima) {
@@ -1227,9 +1282,11 @@ function entregaApp() {
           await this.calcularRotaRuaARua(this.ultimaLatCarro, this.ultimaLngCarro, proxima.latitude, proxima.longitude);
         }
       } else {
-        this.falarTexto('Parabéns! Todas as entregas da carga foram concluídas!');
-        alert('🎉 Rota 100% Concluída com sucesso!');
+        // ÚLTIMA ENTREGA DA CARGA FINALIZADA COM SUCESSO!
+        this.falarTexto('Parabéns! Todos os pacotes da carga foram entregues com sucesso!');
+        if ('vibrate' in navigator) navigator.vibrate([150, 80, 150, 80, 200]);
         this.pararNavegacao();
+        this.modo = 'rua'; // Abre a tela comemorativa com a bandeira 🏁
       }
     },
 
@@ -1264,6 +1321,7 @@ function entregaApp() {
       }
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
+      if (this.intervaloBipeExcesso) { clearInterval(this.intervaloBipeExcesso); this.intervaloBipeExcesso = null; }
       if (this.mapaNavGL) { this.mapaNavGL.remove(); this.mapaNavGL = null; }
       this.marcadorCarroGL = null;
       this.marcadorDestinoGL = null;

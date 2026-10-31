@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 5.2 - Folha de Estilos (Waze Noturno + Botões Ampliados)
+   DriveXPS Pro 5.6 - Folha de Estilos Modular
    Arquivo: /css/styles.css
    ========================================================================== */
 
@@ -139,7 +139,7 @@ body.theme-claro .text-amber-400 {
 }
 
 /* ==========================================================================
-   NAVEGADOR ESTILO WAZE 3D (MapLibre GL) - BOTÕES AMPLIADOS & VISÍVEIS
+   NAVEGADOR ESTILO WAZE 3D (MapLibre GL)
    ========================================================================== */
 
 /* Velocímetro Ampliado e Ergonômico (68px) */
@@ -158,16 +158,17 @@ body.theme-claro .text-amber-400 {
   transition: all 0.3s ease;
 }
 
+/* Alerta de Excesso de Velocidade no Radar: Vermelho Pulsante */
 .waze-speed-circle.alerta-excesso {
   border-color: #ef4444 !important;
   background: rgba(185, 28, 28, 0.95) !important;
-  animation: pulseRadar 0.8s infinite alternate;
-  box-shadow: 0 0 24px rgba(239, 68, 68, 0.9) !important;
+  animation: pulseRadar 0.6s infinite alternate;
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.95) !important;
 }
 
 @keyframes pulseRadar {
   0% { transform: scale(1); }
-  100% { transform: scale(1.08); }
+  100% { transform: scale(1.10); }
 }
 
 /* Mira de Centralização Ampliada (62px) */
@@ -185,22 +186,22 @@ body.theme-claro .text-amber-400 {
   cursor: pointer;
 }
 
-/* Plaqueta de Alerta de Radar Estilo Waze (Canto Superior Direito) */
+/* PLAQUETA DE RADAR ESTILO WAZE (POSICIONADA ABAIXO DO CABEÇALHO SEM CORTES) */
 .waze-radar-badge {
   position: absolute;
-  top: 92px;
+  top: 135px; /* Não fica mais escondida atrás do cabeçalho */
   right: 14px;
-  z-index: 550;
+  z-index: 590;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(15, 23, 42, 0.94);
+  gap: 9px;
+  background: rgba(15, 23, 42, 0.96);
   border: 2px solid #ef4444;
   border-radius: 20px;
   padding: 6px 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 16px rgba(239, 68, 68, 0.45);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85), 0 0 18px rgba(239, 68, 68, 0.5);
   backdrop-filter: blur(8px);
-  animation: slideDownRadar 0.35s ease-out;
+  animation: slideDownRadar 0.3s ease-out;
 }
 
 @keyframes slideDownRadar {
@@ -210,20 +211,20 @@ body.theme-claro .text-amber-400 {
 
 /* Círculo Oficial de Trânsito R-19 (Limite de Velocidade) */
 .radar-speed-limit-circle {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: #ffffff;
   border: 4px solid #dc2626;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .radar-speed-number {
   font-family: monospace;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 900;
   color: #111827;
   line-height: 1;
