@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=4.5.0">
+  <link rel="stylesheet" href="./css/styles.css?v=5.2.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -32,7 +32,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Script Principal Unificado -->
-  <script src="./js/app.js?v=4.5.0"></script>
+  <script src="./js/app.js?v=5.2.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -317,11 +317,11 @@
           <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
         </div>
 
-        <!-- 5 ABAS DE NAVEGAÇÃO -->
+        <!-- 5 ABAS -->
         <nav class="grid grid-cols-5 gap-1 pt-1">
           <button id="btnTourRota" @click="abrirModalImportar()" class="bg-white text-orange-600 shadow-md font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <span class="text-xs font-black tracking-wide">Rota</span>
+            <span class="text-xs font-black tracking-wide">+ Rota</span>
           </button>
           <button id="btnTourSacolas" @click="modo = 'carregamento'" :class="modo === 'carregamento' ? 'bg-black text-white shadow-inner border border-gray-700' : 'bg-orange-700 text-orange-100'" class="font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 active:scale-95 transition-all">
             <span class="text-sm">👜</span><span class="text-xs font-black tracking-wide">Sacolas</span>
@@ -369,7 +369,7 @@
                   <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
                   <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.ordem_shopee)"></span>
                 </div>
-                <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                      :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
                   <span class="text-[10px] font-black tracking-wider uppercase leading-none">SACOLA</span>
                   <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
@@ -560,8 +560,10 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL) -->
+    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL COM ALERTA DE RADAR) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
+      
+      <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
       <div class="absolute top-0 left-0 right-0 z-[600] bg-black/90 backdrop-blur-md text-white px-4 pt-4 pb-3 shadow-2xl border-b border-gray-800/80">
         <div class="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-2 opacity-60"></div>
         <div class="flex items-center justify-between gap-3">
@@ -572,6 +574,7 @@
                 <span class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight leading-none" x-text="distanciaProximaManobra || '0 m'"></span>
                 <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">até o destino</span>
               </div>
+              <!-- Cabeçalho mostra a próxima manobra/rua onde vai virar -->
               <h3 class="text-base sm:text-lg font-black text-cyan-400 truncate leading-tight mt-1" x-text="nomeProximaRua || entregaNavegacao?.endereco"></h3>
             </div>
           </div>
@@ -584,17 +587,28 @@
         </div>
       </div>
       
+      <!-- PLAQUETA FLUTUANTE DE ALERTA DE RADAR À FRENTE (ESTILO WAZE R-19) -->
+      <div x-show="radarProximoAlerta" class="waze-radar-badge" x-cloak>
+        <div class="radar-speed-limit-circle">
+          <span class="radar-speed-number" x-text="radarProximoAlerta?.velocidade || '60'"></span>
+        </div>
+        <div class="text-left leading-tight">
+          <span class="text-[9px] uppercase font-black text-red-400 tracking-wider block">Radar à frente</span>
+          <span class="text-xs font-mono font-bold text-white" x-text="`${distanciaRadarTexto}`"></span>
+        </div>
+      </div>
+
       <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL"></div>
 
-      <!-- VELOCÍMETRO -->
+      <!-- VELOCÍMETRO AMPLIADO (68px) COM ALERTA VISUAL SE ACIMA DO LIMITE -->
       <div class="absolute bottom-52 left-4 z-[500]">
-        <div class="waze-speed-circle">
-          <span class="text-xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
+        <div class="waze-speed-circle" :class="{'alerta-excesso': radarExcessoVelocidade}">
+          <span class="text-2xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
           <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
         </div>
       </div>
 
-      <!-- MIRA CENTRALIZADORA -->
+      <!-- MIRA CENTRALIZADORA AMPLIADA (62px) -->
       <div class="absolute bottom-52 right-4 z-[500]">
         <button @click="centralizarCarroManual()" class="waze-mira-btn active:scale-90 transition" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'">
           <span class="text-2xl">🎯</span>
@@ -719,7 +733,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">⬆️</div>
           <h3 class="text-2xl font-black text-white">1. Importar Romaneio</h3>
-          <p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
+          <p class="text-sm text-gray-200 leading-relaxed">Toque na aba <strong>"+ Rota"</strong> (com a seta verde de upload) e selecione a planilha <code>.xlsx</code> oficial baixada no app da SPX Shopee.</p>
         </div>
       </template>
 
@@ -780,7 +794,7 @@
     </div>
   </div>
 
-  <!-- 8. MODAL DE ASSINATURA COMPLETO COM PLANOS SEMANAL / MENSAL E PIX (FOTO 2 RESOLVIDA) -->
+  <!-- 8. MODAL DE ASSINATURA COMPLETO COM PLANOS SEMANAL / MENSAL E PIX -->
   <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>

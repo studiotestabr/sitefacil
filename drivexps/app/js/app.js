@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 5.0 - Motor Waze: Head-Up Fixo, Carro no Rodapé & Giro Fluido
+   DriveXPS Pro 5.3 - Motor de Navegação Nativa Waze com Radares e Rua Atual
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -58,7 +58,7 @@ function entregaApp() {
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP PERSPECTIVE)
+    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
@@ -85,6 +85,13 @@ function entregaApp() {
     recalculandoRota: false,
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
+
+    // Motor de Radares
+    listaRadares: [],
+    radarProximoAlerta: null,
+    distanciaRadarTexto: '',
+    radarExcessoVelocidade: false,
+    radarVozAnunciadaId: null,
 
     // 6. USUÁRIO E SAAS
     usuarioLogado: false,
@@ -288,6 +295,12 @@ function entregaApp() {
         try { this.rotasHistorico = JSON.parse(cacheHistorico); } catch(e) {}
       }
 
+      // Restaura cache de radares se existir
+      const cacheRadares = localStorage.getItem('drivexps_radares_cache');
+      if (cacheRadares) {
+        try { this.listaRadares = JSON.parse(cacheRadares); } catch(e) {}
+      }
+
       await this.verificarAutenticacao();
 
       if (this.usuarioLogado) {
@@ -297,6 +310,8 @@ function entregaApp() {
         } else {
           await this.carregarUltimaRota();
         }
+        // Carrega radares do Directus em segundo plano
+        this.carregarRadaresDoBanco();
       }
 
       this.escutarArquivosCompartilhados();
@@ -328,6 +343,80 @@ function entregaApp() {
       if (this.rotaGeometria) localStorage.setItem('drivexps_rota_geometria', this.rotaGeometria);
       if (this.coordPartidaSalva) localStorage.setItem('drivexps_coord_partida', JSON.stringify(this.coordPartidaSalva));
       if (this.coordChegadaSalva) localStorage.setItem('drivexps_coord_chegada', JSON.stringify(this.coordChegadaSalva));
+    },
+
+    // =========================================================================
+    // MOTOR DE RADARES (DIRECTUS + CACHE LOCAL)
+    // =========================================================================
+    async carregarRadaresDoBanco() {
+      try {
+        const res = await this.fetchDirectus('/items/drivexps_radares?limit=1000');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.data && data.data.length > 0) {
+            this.listaRadares = data.data;
+            localStorage.setItem('drivexps_radares_cache', JSON.stringify(this.listaRadares));
+          }
+        }
+      } catch (e) {
+        console.warn('Usando cache local de radares:', e);
+      }
+    },
+
+    /**
+     * VERIFICAÇÃO DE RADAR À FRENTE DO VEÍCULO:
+     * Calcula distância e rumo angular para alertar radares no sentido de tráfego.
+     */
+    verificarRadaresProximos(lat, lng, headingCarro) {
+      if (!this.listaRadares || this.listaRadares.length === 0) {
+        this.radarProximoAlerta = null;
+        this.radarExcessoVelocidade = false;
+        return;
+      }
+
+      let radarMaisProximo = null;
+      let menorDistancia = Infinity;
+
+      for (const r of this.listaRadares) {
+        const dist = this.calcularDistancia(lat, lng, r.latitude, r.longitude);
+
+        // Considera radares a até 500 metros
+        if (dist <= 500 && dist < menorDistancia) {
+          // Filtro direcional: o radar precisa estar à frente do veículo (± 70 graus do rumo)
+          const anguloAteRadar = this.calcularBearing(lat, lng, r.latitude, r.longitude);
+          let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
+          if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
+
+          if (diffAngulo <= 75) {
+            menorDistancia = dist;
+            radarMaisProximo = { ...r, distMetros: Math.round(dist) };
+          }
+        }
+      }
+
+      if (radarMaisProximo) {
+        this.radarProximoAlerta = radarMaisProximo;
+        this.distanciaRadarTexto = radarMaisProximo.distMetros > 1000 
+          ? (radarMaisProximo.distMetros / 1000).toFixed(1) + ' km' 
+          : radarMaisProximo.distMetros + ' m';
+
+        // Alerta de excesso: velocidade do carro maior que o limite do radar
+        const velLimite = Number(radarMaisProximo.velocidade) || 60;
+        this.radarExcessoVelocidade = this.velocidadeGPS > velLimite;
+
+        // Dispara aviso de voz apenas uma vez por radar
+        if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 450) {
+          this.radarVozAnunciadaId = radarMaisProximo.id;
+          this.falarTexto(`Atenção: Radar à frente, limite ${velLimite} por hora`);
+          if (this.radarExcessoVelocidade && 'vibrate' in navigator) {
+            navigator.vibrate([120, 60, 120]);
+          }
+        }
+      } else {
+        this.radarProximoAlerta = null;
+        this.radarExcessoVelocidade = false;
+        this.radarVozAnunciadaId = null;
+      }
     },
 
     // =========================================================================
@@ -377,7 +466,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET 2D (COM ROTA OFICIAL VROOM)
+    // MAPA GERAL LEAFLET 2D
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -506,7 +595,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (MOTOR WAZE NATIVO - HEAD-UP RIGOROSO & AUTO-RECENTER)
+    // NAVEGAÇÃO 3D (WAZE ENGINE - RUA ATUAL CORRETA & HEAD-UP FLUIDO)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -524,18 +613,17 @@ function entregaApp() {
     },
 
     /**
-     * SNAP-TO-ROUTE LOCAL COM DIREÇÃO VETORIAL DA VIA:
-     * Identifica em qual pedaço de asfalto o carro está e extrai o rumo (bearing)
-     * exato do segmento para alinhar a rua para o topo da tela imediatamente.
+     * SNAP-TO-ROUTE LOCAL COM EXTRAÇÃO DA VIA ATUAL
      */
     projetarPontoNaRota(lat, lng) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
-        return { lat, lng, distRota: 0, headingSegmento: null };
+        return { lat, lng, distRota: 0, headingSegmento: null, indiceSegmento: 0 };
       }
 
       let menorDist = Infinity;
       let pontoProjetado = { lat, lng };
       let headingDoSegmento = null;
+      let indiceMaisProximo = 0;
 
       const rad = Math.PI / 180;
       const cosLat = Math.cos(lat * rad);
@@ -572,8 +660,8 @@ function entregaApp() {
             lat: latA + t * (latB - latA),
             lng: lngA + t * (lngB - lngA)
           };
-          // Ângulo exato da rua para o Head-Up Waze
           headingDoSegmento = this.calcularBearing(latA, lngA, latB, lngB);
+          indiceMaisProximo = i;
         }
       }
 
@@ -583,11 +671,12 @@ function entregaApp() {
           lat: pontoProjetado.lat,
           lng: pontoProjetado.lng,
           distRota: menorDist,
-          headingSegmento: headingDoSegmento
+          headingSegmento: headingDoSegmento,
+          indiceSegmento: indiceMaisProximo
         };
       }
 
-      return { lat, lng, distRota: menorDist, headingSegmento: null };
+      return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: 0 };
     },
 
     async iniciarNavegacaoNativa(entrega) {
@@ -595,7 +684,7 @@ function entregaApp() {
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
       this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-      this.nomeRuaAtualCarro = entrega?.endereco?.split(',')[0] || 'Iniciando...';
+      this.nomeRuaAtualCarro = 'Calculando via atual...';
       this.instrucaoAtual = `Iniciando trajeto para o Canetão #${entrega?.ordem_entrega}...`;
       this.distanciaProximaManobra = '...';
       this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
@@ -607,14 +696,19 @@ function entregaApp() {
       this.coordenadasRotaAtual = [];
       this.contadorForaDaRota = 0;
       this.recalculandoRota = false;
+      this.radarProximoAlerta = null;
+      this.radarExcessoVelocidade = false;
+      this.radarVozAnunciadaId = null;
+
+      // Garante radares carregados
+      if (!this.listaRadares || this.listaRadares.length === 0) {
+        this.carregarRadaresDoBanco();
+      }
 
       this.falarTexto(`Iniciando rota para Canetão número ${entrega.ordem_entrega}, na ${entrega.endereco}`);
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
 
-    /**
-     * MOTOR MAPLIBRE GL 3D (PITCH 45°, ZOOM WAZE & LARGURA DE RUAS)
-     */
     inicializarMapaNavGL(entrega) {
       const container = document.getElementById('mapaNavGL');
       if (!container) return;
@@ -624,18 +718,16 @@ function entregaApp() {
         container: 'mapaNavGL',
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
         center: [entrega.longitude, entrega.latitude],
-        zoom: 16.8, // Panorama aberto Waze
-        pitch: 45,  // Inclinação 3D da Foto 2 Waze
+        zoom: 16.8,
+        pitch: 45,
         bearing: 0,
         attributionControl: false
       });
 
-      // Retorno automático à centralização caso o usuário toque na tela
       this.mapaNavGL.on('dragstart', (e) => {
         if (e.originalEvent) {
           this.mapaArrastadoPeloUsuario = true;
           if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
-          // Volta a acompanhar automaticamente após 5 segundos sem toques
           this.timeoutRecentralizar = setTimeout(() => {
             this.mapaArrastadoPeloUsuario = false;
           }, 5000);
@@ -648,7 +740,6 @@ function entregaApp() {
             this.mapaNavGL.setPaintProperty('background', 'background-color', '#141c2b');
           }
 
-          // Alargamento das ruas para ficarem grossas como asfalto do Waze
           const layers = this.mapaNavGL.getStyle().layers || [];
           layers.forEach(l => {
             const id = l.id.toLowerCase();
@@ -767,6 +858,11 @@ function entregaApp() {
         this.passosRota = routeEncontrada.legs[0].steps || [];
         this.passoAtualIndex = 0;
         this.atualizarInstrucaoUI();
+
+        // Extrai a rua atual inicial a partir do primeiro passo
+        if (this.passosRota.length > 0 && this.passosRota[0].name) {
+          this.nomeRuaAtualCarro = this.passosRota[0].name;
+        }
       }
 
       if (!coordsLngLat || coordsLngLat.length === 0) {
@@ -809,10 +905,6 @@ function entregaApp() {
       this.marcadorDestinoGL = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(this.mapaNavGL);
     },
 
-    /**
-     * FIORINO SEMPRE APONTADA PARA CIMA NO VISOR:
-     * O mapa gira no chão embaixo do carro, mantendo a frente da Fiorino reta para o topo do celular!
-     */
     atualizarMarcadorCarroGL(lat, lng, headingRelativo = 0) {
       if (!this.mapaNavGL) return;
       if (!this.marcadorCarroGL) {
@@ -848,11 +940,6 @@ function entregaApp() {
       }
     },
 
-    /**
-     * ENQUADRAMENTO EXATO DO WAZE:
-     * Carro próximo ao rodapé da tela, liberando o horizonte à frente,
-     * e o mapa girando para manter a via 100% reta para o topo do celular.
-     */
     centralizarNoCarroGL(lat, lng, bearing, duracao = 800) {
       if (!this.mapaNavGL) return;
 
@@ -861,7 +948,7 @@ function entregaApp() {
       else if (this.velocidadeGPS > 35) zoomDinamico = 16.2;
       else zoomDinamico = 16.8;
 
-      // Ponto de visão à frente: projeta a câmera ligeiramente adiante na direção do carro
+      // Ponto de visão à frente: projeta a câmera adiante, colocando o carro no rodapé
       const distOffsetMetros = 85;
       const rad = (bearing !== undefined && bearing !== null ? bearing : this.headingAtual) * Math.PI / 180;
       const dLat = (distOffsetMetros * Math.cos(rad)) / 111111;
@@ -872,10 +959,10 @@ function entregaApp() {
       this.mapaNavGL.easeTo({
         center: centerFocal,
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
-        pitch: 45, // Perspectiva 3D suave da Foto 2 Waze
+        pitch: 45,
         zoom: zoomDinamico,
         duration: duracao,
-        easing: (t) => t // Deslize linear suave e contínuo
+        easing: (t) => t
       });
     },
 
@@ -888,7 +975,10 @@ function entregaApp() {
     },
 
     /**
-     * LOOP DE POSIÇÃO GPS (Giro imediato ao virar a esquina)
+     * LOOP DE POSIÇÃO GPS:
+     * - Head-up ativo (mapa vira na curva).
+     * - Pílula da Fiorino exibe a rua ATUAL trafegada.
+     * - Monitoramento de radares em tempo real.
      */
     async processarPosicaoGPS(pos, destLat, destLng) {
       const rawLat = pos.coords.latitude;
@@ -900,8 +990,7 @@ function entregaApp() {
       const lat = snap.lat;
       const lng = snap.lng;
 
-      // 2. ROTAÇÃO IMEDIATA DO MAPA (Sem efeito caranguejo):
-      // Quando entra na rua, o mapa vira junto com o segmento da via
+      // 2. Rotação do mapa (Head-Up imediato na curva)
       let headingAlvo = null;
       if (snap.headingSegmento !== null) {
         headingAlvo = snap.headingSegmento;
@@ -915,23 +1004,28 @@ function entregaApp() {
       }
 
       if (headingAlvo !== null && !isNaN(headingAlvo)) {
-        // Giro ágil sem delay para a rua virar para cima no exato momento da curva
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.40);
       }
 
-      // 3. Atualiza o nome da rua real na cápsula embaixo do carro
+      // 3. ATUALIZAÇÃO DA RUA ATUAL (ONDE ESTÁ TRAFEGANDO AGORA):
+      // A pílula da Fiorino mostra o nome do passo viário atual, enquanto o topo mostra a próxima conversão!
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepAtual = this.passosRota[this.passoAtualIndex];
-        const ruaDetectada = stepAtual.name || stepAtual.ref || (this.entregaNavegacao ? this.entregaNavegacao.endereco.split(',')[0] : '');
-        if (ruaDetectada) this.nomeRuaAtualCarro = ruaDetectada;
-      } else if (this.entregaNavegacao) {
-        this.nomeRuaAtualCarro = this.entregaNavegacao.endereco.split(',')[0];
+        // O nome da rua onde você está agora vem do passo ativo da rota
+        if (stepAtual.name && stepAtual.name.trim() !== '') {
+          this.nomeRuaAtualCarro = stepAtual.name;
+        } else if (stepAtual.ref) {
+          this.nomeRuaAtualCarro = stepAtual.ref;
+        }
       }
 
-      // 4. Move o carro suavemente
+      // 4. VERIFICAÇÃO DE RADARES EM TEMPO REAL
+      this.verificarRadaresProximos(lat, lng, this.headingAtual);
+
+      // 5. Move o carro
       this.atualizarMarcadorCarroGL(lat, lng, 0);
 
-      // 5. Câmera acompanha sempre se o usuário não estiver manipulando o mapa
+      // 6. Câmera acompanha no rodapé
       if (!this.mapaArrastadoPeloUsuario) {
         this.centralizarNoCarroGL(lat, lng, this.headingAtual, 900);
       }
@@ -939,7 +1033,7 @@ function entregaApp() {
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
-      // 6. Distância até o destino
+      // 7. Distância até o destino
       const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
@@ -949,7 +1043,7 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // 7. Recálculo genuíno
+      // 8. Recálculo genuíno
       const fora = snap.distRota > 65;
       if (fora) this.contadorForaDaRota++;
       else this.contadorForaDaRota = 0;
@@ -965,7 +1059,7 @@ function entregaApp() {
         return;
       }
 
-      // 8. Alertas sonoros antecipados
+      // 9. Instruções de manobra (PRÓXIMA RUA no cabeçalho)
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepAtual = this.passosRota[this.passoAtualIndex];
         const manobraLat = stepAtual.maneuver.location[1];
@@ -988,6 +1082,7 @@ function entregaApp() {
           this.falarTexto(info.texto);
         }
 
+        // Passou da esquina, avança o passo e atualiza a rua atual
         if (distParaManobra < 20) { 
           this.passoAtualIndex++;
           this.atualizarInstrucaoUI();
@@ -997,14 +1092,17 @@ function entregaApp() {
 
     atualizarInstrucaoUI() {
       if (this.passosRota.length === 0 || this.passoAtualIndex >= this.passosRota.length) return;
-      const step = this.passosRota[this.passoAtualIndex];
-      const info = this.interpretarManobraWaze(step);
-      this.instrucaoAtual = info.texto;
-      this.nomeProximaRua = info.rua;
-      this.iconeManobraNav = info.icone;
+      
+      // O cabeçalho mostra para onde você vai (próximo passo)
+      const proximoPasso = this.passosRota[this.passoAtualIndex + 1] || this.passosRota[this.passoAtualIndex];
+      const infoProxima = this.interpretarManobraWaze(proximoPasso);
+      
+      this.instrucaoAtual = infoProxima.texto;
+      this.nomeProximaRua = infoProxima.rua;
+      this.iconeManobraNav = infoProxima.icone;
 
-      if (this.passosRota[this.passoAtualIndex + 1]) {
-        const nextInfo = this.interpretarManobraWaze(this.passosRota[this.passoAtualIndex + 1]);
+      if (this.passosRota[this.passoAtualIndex + 2]) {
+        const nextInfo = this.interpretarManobraWaze(this.passosRota[this.passoAtualIndex + 2]);
         this.subInstrucaoEmSeguida = `${nextInfo.icone} ${nextInfo.texto}`;
       } else {
         this.subInstrucaoEmSeguida = '🏁 Destino final à frente';
@@ -1130,6 +1228,8 @@ function entregaApp() {
       this.marcadorDestinoGL = null;
       this.coordenadasRotaAtual = [];
       this.mapaArrastadoPeloUsuario = false;
+      this.radarProximoAlerta = null;
+      this.radarExcessoVelocidade = false;
       this.modo = 'rua'; 
     },
 
