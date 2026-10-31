@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=5.2.0">
+  <link rel="stylesheet" href="./css/styles.css?v=5.4.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -32,7 +32,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Script Principal Unificado -->
-  <script src="./js/app.js?v=5.2.0"></script>
+  <script src="./js/app.js?v=5.4.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -123,7 +123,7 @@
     </div>
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
-      <span class="font-black text-amber-400 tracking-wider">STUDIOTESTA</span>
+      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </div>
   </div>
 
@@ -160,7 +160,7 @@
     </div>
     <div class="pt-6 pb-2 text-center text-xs select-text">
       <span class="text-blue-400/90 font-medium">DriveXPS criado e mantido por </span>
-      <span class="font-black text-amber-400 tracking-wider">STUDIOTESTA</span>
+      <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
     </div>
   </div>
 
@@ -199,6 +199,32 @@
           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Status da Assinatura:</span>
           <p class="text-xs font-black" :class="statusAssinatura === 'ativo' ? 'text-emerald-400' : 'text-amber-400'" x-text="getTextoStatusAssinatura()"></p>
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
+        </div>
+
+        <!-- NOVA SEÇÃO: ESCOLHA DO NAVEGADOR PADRÃO (FOTO 2 RESOLVIDA) -->
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Navegador Padrão:</span>
+            <span class="text-[10px] font-black text-cyan-400 uppercase" x-text="appNavegacaoEscolhido"></span>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button @click="selecionarAppNavegacao('drivexps')"
+                    class="py-2.5 px-1.5 rounded-xl text-[11px] font-black flex flex-col items-center justify-center gap-1 border transition active:scale-95"
+                    :class="appNavegacaoEscolhido === 'drivexps' ? 'bg-blue-600 text-white border-blue-400 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700'">
+              <span class="text-base">🧭</span> DriveXPS
+            </button>
+            <button @click="selecionarAppNavegacao('waze')"
+                    class="py-2.5 px-1.5 rounded-xl text-[11px] font-black flex flex-col items-center justify-center gap-1 border transition active:scale-95"
+                    :class="appNavegacaoEscolhido === 'waze' ? 'bg-cyan-600 text-white border-cyan-400 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700'">
+              <span class="text-base">🚗</span> Waze
+            </button>
+            <button @click="selecionarAppNavegacao('maps')"
+                    class="py-2.5 px-1.5 rounded-xl text-[11px] font-black flex flex-col items-center justify-center gap-1 border transition active:scale-95"
+                    :class="appNavegacaoEscolhido === 'maps' ? 'bg-emerald-600 text-white border-emerald-400 shadow-md' : 'bg-gray-800 text-gray-300 border-gray-700'">
+              <span class="text-base">🗺️</span> Maps
+            </button>
+          </div>
+          <p class="text-[9px] text-gray-400 text-center">O botão principal na aba Rua abrirá o app escolhido aqui.</p>
         </div>
 
         <!-- SELETOR DE TEMA -->
@@ -242,11 +268,15 @@
         </nav>
       </div>
 
-      <div class="space-y-3 pt-4 border-t border-gray-800">
+      <!-- CRÉDITO COM LINK CLICÁVEL PARA HTTPS://STUDIOTESTA.COM.BR/ -->
+      <div class="space-y-3 pt-4 border-t border-gray-800 text-center">
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
         </button>
-        <p class="text-[10px] text-gray-500 text-center font-medium">DriveXPS • Desenvolvido e mantido por STUDIOTESTA</p>
+        <p class="text-[10px] text-gray-400 font-medium pt-1">
+          DriveXPS • Criado e mantido por 
+          <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 hover:underline transition ml-0.5">STUDIOTESTA</a>
+        </p>
       </div>
     </div>
   </div>
@@ -338,7 +368,7 @@
         </nav>
       </header>
 
-      <!-- MODO 1: SACOLAS (ORDENAÇÃO COM ENTREGUES NO FINAL + CORES POR STATUS) -->
+      <!-- MODO 1: SACOLAS -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/40 text-xs text-yellow-400 space-y-1 shadow-md">
           <p class="font-black text-sm flex items-center gap-1.5"><span>✍️</span> CONFERÊNCIA E MARCAÇÃO NO CANETÃO</p>
@@ -369,10 +399,10 @@
                   <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
                   <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.ordem_shopee)"></span>
                 </div>
-                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
+                <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                      :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
                   <span class="text-[10px] font-black tracking-wider uppercase leading-none">SACOLA</span>
-                  <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
+                  <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
                 </div>
               </div>
 
@@ -409,7 +439,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT) -->
+      <!-- MODO 2: RUA (COCKPIT COM BOTÃO UNIFICADO DE NAVEGAÇÃO - FOTO 1 RESOLVIDA) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
@@ -486,13 +516,14 @@
               <p class="text-lg sm:text-xl text-gray-200 font-black" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 pt-2">
-              <button @click="iniciarNavegacaoNativa(entregaAtual)" class="bg-blue-600 hover:bg-blue-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">
-                <span class="text-2xl">🧭</span> Navegar
+            <!-- BOTÃO UNIFICADO DE NAVEGAÇÃO: ADAPTA-SE AO NAVEGADOR ESCOLHIDO NO MENU -->
+            <div class="pt-2">
+              <button @click="dispararNavegacaoConfigurada(entregaAtual)" 
+                      class="w-full text-center py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2.5 shadow-xl active:scale-95 transition"
+                      :class="getEstiloBotaoNavegacao()">
+                <span class="text-2xl" x-text="getIconeBotaoNavegacao()"></span>
+                <span x-text="getTextoBotaoNavegacao()"></span>
               </button>
-              <a :href="`waze://?ll=${entregaAtual.latitude},${entregaAtual.longitude}&navigate=yes`" class="bg-emerald-600 hover:bg-emerald-500 text-center py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 shadow-xl active:scale-95 transition">
-                <span class="text-2xl">🚗</span> Waze
-              </a>
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
@@ -574,7 +605,6 @@
                 <span class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight leading-none" x-text="distanciaProximaManobra || '0 m'"></span>
                 <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">até o destino</span>
               </div>
-              <!-- Cabeçalho mostra a próxima manobra/rua onde vai virar -->
               <h3 class="text-base sm:text-lg font-black text-cyan-400 truncate leading-tight mt-1" x-text="nomeProximaRua || entregaNavegacao?.endereco"></h3>
             </div>
           </div>
@@ -794,7 +824,7 @@
     </div>
   </div>
 
-  <!-- 8. MODAL DE ASSINATURA COMPLETO COM PLANOS SEMANAL / MENSAL E PIX -->
+  <!-- 8. MODAL DE ASSINATURA -->
   <div x-show="modalAssinatura" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl">
       <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40 shadow-lg">⚡</div>
@@ -803,7 +833,6 @@
         <p class="text-xs text-gray-300 leading-relaxed">Economize até <strong>2 horas de trabalho</strong> e mais de <strong>R$ 25 de gasolina por dia</strong>.</p>
       </div>
 
-      <!-- SELETOR DOS DOIS PLANOS (SEMANAL E MENSAL) -->
       <div x-show="!codigoPixGerado" class="space-y-2.5 text-left">
         <div @click="planoEscolhido = 'semanal'" class="p-3.5 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center" :class="planoEscolhido === 'semanal' ? 'bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10' : 'bg-black/40 border-gray-800'">
           <div>
@@ -830,7 +859,6 @@
         </div>
       </div>
 
-      <!-- BOTÃO GERAR PIX -->
       <div x-show="!codigoPixGerado" class="space-y-2 pt-1">
         <button @click="gerarPixAssinatura()" :disabled="carregandoPix" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
           <span x-show="!carregandoPix">💠 Pagar com PIX (Ativação Imediata)</span><span x-show="carregandoPix">⏳ Gerando PIX Oficial Pushin Pay...</span>
@@ -838,7 +866,6 @@
         <button @click="fecharModalAssinatura()" class="text-xs text-gray-400 hover:text-white pt-1 font-bold">Fechar</button>
       </div>
 
-      <!-- TELA DO QR CODE E COPIA E COLA -->
       <div x-show="codigoPixGerado" class="space-y-3 pt-1 text-center bg-black/80 p-4 rounded-2xl border border-gray-800">
         <p class="text-xs font-bold text-emerald-400">✅ PIX Gerado com Sucesso!</p>
         <template x-if="qrCodeBase64">
@@ -854,7 +881,7 @@
     </div>
   </div>
 
-  <!-- 10. MODAL BLOQUEANTE DE CADASTRO OBRIGATÓRIO -->
+  <!-- 10. MODAL CADASTRO OBRIGATÓRIO -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
       <h3 class="text-xl font-black text-white text-center">Complete seu Cadastro</h3>
