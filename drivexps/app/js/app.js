@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 5.4 - Sincronização Precisa de Via Atual vs Próxima Manobra
+   DriveXPS Pro 5.5 - Botão Unificado, Seletor de GPS & Rua Atual Calibrada
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -10,9 +10,10 @@ function entregaApp() {
     N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
     OSRM_ROUTER_URL: 'https://rotas.studiotesta.com.br',
 
-    // 2. TEMA E MODOS DE VISUALIZAÇÃO
+    // 2. TEMA, MODOS E PREFERÊNCIAS DE NAVEGAÇÃO
     tema: localStorage.getItem('drivexps_tema') || 'escuro',
     modo: 'carregamento',
+    appNavegacaoEscolhido: localStorage.getItem('drivexps_nav_app') || 'drivexps', // 'drivexps', 'waze', 'maps'
     
     // 3. ESTADOS DE INTERFACE E MODAIS
     menuAberto: false,
@@ -116,6 +117,63 @@ function entregaApp() {
     isStandalone: false,
     isIOS: false,
     isMobile: false,
+
+    // =========================================================================
+    // CONTROLES DE ESCOLHA DO NAVEGADOR PADRÃO (NOVO)
+    // =========================================================================
+    selecionarAppNavegacao(appKey) {
+      this.appNavegacaoEscolhido = appKey;
+      localStorage.setItem('drivexps_nav_app', appKey);
+      if ('vibrate' in navigator) navigator.vibrate(30);
+    },
+
+    getIconeBotaoNavegacao() {
+      if (this.appNavegacaoEscolhido === 'waze') return '🚗';
+      if (this.appNavegacaoEscolhido === 'maps') return '🗺️';
+      return '🧭';
+    },
+
+    getTextoBotaoNavegacao() {
+      if (this.appNavegacaoEscolhido === 'waze') return 'Navegar com Waze';
+      if (this.appNavegacaoEscolhido === 'maps') return 'Navegar com Google Maps';
+      return 'Navegar no DriveXPS (3D)';
+    },
+
+    getEstiloBotaoNavegacao() {
+      if (this.appNavegacaoEscolhido === 'waze') {
+        return 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/30';
+      }
+      if (this.appNavegacaoEscolhido === 'maps') {
+        return 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30';
+      }
+      return 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/40';
+    },
+
+    dispararNavegacaoConfigurada(entrega) {
+      if (!entrega || !entrega.latitude || !entrega.longitude) {
+        alert('Coordenadas indisponíveis para este pacote.');
+        return;
+      }
+
+      if (this.appNavegacaoEscolhido === 'waze') {
+        window.location.href = `waze://?ll=${entrega.latitude},${entrega.longitude}&navigate=yes`;
+        return;
+      }
+
+      if (this.appNavegacaoEscolhido === 'maps') {
+        // Tenta abrir direto no app do Maps no celular com fallback web
+        const isAndroid = /android/i.test(navigator.userAgent);
+        if (isAndroid) {
+          window.location.href = `google.navigation:q=${entrega.latitude},${entrega.longitude}`;
+        } else {
+          window.open(`https://www.google.com/maps/dir/?api=1&destination=${entrega.latitude},${entrega.longitude}`, '_system');
+        }
+        return;
+      }
+
+      // Padrão: Navegação 3D Nativa com Alerta de Radares
+      this.iniciarNavegacaoNativa(entrega);
+    },
 
     // =========================================================================
     // COMUNICAÇÃO DIRECTUS COM AUTO-REFRESH DE TOKEN (401)
@@ -844,7 +902,7 @@ function entregaApp() {
         this.passosRota = routeEncontrada.legs[0].steps || [];
         this.passoAtualIndex = 0;
         
-        // Define a rua de saída na pílula da Fiorino
+        // Atribui o nome da via onde você está iniciando
         if (this.passosRota.length > 0) {
           const stepSaida = this.passosRota[0];
           this.nomeRuaAtualCarro = stepSaida.name || stepSaida.ref || 'Via Atual';
@@ -962,7 +1020,7 @@ function entregaApp() {
     },
 
     /**
-     * LOOP DE POSIÇÃO GPS (COM ATRIBUIÇÃO EXATA DA RUA ATUAL VS PRÓXIMA MANOBRA)
+     * LOOP DE POSIÇÃO GPS (COM ATRIBUIÇÃO DA RUA ONDE O CARRO ESTÁ AGORA)
      */
     async processarPosicaoGPS(pos, destLat, destLng) {
       const rawLat = pos.coords.latitude;
@@ -991,8 +1049,7 @@ function entregaApp() {
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.40);
       }
 
-      // 3. ATRIBUIÇÃO DA RUA ATUAL CORRETA (ONDE O PNEU ESTÁ PISANDO):
-      // A rua atual é o passo viário do índice atual em que o veículo está trafegando.
+      // 3. ATRIBUIÇÃO DA RUA ATUAL CORRETA (ONDE O PNEU ESTÁ PISANDO AGORA):
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepCorrente = this.passosRota[this.passoAtualIndex];
         const nomeVia = stepCorrente.name || stepCorrente.ref;
@@ -1047,8 +1104,6 @@ function entregaApp() {
         const manobraLat = stepAtual.maneuver.location[1];
         const manobraLng = stepAtual.maneuver.location[0];
         const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
-
-        // A instrução do próximo passo é o destino da manobra
         const info = this.interpretarManobraWaze(stepAtual);
 
         const isAltaVelocidade = this.velocidadeGPS > 60;
@@ -1066,8 +1121,7 @@ function entregaApp() {
           this.falarTexto(info.texto);
         }
 
-        // Quando efetivamente passar pela esquina (< 20m), avança o passo!
-        // Neste momento a pílula do carro assume o nome da nova rua em que você entrou.
+        // Quando efetivamente passar pela esquina (< 20m), avança o passo e a pílula do carro assume o nome da nova rua!
         if (distParaManobra < 20) { 
           this.passoAtualIndex++;
           this.atualizarInstrucaoUI();
@@ -1076,7 +1130,7 @@ function entregaApp() {
     },
 
     /**
-     * CABEÇALHO SUPERIOR (MOSTRA A PRÓXIMA MANOBRA / PRÓXIMA RUA ONDE VOCÊ VAI VIRAR)
+     * CABEÇALHO SUPERIOR (PRÓXIMA RUA ONDE VOCÊ VAI VIRAR)
      */
     atualizarInstrucaoUI() {
       if (this.passosRota.length === 0 || this.passoAtualIndex >= this.passosRota.length) return;
@@ -1085,7 +1139,7 @@ function entregaApp() {
       const info = this.interpretarManobraWaze(stepManobra);
       
       this.instrucaoAtual = info.texto;
-      this.nomeProximaRua = info.rua; // Próxima rua onde o motorista vai virar
+      this.nomeProximaRua = info.rua;
       this.iconeManobraNav = info.icone;
 
       if (this.passosRota[this.passoAtualIndex + 1]) {
