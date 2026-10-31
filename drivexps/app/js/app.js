@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 5.8 - VROOM Puro (Sem Ziguezague) + Waze Engine Estabilizado
+   DriveXPS Pro 6.0 - Motor Waze: Radares na Pista, Alertas & VROOM Estabilizado
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -59,13 +59,14 @@ function entregaApp() {
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES)
+    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES NA PISTA)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
     marcadorDestinoGL: null,
+    marcadoresRadaresGL: [],
     watchPositionId: null,
-    instrucaoAtual: 'Calculando melhor trajeto...',
+    instrucaoAtual: 'Calculando trajeto...',
     distanciaProximaManobra: '',
     nomeProximaRua: '',
     nomeRuaAtualCarro: '',
@@ -226,7 +227,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // GETTERS REATIVOS (ORDENAÇÃO VROOM PURA DO INDEX_OLD13)
+    // GETTERS REATIVOS (LÓGICA OFICIAL INDEX_OLD13)
     // =========================================================================
     formatarParada(val) {
       if (val === null || val === undefined) return '-';
@@ -403,7 +404,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MOTOR DE RADARES & BIPE SONORO DE ADVERTÊNCIA NATIVO
+    // MOTOR DE RADARES, BIPE SONORO & PLACAS NA PISTA
     // =========================================================================
     async carregarRadaresDoBanco() {
       try {
@@ -413,11 +414,54 @@ function entregaApp() {
           if (data && data.data && data.data.length > 0) {
             this.listaRadares = data.data;
             localStorage.setItem('drivexps_radares_cache', JSON.stringify(this.listaRadares));
+            if (this.modo === 'navegacao' && this.mapaNavGL) {
+              this.renderizarRadaresNaPistaGL();
+            }
           }
         }
       } catch (e) {
         console.warn('Usando cache local de radares:', e);
       }
+    },
+
+    /**
+     * RENDERIZAÇÃO DE PLACAS DE RADAR FINCADAS NA PISTA DO MAPA 3D
+     */
+    renderizarRadaresNaPistaGL() {
+      if (!this.mapaNavGL) return;
+
+      // Limpa marcadores de radares anteriores para não duplicar
+      if (this.marcadoresRadaresGL && this.marcadoresRadaresGL.length > 0) {
+        this.marcadoresRadaresGL.forEach(m => m.remove());
+      }
+      this.marcadoresRadaresGL = [];
+
+      if (!this.listaRadares || this.listaRadares.length === 0) return;
+
+      // Renderiza apenas os radares próximos ao trajeto para máxima performance (60fps)
+      this.listaRadares.forEach(r => {
+        if (!r.latitude || !r.longitude) return;
+
+        const el = document.createElement('div');
+        el.className = 'radar-pino-pista';
+        el.title = `Radar ${r.velocidade || 60} km/h - ${r.rodovia_rua || 'Via'}`;
+        el.innerHTML = `
+          <div class="radar-pino-disco">
+            <span class="radar-pino-vel">${r.velocidade || 60}</span>
+          </div>
+          <div class="radar-pino-haste"></div>
+        `;
+
+        const marcador = new maplibregl.Marker({ 
+          element: el, 
+          anchor: 'bottom',
+          rotationAlignment: 'viewport'
+        })
+        .setLngLat([r.longitude, r.latitude])
+        .addTo(this.mapaNavGL);
+
+        this.marcadoresRadaresGL.push(marcador);
+      });
     },
 
     tocarBipeExcessoVelocidade() {
@@ -876,6 +920,10 @@ function entregaApp() {
             paint: { 'line-color': '#38bdf8', 'line-width': 8, 'line-opacity': 1.0 }
           });
         }
+
+        // Renderiza as placas dos radares fincadas na pista
+        this.renderizarRadaresNaPistaGL();
+
         this.iniciarGPSContinuoNavegacao(entrega);
       });
     },
@@ -1308,6 +1356,13 @@ function entregaApp() {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
       if (this.intervaloBipeExcesso) { clearInterval(this.intervaloBipeExcesso); this.intervaloBipeExcesso = null; }
+      
+      // Limpa marcadores de radares na pista
+      if (this.marcadoresRadaresGL && this.marcadoresRadaresGL.length > 0) {
+        this.marcadoresRadaresGL.forEach(m => m.remove());
+        this.marcadoresRadaresGL = [];
+      }
+
       if (this.mapaNavGL) { this.mapaNavGL.remove(); this.mapaNavGL = null; }
       this.marcadorCarroGL = null;
       this.marcadorDestinoGL = null;
