@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 5.3 - Motor de Navegação Nativa Waze com Radares e Rua Atual
+   DriveXPS Pro 5.4 - Sincronização Precisa de Via Atual vs Próxima Manobra
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -295,7 +295,6 @@ function entregaApp() {
         try { this.rotasHistorico = JSON.parse(cacheHistorico); } catch(e) {}
       }
 
-      // Restaura cache de radares se existir
       const cacheRadares = localStorage.getItem('drivexps_radares_cache');
       if (cacheRadares) {
         try { this.listaRadares = JSON.parse(cacheRadares); } catch(e) {}
@@ -310,7 +309,6 @@ function entregaApp() {
         } else {
           await this.carregarUltimaRota();
         }
-        // Carrega radares do Directus em segundo plano
         this.carregarRadaresDoBanco();
       }
 
@@ -350,7 +348,7 @@ function entregaApp() {
     // =========================================================================
     async carregarRadaresDoBanco() {
       try {
-        const res = await this.fetchDirectus('/items/drivexps_radares?limit=1000');
+        const res = await this.fetchDirectus('/items/drivexps_radares?limit=1500');
         if (res.ok) {
           const data = await res.json();
           if (data && data.data && data.data.length > 0) {
@@ -363,10 +361,6 @@ function entregaApp() {
       }
     },
 
-    /**
-     * VERIFICAÇÃO DE RADAR À FRENTE DO VEÍCULO:
-     * Calcula distância e rumo angular para alertar radares no sentido de tráfego.
-     */
     verificarRadaresProximos(lat, lng, headingCarro) {
       if (!this.listaRadares || this.listaRadares.length === 0) {
         this.radarProximoAlerta = null;
@@ -380,9 +374,7 @@ function entregaApp() {
       for (const r of this.listaRadares) {
         const dist = this.calcularDistancia(lat, lng, r.latitude, r.longitude);
 
-        // Considera radares a até 500 metros
         if (dist <= 500 && dist < menorDistancia) {
-          // Filtro direcional: o radar precisa estar à frente do veículo (± 70 graus do rumo)
           const anguloAteRadar = this.calcularBearing(lat, lng, r.latitude, r.longitude);
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
@@ -400,11 +392,9 @@ function entregaApp() {
           ? (radarMaisProximo.distMetros / 1000).toFixed(1) + ' km' 
           : radarMaisProximo.distMetros + ' m';
 
-        // Alerta de excesso: velocidade do carro maior que o limite do radar
         const velLimite = Number(radarMaisProximo.velocidade) || 60;
         this.radarExcessoVelocidade = this.velocidadeGPS > velLimite;
 
-        // Dispara aviso de voz apenas uma vez por radar
         if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 450) {
           this.radarVozAnunciadaId = radarMaisProximo.id;
           this.falarTexto(`Atenção: Radar à frente, limite ${velLimite} por hora`);
@@ -595,7 +585,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (WAZE ENGINE - RUA ATUAL CORRETA & HEAD-UP FLUIDO)
+    // NAVEGAÇÃO 3D (WAZE ENGINE: VIA ATUAL REAL & PRÓXIMA MANOBRA NO TOPO)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -612,9 +602,6 @@ function entregaApp() {
       else window.speechSynthesis.cancel();
     },
 
-    /**
-     * SNAP-TO-ROUTE LOCAL COM EXTRAÇÃO DA VIA ATUAL
-     */
     projetarPontoNaRota(lat, lng) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
         return { lat, lng, distRota: 0, headingSegmento: null, indiceSegmento: 0 };
@@ -700,7 +687,6 @@ function entregaApp() {
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
 
-      // Garante radares carregados
       if (!this.listaRadares || this.listaRadares.length === 0) {
         this.carregarRadaresDoBanco();
       }
@@ -857,12 +843,14 @@ function entregaApp() {
         this.distanciaProximaManobra = distMetros > 1000 ? (distMetros / 1000).toFixed(1) + ' km' : distMetros + ' m';
         this.passosRota = routeEncontrada.legs[0].steps || [];
         this.passoAtualIndex = 0;
-        this.atualizarInstrucaoUI();
-
-        // Extrai a rua atual inicial a partir do primeiro passo
-        if (this.passosRota.length > 0 && this.passosRota[0].name) {
-          this.nomeRuaAtualCarro = this.passosRota[0].name;
+        
+        // Define a rua de saída na pílula da Fiorino
+        if (this.passosRota.length > 0) {
+          const stepSaida = this.passosRota[0];
+          this.nomeRuaAtualCarro = stepSaida.name || stepSaida.ref || 'Via Atual';
         }
+        
+        this.atualizarInstrucaoUI();
       }
 
       if (!coordsLngLat || coordsLngLat.length === 0) {
@@ -948,7 +936,6 @@ function entregaApp() {
       else if (this.velocidadeGPS > 35) zoomDinamico = 16.2;
       else zoomDinamico = 16.8;
 
-      // Ponto de visão à frente: projeta a câmera adiante, colocando o carro no rodapé
       const distOffsetMetros = 85;
       const rad = (bearing !== undefined && bearing !== null ? bearing : this.headingAtual) * Math.PI / 180;
       const dLat = (distOffsetMetros * Math.cos(rad)) / 111111;
@@ -975,10 +962,7 @@ function entregaApp() {
     },
 
     /**
-     * LOOP DE POSIÇÃO GPS:
-     * - Head-up ativo (mapa vira na curva).
-     * - Pílula da Fiorino exibe a rua ATUAL trafegada.
-     * - Monitoramento de radares em tempo real.
+     * LOOP DE POSIÇÃO GPS (COM ATRIBUIÇÃO EXATA DA RUA ATUAL VS PRÓXIMA MANOBRA)
      */
     async processarPosicaoGPS(pos, destLat, destLng) {
       const rawLat = pos.coords.latitude;
@@ -1007,19 +991,17 @@ function entregaApp() {
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.40);
       }
 
-      // 3. ATUALIZAÇÃO DA RUA ATUAL (ONDE ESTÁ TRAFEGANDO AGORA):
-      // A pílula da Fiorino mostra o nome do passo viário atual, enquanto o topo mostra a próxima conversão!
+      // 3. ATRIBUIÇÃO DA RUA ATUAL CORRETA (ONDE O PNEU ESTÁ PISANDO):
+      // A rua atual é o passo viário do índice atual em que o veículo está trafegando.
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
-        const stepAtual = this.passosRota[this.passoAtualIndex];
-        // O nome da rua onde você está agora vem do passo ativo da rota
-        if (stepAtual.name && stepAtual.name.trim() !== '') {
-          this.nomeRuaAtualCarro = stepAtual.name;
-        } else if (stepAtual.ref) {
-          this.nomeRuaAtualCarro = stepAtual.ref;
+        const stepCorrente = this.passosRota[this.passoAtualIndex];
+        const nomeVia = stepCorrente.name || stepCorrente.ref;
+        if (nomeVia && nomeVia.trim() !== '') {
+          this.nomeRuaAtualCarro = nomeVia;
         }
       }
 
-      // 4. VERIFICAÇÃO DE RADARES EM TEMPO REAL
+      // 4. VERIFICAÇÃO DE RADARES
       this.verificarRadaresProximos(lat, lng, this.headingAtual);
 
       // 5. Move o carro
@@ -1033,7 +1015,7 @@ function entregaApp() {
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
-      // 7. Distância até o destino
+      // 7. Distância até o destino final
       const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
@@ -1059,12 +1041,14 @@ function entregaApp() {
         return;
       }
 
-      // 9. Instruções de manobra (PRÓXIMA RUA no cabeçalho)
+      // 9. Manobra seguinte: calcula distância até a próxima conversão
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepAtual = this.passosRota[this.passoAtualIndex];
         const manobraLat = stepAtual.maneuver.location[1];
         const manobraLng = stepAtual.maneuver.location[0];
         const distParaManobra = this.calcularDistancia(lat, lng, manobraLat, manobraLng);
+
+        // A instrução do próximo passo é o destino da manobra
         const info = this.interpretarManobraWaze(stepAtual);
 
         const isAltaVelocidade = this.velocidadeGPS > 60;
@@ -1082,7 +1066,8 @@ function entregaApp() {
           this.falarTexto(info.texto);
         }
 
-        // Passou da esquina, avança o passo e atualiza a rua atual
+        // Quando efetivamente passar pela esquina (< 20m), avança o passo!
+        // Neste momento a pílula do carro assume o nome da nova rua em que você entrou.
         if (distParaManobra < 20) { 
           this.passoAtualIndex++;
           this.atualizarInstrucaoUI();
@@ -1090,19 +1075,21 @@ function entregaApp() {
       }
     },
 
+    /**
+     * CABEÇALHO SUPERIOR (MOSTRA A PRÓXIMA MANOBRA / PRÓXIMA RUA ONDE VOCÊ VAI VIRAR)
+     */
     atualizarInstrucaoUI() {
       if (this.passosRota.length === 0 || this.passoAtualIndex >= this.passosRota.length) return;
       
-      // O cabeçalho mostra para onde você vai (próximo passo)
-      const proximoPasso = this.passosRota[this.passoAtualIndex + 1] || this.passosRota[this.passoAtualIndex];
-      const infoProxima = this.interpretarManobraWaze(proximoPasso);
+      const stepManobra = this.passosRota[this.passoAtualIndex];
+      const info = this.interpretarManobraWaze(stepManobra);
       
-      this.instrucaoAtual = infoProxima.texto;
-      this.nomeProximaRua = infoProxima.rua;
-      this.iconeManobraNav = infoProxima.icone;
+      this.instrucaoAtual = info.texto;
+      this.nomeProximaRua = info.rua; // Próxima rua onde o motorista vai virar
+      this.iconeManobraNav = info.icone;
 
-      if (this.passosRota[this.passoAtualIndex + 2]) {
-        const nextInfo = this.interpretarManobraWaze(this.passosRota[this.passoAtualIndex + 2]);
+      if (this.passosRota[this.passoAtualIndex + 1]) {
+        const nextInfo = this.interpretarManobraWaze(this.passosRota[this.passoAtualIndex + 1]);
         this.subInstrucaoEmSeguida = `${nextInfo.icone} ${nextInfo.texto}`;
       } else {
         this.subInstrucaoEmSeguida = '🏁 Destino final à frente';
