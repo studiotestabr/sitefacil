@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.0 - Motor Waze: Radares na Pista, Alertas & VROOM Estabilizado
+   DriveXPS Pro 6.2 - Núcleo Estabilizado Nacional (Radares do Banco & Head-Up)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -59,14 +59,14 @@ function entregaApp() {
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES NA PISTA)
+    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES DO BANCO)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
     marcadorDestinoGL: null,
     marcadoresRadaresGL: [],
     watchPositionId: null,
-    instrucaoAtual: 'Calculando trajeto...',
+    instrucaoAtual: 'Calculando melhor trajeto...',
     distanciaProximaManobra: '',
     nomeProximaRua: '',
     nomeRuaAtualCarro: '',
@@ -89,7 +89,7 @@ function entregaApp() {
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
 
-    // Motor de Radares & Alertas Sonoros
+    // Motor de Radares do Banco de Dados Nacional
     listaRadares: [],
     radarProximoAlerta: null,
     distanciaRadarTexto: '',
@@ -355,11 +355,6 @@ function entregaApp() {
         try { this.rotasHistorico = JSON.parse(cacheHistorico); } catch(e) {}
       }
 
-      const cacheRadares = localStorage.getItem('drivexps_radares_cache');
-      if (cacheRadares) {
-        try { this.listaRadares = JSON.parse(cacheRadares); } catch(e) {}
-      }
-
       await this.verificarAutenticacao();
 
       if (this.usuarioLogado) {
@@ -369,6 +364,7 @@ function entregaApp() {
         } else {
           await this.carregarUltimaRota();
         }
+        // Consulta os radares do banco nacional para a rota ativa
         this.carregarRadaresDoBanco();
       }
 
@@ -404,33 +400,61 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MOTOR DE RADARES, BIPE SONORO & PLACAS NA PISTA
+    // MOTOR DE RADARES NACIONAL (BUSCA NO BANCO DIRECTUS / POSTGRESQL)
     // =========================================================================
     async carregarRadaresDoBanco() {
       try {
-        const res = await this.fetchDirectus('/items/drivexps_radares?limit=1500');
+        let endpoint = '/items/drivexps_radares?limit=1000';
+
+        // Busca regional por Bounding Box oficial do Directus: _gte e _lte
+        if (this.entregas && this.entregas.length > 0) {
+          let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+          this.entregas.forEach(p => {
+            const lat = Number(p.latitude);
+            const lng = Number(p.longitude);
+            if (lat < minLat) minLat = lat;
+            if (lat > maxLat) maxLat = lat;
+            if (lng < minLng) minLng = lng;
+            if (lng > maxLng) maxLng = lng;
+          });
+
+          // Adiciona margem de segurança de ~10 km ao redor da carga
+          const margem = 0.09;
+          const latMin = (minLat - margem).toFixed(4);
+          const latMax = (maxLat + margem).toFixed(4);
+          const lngMin = (minLng - margem).toFixed(4);
+          const lngMax = (maxLng + margem).toFixed(4);
+
+          // Sintaxe oficial correta do Directus
+          endpoint = `/items/drivexps_radares?filter[latitude][_gte]=${latMin}&filter[latitude][_lte]=${latMax}&filter[longitude][_gte]=${lngMin}&filter[longitude][_lte]=${lngMax}&limit=2500`;
+        }
+
+        const res = await this.fetchDirectus(endpoint);
         if (res.ok) {
           const data = await res.json();
           if (data && data.data && data.data.length > 0) {
-            this.listaRadares = data.data;
-            localStorage.setItem('drivexps_radares_cache', JSON.stringify(this.listaRadares));
+            this.listaRadares = data.data.map(r => ({
+              id: r.id || r.osm_id,
+              latitude: Number(r.latitude),
+              longitude: Number(r.longitude),
+              velocidade: Number(r.velocidade) || 60,
+              tipo: r.tipo || 'fixo',
+              rodovia_rua: r.rodovia_rua || 'Via Monitorada'
+            }));
+            
             if (this.modo === 'navegacao' && this.mapaNavGL) {
               this.renderizarRadaresNaPistaGL();
             }
           }
         }
       } catch (e) {
-        console.warn('Usando cache local de radares:', e);
+        console.warn('Erro ao consultar radares no Directus:', e);
       }
     },
 
-    /**
-     * RENDERIZAÇÃO DE PLACAS DE RADAR FINCADAS NA PISTA DO MAPA 3D
-     */
     renderizarRadaresNaPistaGL() {
       if (!this.mapaNavGL) return;
 
-      // Limpa marcadores de radares anteriores para não duplicar
       if (this.marcadoresRadaresGL && this.marcadoresRadaresGL.length > 0) {
         this.marcadoresRadaresGL.forEach(m => m.remove());
       }
@@ -438,9 +462,10 @@ function entregaApp() {
 
       if (!this.listaRadares || this.listaRadares.length === 0) return;
 
-      // Renderiza apenas os radares próximos ao trajeto para máxima performance (60fps)
       this.listaRadares.forEach(r => {
-        if (!r.latitude || !r.longitude) return;
+        const lat = Number(r.latitude);
+        const lng = Number(r.longitude);
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) return;
 
         const el = document.createElement('div');
         el.className = 'radar-pino-pista';
@@ -457,7 +482,7 @@ function entregaApp() {
           anchor: 'bottom',
           rotationAlignment: 'viewport'
         })
-        .setLngLat([r.longitude, r.latitude])
+        .setLngLat([lng, lat])
         .addTo(this.mapaNavGL);
 
         this.marcadoresRadaresGL.push(marcador);
@@ -478,12 +503,12 @@ function entregaApp() {
           const gain = this.audioContextBipe.createGain();
           osc.type = 'sine';
           osc.frequency.setValueAtTime(880, this.audioContextBipe.currentTime);
-          gain.gain.setValueAtTime(0.18, this.audioContextBipe.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, this.audioContextBipe.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.20, this.audioContextBipe.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.audioContextBipe.currentTime + 0.16);
           osc.connect(gain);
           gain.connect(this.audioContextBipe.destination);
           osc.start();
-          osc.stop(this.audioContextBipe.currentTime + 0.16);
+          osc.stop(this.audioContextBipe.currentTime + 0.17);
         }
       } catch (e) {}
     },
@@ -500,14 +525,16 @@ function entregaApp() {
       let menorDistancia = Infinity;
 
       for (const r of this.listaRadares) {
-        const dist = this.calcularDistancia(lat, lng, r.latitude, r.longitude);
+        const rLat = Number(r.latitude);
+        const rLng = Number(r.longitude);
+        const dist = this.calcularDistancia(lat, lng, rLat, rLng);
 
         if (dist <= 500 && dist < menorDistancia) {
-          const anguloAteRadar = this.calcularBearing(lat, lng, r.latitude, r.longitude);
+          const anguloAteRadar = this.calcularBearing(lat, lng, rLat, rLng);
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
 
-          if (diffAngulo <= 75) {
+          if (diffAngulo <= 80 || this.velocidadeGPS < 5) {
             menorDistancia = dist;
             radarMaisProximo = { ...r, distMetros: Math.round(dist) };
           }
@@ -537,7 +564,7 @@ function entregaApp() {
               if (this.radarExcessoVelocidade) {
                 this.tocarBipeExcessoVelocidade();
               }
-            }, 900);
+            }, 850);
           }
         } else {
           if (this.intervaloBipeExcesso) { clearInterval(this.intervaloBipeExcesso); this.intervaloBipeExcesso = null; }
@@ -597,7 +624,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET 2D (COM ROTA OFICIAL VROOM SEM ZIGUEZAGUE)
+    // MAPA GERAL LEAFLET 2D (ORDEM EXATA DO VROOM: ordem_entrega)
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -661,7 +688,7 @@ function entregaApp() {
         L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 PONTO DE PARTIDA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 2. PINOS DAS ENTREGAS (ORDEM ESTRITA DO VROOM: ordem_entrega)
+      // 2. PINOS DAS ENTREGAS NA ORDEM ESTRITA DO VROOM (ordem_entrega)
       const entregasOrdenadas = [...this.entregas].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
 
       entregasOrdenadas.forEach(p => {
@@ -730,7 +757,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (WAZE ENGINE: VIA ATUAL REAL & PRÓXIMA MANOBRA NO TOPO)
+    // NAVEGAÇÃO 3D (WAZE ENGINE: DESTINO DINÂMICO & ZERO DESVIOS FANTASMAS)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -747,7 +774,7 @@ function entregaApp() {
       else window.speechSynthesis.cancel();
     },
 
-    projetarPontoNaRota(lat, lng) {
+    projetarPontoNaRota(lat, lng, headingCarro) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
         return { lat, lng, distRota: 0, headingSegmento: null, indiceSegmento: 0 };
       }
@@ -797,7 +824,15 @@ function entregaApp() {
         }
       }
 
-      if (menorDist <= 32) {
+      if (headingCarro !== null && headingDoSegmento !== null) {
+        let diff = Math.abs(headingCarro - headingDoSegmento);
+        if (diff > 180) diff = 360 - diff;
+        if (diff > 55) {
+          return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: indiceMaisProximo };
+        }
+      }
+
+      if (menorDist <= 28) {
         return {
           lat: pontoProjetado.lat,
           lng: pontoProjetado.lng,
@@ -812,11 +847,17 @@ function entregaApp() {
 
     async iniciarNavegacaoNativa(entrega) {
       if (!navigator.geolocation) { alert('GPS não suportado.'); return; }
+      
+      if (this.watchPositionId) {
+        navigator.geolocation.clearWatch(this.watchPositionId);
+        this.watchPositionId = null;
+      }
+
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
       this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-      this.nomeRuaAtualCarro = 'Calculando via atual...';
-      this.nomeRuaPisoAtual = '';
+      this.nomeRuaPisoAtual = entrega?.endereco?.split(',')[0] || 'Via Atual';
+      this.nomeRuaAtualCarro = this.nomeRuaPisoAtual;
       this.instrucaoAtual = `Iniciando trajeto para o Canetão #${entrega?.ordem_entrega}...`;
       this.distanciaProximaManobra = '...';
       this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
@@ -832,10 +873,6 @@ function entregaApp() {
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
 
-      if (!this.listaRadares || this.listaRadares.length === 0) {
-        this.carregarRadaresDoBanco();
-      }
-
       this.falarTexto(`Iniciando rota para Canetão número ${entrega.ordem_entrega}, na ${entrega.endereco}`);
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
@@ -850,7 +887,7 @@ function entregaApp() {
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
         center: [entrega.longitude, entrega.latitude],
         zoom: 16.8,
-        pitch: 45,
+        pitch: 42,
         bearing: 0,
         attributionControl: false
       });
@@ -921,29 +958,30 @@ function entregaApp() {
           });
         }
 
-        // Renderiza as placas dos radares fincadas na pista
         this.renderizarRadaresNaPistaGL();
-
-        this.iniciarGPSContinuoNavegacao(entrega);
+        this.iniciarGPSContinuoNavegacao();
       });
     },
 
-    iniciarGPSContinuoNavegacao(entrega) {
+    iniciarGPSContinuoNavegacao() {
+      if (!this.entregaNavegacao) return;
+
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const sLat = pos.coords.latitude;
         const sLng = pos.coords.longitude;
         this.ultimaLatCarro = sLat; 
         this.ultimaLngCarro = sLng;
 
-        this.atualizarMarcadorCarroGL(sLat, sLng, 0);
-        const bearingInicial = this.calcularBearing(sLat, sLng, entrega.latitude, entrega.longitude);
+        this.atualizarMarcadorCarroGL(sLat, sLng);
+        const bearingInicial = this.calcularBearing(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
         this.headingAtual = bearingInicial;
         this.centralizarNoCarroGL(sLat, sLng, bearingInicial, 0);
 
-        await this.calcularRotaRuaARua(sLat, sLng, entrega.latitude, entrega.longitude);
+        await this.calcularRotaRuaARua(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
 
+        // A CORREÇÃO CRUCIAL: O callback agora lê sempre dinâmico do pacote ativo
         this.watchPositionId = navigator.geolocation.watchPosition(
-          (novaPos) => this.processarPosicaoGPS(novaPos, entrega.latitude, entrega.longitude),
+          (novaPos) => this.processarPosicaoGPS(novaPos),
           (err) => console.warn('Aviso GPS:', err),
           { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
         );
@@ -994,9 +1032,11 @@ function entregaApp() {
         this.passoAtualIndex = 0;
 
         if (this.passosRota.length > 0) {
-          const viaInicial = this.passosRota[0].name || this.passosRota[0].ref || 'Sua Rota';
-          this.nomeRuaPisoAtual = viaInicial;
-          this.nomeRuaAtualCarro = viaInicial;
+          const viaSaida = this.passosRota[0].name || this.passosRota[0].ref;
+          if (viaSaida && viaSaida.trim() !== '') {
+            this.nomeRuaPisoAtual = viaSaida;
+            this.nomeRuaAtualCarro = viaSaida;
+          }
         }
 
         this.atualizarInstrucaoUI();
@@ -1042,7 +1082,7 @@ function entregaApp() {
       this.marcadorDestinoGL = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(this.mapaNavGL);
     },
 
-    atualizarMarcadorCarroGL(lat, lng, headingRelativo = 0) {
+    atualizarMarcadorCarroGL(lat, lng) {
       if (!this.mapaNavGL) return;
       if (!this.marcadorCarroGL) {
         const el = document.createElement('div');
@@ -1085,18 +1125,12 @@ function entregaApp() {
       else if (this.velocidadeGPS > 35) zoomDinamico = 16.2;
       else zoomDinamico = 16.8;
 
-      const distOffsetMetros = 85;
-      const rad = (bearing !== undefined && bearing !== null ? bearing : this.headingAtual) * Math.PI / 180;
-      const dLat = (distOffsetMetros * Math.cos(rad)) / 111111;
-      const dLng = (distOffsetMetros * Math.sin(rad)) / (111111 * Math.cos(lat * Math.PI / 180));
-
-      const centerFocal = [lng + dLng, lat + dLat];
-
       this.mapaNavGL.easeTo({
-        center: centerFocal,
+        center: [lng, lat],
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
-        pitch: 45,
+        pitch: 42,
         zoom: zoomDinamico,
+        padding: { top: 60, bottom: 220, left: 0, right: 0 },
         duration: duracao,
         easing: (t) => t
       });
@@ -1110,47 +1144,51 @@ function entregaApp() {
       }
     },
 
-    async processarPosicaoGPS(pos, destLat, destLng) {
+    async processarPosicaoGPS(pos) {
+      if (!this.entregaNavegacao) return;
+
+      const destLat = this.entregaNavegacao.latitude;
+      const destLng = this.entregaNavegacao.longitude;
+
       const rawLat = pos.coords.latitude;
       const rawLng = pos.coords.longitude;
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
 
-      // 1. Projeção Snap-to-Route
-      const snap = this.projetarPontoNaRota(rawLat, rawLng);
-      const lat = snap.lat;
-      const lng = snap.lng;
-
-      // 2. Rotação Head-Up fluida
-      let headingAlvo = null;
-      if (snap.headingSegmento !== null && snap.distRota <= 30) {
-        headingAlvo = snap.headingSegmento;
-      } else if (pos.coords.heading !== null && !isNaN(pos.coords.heading) && this.velocidadeGPS >= this.minSpeedKmhNav) {
-        headingAlvo = pos.coords.heading;
+      let headingMovimento = null;
+      if (pos.coords.heading !== null && !isNaN(pos.coords.heading) && pos.coords.heading >= 0 && this.velocidadeGPS >= this.minSpeedKmhNav) {
+        headingMovimento = pos.coords.heading;
       } else if (this.ultimaLatCarro && this.ultimaLngCarro) {
-        const dist = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
-        if (dist > 1.8) {
-          headingAlvo = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, lat, lng);
+        const distMov = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
+        if (distMov >= 1.8 && this.velocidadeGPS >= this.minSpeedKmhNav) {
+          headingMovimento = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
         }
       }
 
-      if (headingAlvo !== null && !isNaN(headingAlvo)) {
-        this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.40);
+      const snap = this.projetarPontoNaRota(rawLat, rawLng, headingMovimento);
+      const lat = snap.lat;
+      const lng = snap.lng;
+
+      if (headingMovimento !== null) {
+        let headingAlvo = headingMovimento;
+        if (snap.headingSegmento !== null && snap.distRota <= 20) {
+          let diff = Math.abs(snap.headingSegmento - headingMovimento);
+          if (diff > 180) diff = 360 - diff;
+          if (diff <= 35) {
+            headingAlvo = snap.headingSegmento;
+          }
+        }
+        this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.45);
       }
 
-      // 3. Atualização da Pílula da Rua Atual
       if (this.nomeRuaPisoAtual && this.nomeRuaPisoAtual.trim() !== '') {
         this.nomeRuaAtualCarro = this.nomeRuaPisoAtual;
       } else if (this.passosRota.length > 0) {
         this.nomeRuaAtualCarro = this.passosRota[0].name || this.passosRota[0].ref || 'Sua Rota';
       }
 
-      // 4. Verificação de Radares & Alertas Sonoros
       this.verificarRadaresProximos(lat, lng, this.headingAtual);
+      this.atualizarMarcadorCarroGL(lat, lng);
 
-      // 5. Move o carro
-      this.atualizarMarcadorCarroGL(lat, lng, 0);
-
-      // 6. Câmera acompanha o carro
       if (!this.mapaArrastadoPeloUsuario) {
         this.centralizarNoCarroGL(lat, lng, this.headingAtual, 900);
       }
@@ -1158,7 +1196,6 @@ function entregaApp() {
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
-      // 7. Distância até o destino final
       const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
@@ -1168,16 +1205,16 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // 8. Recálculo ágil em 3 segundos
+      // Recálculo ágil em 3 segundos
       const agora = Date.now();
-      const fora = snap.distRota > 35;
+      const fora = snap.distRota > 30;
       if (fora) {
         this.contadorForaDaRota++;
       } else {
         this.contadorForaDaRota = 0;
       }
 
-      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 5000)) {
+      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 4500)) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
         this.contadorForaDaRota = 0;
@@ -1187,7 +1224,6 @@ function entregaApp() {
         return;
       }
 
-      // 9. Manobras & Transição da Rua Atual após virar a esquina
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
         const stepManobra = this.passosRota[this.passoAtualIndex];
         const manobraLat = stepManobra.maneuver.location[1];
@@ -1210,7 +1246,7 @@ function entregaApp() {
           this.falarTexto(info.texto);
         }
 
-        if (distParaManobra < 15) {
+        if (distParaManobra < 14) {
           if (stepManobra.name && stepManobra.name.trim() !== '') {
             this.nomeRuaPisoAtual = stepManobra.name;
             this.nomeRuaAtualCarro = stepManobra.name;
@@ -1357,7 +1393,6 @@ function entregaApp() {
       if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
       if (this.intervaloBipeExcesso) { clearInterval(this.intervaloBipeExcesso); this.intervaloBipeExcesso = null; }
       
-      // Limpa marcadores de radares na pista
       if (this.marcadoresRadaresGL && this.marcadoresRadaresGL.length > 0) {
         this.marcadoresRadaresGL.forEach(m => m.remove());
         this.marcadoresRadaresGL = [];
