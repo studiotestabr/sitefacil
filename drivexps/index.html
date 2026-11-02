@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DriveXPS | Roteirizador Contínuo & Navegador 3D Nativo para Shopee Express</title>
+  <title>DriveXPS | Roteirizador Contínuo, Radares em Tempo Real & Navegador 3D para Shopee Express</title>
   
-  <meta name="description" content="Pare de queimar gasolina no ziguezague da Shopee. O DriveXPS organiza sua carga em sacolas de 10 em 10 no Canetão e navega curva a curva em 3D estilo Waze sem sair do app.">
+  <meta name="description" content="Pare de queimar gasolina no ziguezague e fuja das multas. O DriveXPS organiza sua carga em sacolas de 10 em 10 no Canetão, avisa radares na pista e navega curva a curva em 3D nativo ou pelo seu app favorito (DriveXPS, Waze ou Maps).">
   <meta name="theme-color" content="#ea580c">
   
   <!-- REDIRECIONAMENTO INSTANTÂNEO: SE O MOTORISTA ABRIR PELO ATALHO DO CELULAR, ENTRA DIRETO NO APP -->
@@ -19,7 +19,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DriveXPS">
   <meta property="og:title" content="DriveXPS - O Navegador Inteligente do Entregador Shopee Express">
-  <meta property="og:description" content="Economize até 2 horas de rua e R$ 25 de gasolina por dia. Separação no Canetão, Navegação 3D nativa e Mapa de Mancha completo.">
+  <meta property="og:description" content="Economize até 2 horas de rua e R$ 25 de gasolina por dia. Alerta de radares na pista, Separação no Canetão, Navegação 3D nativa ou Waze/Maps com 1 toque.">
   <meta property="og:image" content="https://studiotesta.com.br/drivexps/app/icon-512.png">
   <meta property="og:url" content="https://studiotesta.com.br/drivexps/">
 
@@ -71,13 +71,16 @@
     .glow-cyan {
       box-shadow: 0 0 45px -10px rgba(56, 189, 248, 0.35);
     }
+    .glow-radar {
+      box-shadow: 0 0 35px -5px rgba(239, 68, 68, 0.5);
+    }
   </style>
 </head>
 <body class="bg-grid antialiased selection:bg-orange-600 selection:text-white">
 
   <!-- 1. BARRA SUPERIOR DE AVISO COM GATILHO DE TESTE LIVRE -->
   <aside class="bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 text-white text-[11px] sm:text-xs font-black tracking-wide py-2.5 px-4 text-center select-none shadow-lg" aria-label="Aviso">
-    🎁 7 DIAS GRÁTIS NA SUA 1ª ROTA • SEM PEDIR CARTÃO DE CRÉDITO • VEJA SUA CARGA ORGANIZADA HOJE
+    🎁 7 DIAS GRÁTIS NA SUA 1ª ROTA • SEM CARTÃO DE CRÉDITO • ALERTA DE RADARES NACIONAL INTEGRADO
   </aside>
 
   <!-- 2. NAVBAR MODERNA -->
@@ -93,11 +96,13 @@
       </a>
 
       <nav class="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-300 uppercase tracking-wider">
+        <a href="#radares" class="text-red-400 hover:text-red-300 transition flex items-center gap-1"><span>📷</span> Radares</a>
         <a href="#navegador" class="text-cyan-400 hover:text-cyan-300 transition flex items-center gap-1"><span>🧭</span> Navegador 3D</a>
         <a href="#metodo" class="hover:text-orange-400 transition">O Método Canetão</a>
         <a href="#cockpit" class="hover:text-orange-400 transition">Cockpit da Rua</a>
         <a href="#mapa" class="hover:text-orange-400 transition">Mapa Geral</a>
         <a href="#calculadora" class="hover:text-orange-400 transition">Economia</a>
+        <a href="#depoimentos" class="hover:text-orange-400 transition">Depoimentos</a>
         <a href="#planos" class="hover:text-orange-400 transition">Planos</a>
         <a href="#faq" class="hover:text-orange-400 transition">Dúvidas</a>
       </nav>
@@ -116,15 +121,15 @@
     <div class="max-w-5xl mx-auto px-4 text-center space-y-6 relative z-10">
       
       <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 px-4 py-1.5 rounded-full text-orange-400 text-xs font-black uppercase tracking-wider">
-        <span>⚡</span> A Primeira Tecnologia com Navegador 3D Nativo Feita para a SPX
+        <span>⚡</span> Versão 6.0 Pro • Navegação 3D, Detecção de Radares & VROOM sem Ziguezague
       </div>
 
       <h1 class="text-3xl sm:text-5xl md:text-6xl font-heading font-black text-white tracking-tight leading-[1.1] max-w-4xl mx-auto">
-        Entregue até <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300">2 horas mais rápido</span> e economize R$ 25 de combustível em cada rota.
+        Entregue até <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300">2 horas mais rápido</span>, livre-se das multas e economize combustível em cada rota.
       </h1>
 
       <p class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-        Chega de ziguezague, retornos perigosos e meia hora revirando o porta-malas. O <strong>DriveXPS</strong> lê a planilha <strong class="text-white">.xlsx</strong> da Shopee, organiza sua carga de 10 em 10 no <strong class="text-orange-400">Canetão</strong> e guia seu carro curva a curva em um <strong class="text-cyan-400">navegador 3D estilo Waze sem você precisar sair do aplicativo</strong>.
+        Chega de ziguezague, retornos perigosos e meia hora revirando o porta-malas. O <strong>DriveXPS</strong> lê o romaneio <strong class="text-white">.xlsx</strong> da Shopee, organiza sua carga de 10 em 10 no <strong class="text-orange-400">Canetão</strong>, avisa <strong class="text-red-400">radares na pista em tempo real</strong> e guia você em um <strong class="text-cyan-400">navegador 3D fluido estilo Waze ou pelo seu app favorito (DriveXPS, Waze ou Maps)</strong>.
       </p>
 
       <!-- BOTÕES DE AÇÃO HERO -->
@@ -132,29 +137,29 @@
         <a href="https://studiotesta.com.br/drivexps/app/" class="w-full sm:w-auto px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/40 active:scale-95 transition flex items-center justify-center gap-2">
           <span>📲 Instalar Grátis no Celular</span>
         </a>
-        <a href="#navegador" class="w-full sm:w-auto px-6 py-4 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 font-bold text-xs uppercase tracking-wider rounded-2xl active:scale-95 transition flex items-center justify-center gap-2">
-          <span>🧭 Ver o Navegador em Ação</span>
+        <a href="#radares" class="w-full sm:w-auto px-6 py-4 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 font-bold text-xs uppercase tracking-wider rounded-2xl active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📷 Conhecer o Alerta de Radares</span>
         </a>
       </div>
 
       <p class="text-[11px] text-slate-500 font-medium">
-        🔒 Sem cadastro de cartão de crédito • Roda em Android e iPhone • Ativação imediata da sua rota
+        🔒 Sem cartão de crédito • Cobertura nacional completa • Roda leve no Android e iPhone
       </p>
 
-      <!-- MOCKUP VISUAL INTERATIVO DO COCKPIT REAL (O MOTOR WAZE 3D) -->
+      <!-- MOCKUP VISUAL INTERATIVO DO COCKPIT REAL (MOTOR WAZE 3D COM RADAR) -->
       <div class="pt-8 max-w-sm sm:max-w-md mx-auto">
         <div class="bg-[#050811] border-2 border-cyan-500/50 rounded-[2.5rem] p-4 shadow-2xl glow-cyan text-left space-y-3 relative overflow-hidden">
           
-          <!-- Banner Superior Waze da Tela -->
+          <!-- Banner Superior da Tela com Próxima Manobra -->
           <div class="bg-black/90 border border-slate-800 rounded-2xl p-3 text-white flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-xl font-black text-cyan-400">
                 ⬆️
               </div>
               <div>
-                <span class="text-2xl font-black font-mono leading-none">1.8 km</span>
-                <span class="text-[9px] text-slate-400 block font-bold uppercase">até o destino</span>
-                <h4 class="text-xs font-black text-cyan-400 truncate max-w-[180px]">Av. Principal da Rota, 1500</h4>
+                <span class="text-2xl font-black font-mono leading-none">320 m</span>
+                <span class="text-[9px] text-slate-400 block font-bold uppercase">até a manobra</span>
+                <h4 class="text-xs font-black text-cyan-400 truncate max-w-[170px]">Av. Monteiro Lobato, 4372</h4>
               </div>
             </div>
             <div class="flex items-center gap-1.5 text-xs">
@@ -162,60 +167,81 @@
             </div>
           </div>
 
-          <!-- Janela do Mapa Simulado com a Fiorino e Linha Ciano -->
-          <div class="h-64 bg-[#0a0f1d] rounded-2xl relative overflow-hidden border border-slate-800/80 flex items-center justify-center">
-            
-            <!-- Linha da Rota Ciano Brilhante Vertical -->
-            <div class="absolute top-0 bottom-0 w-3 bg-[#38bdf8] shadow-[0_0_20px_#38bdf8] flex items-center justify-center">
-              <div class="w-1.5 h-full bg-white/70"></div>
-            </div>
-
-            <!-- Pino do Canetão no Topo da Rua -->
-            <div class="absolute top-4 flex flex-col items-center">
-              <div class="bg-emerald-500 text-black font-black font-mono text-[11px] w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
-                #5
+          <!-- Plaqueta de Radar Flutuante R-19 -->
+          <div class="bg-slate-950/90 border border-red-500/80 rounded-2xl px-3 py-1.5 flex items-center justify-between shadow-lg glow-radar">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-white border-2 border-red-600 flex items-center justify-center font-mono font-black text-slate-950 text-xs">
+                60
               </div>
-              <span class="text-[8px] font-black uppercase text-white bg-slate-900 px-1.5 py-0.5 rounded mt-1 border border-slate-700">Canetão #5</span>
+              <div class="leading-none">
+                <span class="text-[9px] font-black uppercase text-red-400 block">Radar Fixo à Frente</span>
+                <span class="text-xs font-mono font-bold text-white">a 350 metros</span>
+              </div>
+            </div>
+            <span class="text-xs text-amber-400 animate-pulse font-mono font-black">BIP-BIP!</span>
+          </div>
+
+          <!-- Janela do Mapa 3D com Asfalto Real e Placa na Pista -->
+          <div class="h-64 bg-[#141c2b] rounded-2xl relative overflow-hidden border border-slate-800/80 flex items-center justify-center">
+            
+            <!-- Linha da Rota Ciano no Asfalto Escuro -->
+            <div class="absolute top-0 bottom-0 w-8 bg-[#25334a] flex items-center justify-center">
+              <div class="w-2.5 h-full bg-[#38bdf8] shadow-[0_0_15px_#38bdf8]"></div>
             </div>
 
-            <!-- Fiorino Alinhada na Vertical -->
-            <div class="absolute bottom-8 flex flex-col items-center z-10">
-              <div class="w-10 h-10 rounded-full bg-cyan-400/20 border border-cyan-400/60 absolute -inset-0.5 animate-ping"></div>
-              <div class="bg-orange-600 w-7 h-12 rounded-lg border-2 border-slate-900 flex flex-col items-center justify-between p-1 shadow-2xl relative z-10">
+            <!-- Placa de Radar R-19 Fincada no Asfalto 3D -->
+            <div class="absolute top-10 flex flex-col items-center z-20">
+              <div class="w-7 h-7 rounded-full bg-white border-2 border-red-600 flex items-center justify-center font-mono font-black text-[10px] text-slate-950 shadow-lg">
+                60
+              </div>
+              <div class="w-1 h-2 bg-slate-400"></div>
+            </div>
+
+            <!-- Pino do Canetão no Destino -->
+            <div class="absolute top-2 right-8 flex flex-col items-center">
+              <div class="bg-emerald-500 text-black font-black font-mono text-[10px] w-7 h-7 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                #1
+              </div>
+            </div>
+
+            <!-- Fiorino no Terço Inferior com Pílula da Rua Atual -->
+            <div class="absolute bottom-4 flex flex-col items-center z-10">
+              <div class="w-9 h-9 rounded-full bg-cyan-400/20 border border-cyan-400/60 absolute -inset-0.5 animate-ping"></div>
+              <div class="bg-orange-600 w-6 h-11 rounded-lg border-2 border-slate-950 flex flex-col items-center justify-between p-1 shadow-2xl relative z-10">
                 <div class="w-full h-2.5 bg-slate-900 rounded-sm"></div>
                 <div class="w-full flex justify-between px-0.5">
                   <div class="w-1 h-1 bg-yellow-300 rounded-full"></div>
                   <div class="w-1 h-1 bg-yellow-300 rounded-full"></div>
                 </div>
               </div>
-              <span class="bg-white text-slate-900 font-black text-[9px] px-2 py-0.5 rounded-full shadow-md mt-1 font-mono">Sua Posição</span>
+              <span class="bg-slate-950/95 text-white border border-white/25 font-bold text-[9px] px-2.5 py-0.5 rounded-full shadow-md mt-1">Av. Jussara</span>
             </div>
 
-            <!-- Velocímetro Flutuante Waze -->
-            <div class="absolute bottom-3 left-3 w-12 h-12 rounded-full bg-slate-950/90 border-2 border-cyan-400 flex flex-col items-center justify-center shadow-lg">
-              <span class="text-xs font-black font-mono text-white leading-none">38</span>
-              <span class="text-[7px] text-slate-400 font-bold leading-none">km/h</span>
+            <!-- Velocímetro Ergonômico de 68px -->
+            <div class="absolute bottom-3 left-3 w-14 h-14 rounded-full bg-slate-950/95 border-2 border-cyan-400 flex flex-col items-center justify-center shadow-xl">
+              <span class="text-sm font-black font-mono text-white leading-none">58</span>
+              <span class="text-[8px] text-slate-400 font-bold leading-none mt-0.5">km/h</span>
             </div>
 
-            <!-- Botão Mira Flutuante -->
-            <div class="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-slate-950/90 border-2 border-orange-500 flex items-center justify-center text-sm shadow-lg">
+            <!-- Botão Mira de 62px -->
+            <div class="absolute bottom-3 right-3 w-12 h-12 rounded-full bg-slate-950/95 border-2 border-orange-500 flex items-center justify-center text-base shadow-xl">
               🎯
             </div>
           </div>
 
-          <!-- 4 Cartões de Carga Persistentes da Navegação -->
+          <!-- 4 Cartões de Carga do Canetão -->
           <div class="grid grid-cols-4 gap-1.5 text-center pt-1">
             <div class="bg-[#1c1815] border border-orange-500/80 rounded-xl py-1.5">
               <span class="text-[8px] text-orange-400 font-black block leading-none">CANETÃO</span>
-              <span class="text-base font-black text-orange-400 font-mono mt-0.5 block leading-none">#5</span>
+              <span class="text-base font-black text-orange-400 font-mono mt-0.5 block leading-none">#1</span>
             </div>
             <div class="bg-[#141b26] border border-slate-700 rounded-xl py-1.5">
               <span class="text-[8px] text-slate-400 font-black block leading-none">PARADA</span>
-              <span class="text-base font-black text-white font-mono mt-0.5 block leading-none">12</span>
+              <span class="text-base font-black text-white font-mono mt-0.5 block leading-none">30</span>
             </div>
             <div class="bg-[#141b26] border border-slate-700 rounded-xl py-1.5">
               <span class="text-[8px] text-slate-400 font-black block leading-none">ORDEM</span>
-              <span class="text-base font-black text-white font-mono mt-0.5 block leading-none">14</span>
+              <span class="text-base font-black text-white font-mono mt-0.5 block leading-none">34</span>
             </div>
             <div class="bg-[#1c1815] border border-orange-500/80 rounded-xl py-1.5">
               <span class="text-[8px] text-orange-400 font-black block leading-none">SACOLA</span>
@@ -223,8 +249,9 @@
             </div>
           </div>
 
-          <div class="bg-emerald-600 text-white font-black text-xs py-2.5 rounded-xl text-center shadow-lg flex items-center justify-center gap-1.5">
-            <span>✅</span> Tocar em "Entregue" já puxa a próxima entrega!
+          <!-- Botão Unificado -->
+          <div class="bg-blue-600 text-white font-black text-xs py-3 rounded-xl text-center shadow-lg flex items-center justify-center gap-2">
+            <span>🧭</span> Navegar no DriveXPS (ou escolha Waze / Maps no menu)
           </div>
 
         </div>
@@ -279,7 +306,110 @@
     </div>
   </section>
 
-  <!-- 🌟 MÓDULO 1: NAVEGADOR NATIVO 3D ESTILO WAZE (O CORAÇÃO DO APP) -->
+  <!-- 🌟 NOVIDADE 1: ALERTA DE RADARES AUDITADOS EM TEMPO REAL -->
+  <section id="radares" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-red-500/10 text-red-400 border border-red-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          📷 Proteção Total Contra Multas
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Radares Reais na Pista: Saiba o limite antes de passar
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Esqueça radares fantasmas ou locais perigosos sem aviso. O DriveXPS cruza sua rota com a base oficial de fiscalização eletrônica brasileira (MapaRadar e Inmetro) com precisão métrica.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-red-600/20 text-red-400 border border-red-500/40 flex items-center justify-center font-black text-2xl">
+            🛑
+          </div>
+          <h3 class="text-base font-black text-white">Placas R-19 Fincadas no Asfalto</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Conforme seu veículo anda na navegação 3D, você enxerga a placa circular de velocidade (ex: 40, 50, 60, 80 km/h) exatamente no poste ou canteiro da via onde a câmera está posicionada.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border-2 border-red-500/60 p-6 rounded-3xl space-y-3 shadow-xl glow-radar">
+          <div class="w-12 h-12 rounded-2xl bg-red-600 text-white flex items-center justify-center font-black text-2xl shadow-lg">
+            🚨
+          </div>
+          <h3 class="text-base font-black text-white">Bipe Sonoro & Velocímetro Pulsante</h3>
+          <p class="text-slate-300 leading-relaxed">
+            Se você estiver acima do limite permitido a menos de 450 metros do radar, o velocímetro fica vermelho vivo piscante e o app emite bipes sonoros contínuos e vibração até você desacelerar.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-black text-2xl">
+            🗣️
+          </div>
+          <h3 class="text-base font-black text-white">Avisos por Voz Antecipados</h3>
+          <p class="text-slate-400 leading-relaxed">
+            O aplicativo avisa pelo áudio do carro ou alto-falante: <em>"Atenção: Radar à frente, limite 60 por hora"</em>, dando tempo confortável para ajustar a velocidade sem freadas bruscas.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 NOVIDADE 2: SELETOR DE NAVEGADOR PADRÃO (SEU APP FAVORITO COM 1 TOQUE) -->
+  <section class="py-20 bg-[#080d18] border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-blue-500/10 text-blue-400 border border-blue-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          🎛️ Liberdade Total de Escolha
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Um Botão Unificado: Navegue no App, no Waze ou no Maps
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Cada motorista tem sua preferência no volante. No menu do DriveXPS você escolhe qual navegador quer usar e o botão principal da tela Rua se adapta instantaneamente.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-center">
+        
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <span class="text-3xl block">🧭</span>
+          <h3 class="text-base font-black text-white">Navegador 3D Nativo (Recomendado)</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Navega com radares, linha ciano e bipes sem sair do app. Ao tocar em "Entregue", já aponta para a próxima entrega sozinho.
+          </p>
+          <span class="inline-block bg-blue-600/20 text-blue-400 border border-blue-500/30 text-[10px] font-black uppercase px-2.5 py-1 rounded-md">Velocidade Máxima</span>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <span class="text-3xl block">🚗</span>
+          <h3 class="text-base font-black text-white">Waze Oficial</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Prefere o Waze tradicional? O botão unificado abre o Waze já calculando a rota direta para a coordenada exata da casa.
+          </p>
+          <span class="inline-block bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 text-[10px] font-black uppercase px-2.5 py-1 rounded-md">Com 1 Toque</span>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <span class="text-3xl block">🗺️</span>
+          <h3 class="text-base font-black text-white">Google Maps</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Mais acostumado com o Google Maps? Configure como padrão e o app dispara as rotas direto no aplicativo do Maps.
+          </p>
+          <span class="inline-block bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-2.5 py-1 rounded-md">Compatibilidade Total</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 1: NAVEGADOR NATIVO 3D ESTILO WAZE -->
   <section id="navegador" class="py-20 border-b border-slate-800/80">
     <div class="max-w-5xl mx-auto px-4 space-y-12">
       
@@ -386,7 +516,7 @@
           </div>
           <h3 class="text-base font-black text-white">Suba a Planilha Oficial (.xlsx)</h3>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Ao receber os pacotes, compartilhe o arquivo do romaneio diretamente para o DriveXPS no celular. Em 3 segundos ele processa todas as coordenadas.
+            Ao receber os pacotes no CD, compartilhe o arquivo do romaneio para o DriveXPS no celular. O motor VROOM calcula a varredura contínua de rua sem ziguezague.
           </p>
         </div>
 
@@ -402,7 +532,7 @@
             Na aba <strong>Sacolas</strong>, cada pacote tem seu número contínuo:
             <br>• Pacotes <strong>#1 ao #10</strong> vão na <strong>Sacola 1</strong>.
             <br>• Pacotes <strong>#11 ao #20</strong> vão na <strong>Sacola 2</strong>.
-            <br>Escreva apenas <strong>#1, #2, #3</strong> grande na caixa.
+            <br>Pacotes avulsos sem ordem ganham as etiquetas correspondentes <strong>+1, +2, +3...</strong> automaticamente.
           </p>
         </div>
 
@@ -559,6 +689,169 @@
     </div>
   </section>
 
+  <!-- 🌟 MÓDULO 5: TABELA COMPARATIVA LADO A LADO (MODO COMUM VS DRIVEXPS) -->
+  <section class="py-20 border-b border-slate-800/80">
+    <div class="max-w-4xl mx-auto px-4 space-y-10">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Comparativo Real</span>
+        <h2 class="text-3xl font-heading font-black text-white">O seu dia com e sem o DriveXPS</h2>
+      </div>
+
+      <div class="overflow-x-auto rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] font-black border-b border-slate-800">
+            <tr>
+              <th class="p-4 sm:p-5">Situação na Rotina</th>
+              <th class="p-4 sm:p-5 text-red-400">Sem o DriveXPS</th>
+              <th class="p-4 sm:p-5 text-emerald-400 bg-emerald-500/5 border-l border-emerald-500/20">Com o DriveXPS</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 font-medium">
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Carregamento no Galpão</td>
+              <td class="p-4 sm:p-5 text-slate-400">1h a 1h30 tentando adivinhar como empilhar as caixas</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">20 minutos: sacolas de 10 em 10 no Canetão</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Traçado da Rota</td>
+              <td class="p-4 sm:p-5 text-slate-400">Ziguezague louco cruzando avenidas e fazendo retornos</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Varredura contínua de rua rua-a-rua sem retorno</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Radar e Velocidade</td>
+              <td class="p-4 sm:p-5 text-slate-400">Freadas bruscas em radares escondidos ou multas surpresa</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Placas fincadas na pista 3D, voz e bipe de advertência</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Navegação Curva a Curva</td>
+              <td class="p-4 sm:p-5 text-slate-400">Abrir Waze, fechar Waze, abrir Shopee, dar baixa (300 toques)</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Navegador 3D nativo ou escolha Waze/Maps com 1 toque</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Procura da Caixa no Carro</td>
+              <td class="p-4 sm:p-5 text-slate-400">3 a 5 minutos por cliente revirando 100 caixas no porta-malas</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">5 segundos: a sacola certa já está aberta no banco</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Horário de Chegada em Casa</td>
+              <td class="p-4 sm:p-5 text-slate-400">19h30 às 21h cansado, estressado e com o tanque vazio</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">16h30 às 17h com rota concluída e dinheiro no bolso</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 6: PROVA SOCIAL & DEPOIMENTOS REAIS -->
+  <section id="depoimentos" class="py-20 bg-[#080d18] border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Quem Usa Recomenda</span>
+        <h2 class="text-3xl font-heading font-black text-white">O que os entregadores estão dizendo na rua</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex text-amber-400 text-sm">★★★★★</div>
+            <p class="text-slate-300 leading-relaxed italic">
+              "Fiz 60 entregas em 3 horas cravadas sem correria. Antes eu chegava em casa 20h moído. Só de não ter que ficar abrindo e fechando o Waze a cada entrega o dia rende o dobro!"
+            </p>
+          </div>
+          <div class="pt-3 border-t border-slate-800 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-orange-600/30 text-orange-400 font-black flex items-center justify-center text-xs">ST</div>
+            <div>
+              <strong class="text-white block">Sidnei T.</strong>
+              <span class="text-[10px] text-slate-500">Fiorino • Baixada Santista</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex text-amber-400 text-sm">★★★★★</div>
+            <p class="text-slate-300 leading-relaxed italic">
+              "A separação no Canetão de 10 em 10 é mágica. Eu colocava tudo solto na Fiorino e era um desespero achar encomenda pequena. Agora cada sacola tem seu número certinho. Economizo fácil uns 20 conto de gasolina por rota."
+            </p>
+          </div>
+          <div class="pt-3 border-t border-slate-800 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-cyan-600/30 text-cyan-400 font-black flex items-center justify-center text-xs">MR</div>
+            <div>
+              <strong class="text-white block">Marcos R.</strong>
+              <span class="text-[10px] text-slate-500">Kombi • Zona Sul SP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex text-amber-400 text-sm">★★★★★</div>
+            <p class="text-slate-300 leading-relaxed italic">
+              "O aviso dos radares na pista me salvou de duas multas já no primeiro mês de uso na rodovia. O velocímetro pisca em vermelho e apita na hora certa. Vale cada centavo da assinatura."
+            </p>
+          </div>
+          <div class="pt-3 border-t border-slate-800 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-emerald-600/30 text-emerald-400 font-black flex items-center justify-center text-xs">AL</div>
+            <div>
+              <strong class="text-white block">André L.</strong>
+              <span class="text-[10px] text-slate-500">Uno Way • Campinas</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 7: COMO INSTALAR O PWA NO CELULAR (3 PASSOS RÁPIDOS) -->
+  <section class="py-20 border-b border-slate-800/80">
+    <div class="max-w-4xl mx-auto px-4 space-y-12">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Sem Ocupar Memória</span>
+        <h2 class="text-3xl font-heading font-black text-white">Instale em 10 segundos no seu celular</h2>
+        <p class="text-xs text-slate-400">O DriveXPS é um Progressive Web App (PWA) de última geração: não precisa baixar pela Play Store e não ocupa espaço.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+        
+        <!-- Android -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🤖</span>
+            <h3 class="text-base font-black text-white">Instalação no Android</h3>
+          </div>
+          <ol class="space-y-2.5 text-slate-300 list-decimal list-inside leading-relaxed">
+            <li>Abra o link pelo <strong>Google Chrome</strong>.</li>
+            <li>Toque nos <strong>3 pontinhos ⋮</strong> no canto superior direito.</li>
+            <li>Selecione <strong>"Instalar Aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
+          </ol>
+          <div class="bg-black/50 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+            Pronto! O ícone oficial do DriveXPS ficará na sua tela inicial como um app nativo.
+          </div>
+        </div>
+
+        <!-- iPhone iOS -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🍏</span>
+            <h3 class="text-base font-black text-white">Instalação no iPhone (iOS)</h3>
+          </div>
+          <ol class="space-y-2.5 text-slate-300 list-decimal list-inside leading-relaxed">
+            <li>Abra o link pelo navegador <strong>Safari</strong>.</li>
+            <li>Toque no botão de <strong>Compartilhar ⎋</strong> na barra inferior.</li>
+            <li>Role para baixo e selecione <strong>"Adicionar à Tela de Início ➕"</strong>.</li>
+          </ol>
+          <div class="bg-black/50 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+            Pronto! Abra pelo ícone criado para rodar em tela cheia com navegação 3D fluida.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- 8. CALCULADORA INTERATIVA DE ECONOMIA -->
   <section id="calculadora" class="py-20 border-b border-slate-800/80">
     <div class="max-w-2xl mx-auto px-4">
@@ -579,7 +872,7 @@
 
           <div class="bg-black/60 p-5 rounded-2xl border border-slate-800 space-y-3 font-mono">
             <div class="flex justify-between items-center text-xs">
-              <span class="text-slate-400">Gasolina economizada por mês:</span>
+              <span class="text-slate-400">Combustível economizado por mês:</span>
               <span id="gasolinaMes" class="text-emerald-400 font-black text-base">R$ 520,80</span>
             </div>
             <div class="flex justify-between items-center text-xs">
@@ -676,6 +969,26 @@
 
         <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
           <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>O detector de radares funciona sem internet?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Sim!</strong> Quando você inicia sua rota, o aplicativo salva os radares da região no cache local do seu aparelho. Mesmo em trechos de rodovia sem sinal ou túneis, os alertas visuais na pista, o bipe de excesso de velocidade e os avisos de voz continuam funcionando perfeitamente.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Posso usar o Waze ou Google Maps se eu preferir?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Com certeza!</strong> No menu lateral você encontra a opção "Navegador Padrão". Escolha entre o Navegador 3D Nativo do DriveXPS, Waze ou Google Maps. O botão principal na tela Rua abrirá diretamente o app da sua escolha.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
             <span>Preciso colocar cartão de crédito para testar?</span>
             <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
           </summary>
@@ -686,21 +999,11 @@
 
         <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
           <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
-            <span>O navegador 3D precisa do app do Waze instalado?</span>
-            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
-          </summary>
-          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
-            <strong>Não precisa!</strong> O DriveXPS tem o seu próprio motor 3D interno com GPS e comando de voz. Mas se por algum motivo você preferir usar o Waze tradicional, existe um botão dedicado "Waze" na aba Rua para abrir com 1 toque. Você escolhe como prefere navegar!
-          </p>
-        </details>
-
-        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
-          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
             <span>Como faço para instalar no meu celular?</span>
             <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
           </summary>
           <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
-            O DriveXPS é um PWA ultraleve (não ocupa memória do celular). No Android, abra pelo Google Chrome e toque em <strong>"Instalar Aplicativo"</strong>. No iPhone, abra pelo Safari, toque no botão <strong>Compartilhar ⎋</strong> e depois em <strong>"Adicionar à Tela de Início ➕"</strong>.
+            O DriveXPS é um PWA ultraleve. No Android, abra pelo Google Chrome e toque em <strong>"Instalar Aplicativo"</strong>. No iPhone, abra pelo Safari, toque no botão <strong>Compartilhar ⎋</strong> e depois em <strong>"Adicionar à Tela de Início ➕"</strong>.
           </p>
         </details>
 
@@ -710,7 +1013,7 @@
             <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
           </summary>
           <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
-            <strong>Sim, 100% do território nacional.</strong> Qualquer galpão da Shopee Express no Brasil que emita o romaneio oficial em .xlsx é suportado pelo nosso motor viário.
+            <strong>Sim, 100% do território nacional.</strong> Qualquer galpão da Shopee Express no Brasil que emita o romaneio oficial em .xlsx é suportado pelo nosso motor viário e banco nacional de radares.
           </p>
         </details>
 
@@ -718,7 +1021,7 @@
     </div>
   </section>
 
-  <!-- 11. CTA FINAL HIPNÓTICO -->
+  <!-- 11. CTA FINAL -->
   <section class="py-20 bg-gradient-to-t from-orange-950/40 via-transparent to-transparent text-center">
     <div class="max-w-2xl mx-auto px-4 space-y-6">
       <div class="w-16 h-16 bg-orange-600/20 text-orange-400 border border-orange-500/40 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-xl">
@@ -728,7 +1031,7 @@
         Sua próxima rota pode terminar 2 horas mais cedo.
       </h2>
       <p class="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
-        Cada dia que você roda sem o DriveXPS são R$ 25 de gasolina jogados fora no escapamento e horas de vida perdidas no trânsito. Instale agora e comprove na sua próxima carga.
+        Cada dia rodando sem o DriveXPS são R$ 25 de combustível jogados fora e o risco constante de multas em radares escondidos. Instale agora e comprove na sua próxima carga.
       </p>
       <div class="pt-2">
         <a href="https://studiotesta.com.br/drivexps/app/" class="inline-flex items-center gap-2 px-9 py-4 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/40 active:scale-95 transition">
