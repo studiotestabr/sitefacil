@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TestaPay - Pagamento Seguro via Pix</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- QRCode.js para renderizar caso a API mande a string pura -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .animate-subtle { animation: pulse-subtle 2s infinite ease-in-out; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 antialiased">
+
+  <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8">
+    
+    <!-- Header / Branding White Label -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-5 mb-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xl">
+          ⚡
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-white tracking-wide">TestaPay</h1>
+          <p class="text-xs text-slate-400">Checkout Pix Instantâneo</p>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Seguro
+      </span>
+    </div>
+
+    <!-- ETAPA 1: Formulário de Checkout -->
+    <div id="step-form">
+      <form id="pix-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Nome Completo</label>
+          <input type="text" id="cliente_nome" required placeholder="Seu Nome" 
+                 class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">CPF ou CNPJ</label>
+          <input type="text" id="cliente_cpf_cnpj" required placeholder="000.000.000-00" 
+                 class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">WhatsApp (com DDD)</label>
+          <input type="tel" id="cliente_whatsapp" required placeholder="11999999999" 
+                 class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Valor (R$)</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-2.5 text-slate-500 text-sm">R$</span>
+            <input type="number" step="0.01" min="1.00" id="valor_original" required placeholder="50.00" 
+                   class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition font-medium">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit"
+                class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-lg transition duration-200 shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+          <span>Gerar Cobrança Pix</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- ETAPA 2: Exibição do QR Code e Pix Copia e Cola -->
+    <div id="step-pix" class="hidden text-center space-y-5">
+      <div class="space-y-1">
+        <span class="text-xs uppercase tracking-wider text-emerald-400 font-semibold">Cobrança Gerada</span>
+        <div id="pix-valor-display" class="text-3xl font-extrabold text-white">R$ 0,00</div>
+        <p class="text-xs text-slate-400">Escaneie o QR Code abaixo com seu banco</p>
+      </div>
+
+      <!-- Container do QR Code -->
+      <div class="bg-white p-4 rounded-xl inline-block shadow-inner mx-auto" id="qrcode-container"></div>
+
+      <!-- Copia e Cola -->
+      <div class="space-y-2">
+        <label class="block text-xs text-slate-400">Pix Copia e Cola:</label>
+        <div class="flex items-center gap-2 bg-slate-950 border border-slate-800 p-2 rounded-lg">
+          <input type="text" id="pix-copia-cola" readonly class="bg-transparent text-xs text-slate-300 w-full focus:outline-none">
+          <button onclick="copiarPix()" id="btn-copiar" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-md text-white font-medium transition">
+            Copiar
+          </button>
+        </div>
+      </div>
+
+      <!-- Status em tempo real -->
+      <div class="flex items-center justify-center gap-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 py-2.5 rounded-lg animate-subtle">
+        <svg class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>Aguardando confirmação do banco...</span>
+      </div>
+    </div>
+
+    <!-- ETAPA 3: Sucesso / Pagamento Aprovado -->
+    <div id="step-success" class="hidden text-center space-y-4 py-6">
+      <div class="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-3xl">
+        ✓
+      </div>
+      <div class="space-y-1">
+        <h2 class="text-xl font-bold text-white">Pagamento Confirmado!</h2>
+        <p class="text-xs text-slate-400">O comprovante foi enviado para o seu WhatsApp.</p>
+      </div>
+      <div class="pt-4 border-t border-slate-800 text-xs text-slate-500">
+        TestaPay • Transação finalizada com sucesso
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ========================================================
+       CONFIGURAÇÃO DOS ENDPOINTS (n8n)
+       Altere para a URL pública/domínio do seu n8n
+    ======================================================== */
+    const N8N_URL_CRIAR_PIX = "https://seu-n8n.seudominio.com.br/webhook/testapay-criar-pix";
+    const N8N_URL_STATUS    = "https://seu-n8n.seudominio.com.br/webhook/testapay-status-pix";
+
+    let currentTxid = null;
+    let pollingInterval = null;
+
+    // 1. Envio do Formulário para gerar o Pix
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btn-submit");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin text-sm">⏳</span> Gerando Pix...`;
+
+      const payload = {
+        cliente_nome: document.getElementById("cliente_nome").value,
+        cliente_cpf_cnpj: document.getElementById("cliente_cpf_cnpj").value.replace(/\D/g, ''),
+        cliente_whatsapp: document.getElementById("cliente_whatsapp").value.replace(/\D/g, ''),
+        valor_original: parseFloat(document.getElementById("valor_original").value).toFixed(2)
+      };
+
+      try {
+        const response = await fetch(N8N_URL_CRIAR_PIX, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!data.txid || !data.pix_copia_cola) {
+          throw new Error("Resposta inválida do gateway.");
+        }
+
+        currentTxid = data.txid;
+        exibirTelaPix(data.valor_original, data.pix_copia_cola, data.qrcode_base64);
+        iniciarPollingStatus();
+
+      } catch (err) {
+        alert("Erro ao gerar Pix. Verifique a conexão com o n8n.");
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = "Gerar Cobrança Pix";
+      }
+    }
+
+    // 2. Renderização do QR Code e Copia e Cola
+    function exibirTelaPix(valor, copiaCola, qrcodeBase64) {
+      document.getElementById("step-form").classList.add("hidden");
+      document.getElementById("step-pix").classList.remove("hidden");
+      document.getElementById("pix-valor-display").innerText = `R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`;
+      document.getElementById("pix-copia-cola").value = copiaCola;
+
+      const qrContainer = document.getElementById("qrcode-container");
+      qrContainer.innerHTML = "";
+
+      // Se a API já devolveu a imagem base64 pronta, usamos a imagem; senão, desenhamos pelo QRCode.js
+      if (qrcodeBase64) {
+        const img = document.createElement("img");
+        img.src = qrcodeBase64.startsWith("data:") ? qrcodeBase64 : `data:image/png;base64,${qrcodeBase64}`;
+        img.className = "w-48 h-48 mx-auto";
+        qrContainer.appendChild(img);
+      } else {
+        new QRCode(qrContainer, {
+          text: copiaCola,
+          width: 190,
+          height: 190,
+          colorDark: "#020617",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }
+
+    // 3. Copiar Pix
+    function copiarPix() {
+      const input = document.getElementById("pix-copia-cola");
+      navigator.clipboard.writeText(input.value);
+      const btn = document.getElementById("btn-copiar");
+      btn.innerText = "Copiado! ✓";
+      btn.classList.add("bg-emerald-600");
+      setTimeout(() => {
+        btn.innerText = "Copiar";
+        btn.classList.remove("bg-emerald-600");
+      }, 2500);
+    }
+
+    // 4. Polling automático checando status a cada 3 segundos
+    function iniciarPollingStatus() {
+      pollingInterval = setInterval(async () => {
+        if (!currentTxid) return;
+
+        try {
+          const res = await fetch(`${N8N_URL_STATUS}?txid=${currentTxid}`);
+          const data = await res.json();
+
+          if (data.status === "PAGO" || data.status === "CONCLUIDO") {
+            clearInterval(pollingInterval);
+            document.getElementById("step-pix").classList.add("hidden");
+            document.getElementById("step-success").classList.remove("hidden");
+          }
+        } catch (e) {
+          console.warn("Aguardando confirmação...", e);
+        }
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
