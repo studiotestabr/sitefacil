@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.2 - Núcleo Estabilizado Nacional (Radares do Banco & Head-Up)
+   DriveXPS Pro 6.3 - Núcleo Estabilizado Nacional (Etiquetas +1 100% Alinhadas)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -230,8 +230,9 @@ function entregaApp() {
     // GETTERS REATIVOS (LÓGICA OFICIAL INDEX_OLD13)
     // =========================================================================
     formatarParada(val) {
-      if (val === null || val === undefined) return '-';
-      if (val < 0) return '+' + Math.abs(val);
+      if (val === null || val === undefined || val === '') return '-';
+      if (typeof val === 'number' && val < 0) return '+' + Math.abs(val);
+      if (typeof val === 'string' && Number(val) < 0) return '+' + Math.abs(Number(val));
       return val;
     },
 
@@ -364,7 +365,6 @@ function entregaApp() {
         } else {
           await this.carregarUltimaRota();
         }
-        // Consulta os radares do banco nacional para a rota ativa
         this.carregarRadaresDoBanco();
       }
 
@@ -406,7 +406,6 @@ function entregaApp() {
       try {
         let endpoint = '/items/drivexps_radares?limit=1000';
 
-        // Busca regional por Bounding Box oficial do Directus: _gte e _lte
         if (this.entregas && this.entregas.length > 0) {
           let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
           this.entregas.forEach(p => {
@@ -418,14 +417,12 @@ function entregaApp() {
             if (lng > maxLng) maxLng = lng;
           });
 
-          // Adiciona margem de segurança de ~10 km ao redor da carga
           const margem = 0.09;
           const latMin = (minLat - margem).toFixed(4);
           const latMax = (maxLat + margem).toFixed(4);
           const lngMin = (minLng - margem).toFixed(4);
           const lngMax = (maxLng + margem).toFixed(4);
 
-          // Sintaxe oficial correta do Directus
           endpoint = `/items/drivexps_radares?filter[latitude][_gte]=${latMin}&filter[latitude][_lte]=${latMax}&filter[longitude][_gte]=${lngMin}&filter[longitude][_lte]=${lngMax}&limit=2500`;
         }
 
@@ -979,7 +976,6 @@ function entregaApp() {
 
         await this.calcularRotaRuaARua(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
 
-        // A CORREÇÃO CRUCIAL: O callback agora lê sempre dinâmico do pacote ativo
         this.watchPositionId = navigator.geolocation.watchPosition(
           (novaPos) => this.processarPosicaoGPS(novaPos),
           (err) => console.warn('Aviso GPS:', err),
@@ -1205,7 +1201,6 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // Recálculo ágil em 3 segundos
       const agora = Date.now();
       const fora = snap.distRota > 30;
       if (fora) {
@@ -1500,6 +1495,10 @@ function entregaApp() {
       } catch(e) {}
     },
 
+    /**
+     * LEITOR ESTRITO DE PLANILHAS SHOPEE EXPRESS:
+     * Restaura a regra pura do index_old13 que garante a numeração de etiquetas +1, +2, +3...
+     */
     parseLinhasShopee(linhasMatriz) {
       this.msgErro = null;
       if (!linhasMatriz || linhasMatriz.length < 2) return [];
@@ -1535,8 +1534,11 @@ function entregaApp() {
         const cols = linhasMatriz[r];
         if (!cols || cols.length <= Math.max(iLat, iLng)) continue;
 
-        const lat = parseFloat(String(cols[iLat] || '').replace(',', '.').trim());
-        const lng = parseFloat(String(cols[iLng] || '').replace(',', '.').trim());
+        const rawLat = String(cols[iLat] || '').replace(',', '.').trim();
+        const rawLng = String(cols[iLng] || '').replace(',', '.').trim();
+        const lat = parseFloat(rawLat); 
+        const lng = parseFloat(rawLng);
+
         if (!lat || !lng || isNaN(lat) || isNaN(lng) || lat === 0) continue;
 
         const addr = String(cols[iAddr] || '').trim();
@@ -1546,13 +1548,17 @@ function entregaApp() {
         let seqVal = null;
         let stpVal = null;
 
+        // REGRA OFICIAL PURA DO INDEX_OLD13:
+        // Apenas quando a coluna for explicitamente um traço "-", incrementa as etiquetas extras
         if (rawSeq === '-' || rawStop === '-') {
-          seqVal = -contadorExtra;
-          stpVal = -contadorExtra;
-          contadorExtra++;
+            seqVal = -contadorExtra;
+            stpVal = -contadorExtra;
+            contadorExtra++;
         } else {
-          seqVal = parseInt(rawSeq) || null;
-          stpVal = parseInt(rawStop) || null;
+            seqVal = parseInt(rawSeq);
+            stpVal = parseInt(rawStop);
+            if (isNaN(seqVal)) seqVal = null;
+            if (isNaN(stpVal)) stpVal = null;
         }
 
         const rawTN = (iTN !== -1 && cols[iTN]) ? String(cols[iTN]).trim() : '';
@@ -1566,7 +1572,7 @@ function entregaApp() {
           ordem_shopee: seqVal,
           parada_shopee: stpVal,
           codigo_rastreio: rastreioFinal,
-          destinatario: stpVal ? `Parada #${stpVal}` : 'Destinatário',
+          destinatario: (stpVal !== null && stpVal < 0) ? `Parada +${Math.abs(stpVal)}` : (stpVal ? `Parada #${stpVal}` : 'Destinatário'),
           telefone: '13999999999',
           endereco: addr,
           numero: numero,
