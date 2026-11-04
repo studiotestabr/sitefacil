@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.4 - Head-Up Fixo no Rodapé & VROOM Nacional
+   DriveXPS Pro 6.3 - Fiorino Travada no Rodapé & Cobertura Total de Radares
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -10,7 +10,7 @@ function entregaApp() {
     N8N_WEBHOOK_URL: 'https://n8n.studiotesta.com.br/webhook/importar-shopee',
     OSRM_ROUTER_URL: 'https://rotas.studiotesta.com.br',
 
-    // 2. TEMA, MODOS E PREFERÊNCIAS DE NAVEGAÇÃO
+    // 2. TEMA E PREFERÊNCIAS DE NAVEGAÇÃO
     tema: localStorage.getItem('drivexps_tema') || 'escuro',
     modo: 'carregamento',
     appNavegacaoEscolhido: localStorage.getItem('drivexps_nav_app') || 'drivexps',
@@ -24,7 +24,6 @@ function entregaApp() {
     modalAssinatura: false,
     modalCadastroObrigatorio: false,
 
-    // Formulários
     inputNome: '',
     inputEmail: '',
     inputTelefone: '',
@@ -54,12 +53,11 @@ function entregaApp() {
     coordChegadaSalva: JSON.parse(localStorage.getItem('drivexps_coord_chegada') || 'null'),
     rotaGeometria: localStorage.getItem('drivexps_rota_geometria') || null,
 
-    // Mapa Leaflet 2D
     mapaLeaflet: null,
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES)
+    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP NO RODAPÉ)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
@@ -89,7 +87,7 @@ function entregaApp() {
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
 
-    // Motor de Radares
+    // Radares do Banco de Dados Nacional
     listaRadares: [],
     radarProximoAlerta: null,
     distanciaRadarTexto: '',
@@ -115,7 +113,6 @@ function entregaApp() {
     tutorialAberto: false,
     passoTutorial: 1,
 
-    // PWA
     mostrarPopupInstalar: false,
     temPromptInstalacao: false,
     isStandalone: false,
@@ -144,12 +141,8 @@ function entregaApp() {
     },
 
     getEstiloBotaoNavegacao() {
-      if (this.appNavegacaoEscolhido === 'waze') {
-        return 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/30';
-      }
-      if (this.appNavegacaoEscolhido === 'maps') {
-        return 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30';
-      }
+      if (this.appNavegacaoEscolhido === 'waze') return 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/30';
+      if (this.appNavegacaoEscolhido === 'maps') return 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30';
       return 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/40';
     },
 
@@ -178,7 +171,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // COMUNICAÇÃO DIRECTUS COM AUTO-REFRESH DE TOKEN (401)
+    // COMUNICAÇÃO DIRECTUS (AUTO-REFRESH DE TOKEN 401)
     // =========================================================================
     async fetchDirectus(path, options = {}) {
       const url = path.startsWith('http') ? path : `${this.DIRECTUS_URL}${path}`;
@@ -216,9 +209,7 @@ function entregaApp() {
           if (data?.data?.access_token) {
             this.tokenAcesso = data.data.access_token;
             localStorage.setItem('directus_token', this.tokenAcesso);
-            if (data.data.refresh_token) {
-              localStorage.setItem('directus_refresh_token', data.data.refresh_token);
-            }
+            if (data.data.refresh_token) localStorage.setItem('directus_refresh_token', data.data.refresh_token);
             return true;
           }
         }
@@ -230,9 +221,8 @@ function entregaApp() {
     // GETTERS REATIVOS (LÓGICA OFICIAL INDEX_OLD13)
     // =========================================================================
     formatarParada(val) {
-      if (val === null || val === undefined || val === '') return '-';
-      if (typeof val === 'number' && val < 0) return '+' + Math.abs(val);
-      if (typeof val === 'string' && Number(val) < 0) return '+' + Math.abs(Number(val));
+      if (val === null || val === undefined) return '-';
+      if (val < 0) return '+' + Math.abs(val);
       return val;
     },
 
@@ -304,7 +294,6 @@ function entregaApp() {
         if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
         if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
         if (t.startsWith('+') && t === paradaStr) return true;
-
         if (apenasNumeros && t.length <= 3) return false;
 
         return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
@@ -405,11 +394,11 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MOTOR DE RADARES NACIONAL (BUSCA NO BANCO DIRECTUS / POSTGRESQL)
+    // MOTOR DE RADARES (ABRANGÊNCIA NACIONAL COM RAIO AMPLIADO DE 15KM)
     // =========================================================================
     async carregarRadaresDoBanco() {
       try {
-        let endpoint = '/items/drivexps_radares?limit=1000';
+        let endpoint = '/items/drivexps_radares?limit=1500';
 
         if (this.entregas && this.entregas.length > 0) {
           let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
@@ -422,27 +411,36 @@ function entregaApp() {
             if (lng > maxLng) maxLng = lng;
           });
 
-          const margem = 0.09;
+          // MARGEM CORRIGIDA: Cobre um raio gigantesco de +/- 15km garantindo todos os radares da região
+          const margem = 0.15;
           const latMin = (minLat - margem).toFixed(4);
           const latMax = (maxLat + margem).toFixed(4);
           const lngMin = (minLng - margem).toFixed(4);
           const lngMax = (maxLng + margem).toFixed(4);
 
-          endpoint = `/items/drivexps_radares?filter[latitude][_gte]=${latMin}&filter[latitude][_lte]=${latMax}&filter[longitude][_gte]=${lngMin}&filter[longitude][_lte]=${lngMax}&limit=2500`;
+          endpoint = `/items/drivexps_radares?filter[latitude][_gte]=${latMin}&filter[latitude][_lte]=${latMax}&filter[longitude][_gte]=${lngMin}&filter[longitude][_lte]=${lngMax}&limit=3500`;
         }
 
         const res = await this.fetchDirectus(endpoint);
         if (res.ok) {
           const data = await res.json();
           if (data && data.data && data.data.length > 0) {
-            this.listaRadares = data.data.map(r => ({
-              id: r.id || r.osm_id,
-              latitude: Number(r.latitude),
-              longitude: Number(r.longitude),
-              velocidade: Number(r.velocidade) || 60,
-              tipo: r.tipo || 'fixo',
-              rodovia_rua: r.rodovia_rua || 'Via Monitorada'
-            }));
+            const mapaIds = new Set(this.listaRadares.map(r => `${r.latitude.toFixed(4)}_${r.longitude.toFixed(4)}`));
+            data.data.forEach(r => {
+              const chave = `${Number(r.latitude).toFixed(4)}_${Number(r.longitude).toFixed(4)}`;
+              if (!mapaIds.has(chave)) {
+                this.listaRadares.push({
+                  id: r.id || r.osm_id,
+                  latitude: Number(r.latitude),
+                  longitude: Number(r.longitude),
+                  velocidade: Number(r.velocidade) || 60,
+                  tipo: r.tipo || 'fixo',
+                  rodovia_rua: r.rodovia_rua || 'Via Monitorada'
+                });
+                mapaIds.add(chave);
+              }
+            });
+            localStorage.setItem('drivexps_radares_cache', JSON.stringify(this.listaRadares));
             
             if (this.modo === 'navegacao' && this.mapaNavGL) {
               this.renderizarRadaresNaPistaGL();
@@ -450,7 +448,7 @@ function entregaApp() {
           }
         }
       } catch (e) {
-        console.warn('Erro ao consultar radares no Directus:', e);
+        console.warn('Usando cache local de radares auditados:', e);
       }
     },
 
@@ -471,7 +469,7 @@ function entregaApp() {
 
         const el = document.createElement('div');
         el.className = 'radar-pino-pista';
-        el.title = `Radar ${r.velocidade || 60} km/h - ${r.rodovia_rua || 'Via'}`;
+        el.title = `Radar ${r.velocidade || 60} km/h`;
         el.innerHTML = `
           <div class="radar-pino-disco">
             <span class="radar-pino-vel">${r.velocidade || 60}</span>
@@ -563,9 +561,7 @@ function entregaApp() {
             this.tocarBipeExcessoVelocidade();
             if ('vibrate' in navigator) navigator.vibrate([80, 50, 80]);
             this.intervaloBipeExcesso = setInterval(() => {
-              if (this.radarExcessoVelocidade) {
-                this.tocarBipeExcessoVelocidade();
-              }
+              if (this.radarExcessoVelocidade) this.tocarBipeExcessoVelocidade();
             }, 850);
           }
         } else {
@@ -626,7 +622,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MAPA GERAL LEAFLET 2D (ORDEM EXATA DO VROOM: ordem_entrega)
+    // MAPA GERAL LEAFLET 2D
     // =========================================================================
     abrirAbaMapa() {
       this.modo = 'mapa';
@@ -671,7 +667,6 @@ function entregaApp() {
 
       const pontosLinha = [];
 
-      // 1. PIN DO CD / PARTIDA
       let posCD = null;
       if (this.coordPartidaSalva && this.coordPartidaSalva.latitude) {
         posCD = [this.coordPartidaSalva.latitude, this.coordPartidaSalva.longitude];
@@ -690,7 +685,6 @@ function entregaApp() {
         L.marker(posCD, { icon: iconeCD }).bindPopup(`<strong>📍 PONTO DE PARTIDA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 2. PINOS DAS ENTREGAS NA ORDEM ESTRITA DO VROOM (ordem_entrega)
       const entregasOrdenadas = [...this.entregas].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
 
       entregasOrdenadas.forEach(p => {
@@ -722,7 +716,6 @@ function entregaApp() {
         L.marker(coord, { icon: iconePacote }).bindPopup(popupContent).addTo(this.grupoMarcadores);
       });
 
-      // 3. PIN DA CHEGADA
       let posCasa = null;
       if (this.coordChegadaSalva && this.coordChegadaSalva.latitude) {
         posCasa = [this.coordChegadaSalva.latitude, this.coordChegadaSalva.longitude];
@@ -758,7 +751,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (WAZE ENGINE: DESTINO DINÂMICO & ZERO DESVIOS FANTASMAS)
+    // NAVEGAÇÃO 3D (WAZE ENGINE: OFFSET DE CÂMERA OFICIAL & AUTO-RECENTER)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -775,10 +768,6 @@ function entregaApp() {
       else window.speechSynthesis.cancel();
     },
 
-    /**
-     * SNAP-TO-ROUTE ROBUSTO:
-     * Alinha a Fiorino com a via. Se passar da entrada, desativa para o mapa não virar biruta!
-     */
     projetarPontoNaRota(lat, lng, headingCarro) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
         return { lat, lng, distRota: 0, headingSegmento: null, indiceSegmento: 0 };
@@ -1124,9 +1113,7 @@ function entregaApp() {
     },
 
     /**
-     * CÂMERA DINÂMICA NATIVA COM PADDING:
-     * O carro fica fisicamente ancorado a 280px do rodapé. Sem deslocamento de latitude,
-     * garantindo que a bússola rode perfeitamente no próprio eixo da Fiorino!
+     * CÂMERA CHUMBADA NO RODAPÉ (OFFSET VETORIAL MATEMÁTICO - WAZE EXACT MATCH)
      */
     centralizarNoCarroGL(lat, lng, bearing, duracao = 800) {
       if (!this.mapaNavGL) return;
@@ -1136,12 +1123,20 @@ function entregaApp() {
       else if (this.velocidadeGPS > 35) zoomDinamico = 16.2;
       else zoomDinamico = 16.8;
 
+      // Desloca fisicamente o foco da câmera 110 metros à frente do carro,
+      // fazendo a Fiorino ancorar visualmente no terço inferior da tela.
+      const distOffsetMetros = 110;
+      const rad = (bearing !== undefined && bearing !== null ? bearing : this.headingAtual) * Math.PI / 180;
+      const dLat = (distOffsetMetros * Math.cos(rad)) / 111111;
+      const dLng = (distOffsetMetros * Math.sin(rad)) / (111111 * Math.cos(lat * Math.PI / 180));
+
+      const centerFocal = [lng + dLng, lat + dLat];
+
       this.mapaNavGL.easeTo({
-        center: [lng, lat],
+        center: centerFocal,
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
         pitch: 45,
         zoom: zoomDinamico,
-        padding: { top: 0, bottom: 280, left: 0, right: 0 },
         duration: duracao,
         easing: (t) => t
       });
@@ -1155,9 +1150,6 @@ function entregaApp() {
       }
     },
 
-    /**
-     * LOOP GPS COM PROTEÇÃO CONTRA O EFEITO BIRUTA
-     */
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
 
@@ -1219,7 +1211,6 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // Se afastou 30 metros da linha oficial, é porque virou a rua errada (aciona o recálculo)
       const agora = Date.now();
       const fora = snap.distRota > 30;
       if (fora) {
@@ -1423,7 +1414,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // ROTAS, HISTÓRICO E PLANILHAS (COM VROOM PURO DO INDEX_OLD13)
+    // ROTAS, HISTÓRICO E PLANILHAS
     // =========================================================================
     async carregarUltimaRota() {
       try {
@@ -1474,9 +1465,7 @@ function entregaApp() {
           this.rotasHistorico = dataRota.data || [];
           localStorage.setItem('drivexps_rotas_historico_cache', JSON.stringify(this.rotasHistorico));
         }
-      } catch (e) {
-        console.warn('Erro ao carregar histórico:', e);
-      }
+      } catch (e) {}
       
       if (!this.rotasHistorico || this.rotasHistorico.length === 0) {
         const cache = localStorage.getItem('drivexps_rotas_historico_cache');
@@ -1560,16 +1549,13 @@ function entregaApp() {
         let seqVal = null;
         let stpVal = null;
 
-        // REGRA DE ETIQUETAS AVULSAS PURA DO INDEX_OLD13 (Só se for traço explicitly)
         if (rawSeq === '-' || rawStop === '-') {
           seqVal = -contadorExtra;
           stpVal = -contadorExtra;
           contadorExtra++;
         } else {
-          seqVal = parseInt(rawSeq);
-          stpVal = parseInt(rawStop);
-          if (isNaN(seqVal)) seqVal = null;
-          if (isNaN(stpVal)) stpVal = null;
+          seqVal = parseInt(rawSeq) || null;
+          stpVal = parseInt(rawStop) || null;
         }
 
         const rawTN = (iTN !== -1 && cols[iTN]) ? String(cols[iTN]).trim() : '';
