@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.3 - Núcleo Estabilizado Nacional (Etiquetas +1 100% Alinhadas)
+   DriveXPS Pro 6.4 - Head-Up Fixo no Rodapé & VROOM Nacional
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -59,7 +59,7 @@ function entregaApp() {
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES DO BANCO)
+    // 5. MOTOR DE NAVEGAÇÃO 3D (WAZE HEAD-UP & RADARES)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
@@ -89,7 +89,7 @@ function entregaApp() {
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
 
-    // Motor de Radares do Banco de Dados Nacional
+    // Motor de Radares
     listaRadares: [],
     radarProximoAlerta: null,
     distanciaRadarTexto: '',
@@ -354,6 +354,11 @@ function entregaApp() {
       const cacheHistorico = localStorage.getItem('drivexps_rotas_historico_cache');
       if (cacheHistorico) {
         try { this.rotasHistorico = JSON.parse(cacheHistorico); } catch(e) {}
+      }
+
+      const cacheRadares = localStorage.getItem('drivexps_radares_cache');
+      if (cacheRadares) {
+        try { this.listaRadares = JSON.parse(cacheRadares); } catch(e) {}
       }
 
       await this.verificarAutenticacao();
@@ -736,7 +741,6 @@ function entregaApp() {
         L.marker(posCasa, { icon: iconeCasa }).bindPopup(`<strong>🏠 PONTO DE CHEGADA</strong>`).addTo(this.grupoMarcadores);
       }
 
-      // 4. DESENHO DA GEOMETRIA OFICIAL VROOM (SEM ZIGUEZAGUE)
       if (this.rotaGeometria && this.rotaGeometria.length > 5) {
         const latlngs = this.decodePolyline(this.rotaGeometria);
         this.linhaTrajeto = L.polyline(latlngs, { color: '#38bdf8', weight: 6, opacity: 0.95 }).addTo(this.mapaLeaflet);
@@ -771,6 +775,10 @@ function entregaApp() {
       else window.speechSynthesis.cancel();
     },
 
+    /**
+     * SNAP-TO-ROUTE ROBUSTO:
+     * Alinha a Fiorino com a via. Se passar da entrada, desativa para o mapa não virar biruta!
+     */
     projetarPontoNaRota(lat, lng, headingCarro) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
         return { lat, lng, distRota: 0, headingSegmento: null, indiceSegmento: 0 };
@@ -869,6 +877,10 @@ function entregaApp() {
       this.radarProximoAlerta = null;
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
+
+      if (!this.listaRadares || this.listaRadares.length === 0) {
+        this.carregarRadaresDoBanco();
+      }
 
       this.falarTexto(`Iniciando rota para Canetão número ${entrega.ordem_entrega}, na ${entrega.endereco}`);
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
@@ -1028,11 +1040,9 @@ function entregaApp() {
         this.passoAtualIndex = 0;
 
         if (this.passosRota.length > 0) {
-          const viaSaida = this.passosRota[0].name || this.passosRota[0].ref;
-          if (viaSaida && viaSaida.trim() !== '') {
-            this.nomeRuaPisoAtual = viaSaida;
-            this.nomeRuaAtualCarro = viaSaida;
-          }
+          const viaSaida = this.passosRota[0].name || this.passosRota[0].ref || 'Sua Rota';
+          this.nomeRuaPisoAtual = viaSaida;
+          this.nomeRuaAtualCarro = viaSaida;
         }
 
         this.atualizarInstrucaoUI();
@@ -1113,6 +1123,11 @@ function entregaApp() {
       }
     },
 
+    /**
+     * CÂMERA DINÂMICA NATIVA COM PADDING:
+     * O carro fica fisicamente ancorado a 280px do rodapé. Sem deslocamento de latitude,
+     * garantindo que a bússola rode perfeitamente no próprio eixo da Fiorino!
+     */
     centralizarNoCarroGL(lat, lng, bearing, duracao = 800) {
       if (!this.mapaNavGL) return;
 
@@ -1124,9 +1139,9 @@ function entregaApp() {
       this.mapaNavGL.easeTo({
         center: [lng, lat],
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
-        pitch: 42,
+        pitch: 45,
         zoom: zoomDinamico,
-        padding: { top: 60, bottom: 220, left: 0, right: 0 },
+        padding: { top: 0, bottom: 280, left: 0, right: 0 },
         duration: duracao,
         easing: (t) => t
       });
@@ -1140,6 +1155,9 @@ function entregaApp() {
       }
     },
 
+    /**
+     * LOOP GPS COM PROTEÇÃO CONTRA O EFEITO BIRUTA
+     */
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
 
@@ -1201,6 +1219,7 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
+      // Se afastou 30 metros da linha oficial, é porque virou a rua errada (aciona o recálculo)
       const agora = Date.now();
       const fora = snap.distRota > 30;
       if (fora) {
@@ -1495,10 +1514,6 @@ function entregaApp() {
       } catch(e) {}
     },
 
-    /**
-     * LEITOR ESTRITO DE PLANILHAS SHOPEE EXPRESS:
-     * Restaura a regra pura do index_old13 que garante a numeração de etiquetas +1, +2, +3...
-     */
     parseLinhasShopee(linhasMatriz) {
       this.msgErro = null;
       if (!linhasMatriz || linhasMatriz.length < 2) return [];
@@ -1534,11 +1549,8 @@ function entregaApp() {
         const cols = linhasMatriz[r];
         if (!cols || cols.length <= Math.max(iLat, iLng)) continue;
 
-        const rawLat = String(cols[iLat] || '').replace(',', '.').trim();
-        const rawLng = String(cols[iLng] || '').replace(',', '.').trim();
-        const lat = parseFloat(rawLat); 
-        const lng = parseFloat(rawLng);
-
+        const lat = parseFloat(String(cols[iLat] || '').replace(',', '.').trim());
+        const lng = parseFloat(String(cols[iLng] || '').replace(',', '.').trim());
         if (!lat || !lng || isNaN(lat) || isNaN(lng) || lat === 0) continue;
 
         const addr = String(cols[iAddr] || '').trim();
@@ -1548,17 +1560,16 @@ function entregaApp() {
         let seqVal = null;
         let stpVal = null;
 
-        // REGRA OFICIAL PURA DO INDEX_OLD13:
-        // Apenas quando a coluna for explicitamente um traço "-", incrementa as etiquetas extras
+        // REGRA DE ETIQUETAS AVULSAS PURA DO INDEX_OLD13 (Só se for traço explicitly)
         if (rawSeq === '-' || rawStop === '-') {
-            seqVal = -contadorExtra;
-            stpVal = -contadorExtra;
-            contadorExtra++;
+          seqVal = -contadorExtra;
+          stpVal = -contadorExtra;
+          contadorExtra++;
         } else {
-            seqVal = parseInt(rawSeq);
-            stpVal = parseInt(rawStop);
-            if (isNaN(seqVal)) seqVal = null;
-            if (isNaN(stpVal)) stpVal = null;
+          seqVal = parseInt(rawSeq);
+          stpVal = parseInt(rawStop);
+          if (isNaN(seqVal)) seqVal = null;
+          if (isNaN(stpVal)) stpVal = null;
         }
 
         const rawTN = (iTN !== -1 && cols[iTN]) ? String(cols[iTN]).trim() : '';
