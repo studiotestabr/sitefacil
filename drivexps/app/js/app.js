@@ -1126,7 +1126,7 @@ function entregaApp() {
         bearing: (bearing !== undefined && bearing !== null) ? bearing : this.headingAtual,
         pitch: 42,
         zoom: zoomDinamico,
-        padding: { top: 60, bottom: 220, left: 0, right: 0 },
+        padding: { top: 220, bottom: 60, left: 0, right: 0 },
         duration: duracao,
         easing: (t) => t
       });
