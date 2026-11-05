@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.3 - Núcleo Estabilizado Nacional (Etiquetas +1 100% Alinhadas)
+   DriveXPS Pro 6.4 - Núcleo Estabilizado Nacional (Final de Rastreio Rápido)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -227,7 +227,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // GETTERS REATIVOS (LÓGICA OFICIAL INDEX_OLD13)
+    // GETTERS REATIVOS (COM BUSCA OTIMIZADA POR FINAL DE RASTREIO)
     // =========================================================================
     formatarParada(val) {
       if (val === null || val === undefined || val === '') return '-';
@@ -300,16 +300,22 @@ function entregaApp() {
         const ordemStr = this.formatarParada(e.ordem_shopee).toString().toLowerCase();
         const sacolaNum = Math.ceil(e.ordem_entrega / 10).toString();
         const canetaoStr = e.ordem_entrega.toString();
+        const rastreioCompleto = (e.codigo_rastreio || '').toLowerCase();
+        const finalRastreio = rastreioCompleto.slice(-4);
 
+        // Correspondências diretas
         if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
         if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
         if (t.startsWith('+') && t === paradaStr) return true;
 
-        if (apenasNumeros && t.length <= 3) return false;
+        // Correspondência direta com o N. FINAL RASTREIO (ex: "944b" ou "4949")
+        if (finalRastreio === t || (t.length >= 3 && finalRastreio.endsWith(t))) return true;
+
+        if (apenasNumeros && t.length <= 3 && canetaoStr !== t) return false;
 
         return (e.endereco && e.endereco.toLowerCase().includes(t)) ||
                (e.bairro && e.bairro.toLowerCase().includes(t)) ||
-               (e.codigo_rastreio && e.codigo_rastreio.toLowerCase().includes(t));
+               rastreioCompleto.includes(t);
       });
     },
 
@@ -1404,7 +1410,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // ROTAS, HISTÓRICO E PLANILHAS (COM VROOM PURO DO INDEX_OLD13)
+    // ROTAS, HISTÓRICO E PLANILHAS (COM VROOM PURO E AVULSOS NO FINAL DE RASTREIO)
     // =========================================================================
     async carregarUltimaRota() {
       try {
@@ -1497,7 +1503,7 @@ function entregaApp() {
 
     /**
      * LEITOR ESTRITO DE PLANILHAS SHOPEE EXPRESS:
-     * Restaura a regra pura do index_old13 que garante a numeração de etiquetas +1, +2, +3...
+     * Identifica pacotes com traço "-" mantendo o sinal para layout dinâmico de N. FINAL RASTREIO
      */
     parseLinhasShopee(linhasMatriz) {
       this.msgErro = null;
@@ -1548,8 +1554,7 @@ function entregaApp() {
         let seqVal = null;
         let stpVal = null;
 
-        // REGRA OFICIAL PURA DO INDEX_OLD13:
-        // Apenas quando a coluna for explicitamente um traço "-", incrementa as etiquetas extras
+        // Pacotes com traço "-" são marcados com valor negativo para ativação do N. FINAL RASTREIO
         if (rawSeq === '-' || rawStop === '-') {
             seqVal = -contadorExtra;
             stpVal = -contadorExtra;
@@ -1572,7 +1577,7 @@ function entregaApp() {
           ordem_shopee: seqVal,
           parada_shopee: stpVal,
           codigo_rastreio: rastreioFinal,
-          destinatario: (stpVal !== null && stpVal < 0) ? `Parada +${Math.abs(stpVal)}` : (stpVal ? `Parada #${stpVal}` : 'Destinatário'),
+          destinatario: (stpVal !== null && stpVal < 0) ? `Final ${rastreioFinal.slice(-4)}` : (stpVal ? `Parada #${stpVal}` : 'Destinatário'),
           telefone: '13999999999',
           endereco: addr,
           numero: numero,
