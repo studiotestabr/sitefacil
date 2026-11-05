@@ -201,7 +201,7 @@
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
-        <!-- NOVA SEÇÃO: ESCOLHA DO NAVEGADOR PADRÃO (FOTO 2 RESOLVIDA) -->
+        <!-- ESCOLHA DO NAVEGADOR PADRÃO -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Navegador Padrão:</span>
@@ -268,7 +268,7 @@
         </nav>
       </div>
 
-      <!-- CRÉDITO COM LINK CLICÁVEL PARA HTTPS://STUDIOTESTA.COM.BR/ -->
+      <!-- CRÉDITO COM LINK CLICÁVEL -->
       <div class="space-y-3 pt-4 border-t border-gray-800 text-center">
         <button @click="menuAberto = false; deslogar();" class="w-full bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-bold text-xs p-3 rounded-2xl flex items-center justify-center gap-2 border border-red-500/30 transition">
           <span>🚪</span> Sair da Conta
@@ -317,8 +317,15 @@
               <h4 class="text-sm font-black text-white truncate" x-text="item.endereco"></h4>
               <p class="text-[11px] text-gray-400 truncate mt-0.5 font-mono" x-text="item.codigo_rastreio"></p>
               <div class="flex gap-2 mt-1.5">
-                <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
-                <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+                <template x-if="item.parada_shopee && Number(item.parada_shopee) > 0 && !(typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
+                  <div class="flex gap-2">
+                    <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada: ${formatarParada(item.parada_shopee)}`"></span>
+                    <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+                  </div>
+                </template>
+                <template x-if="!item.parada_shopee || Number(item.parada_shopee) <= 0 || item.parada_shopee === '-' || (typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
+                  <span class="text-[10px] bg-[#1c2430] border border-orange-500/60 px-2.5 py-0.5 rounded-md text-white font-black font-mono tracking-wider" x-text="`Final: ${item.codigo_rastreio ? item.codigo_rastreio.slice(-4) : '----'}`"></span>
+                </template>
               </div>
             </div>
           </div>
@@ -385,26 +392,52 @@
                    'border-red-500/50 bg-red-950/20 border-l-red-500': item.status === 'entregue'
                  }">
               
-              <div class="grid grid-cols-4 gap-2 text-center">
-                <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
-                     :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
-                  <span class="text-[10px] font-black tracking-wider uppercase leading-none">CANETÃO</span>
-                  <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
+              <!-- CASO 1: PACOTES COM ROTA NORMAL (4 QUADRADOS ORIGINAIS) -->
+              <template x-if="item.parada_shopee && Number(item.parada_shopee) > 0 && !(typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
+                <div class="grid grid-cols-4 gap-2 text-center">
+                  <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
+                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                    <span class="text-[10px] font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                    <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
+                  </div>
+                  <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                    <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
+                    <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.parada_shopee)"></span>
+                  </div>
+                  <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                    <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
+                    <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.ordem_shopee)"></span>
+                  </div>
+                  <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
+                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                    <span class="text-[10px] font-black tracking-wider uppercase leading-none">SACOLA</span>
+                    <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
+                  </div>
                 </div>
-                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
-                  <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.parada_shopee)"></span>
+              </template>
+
+              <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT PERSONALIZADO CONFORME MOCKUP) -->
+              <template x-if="!item.parada_shopee || Number(item.parada_shopee) <= 0 || item.parada_shopee === '-' || (typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
+                <div class="grid grid-cols-4 gap-2 text-center">
+                  <!-- CANETÃO (COLUNA 1) -->
+                  <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
+                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                    <span class="text-[10px] font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                    <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
+                  </div>
+                  <!-- N. FINAL RASTREIO (COLUNAS 2 E 3 EXPANDIDAS) -->
+                  <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-2 flex flex-col justify-center shadow-sm col-span-2">
+                    <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+                    <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight tracking-wider" x-text="item.codigo_rastreio ? item.codigo_rastreio.slice(-4) : '----'"></span>
+                  </div>
+                  <!-- SACOLA (COLUNA 4) -->
+                  <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
+                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                    <span class="text-[10px] font-black tracking-wider uppercase leading-none">SACOLA</span>
+                    <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
+                  </div>
                 </div>
-                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
-                  <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.ordem_shopee)"></span>
-                </div>
-                <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
-                     :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
-                  <span class="text-[10px] font-black tracking-wider uppercase leading-none">SACOLA</span>
-                  <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
-                </div>
-              </div>
+              </template>
 
               <!-- TAGS VISUAIS -->
               <div class="flex flex-wrap items-center gap-2 pt-1">
@@ -439,7 +472,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT COM BOTÃO UNIFICADO DE NAVEGAÇÃO - FOTO 1 RESOLVIDA) -->
+      <!-- MODO 2: RUA (COCKPIT COM BOTÃO UNIFICADO DE NAVEGAÇÃO) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-4">
@@ -461,24 +494,45 @@
               <p class="text-xs font-black text-red-400 leading-tight">ATENÇÃO: Pino suspeito! Confira o endereço escrito antes de desembarcar.</p>
             </div>
 
-            <div class="grid grid-cols-4 gap-2 text-center">
-              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-                <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
-                <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
+            <!-- CASO 1: PACOTES COM ROTA NORMAL (4 QUADRADOS) -->
+            <template x-if="entregaAtual.parada_shopee && Number(entregaAtual.parada_shopee) > 0 && !(typeof entregaAtual.parada_shopee === 'string' && entregaAtual.parada_shopee.includes('+'))">
+              <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                  <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
+                </div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
+                  <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.parada_shopee)"></span>
+                </div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
+                  <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.ordem_shopee)"></span>
+                </div>
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+                  <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span>
+                </div>
               </div>
-              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
-                <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.parada_shopee)"></span>
+            </template>
+
+            <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT MOCKUP NA RUA) -->
+            <template x-if="!entregaAtual.parada_shopee || Number(entregaAtual.parada_shopee) <= 0 || entregaAtual.parada_shopee === '-' || (typeof entregaAtual.parada_shopee === 'string' && entregaAtual.parada_shopee.includes('+'))">
+              <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
+                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                  <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
+                </div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-2 flex flex-col justify-center shadow-sm col-span-2">
+                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+                  <span class="text-3xl font-black text-white font-mono mt-1 leading-tight tracking-wider" x-text="entregaAtual.codigo_rastreio ? entregaAtual.codigo_rastreio.slice(-4) : '----'"></span>
+                </div>
+                <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
+                  <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+                  <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span>
+                </div>
               </div>
-              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
-                <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.ordem_shopee)"></span>
-              </div>
-              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
-                <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-                <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(entregaAtual.ordem_entrega / 10)"></span>
-              </div>
-            </div>
+            </template>
 
             <div class="flex justify-end text-xs pr-1">
               <span class="text-xs sm:text-sm font-black text-gray-100 font-mono" x-text="getFaixaPacotes(entregaAtual.ordem_entrega)"></span>
@@ -503,7 +557,7 @@
                   <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
                     <div class="space-x-2">
                       <span class="text-orange-400 font-black text-sm" x-text="`Canetão #${p.ordem_entrega}`"></span>
-                      <span class="text-white text-xs" x-text="`Ordem SPX ${formatarParada(p.ordem_shopee)}`"></span>
+                      <span class="text-white text-xs" x-text="p.parada_shopee && Number(p.parada_shopee) > 0 ? `Ordem SPX ${formatarParada(p.ordem_shopee)}` : `Final ${p.codigo_rastreio.slice(-4)}`"></span>
                     </div>
                     <span class="tracking-wider text-xs" x-text="p.codigo_rastreio"></span>
                   </div>
@@ -516,7 +570,7 @@
               <p class="text-lg sm:text-xl text-gray-200 font-black" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
             </div>
 
-            <!-- BOTÃO UNIFICADO DE NAVEGAÇÃO: ADAPTA-SE AO NAVEGADOR ESCOLHIDO NO MENU -->
+            <!-- BOTÃO UNIFICADO DE NAVEGAÇÃO -->
             <div class="pt-2">
               <button @click="dispararNavegacaoConfigurada(entregaAtual)" 
                       class="w-full text-center py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2.5 shadow-xl active:scale-95 transition"
@@ -645,26 +699,48 @@
         </button>
       </div>
 
-      <!-- PAINEL INFERIOR -->
+      <!-- PAINEL INFERIOR COM ADAPTAÇÃO INTELIGENTE PARA PACOTES AVULSOS -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 pb-6">
-        <div class="grid grid-cols-4 gap-2 text-center">
-          <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
-            <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
-            <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
+        
+        <!-- CASO 1: PACOTES COM ROTA NORMAL (4 QUADRADOS) -->
+        <template x-if="entregaNavegacao && entregaNavegacao.parada_shopee && Number(entregaNavegacao.parada_shopee) > 0 && !(typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+'))">
+          <div class="grid grid-cols-4 gap-2 text-center">
+            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+              <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+              <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
+            </div>
+            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+              <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
+              <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.parada_shopee : null)"></span>
+            </div>
+            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+              <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
+              <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.ordem_shopee : null)"></span>
+            </div>
+            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
+              <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+              <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="entregaNavegacao ? Math.ceil(entregaNavegacao.ordem_entrega / 10) : '-'"></span>
+            </div>
           </div>
-          <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
-            <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA</span>
-            <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.parada_shopee : null)"></span>
+        </template>
+
+        <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT MOCKUP NO NAVEGADOR) -->
+        <template x-if="entregaNavegacao && (!entregaNavegacao.parada_shopee || Number(entregaNavegacao.parada_shopee) <= 0 || entregaNavegacao.parada_shopee === '-' || (typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+')))">
+          <div class="grid grid-cols-4 gap-2 text-center">
+            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center col-span-1">
+              <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+              <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
+            </div>
+            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-2 flex flex-col justify-center col-span-2">
+              <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+              <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight tracking-wider" x-text="entregaNavegacao && entregaNavegacao.codigo_rastreio ? entregaNavegacao.codigo_rastreio.slice(-4) : '----'"></span>
+            </div>
+            <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center col-span-1">
+              <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+              <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="entregaNavegacao ? Math.ceil(entregaNavegacao.ordem_entrega / 10) : '-'"></span>
+            </div>
           </div>
-          <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
-            <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
-            <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.ordem_shopee : null)"></span>
-          </div>
-          <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
-            <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-            <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="entregaNavegacao ? Math.ceil(entregaNavegacao.ordem_entrega / 10) : '-'"></span>
-          </div>
-        </div>
+        </template>
 
         <div class="flex items-center justify-between gap-3 pt-1">
           <div class="flex-1 min-w-0">
