@@ -686,16 +686,16 @@
 
       <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL"></div>
 
-      <!-- VELOCÍMETRO AMPLIADO (68px) COM ALERTA VISUAL SE ACIMA DO LIMITE -->
-      <div class="absolute bottom-52 left-4 z-[500]">
+      <!-- VELOCÍMETRO ELEVADO PARA EVITAR QUALQUER SOBREPOSIÇÃO (bottom-60 sm:bottom-64) -->
+      <div class="absolute bottom-60 sm:bottom-64 left-4 z-[500]">
         <div class="waze-speed-circle" :class="{'alerta-excesso': radarExcessoVelocidade}">
           <span class="text-2xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
           <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
         </div>
       </div>
 
-      <!-- MIRA CENTRALIZADORA AMPLIADA (62px) -->
-      <div class="absolute bottom-52 right-4 z-[500]">
+      <!-- MIRA CENTRALIZADORA ELEVADA (bottom-60 sm:bottom-64) -->
+      <div class="absolute bottom-60 sm:bottom-64 right-4 z-[500]">
         <button @click="centralizarCarroManual()" class="waze-mira-btn active:scale-90 transition" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'">
           <span class="text-2xl">🎯</span>
         </button>
@@ -745,11 +745,14 @@
           </div>
         </template>
 
-        <!-- ENDEREÇO AMPLIADO COM QUEBRA DE LINHA NÍTIDA (SEM CORTAR NÚMERO) -->
+        <!-- ENDEREÇO OTIMIZADO: SEM N/A, SEM SÃO PAULO E SEM CEP (ECONOMIZA ATÉ 2 LINHAS) -->
         <div class="flex items-center justify-between gap-3 pt-1">
           <div class="flex-1 min-w-0 pr-1">
-            <h4 class="text-base sm:text-lg font-black text-white leading-tight break-words" x-text="entregaNavegacao ? entregaNavegacao.endereco : ''"></h4>
-            <p class="text-xs sm:text-sm font-bold text-gray-300 truncate mt-0.5" x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
+            <h4 class="text-base sm:text-lg font-black text-white leading-tight break-words" 
+                x-text="entregaNavegacao ? (entregaNavegacao.endereco || '').replace(/,\s*N\/A/gi, '').replace(/,\s*(São Paulo|SP)\b.*$/gi, '').replace(/,\s*\d{5}-?\d{3}.*$/gi, '').replace(/,\s*\d{7,8}.*$/gi, '').trim() : ''"></h4>
+            <p x-show="entregaNavegacao && !entregaNavegacao.endereco?.toLowerCase().includes(entregaNavegacao.bairro?.toLowerCase())" 
+               class="text-xs sm:text-sm font-bold text-gray-300 truncate mt-0.5" 
+               x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
           </div>
           <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3.5 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
             <span>✅</span> Entregue
