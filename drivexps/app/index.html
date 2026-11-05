@@ -275,7 +275,7 @@
         </button>
         <p class="text-[10px] text-gray-400 font-medium pt-1">
           DriveXPS • Criado e mantido por 
-          <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 hover:underline transition ml-0.5">STUDIOTESTA</a>
+          <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
         </p>
       </div>
     </div>
@@ -810,7 +810,7 @@
           </div>
         </div>
         <div class="pt-2 space-y-3">
-          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
             <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
             <span x-show="carregandoProcesso">⏳ Calculando vias...</span>
           </button>
@@ -977,35 +977,43 @@
     </div>
   </div>
 
-  <!-- 11. MODAL COMPLETO DE IMPORTAR PLANILHA -->
+  <!-- 11. MODAL COMPLETO DE IMPORTAR PLANILHA (COM LETRAS AMPLIADAS E ERGONÔMICAS) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
-    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-        <h2 class="font-black text-lg text-orange-500">IMPORTAR ROMANEIO</h2>
-        <button @click="modalImportar = false" class="text-gray-400 text-2xl font-bold">&times;</button>
+    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 sm:p-7 space-y-5 shadow-2xl max-h-[95vh] overflow-y-auto">
+      
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3.5">
+        <h2 class="font-black text-xl sm:text-2xl text-orange-500 tracking-wide flex items-center gap-2">
+          <span>📊</span> IMPORTAR ROMANEIO
+        </h2>
+        <button @click="modalImportar = false" class="text-gray-400 hover:text-white text-3xl font-bold leading-none p-1 transition">&times;</button>
       </div>
 
-      <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs">
-        <div class="flex justify-between items-center">
-          <span class="font-black text-orange-400 uppercase tracking-wider text-[11px]">📍 Ponto de Partida e Chegada</span>
-          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-gray-700 active:scale-95 transition">📍 Usar Meu GPS Atual</button>
+      <div class="space-y-4 bg-gray-950 p-4 sm:p-5 rounded-2xl border border-gray-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <span class="font-black text-orange-400 uppercase tracking-wider text-xs sm:text-sm flex items-center gap-1.5">
+            <span>📍</span> Ponto de Partida e Chegada
+          </span>
+          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black border border-gray-700 active:scale-95 transition flex items-center justify-center gap-1.5 shadow-sm">
+            <span>📍</span> Usar Meu GPS Atual
+          </button>
         </div>
-        <div class="space-y-2">
+        <div class="space-y-3">
           <div>
-            <label class="text-[10px] text-gray-400 font-bold block mb-1">Partida (Onde você pega a carga / CD ou sua rua):</label>
-            <input type="text" x-model="inputPartidaModal" placeholder="Ex: Av. Principal, 100 ou Nome do CD" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+            <label class="text-xs sm:text-sm text-gray-200 font-bold block mb-1.5">Partida (Onde você pega a carga / CD ou sua rua):</label>
+            <input type="text" x-model="inputPartidaModal" placeholder="Ex: Av. Principal, 100 ou Nome do CD" class="w-full bg-black border border-gray-800 rounded-xl px-3.5 py-3 text-sm sm:text-base text-white focus:outline-none focus:border-orange-500 font-medium">
           </div>
           <div>
-            <label class="text-[10px] text-gray-400 font-bold block mb-1">Chegada (Onde a rota termina / Sua casa):</label>
-            <input type="text" x-model="inputChegadaModal" placeholder="Ex: Rua das Flores, 500 ou sua residência" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500">
+            <label class="text-xs sm:text-sm text-gray-200 font-bold block mb-1.5">Chegada (Onde a rota termina / Sua casa):</label>
+            <input type="text" x-model="inputChegadaModal" placeholder="Ex: Rua das Flores, 500 ou sua residência" class="w-full bg-black border border-gray-800 rounded-xl px-3.5 py-3 text-sm sm:text-base text-white focus:outline-none focus:border-green-500 font-medium">
           </div>
         </div>
       </div>
 
       <div class="space-y-3">
-        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 transition">
-          <span class="text-3xl block mb-1.5">📊</span>
-          <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
+        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 sm:p-8 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 active:scale-[0.99] transition">
+          <span class="text-4xl sm:text-5xl block mb-2">📊</span>
+          <span class="text-base sm:text-lg font-black block text-white">Toque para escolher o arquivo .XLSX</span>
+          <span class="text-xs sm:text-sm text-gray-400 block mt-1">Formatos aceitos: .xlsx, .xls, .csv</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
         </label>
       </div>
