@@ -745,12 +745,13 @@
           </div>
         </template>
 
+        <!-- ENDEREÇO AMPLIADO COM QUEBRA DE LINHA NÍTIDA (SEM CORTAR NÚMERO) -->
         <div class="flex items-center justify-between gap-3 pt-1">
-          <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-black text-white truncate" x-text="entregaNavegacao ? entregaNavegacao.endereco : ''"></h4>
-            <p class="text-xs text-gray-400 truncate" x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
+          <div class="flex-1 min-w-0 pr-1">
+            <h4 class="text-base sm:text-lg font-black text-white leading-tight break-words" x-text="entregaNavegacao ? entregaNavegacao.endereco : ''"></h4>
+            <p class="text-xs sm:text-sm font-bold text-gray-300 truncate mt-0.5" x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
           </div>
-          <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
+          <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3.5 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
             <span>✅</span> Entregue
           </button>
         </div>
