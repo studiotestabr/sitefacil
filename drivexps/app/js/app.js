@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.5 - Núcleo Estabilizado Nacional (Filtro Anti-Falso Positivo de Radares)
+   DriveXPS Pro 6.6 - Núcleo Estabilizado Nacional (Retorno Direto à Aba Rua)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -1386,27 +1386,25 @@ function entregaApp() {
       return { icone, texto, rua: step.name || step.ref || this.entregaNavegacao?.endereco || 'Rota' };
     },
 
+    /**
+     * Ao clicar em "Entregue" no navegador 3D:
+     * Dá baixa no pacote atual, encerra o GPS e retorna imediatamente à aba "Rua"
+     * para que o motorista visualize o cockpit completo e eventuais múltiplos pacotes na parada.
+     */
     async concluirEntregaPeloNav(entrega) {
       if (!entrega) return;
       await this.concluirEntrega(entrega);
       
-      const proxima = this.entregas.find(e => e.status !== 'entregue' && e.id !== entrega.id);
-      
-      if (proxima) {
-        this.entregaNavegacao = proxima;
-        this.chegadaAnunciada = false;
-        this.nomeProximaRua = proxima.endereco;
-        this.falarTexto(`Entregue! Próxima parada: Canetão número ${proxima.ordem_entrega}, na ${proxima.endereco}`);
+      this.pararNavegacao();
+      this.modo = 'rua';
+
+      const restantes = this.naoEntregues;
+      if (restantes.length > 0) {
+        this.falarTexto('Entregue!');
         if ('vibrate' in navigator) navigator.vibrate([60, 40, 60]);
-        
-        if (this.ultimaLatCarro && this.ultimaLngCarro) {
-          await this.calcularRotaRuaARua(this.ultimaLatCarro, this.ultimaLngCarro, proxima.latitude, proxima.longitude);
-        }
       } else {
         this.falarTexto('Parabéns! Todos os pacotes da carga foram entregues com sucesso!');
         if ('vibrate' in navigator) navigator.vibrate([150, 80, 150, 80, 200]);
-        this.pararNavegacao();
-        this.modo = 'rua';
       }
     },
 

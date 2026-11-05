@@ -416,7 +416,7 @@
                 </div>
               </template>
 
-              <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT PERSONALIZADO CONFORME MOCKUP) -->
+              <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT PERSONALIZADO COM "PACOTE + +") -->
               <template x-if="!item.parada_shopee || Number(item.parada_shopee) <= 0 || item.parada_shopee === '-' || (typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
                 <div class="grid grid-cols-4 gap-2 text-center">
                   <!-- CANETÃO (COLUNA 1) -->
@@ -425,10 +425,11 @@
                     <span class="text-[10px] font-black tracking-wider uppercase leading-none">CANETÃO</span>
                     <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
                   </div>
-                  <!-- N. FINAL RASTREIO (COLUNAS 2 E 3 EXPANDIDAS) -->
-                  <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-2 flex flex-col justify-center shadow-sm col-span-2">
+                  <!-- N. FINAL RASTREIO + PACOTE + + (COLUNAS 2 E 3 EXPANDIDAS) -->
+                  <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
                     <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
-                    <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight tracking-wider" x-text="item.codigo_rastreio ? item.codigo_rastreio.slice(-4) : '----'"></span>
+                    <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="item.codigo_rastreio ? item.codigo_rastreio.slice(-4) : '----'"></span>
+                    <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
                   </div>
                   <!-- SACOLA (COLUNA 4) -->
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
@@ -516,16 +517,17 @@
               </div>
             </template>
 
-            <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT MOCKUP NA RUA) -->
+            <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT MOCKUP NA RUA COM "PACOTE + +") -->
             <template x-if="!entregaAtual.parada_shopee || Number(entregaAtual.parada_shopee) <= 0 || entregaAtual.parada_shopee === '-' || (typeof entregaAtual.parada_shopee === 'string' && entregaAtual.parada_shopee.includes('+'))">
               <div class="grid grid-cols-4 gap-2 text-center">
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
                   <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
                   <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
                 </div>
-                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-2 flex flex-col justify-center shadow-sm col-span-2">
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
                   <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
-                  <span class="text-3xl font-black text-white font-mono mt-1 leading-tight tracking-wider" x-text="entregaAtual.codigo_rastreio ? entregaAtual.codigo_rastreio.slice(-4) : '----'"></span>
+                  <span class="text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="entregaAtual.codigo_rastreio ? entregaAtual.codigo_rastreio.slice(-4) : '----'"></span>
+                  <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
                 </div>
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
                   <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -724,16 +726,17 @@
           </div>
         </template>
 
-        <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT MOCKUP NO NAVEGADOR) -->
+        <!-- CASO 2: PACOTES AVULSOS + + (LAYOUT MOCKUP NO NAVEGADOR COM "PACOTE + +") -->
         <template x-if="entregaNavegacao && (!entregaNavegacao.parada_shopee || Number(entregaNavegacao.parada_shopee) <= 0 || entregaNavegacao.parada_shopee === '-' || (typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+')))">
           <div class="grid grid-cols-4 gap-2 text-center">
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center col-span-1">
               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
               <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
             </div>
-            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-2 flex flex-col justify-center col-span-2">
+            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center col-span-2">
               <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
-              <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight tracking-wider" x-text="entregaNavegacao && entregaNavegacao.codigo_rastreio ? entregaNavegacao.codigo_rastreio.slice(-4) : '----'"></span>
+              <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="entregaNavegacao && entregaNavegacao.codigo_rastreio ? entregaNavegacao.codigo_rastreio.slice(-4) : '----'"></span>
+              <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
             </div>
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center col-span-1">
               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
