@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.4 - Núcleo Estabilizado Nacional (Final de Rastreio Rápido)
+   DriveXPS Pro 6.5 - Núcleo Estabilizado Nacional (Filtro Anti-Falso Positivo de Radares)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -303,12 +303,10 @@ function entregaApp() {
         const rastreioCompleto = (e.codigo_rastreio || '').toLowerCase();
         const finalRastreio = rastreioCompleto.slice(-4);
 
-        // Correspondências diretas
         if (canetaoStr === t || paradaStr === t || ordemStr === t || sacolaNum === t) return true;
         if (t.startsWith('#') && t.replace('#', '') === canetaoStr) return true;
         if (t.startsWith('+') && t === paradaStr) return true;
 
-        // Correspondência direta com o N. FINAL RASTREIO (ex: "944b" ou "4949")
         if (finalRastreio === t || (t.length >= 3 && finalRastreio.endsWith(t))) return true;
 
         if (apenasNumeros && t.length <= 3 && canetaoStr !== t) return false;
@@ -516,6 +514,45 @@ function entregaApp() {
       } catch (e) {}
     },
 
+    /**
+     * Calcula a menor distância perpendicular de um ponto até a polilinha da rota traçada
+     */
+    calcularDistanciaPontoAteRota(pLat, pLng) {
+      if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) return 9999;
+      let menorDist = Infinity;
+      const rad = Math.PI / 180;
+      const cosLat = Math.cos(pLat * rad);
+      const mPorLng = 111320 * cosLat;
+      const mPorLat = 110540;
+
+      for (let i = 0; i < this.coordenadasRotaAtual.length - 1; i++) {
+        const pA = this.coordenadasRotaAtual[i];
+        const pB = this.coordenadasRotaAtual[i + 1];
+        const lngA = pA[0], latA = pA[1];
+        const lngB = pB[0], latB = pB[1];
+
+        const dx = (lngB - lngA) * mPorLng;
+        const dy = (latB - latA) * mPorLat;
+        const L2 = dx * dx + dy * dy;
+        if (L2 === 0) continue;
+
+        const px = (pLng - lngA) * mPorLng;
+        const py = (pLat - latA) * mPorLat;
+        let t = (px * dx + py * dy) / L2;
+        t = Math.max(0, Math.min(1, t));
+
+        const projX = t * dx;
+        const projY = t * dy;
+        const distM = Math.sqrt((px - projX) * (px - projX) + (py - projY) * (py - projY));
+        if (distM < menorDist) menorDist = distM;
+      }
+      return menorDist;
+    },
+
+    /**
+     * Motor de Detecção com Trava de Corredor Viário (Padrão Waze):
+     * Só alerta radares se a rota traçada passar na mesma pista física (desvio lateral <= 35 metros)
+     */
     verificarRadaresProximos(lat, lng, headingCarro) {
       if (!this.listaRadares || this.listaRadares.length === 0) {
         this.radarProximoAlerta = null;
@@ -526,18 +563,30 @@ function entregaApp() {
 
       let radarMaisProximo = null;
       let menorDistancia = Infinity;
+      const temRotaAtiva = this.coordenadasRotaAtual && this.coordenadasRotaAtual.length >= 2;
 
       for (const r of this.listaRadares) {
         const rLat = Number(r.latitude);
         const rLng = Number(r.longitude);
         const dist = this.calcularDistancia(lat, lng, rLat, rLng);
 
-        if (dist <= 500 && dist < menorDistancia) {
+        // Alcance ajustado para 380m (evita alertas em excesso)
+        if (dist <= 380 && dist < menorDistancia) {
+
+          // TRAVA DE CORREDOR VIÁRIO:
+          // Se a rota traçada estiver a mais de 35 metros do radar, significa que ele está em outra rodovia,
+          // viaduto transversal ou rua paralela do bairro. O radar é IGNORADO!
+          if (temRotaAtiva) {
+            const distRadarAteRota = this.calcularDistanciaPontoAteRota(rLat, rLng);
+            if (distRadarAteRota > 35) continue;
+          }
+
           const anguloAteRadar = this.calcularBearing(lat, lng, rLat, rLng);
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
 
-          if (diffAngulo <= 80 || this.velocidadeGPS < 5) {
+          // Cone frontal de 50°: só alerta se o radar estiver à frente no sentido de deslocamento do veículo
+          if (diffAngulo <= 50) {
             menorDistancia = dist;
             radarMaisProximo = { ...r, distMetros: Math.round(dist) };
           }
@@ -554,7 +603,7 @@ function entregaApp() {
         const acimaLimite = this.velocidadeGPS > velLimite;
         this.radarExcessoVelocidade = acimaLimite;
 
-        if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 450) {
+        if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 350) {
           this.radarVozAnunciadaId = radarMaisProximo.id;
           this.falarTexto(`Atenção: Radar à frente, limite ${velLimite} por hora`);
         }
