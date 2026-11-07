@@ -1,5 +1,6 @@
 /* ==========================================================================
-   DriveXPS Pro 6.6 - Núcleo Estabilizado Nacional (Retorno Direto à Aba Rua)
+   DriveXPS Pro 6.7 - Núcleo Estabilizado Nacional
+   (Blindagem de Radares Rodovia/Marginal, Recálculo Rápido e Zoom Fluido)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -404,7 +405,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MOTOR DE RADARES NACIONAL (BUSCA NO BANCO DIRECTUS / POSTGRESQL)
+    // MOTOR DE RADARES NACIONAL COM BLINDAGEM DE VIA
     // =========================================================================
     async carregarRadaresDoBanco() {
       try {
@@ -514,9 +515,6 @@ function entregaApp() {
       } catch (e) {}
     },
 
-    /**
-     * Calcula a menor distância perpendicular de um ponto até a polilinha da rota traçada
-     */
     calcularDistanciaPontoAteRota(pLat, pLng) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) return 9999;
       let menorDist = Infinity;
@@ -550,8 +548,10 @@ function entregaApp() {
     },
 
     /**
-     * Motor de Detecção com Trava de Corredor Viário (Padrão Waze):
-     * Só alerta radares se a rota traçada passar na mesma pista física (desvio lateral <= 35 metros)
+     * BLINDAGEM TRIPLA DE RADARES (Elimina falsos alarmes de Rodovia quando na Marginal):
+     * 1. Trava viária afunilada de 18 metros da rota.
+     * 2. Comparação de via: bloqueia radares de rodovia/SP-055 se o veículo estiver em marginal/rua.
+     * 3. Cone frontal estrito de 45° a no máximo 320 metros.
      */
     verificarRadaresProximos(lat, lng, headingCarro) {
       if (!this.listaRadares || this.listaRadares.length === 0) {
@@ -565,28 +565,36 @@ function entregaApp() {
       let menorDistancia = Infinity;
       const temRotaAtiva = this.coordenadasRotaAtual && this.coordenadasRotaAtual.length >= 2;
 
+      const viaAtualCarro = (this.nomeRuaAtualCarro || this.nomeRuaPisoAtual || '').toLowerCase().trim();
+      const carroEstaEmMarginalOuBairro = viaAtualCarro.includes('monteiro lobato') || viaAtualCarro.includes('marginal') || viaAtualCarro.includes('rua') || viaAtualCarro.includes('avenida') || viaAtualCarro.includes('alameda');
+      const carroNaoEstaNaRodovia = !viaAtualCarro.includes('padre manoel') && !viaAtualCarro.includes('sp-055') && !viaAtualCarro.includes('rodovia');
+
       for (const r of this.listaRadares) {
         const rLat = Number(r.latitude);
         const rLng = Number(r.longitude);
         const dist = this.calcularDistancia(lat, lng, rLat, rLng);
 
-        // Alcance ajustado para 380m (evita alertas em excesso)
-        if (dist <= 380 && dist < menorDistancia) {
+        if (dist <= 320 && dist < menorDistancia) {
+          const viaRadar = (r.rodovia_rua || '').toLowerCase().trim();
+          const radarEhDeRodoviaExpressa = viaRadar.includes('padre manoel') || viaRadar.includes('sp-055') || viaRadar.includes('rodovia') || r.velocidade >= 80;
 
-          // TRAVA DE CORREDOR VIÁRIO:
-          // Se a rota traçada estiver a mais de 35 metros do radar, significa que ele está em outra rodovia,
-          // viaduto transversal ou rua paralela do bairro. O radar é IGNORADO!
+          // REGRA 1: Se o radar é de rodovia de 80km/h e o carro está rodando na marginal/rua de 40km/h, DESCARTA NA HORA!
+          if (radarEhDeRodoviaExpressa && carroEstaEmMarginalOuBairro && carroNaoEstaNaRodovia) {
+            continue;
+          }
+
+          // REGRA 2: Trava viária estrita de 18 metros do asfalto traçado
           if (temRotaAtiva) {
             const distRadarAteRota = this.calcularDistanciaPontoAteRota(rLat, rLng);
-            if (distRadarAteRota > 35) continue;
+            if (distRadarAteRota > 18) continue;
           }
 
           const anguloAteRadar = this.calcularBearing(lat, lng, rLat, rLng);
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
 
-          // Cone frontal de 50°: só alerta se o radar estiver à frente no sentido de deslocamento do veículo
-          if (diffAngulo <= 50) {
+          // REGRA 3: Cone frontal estrito de 45°
+          if (diffAngulo <= 45) {
             menorDistancia = dist;
             radarMaisProximo = { ...r, distMetros: Math.round(dist) };
           }
@@ -603,7 +611,7 @@ function entregaApp() {
         const acimaLimite = this.velocidadeGPS > velLimite;
         this.radarExcessoVelocidade = acimaLimite;
 
-        if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 350) {
+        if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 300) {
           this.radarVozAnunciadaId = radarMaisProximo.id;
           this.falarTexto(`Atenção: Radar à frente, limite ${velLimite} por hora`);
         }
@@ -884,7 +892,7 @@ function entregaApp() {
         }
       }
 
-      if (menorDist <= 28) {
+      if (menorDist <= 20) {
         return {
           lat: pontoProjetado.lat,
           lng: pontoProjetado.lng,
@@ -929,6 +937,10 @@ function entregaApp() {
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
 
+    /**
+     * Inicializa MapLibre GL com correção completa de gestos de pinça (zoom)
+     * e ampliação das fontes dos nomes das ruas no asfalto vetorial 3D.
+     */
     inicializarMapaNavGL(entrega) {
       const container = document.getElementById('mapaNavGL');
       if (!container) return;
@@ -944,13 +956,22 @@ function entregaApp() {
         attributionControl: false
       });
 
-      this.mapaNavGL.on('dragstart', (e) => {
-        if (e.originalEvent) {
-          this.mapaArrastadoPeloUsuario = true;
-          if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
-          this.timeoutRecentralizar = setTimeout(() => {
-            this.mapaArrastadoPeloUsuario = false;
-          }, 5000);
+      // CONGELAMENTO IMEDIATO DO PILOTO AUTOMÁTICO AO TOCAR OU DAR PINÇA/ZOOM
+      const pausarCameraAutomatica = () => {
+        this.mapaArrastadoPeloUsuario = true;
+        if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
+        this.timeoutRecentralizar = setTimeout(() => {
+          this.mapaArrastadoPeloUsuario = false;
+        }, 8000);
+      };
+
+      this.mapaNavGL.on('dragstart', pausarCameraAutomatica);
+      this.mapaNavGL.on('zoomstart', (e) => { if (e.originalEvent) pausarCameraAutomatica(); });
+      this.mapaNavGL.on('rotatestart', (e) => { if (e.originalEvent) pausarCameraAutomatica(); });
+      this.mapaNavGL.on('pitchstart', (e) => { if (e.originalEvent) pausarCameraAutomatica(); });
+      this.mapaNavGL.on('touchstart', (e) => {
+        if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length > 1) {
+          pausarCameraAutomatica();
         }
       });
 
@@ -983,11 +1004,16 @@ function entregaApp() {
               } catch(err) {}
             }
 
-            if (l.type === 'symbol' && (id.includes('label') || id.includes('name'))) {
+            // NOMES DE RUAS AMPLIADOS, BOLD E COM CONTRASTE TOTAL NO ASFALTO
+            if (l.type === 'symbol' && (id.includes('label') || id.includes('name') || id.includes('road') || id.includes('street'))) {
               try {
-                this.mapaNavGL.setPaintProperty(l.id, 'text-color', '#cbd5e1');
-                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-color', '#0f172a');
-                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-width', 2);
+                this.mapaNavGL.setPaintProperty(l.id, 'text-color', '#ffffff');
+                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-color', '#090d16');
+                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-width', 2.5);
+                this.mapaNavGL.setLayoutProperty(l.id, 'text-size', [
+                  'interpolate', ['linear'], ['zoom'],
+                  13, 11, 15, 14, 16.8, 16, 18.5, 18
+                ]);
               } catch(err) {}
             }
           });
@@ -1195,6 +1221,9 @@ function entregaApp() {
       }
     },
 
+    /**
+     * Processamento de posição contínuo com recálculo instantâneo ao sair da rota (ex: entrar na Marginal)
+     */
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
 
@@ -1256,15 +1285,16 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
+      // RECÁLCULO ÁGIL: Se o veículo se afastar mais de 22 metros da linha por 2 verificações (2s), refaz na hora!
       const agora = Date.now();
-      const fora = snap.distRota > 30;
-      if (fora) {
+      const foraDaLinha = snap.distRota > 22;
+      if (foraDaLinha) {
         this.contadorForaDaRota++;
       } else {
         this.contadorForaDaRota = 0;
       }
 
-      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 4500)) {
+      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 2500)) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
         this.contadorForaDaRota = 0;
