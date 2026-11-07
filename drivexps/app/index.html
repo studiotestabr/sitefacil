@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=5.4.0">
+  <link rel="stylesheet" href="./css/styles.css?v=6.8.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -31,8 +31,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- Script Principal Unificado -->
-  <script src="./js/app.js?v=5.4.0"></script>
+  <!-- jsPDF & AutoTable para Relatórios Executivos em PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Módulo Dedicado de Relatórios e Custos -->
+  <script src="./js/relatorio.js?v=6.8.0"></script>
+
+  <!-- Script Principal Unificado com Cache-Busting -->
+  <script src="./js/app.js?v=6.8.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -201,6 +208,37 @@
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
+        <!-- CONFIGURAÇÃO DO VEÍCULO & COMBUSTÍVEL (NOVO) -->
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span>⛽</span> Meu Veículo & Combustível
+            </span>
+            <span class="text-[9px] text-gray-500 font-bold">Para Custos Reais</span>
+          </div>
+          <div class="space-y-2">
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Combustível:</label>
+              <select x-model="configVeiculo.tipoCombustivel" @change="salvarConfigVeiculo()" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-bold">
+                <option value="Gasolina">Gasolina</option>
+                <option value="Etanol">Etanol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="GNV">GNV</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Média (km/l):</label>
+                <input type="number" step="0.1" x-model="configVeiculo.consumoKmL" @change="salvarConfigVeiculo()" placeholder="Ex: 10.0" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-mono font-bold">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Preço Litro (R$):</label>
+                <input type="number" step="0.01" x-model="configVeiculo.precoLitro" @change="salvarConfigVeiculo()" placeholder="Ex: 5.89" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-mono font-bold">
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ESCOLHA DO NAVEGADOR PADRÃO -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
@@ -275,7 +313,7 @@
         </button>
         <p class="text-[10px] text-gray-400 font-medium pt-1">
           DriveXPS • Criado e mantido por 
-          <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
+          <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 hover:underline transition ml-0.5">STUDIOTESTA</a>
         </p>
       </div>
     </div>
@@ -427,9 +465,9 @@
                   </div>
                   <!-- N. FINAL RASTREIO + PACOTE + + (COLUNAS 2 E 3 EXPANDIDAS) -->
                   <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
-                    <span class="text-[11px] text-gray-400 font-black tracking-wider uppercase leading-none">PACOTES + +</span>
+                    <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
                     <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="item.codigo_rastreio ? item.codigo_rastreio.slice(-4) : '----'"></span>
-                    <span class="text-[11px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">Nº FINAL RASTREIO</span>
+                    <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
                   </div>
                   <!-- SACOLA (COLUNA 4) -->
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
@@ -525,9 +563,9 @@
                   <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
                 </div>
                 <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
-                  <span class="text-[11px] text-gray-400 font-black tracking-wider uppercase leading-none">PACOTES + +</span>
+                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
                   <span class="text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="entregaAtual.codigo_rastreio ? entregaAtual.codigo_rastreio.slice(-4) : '----'"></span>
-                  <span class="text-[11px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">Nº FINAL RASTREIO</span>
+                  <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
                 </div>
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
                   <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -615,7 +653,7 @@
         </div>
       </main>
 
-      <!-- MODO 5: HISTÓRICO -->
+      <!-- MODO 5: HISTÓRICO COM DOIS BOTÕES (REABRIR E RELATÓRIO) -->
       <main x-show="modo === 'historico'" class="p-4 space-y-4 max-w-4xl mx-auto w-full">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-black text-orange-500">📜 Histórico de Rotas</h2>
@@ -635,7 +673,12 @@
                 <span class="text-xs bg-orange-600/20 text-orange-400 border border-orange-500/30 px-3 py-1 rounded-full font-bold" x-text="`${r.total_pacotes || 0} pacotes`"></span>
               </div>
               <div class="flex items-center gap-2 pt-1">
-                <button @click="selecionarRotaHistorico(r.id)" class="flex-1 bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700 active:scale-95 transition">Reabrir Detalhes Desta Rota</button>
+                <button @click="selecionarRotaHistorico(r.id)" class="flex-1 bg-gray-800 hover:bg-gray-700 text-xs py-3 rounded-xl font-bold text-gray-200 border border-gray-700 active:scale-95 transition flex items-center justify-center gap-1.5">
+                  <span>🔄</span> Reabrir Rota
+                </button>
+                <button @click="abrirModalRelatorio(r)" class="flex-1 bg-orange-600/20 hover:bg-orange-600 text-orange-400 hover:text-white text-xs py-3 rounded-xl font-bold border border-orange-500/40 active:scale-95 transition flex items-center justify-center gap-1.5 shadow-sm">
+                  <span>📊</span> Relatório & PDF
+                </button>
                 <button @click="apagarRota(r.id)" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 p-3 rounded-xl active:scale-95 transition flex items-center justify-center shrink-0" title="Apagar Rota e Pacotes do Banco">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
@@ -734,9 +777,9 @@
               <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
             </div>
             <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center col-span-2">
-              <span class="text-[11px] text-gray-400 font-black tracking-wider uppercase leading-none">PACOTES + +</span>
+              <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
               <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="entregaNavegacao && entregaNavegacao.codigo_rastreio ? entregaNavegacao.codigo_rastreio.slice(-4) : '----'"></span>
-              <span class="text-[11px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">Nº FINAL RASTREIO</span>
+              <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
             </div>
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center col-span-1">
               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -745,7 +788,7 @@
           </div>
         </template>
 
-        <!-- ENDEREÇO OTIMIZADO: SEM N/A, SEM SÃO PAULO E SEM CEP (ECONOMIZA ATÉ 2 LINHAS) -->
+        <!-- ENDEREÇO OTIMIZADO: SEM N/A, SEM SÃO PAULO E SEM CEP -->
         <div class="flex items-center justify-between gap-3 pt-1">
           <div class="flex-1 min-w-0 pr-1">
             <h4 class="text-base sm:text-lg font-black text-white leading-tight break-words" 
@@ -760,6 +803,118 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- MODAL EXECUTIVO DE RELATÓRIO OPERACIONAL & FINANCEIRO (NOVO) -->
+  <div x-show="modalRelatorio" class="fixed inset-0 bg-black/90 z-[160] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-lg text-left shadow-2xl overflow-hidden max-h-[92vh] flex flex-col justify-between" @click.away="modalRelatorio = false">
+      
+      <!-- Cabeçalho do Modal -->
+      <div class="p-5 border-b border-gray-800 flex items-center justify-between bg-gray-950">
+        <div>
+          <span class="text-[10px] font-black uppercase text-orange-400 tracking-wider block">Relatório de Fechamento</span>
+          <h3 class="text-xl font-black text-white" x-text="`Rota #${dadosRelatorio?.rotaId || ''}`"></h3>
+          <span class="text-xs text-gray-400 font-medium" x-text="`Data: ${dadosRelatorio?.data || 'Hoje'} • Motorista: ${usuarioNome || 'Motorista'}`"></span>
+        </div>
+        <button @click="modalRelatorio = false" class="text-gray-400 hover:text-white text-3xl font-bold leading-none p-1">&times;</button>
+      </div>
+
+      <!-- Conteúdo com Rolagem -->
+      <div class="p-5 space-y-4 overflow-y-auto flex-1 text-xs">
+        
+        <!-- 4 CARDS PRINCIPAIS DE IMPACTO -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+          <div class="bg-[#1c1815] border border-orange-500/60 p-3 rounded-2xl shadow-inner">
+            <span class="text-[9px] text-orange-400 font-black block uppercase">TOTAL PACOTES</span>
+            <span class="text-2xl font-black font-mono text-white mt-0.5 block" x-text="dadosRelatorio?.totalPacotes || 0"></span>
+          </div>
+          <div class="bg-[#141b26] border border-slate-800 p-3 rounded-2xl">
+            <span class="text-[9px] text-gray-400 font-black block uppercase">PARADAS REAIS</span>
+            <span class="text-2xl font-black font-mono text-white mt-0.5 block" x-text="dadosRelatorio?.totalParadasUnicas || 0"></span>
+          </div>
+          <div class="bg-[#141b26] border border-cyan-500/40 p-3 rounded-2xl">
+            <span class="text-[9px] text-cyan-400 font-black block uppercase">DISTÂNCIA REAL</span>
+            <span class="text-2xl font-black font-mono text-cyan-300 mt-0.5 block" x-text="`${dadosRelatorio?.kmTotal || 0} km`"></span>
+          </div>
+          <div class="bg-[#141b26] border border-emerald-500/40 p-3 rounded-2xl">
+            <span class="text-[9px] text-emerald-400 font-black block uppercase">TEMPO ESTIMADO</span>
+            <span class="text-lg font-black font-mono text-emerald-300 mt-1 block" x-text="dadosRelatorio?.tempoEstimadoFormatado || '0h'"></span>
+          </div>
+        </div>
+
+        <!-- GESTÃO FINANCEIRA DE COMBUSTÍVEL -->
+        <div class="bg-gray-950 p-4 rounded-2xl border border-gray-800 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-gray-800/80 pb-2">
+            <span class="font-black text-sm text-white flex items-center gap-1.5">
+              <span>⛽</span> Desempenho do Tanque
+            </span>
+            <span class="text-[10px] text-orange-400 font-mono font-bold" x-text="`${dadosRelatorio?.tipoCombustivel} (${dadosRelatorio?.consumoKmL} km/l)`"></span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center pt-1">
+            <div class="bg-black/60 p-2.5 rounded-xl border border-gray-800">
+              <span class="text-[9px] text-gray-400 font-bold block uppercase">Litros Gastos</span>
+              <span class="text-base font-black font-mono text-white mt-0.5 block" x-text="`${dadosRelatorio?.litrosGastos || 0} L`"></span>
+            </div>
+            <div class="bg-orange-500/10 border border-orange-500/40 p-2.5 rounded-xl">
+              <span class="text-[9px] text-orange-300 font-bold block uppercase">Custo da Rota</span>
+              <span class="text-base font-black font-mono text-orange-400 mt-0.5 block" x-text="`R$ ${dadosRelatorio?.custoTotalCombustivel?.toFixed(2) || '0,00'}`"></span>
+            </div>
+            <div class="bg-black/60 p-2.5 rounded-xl border border-gray-800">
+              <span class="text-[9px] text-gray-400 font-bold block uppercase">Por Pacote</span>
+              <span class="text-base font-black font-mono text-emerald-400 mt-0.5 block" x-text="`R$ ${dadosRelatorio?.custoPorPacote?.toFixed(2) || '0,00'}`"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RAIO-X POR BAIRRO -->
+        <div class="bg-gray-950 p-4 rounded-2xl border border-gray-800 space-y-2">
+          <span class="font-black text-sm text-white flex items-center gap-1.5 block">
+            <span>📍</span> Volume por Região / Bairro
+          </span>
+          <div class="space-y-1.5 pt-1">
+            <template x-for="b in dadosRelatorio?.listaBairros || []" :key="b.nome">
+              <div class="flex items-center justify-between bg-black/40 px-3 py-2 rounded-xl border border-gray-800/80">
+                <span class="text-white font-bold truncate max-w-[200px]" x-text="b.nome"></span>
+                <div class="flex items-center gap-2">
+                  <span class="text-orange-400 font-mono font-bold" x-text="`${b.qtd} pct`"></span>
+                  <span class="text-[10px] bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded font-mono" x-text="`${b.porcentagem}%`"></span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- OCORRÊNCIAS / AUSENTES (SE HOUVER) -->
+        <div x-show="dadosRelatorio?.listaAusentes && dadosRelatorio.listaAusentes.length > 0" class="bg-yellow-500/10 border border-yellow-500/40 p-4 rounded-2xl space-y-2">
+          <span class="font-black text-sm text-yellow-300 flex items-center gap-1.5 block">
+            <span>⚠️</span> Devolução no CD (<span x-text="dadosRelatorio?.listaAusentes?.length"></span> Ausentes)
+          </span>
+          <div class="space-y-1.5 pt-1">
+            <template x-for="a in dadosRelatorio?.listaAusentes || []" :key="a.rastreio">
+              <div class="bg-black/60 p-2.5 rounded-xl border border-yellow-500/30 flex items-center justify-between text-[11px]">
+                <div class="truncate pr-2">
+                  <span class="text-orange-400 font-black font-mono" x-text="`#${a.canetao}`"></span>
+                  <span class="text-white font-bold ml-1 truncate" x-text="a.endereco"></span>
+                </div>
+                <span class="text-yellow-300 font-mono font-black shrink-0" x-text="`Final ${a.finalRastreio}`"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Rodapé com Ação de Exportar PDF -->
+      <div class="p-4 border-t border-gray-800 bg-gray-950 flex flex-col sm:flex-row gap-2">
+        <button @click="baixarPDFRelatorio()" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📥</span> Baixar Relatório em PDF
+        </button>
+        <button @click="modalRelatorio = false" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3.5 px-6 rounded-2xl text-xs active:scale-95 transition text-center">
+          Fechar
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- MODAL DE RESUMO DE IMPORTAÇÃO (COMPLETO) -->
@@ -810,7 +965,7 @@
           </div>
         </div>
         <div class="pt-2 space-y-3">
-          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
             <span x-show="!carregandoProcesso">🗺️ Otimizar Rota</span>
             <span x-show="carregandoProcesso">⏳ Calculando vias...</span>
           </button>
@@ -977,7 +1132,7 @@
     </div>
   </div>
 
-  <!-- 11. MODAL COMPLETO DE IMPORTAR PLANILHA (COM LETRAS AMPLIADAS E ERGONÔMICAS) -->
+  <!-- 11. MODAL COMPLETO DE IMPORTAR PLANILHA -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 sm:p-7 space-y-5 shadow-2xl max-h-[95vh] overflow-y-auto">
       
