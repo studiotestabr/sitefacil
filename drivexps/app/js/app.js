@@ -1,6 +1,6 @@
 /* ==========================================================================
-   DriveXPS Pro 6.8 - Núcleo Estabilizado Nacional
-   (Trava Anti-Loop de Voz Parado, Recálculo em Movimento e Radares Blindados)
+   DriveXPS Pro 6.9 - Núcleo Estabilizado Nacional
+   (Trava de Ferro Anti-Loop de Voz Parado e Silenciamento de GPS Estacionado)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -89,6 +89,10 @@ function entregaApp() {
     recalculandoRota: false,
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
+    ultimaLatRecalculo: null,
+    ultimaLngRecalculo: null,
+    ultimoTextoFalado: '',
+    ultimoTempoFala: 0,
 
     // Motor de Radares do Banco de Dados Nacional
     listaRadares: [],
@@ -318,7 +322,7 @@ function entregaApp() {
       });
     },
 
-    getFaixaPacotes(ordem) {
+    get FaixaPacotes(ordem) {
       const sacola = Math.ceil(ordem / 10);
       const inicio = (sacola - 1) * 10 + 1;
       const fim = sacola * 10;
@@ -547,12 +551,6 @@ function entregaApp() {
       return menorDist;
     },
 
-    /**
-     * BLINDAGEM TRIPLA DE RADARES (Elimina falsos alarmes de Rodovia quando na Marginal):
-     * 1. Trava viária afunilada de 18 metros da rota.
-     * 2. Comparação de via: bloqueia radares de rodovia/SP-055 se o veículo estiver em marginal/rua.
-     * 3. Cone frontal estrito de 45° a no máximo 320 metros.
-     */
     verificarRadaresProximos(lat, lng, headingCarro) {
       if (!this.listaRadares || this.listaRadares.length === 0) {
         this.radarProximoAlerta = null;
@@ -814,12 +812,22 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (WAZE ENGINE: DESTINO DINÂMICO & ZERO DESVIOS FANTASMAS)
+    // NAVEGAÇÃO 3D (WAZE ENGINE COM TRAVA ANTI-REPETIÇÃO DE FALA)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
+      if (!texto || typeof texto !== 'string') return;
+
+      const agora = Date.now();
+      // FILTRO ANTI-LOOP: Nunca repete a mesmíssima instrução em menos de 6 segundos
+      if (this.ultimoTextoFalado === texto && (agora - this.ultimoTempoFala < 6000)) return;
+
       const synth = window.speechSynthesis;
       if (synth.speaking) synth.cancel();
+
+      this.ultimoTextoFalado = texto;
+      this.ultimoTempoFala = agora;
+
       const u = new SpeechSynthesisUtterance(texto);
       u.lang = 'pt-BR'; u.rate = 1.05;
       synth.speak(u);
@@ -934,10 +942,6 @@ function entregaApp() {
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
 
-    /**
-     * Inicializa MapLibre GL com correção completa de gestos de pinça (zoom)
-     * e ampliação das fontes dos nomes das ruas no asfalto vetorial 3D.
-     */
     inicializarMapaNavGL(entrega) {
       const container = document.getElementById('mapaNavGL');
       if (!container) return;
@@ -953,7 +957,6 @@ function entregaApp() {
         attributionControl: false
       });
 
-      // CONGELAMENTO IMEDIATO DO PILOTO AUTOMÁTICO AO TOCAR OU DAR PINÇA/ZOOM
       const pausarCameraAutomatica = () => {
         this.mapaArrastadoPeloUsuario = true;
         if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
@@ -1001,7 +1004,6 @@ function entregaApp() {
               } catch(err) {}
             }
 
-            // NOMES DE RUAS AMPLIADOS, BOLD E COM CONTRASTE TOTAL NO ASFALTO
             if (l.type === 'symbol' && (id.includes('label') || id.includes('name') || id.includes('road') || id.includes('street'))) {
               try {
                 this.mapaNavGL.setPaintProperty(l.id, 'text-color', '#ffffff');
@@ -1219,10 +1221,11 @@ function entregaApp() {
     },
 
     /**
-     * Processamento de posição com BLINDAGEM TOTAL ANTI-LOOP DE VOZ:
-     * - Carro parado (< 5 km/h) NUNCA aciona recálculo por oscilação de sinal GPS.
-     * - Tolerância ajustada para 45 metros reais de desvio em movimento.
-     * - Intervalo de 7 segundos para permitir fala fluida e sem repetição.
+     * Processamento de posição com BLINDAGEM DE FERRO ANTI-LOOP DE VOZ:
+     * - Carro parado ou em manobra lenta (< 8 km/h): NUNCA recalcula por desvio.
+     * - Se o veículo não andou pelo menos 30 metros desde o último recálculo: NUNCA recalcula.
+     * - Só considera desvio se estiver a mais de 50 metros da rota em movimento real.
+     * - Intervalo mínimo de 10 segundos entre recálculos.
      */
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
@@ -1285,11 +1288,19 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // TRAVA DEFINITIVA ANTI-LOOP DE VOZ:
-      // Se o carro estiver parado ou a menos de 5 km/h, o recálculo é BLOQUEADO (ignora oscilações paradas)
+      // TRAVA DE FERRO ANTI-LOOP DE VOZ:
+      // 1. Carro abaixo de 8 km/h: NUNCA recalcula (elimina ruído de GPS parado)
+      // 2. Se não andou 30m desde o último recálculo: NUNCA recalcula
+      // 3. Só considera desvio se estiver a mais de 50 metros da rota
       const agora = Date.now();
-      const carroEmMovimento = this.velocidadeGPS >= 5;
-      const foraDaLinha = carroEmMovimento && snap.distRota > 45;
+      const carroRealmenteAndando = this.velocidadeGPS >= 8;
+
+      let distDesdeUltimoRecalculo = 999;
+      if (this.ultimaLatRecalculo && this.ultimaLngRecalculo) {
+        distDesdeUltimoRecalculo = this.calcularDistancia(this.ultimaLatRecalculo, this.ultimaLngRecalculo, rawLat, rawLng);
+      }
+
+      const foraDaLinha = carroRealmenteAndando && snap.distRota > 50 && distDesdeUltimoRecalculo > 30;
 
       if (foraDaLinha) {
         this.contadorForaDaRota++;
@@ -1297,9 +1308,11 @@ function entregaApp() {
         this.contadorForaDaRota = 0;
       }
 
-      if (carroEmMovimento && this.contadorForaDaRota >= 3 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 7000)) {
+      if (carroRealmenteAndando && this.contadorForaDaRota >= 4 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 10000)) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
+        this.ultimaLatRecalculo = rawLat;
+        this.ultimaLngRecalculo = rawLng;
         this.contadorForaDaRota = 0;
         this.falarTexto('Recalculando rota...');
         await this.calcularRotaRuaARua(rawLat, rawLng, destLat, destLng);
@@ -1576,10 +1589,6 @@ function entregaApp() {
       } catch(e) {}
     },
 
-    /**
-     * LEITOR ESTRITO DE PLANILHAS SHOPEE EXPRESS:
-     * Identifica pacotes com traço "-" mantendo o sinal para layout dinâmico de N. FINAL RASTREIO
-     */
     parseLinhasShopee(linhasMatriz) {
       this.msgErro = null;
       if (!linhasMatriz || linhasMatriz.length < 2) return [];
