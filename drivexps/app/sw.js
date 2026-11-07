@@ -1,4 +1,4 @@
-const CACHE_NAME = 'drivexps-v5';
+const CACHE_NAME = 'drivexps-v4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

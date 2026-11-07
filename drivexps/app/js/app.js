@@ -1,6 +1,5 @@
 /* ==========================================================================
-   DriveXPS Pro 6.9 - Núcleo Estabilizado Nacional
-   (Trava de Ferro Anti-Loop de Voz Parado e Silenciamento de GPS Estacionado)
+   DriveXPS Pro 6.6 - Núcleo Estabilizado Nacional (Retorno Direto à Aba Rua)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -89,10 +88,6 @@ function entregaApp() {
     recalculandoRota: false,
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
-    ultimaLatRecalculo: null,
-    ultimaLngRecalculo: null,
-    ultimoTextoFalado: '',
-    ultimoTempoFala: 0,
 
     // Motor de Radares do Banco de Dados Nacional
     listaRadares: [],
@@ -322,7 +317,7 @@ function entregaApp() {
       });
     },
 
-    get FaixaPacotes(ordem) {
+    getFaixaPacotes(ordem) {
       const sacola = Math.ceil(ordem / 10);
       const inicio = (sacola - 1) * 10 + 1;
       const fim = sacola * 10;
@@ -409,7 +404,7 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // MOTOR DE RADARES NACIONAL COM BLINDAGEM DE VIA
+    // MOTOR DE RADARES NACIONAL (BUSCA NO BANCO DIRECTUS / POSTGRESQL)
     // =========================================================================
     async carregarRadaresDoBanco() {
       try {
@@ -519,6 +514,9 @@ function entregaApp() {
       } catch (e) {}
     },
 
+    /**
+     * Calcula a menor distância perpendicular de um ponto até a polilinha da rota traçada
+     */
     calcularDistanciaPontoAteRota(pLat, pLng) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) return 9999;
       let menorDist = Infinity;
@@ -551,6 +549,10 @@ function entregaApp() {
       return menorDist;
     },
 
+    /**
+     * Motor de Detecção com Trava de Corredor Viário (Padrão Waze):
+     * Só alerta radares se a rota traçada passar na mesma pista física (desvio lateral <= 35 metros)
+     */
     verificarRadaresProximos(lat, lng, headingCarro) {
       if (!this.listaRadares || this.listaRadares.length === 0) {
         this.radarProximoAlerta = null;
@@ -563,33 +565,28 @@ function entregaApp() {
       let menorDistancia = Infinity;
       const temRotaAtiva = this.coordenadasRotaAtual && this.coordenadasRotaAtual.length >= 2;
 
-      const viaAtualCarro = (this.nomeRuaAtualCarro || this.nomeRuaPisoAtual || '').toLowerCase().trim();
-      const carroEstaEmMarginalOuBairro = viaAtualCarro.includes('monteiro lobato') || viaAtualCarro.includes('marginal') || viaAtualCarro.includes('rua') || viaAtualCarro.includes('avenida') || viaAtualCarro.includes('alameda');
-      const carroNaoEstaNaRodovia = !viaAtualCarro.includes('padre manoel') && !viaAtualCarro.includes('sp-055') && !viaAtualCarro.includes('rodovia');
-
       for (const r of this.listaRadares) {
         const rLat = Number(r.latitude);
         const rLng = Number(r.longitude);
         const dist = this.calcularDistancia(lat, lng, rLat, rLng);
 
-        if (dist <= 320 && dist < menorDistancia) {
-          const viaRadar = (r.rodovia_rua || '').toLowerCase().trim();
-          const radarEhDeRodoviaExpressa = viaRadar.includes('padre manoel') || viaRadar.includes('sp-055') || viaRadar.includes('rodovia') || r.velocidade >= 80;
+        // Alcance ajustado para 380m (evita alertas em excesso)
+        if (dist <= 380 && dist < menorDistancia) {
 
-          if (radarEhDeRodoviaExpressa && carroEstaEmMarginalOuBairro && carroNaoEstaNaRodovia) {
-            continue;
-          }
-
+          // TRAVA DE CORREDOR VIÁRIO:
+          // Se a rota traçada estiver a mais de 35 metros do radar, significa que ele está em outra rodovia,
+          // viaduto transversal ou rua paralela do bairro. O radar é IGNORADO!
           if (temRotaAtiva) {
             const distRadarAteRota = this.calcularDistanciaPontoAteRota(rLat, rLng);
-            if (distRadarAteRota > 18) continue;
+            if (distRadarAteRota > 35) continue;
           }
 
           const anguloAteRadar = this.calcularBearing(lat, lng, rLat, rLng);
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
 
-          if (diffAngulo <= 45) {
+          // Cone frontal de 50°: só alerta se o radar estiver à frente no sentido de deslocamento do veículo
+          if (diffAngulo <= 50) {
             menorDistancia = dist;
             radarMaisProximo = { ...r, distMetros: Math.round(dist) };
           }
@@ -606,7 +603,7 @@ function entregaApp() {
         const acimaLimite = this.velocidadeGPS > velLimite;
         this.radarExcessoVelocidade = acimaLimite;
 
-        if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 300) {
+        if (this.radarVozAnunciadaId !== radarMaisProximo.id && radarMaisProximo.distMetros <= 350) {
           this.radarVozAnunciadaId = radarMaisProximo.id;
           this.falarTexto(`Atenção: Radar à frente, limite ${velLimite} por hora`);
         }
@@ -812,22 +809,12 @@ function entregaApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D (WAZE ENGINE COM TRAVA ANTI-REPETIÇÃO DE FALA)
+    // NAVEGAÇÃO 3D (WAZE ENGINE: DESTINO DINÂMICO & ZERO DESVIOS FANTASMAS)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
-      if (!texto || typeof texto !== 'string') return;
-
-      const agora = Date.now();
-      // FILTRO ANTI-LOOP: Nunca repete a mesmíssima instrução em menos de 6 segundos
-      if (this.ultimoTextoFalado === texto && (agora - this.ultimoTempoFala < 6000)) return;
-
       const synth = window.speechSynthesis;
       if (synth.speaking) synth.cancel();
-
-      this.ultimoTextoFalado = texto;
-      this.ultimoTempoFala = agora;
-
       const u = new SpeechSynthesisUtterance(texto);
       u.lang = 'pt-BR'; u.rate = 1.05;
       synth.speak(u);
@@ -867,7 +854,7 @@ function entregaApp() {
 
         if (L2 === 0) continue;
 
-        const px = (pLng - lngA) * mPorLng;
+        const px = (lng - lngA) * mPorLng;
         const py = (lat - latA) * mPorLat;
 
         let t = (px * dx + py * dy) / L2;
@@ -897,7 +884,7 @@ function entregaApp() {
         }
       }
 
-      if (menorDist <= 20) {
+      if (menorDist <= 28) {
         return {
           lat: pontoProjetado.lat,
           lng: pontoProjetado.lng,
@@ -957,21 +944,13 @@ function entregaApp() {
         attributionControl: false
       });
 
-      const pausarCameraAutomatica = () => {
-        this.mapaArrastadoPeloUsuario = true;
-        if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
-        this.timeoutRecentralizar = setTimeout(() => {
-          this.mapaArrastadoPeloUsuario = false;
-        }, 8000);
-      };
-
-      this.mapaNavGL.on('dragstart', pausarCameraAutomatica);
-      this.mapaNavGL.on('zoomstart', (e) => { if (e.originalEvent) pausarCameraAutomatica(); });
-      this.mapaNavGL.on('rotatestart', (e) => { if (e.originalEvent) pausarCameraAutomatica(); });
-      this.mapaNavGL.on('pitchstart', (e) => { if (e.originalEvent) pausarCameraAutomatica(); });
-      this.mapaNavGL.on('touchstart', (e) => {
-        if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length > 1) {
-          pausarCameraAutomatica();
+      this.mapaNavGL.on('dragstart', (e) => {
+        if (e.originalEvent) {
+          this.mapaArrastadoPeloUsuario = true;
+          if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
+          this.timeoutRecentralizar = setTimeout(() => {
+            this.mapaArrastadoPeloUsuario = false;
+          }, 5000);
         }
       });
 
@@ -1004,15 +983,11 @@ function entregaApp() {
               } catch(err) {}
             }
 
-            if (l.type === 'symbol' && (id.includes('label') || id.includes('name') || id.includes('road') || id.includes('street'))) {
+            if (l.type === 'symbol' && (id.includes('label') || id.includes('name'))) {
               try {
-                this.mapaNavGL.setPaintProperty(l.id, 'text-color', '#ffffff');
-                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-color', '#090d16');
-                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-width', 2.5);
-                this.mapaNavGL.setLayoutProperty(l.id, 'text-size', [
-                  'interpolate', ['linear'], ['zoom'],
-                  13, 11, 15, 14, 16.8, 16, 18.5, 18
-                ]);
+                this.mapaNavGL.setPaintProperty(l.id, 'text-color', '#cbd5e1');
+                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-color', '#0f172a');
+                this.mapaNavGL.setPaintProperty(l.id, 'text-halo-width', 2);
               } catch(err) {}
             }
           });
@@ -1220,13 +1195,6 @@ function entregaApp() {
       }
     },
 
-    /**
-     * Processamento de posição com BLINDAGEM DE FERRO ANTI-LOOP DE VOZ:
-     * - Carro parado ou em manobra lenta (< 8 km/h): NUNCA recalcula por desvio.
-     * - Se o veículo não andou pelo menos 30 metros desde o último recálculo: NUNCA recalcula.
-     * - Só considera desvio se estiver a mais de 50 metros da rota em movimento real.
-     * - Intervalo mínimo de 10 segundos entre recálculos.
-     */
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
 
@@ -1288,31 +1256,17 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // TRAVA DE FERRO ANTI-LOOP DE VOZ:
-      // 1. Carro abaixo de 8 km/h: NUNCA recalcula (elimina ruído de GPS parado)
-      // 2. Se não andou 30m desde o último recálculo: NUNCA recalcula
-      // 3. Só considera desvio se estiver a mais de 50 metros da rota
       const agora = Date.now();
-      const carroRealmenteAndando = this.velocidadeGPS >= 8;
-
-      let distDesdeUltimoRecalculo = 999;
-      if (this.ultimaLatRecalculo && this.ultimaLngRecalculo) {
-        distDesdeUltimoRecalculo = this.calcularDistancia(this.ultimaLatRecalculo, this.ultimaLngRecalculo, rawLat, rawLng);
-      }
-
-      const foraDaLinha = carroRealmenteAndando && snap.distRota > 50 && distDesdeUltimoRecalculo > 30;
-
-      if (foraDaLinha) {
+      const fora = snap.distRota > 30;
+      if (fora) {
         this.contadorForaDaRota++;
       } else {
         this.contadorForaDaRota = 0;
       }
 
-      if (carroRealmenteAndando && this.contadorForaDaRota >= 4 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 10000)) {
+      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 4500)) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
-        this.ultimaLatRecalculo = rawLat;
-        this.ultimaLngRecalculo = rawLng;
         this.contadorForaDaRota = 0;
         this.falarTexto('Recalculando rota...');
         await this.calcularRotaRuaARua(rawLat, rawLng, destLat, destLng);
@@ -1432,6 +1386,11 @@ function entregaApp() {
       return { icone, texto, rua: step.name || step.ref || this.entregaNavegacao?.endereco || 'Rota' };
     },
 
+    /**
+     * Ao clicar em "Entregue" no navegador 3D:
+     * Dá baixa no pacote atual, encerra o GPS e retorna imediatamente à aba "Rua"
+     * para que o motorista visualize o cockpit completo e eventuais múltiplos pacotes na parada.
+     */
     async concluirEntregaPeloNav(entrega) {
       if (!entrega) return;
       await this.concluirEntrega(entrega);
@@ -1589,6 +1548,10 @@ function entregaApp() {
       } catch(e) {}
     },
 
+    /**
+     * LEITOR ESTRITO DE PLANILHAS SHOPEE EXPRESS:
+     * Identifica pacotes com traço "-" mantendo o sinal para layout dinâmico de N. FINAL RASTREIO
+     */
     parseLinhasShopee(linhasMatriz) {
       this.msgErro = null;
       if (!linhasMatriz || linhasMatriz.length < 2) return [];
@@ -1638,6 +1601,7 @@ function entregaApp() {
         let seqVal = null;
         let stpVal = null;
 
+        // Pacotes com traço "-" são marcados com valor negativo para ativação do N. FINAL RASTREIO
         if (rawSeq === '-' || rawStop === '-') {
             seqVal = -contadorExtra;
             stpVal = -contadorExtra;
