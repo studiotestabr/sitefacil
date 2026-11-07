@@ -1,6 +1,6 @@
 /* ==========================================================================
-   DriveXPS Pro 6.7 - Núcleo Estabilizado Nacional
-   (Blindagem de Radares Rodovia/Marginal, Recálculo Rápido e Zoom Fluido)
+   DriveXPS Pro 6.8 - Núcleo Estabilizado Nacional
+   (Trava Anti-Loop de Voz Parado, Recálculo em Movimento e Radares Blindados)
    Arquivo: /js/app.js
    ========================================================================== */
 
@@ -578,12 +578,10 @@ function entregaApp() {
           const viaRadar = (r.rodovia_rua || '').toLowerCase().trim();
           const radarEhDeRodoviaExpressa = viaRadar.includes('padre manoel') || viaRadar.includes('sp-055') || viaRadar.includes('rodovia') || r.velocidade >= 80;
 
-          // REGRA 1: Se o radar é de rodovia de 80km/h e o carro está rodando na marginal/rua de 40km/h, DESCARTA NA HORA!
           if (radarEhDeRodoviaExpressa && carroEstaEmMarginalOuBairro && carroNaoEstaNaRodovia) {
             continue;
           }
 
-          // REGRA 2: Trava viária estrita de 18 metros do asfalto traçado
           if (temRotaAtiva) {
             const distRadarAteRota = this.calcularDistanciaPontoAteRota(rLat, rLng);
             if (distRadarAteRota > 18) continue;
@@ -593,7 +591,6 @@ function entregaApp() {
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
 
-          // REGRA 3: Cone frontal estrito de 45°
           if (diffAngulo <= 45) {
             menorDistancia = dist;
             radarMaisProximo = { ...r, distMetros: Math.round(dist) };
@@ -862,7 +859,7 @@ function entregaApp() {
 
         if (L2 === 0) continue;
 
-        const px = (lng - lngA) * mPorLng;
+        const px = (pLng - lngA) * mPorLng;
         const py = (lat - latA) * mPorLat;
 
         let t = (px * dx + py * dy) / L2;
@@ -1222,7 +1219,10 @@ function entregaApp() {
     },
 
     /**
-     * Processamento de posição contínuo com recálculo instantâneo ao sair da rota (ex: entrar na Marginal)
+     * Processamento de posição com BLINDAGEM TOTAL ANTI-LOOP DE VOZ:
+     * - Carro parado (< 5 km/h) NUNCA aciona recálculo por oscilação de sinal GPS.
+     * - Tolerância ajustada para 45 metros reais de desvio em movimento.
+     * - Intervalo de 7 segundos para permitir fala fluida e sem repetição.
      */
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
@@ -1285,16 +1285,19 @@ function entregaApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
-      // RECÁLCULO ÁGIL: Se o veículo se afastar mais de 22 metros da linha por 2 verificações (2s), refaz na hora!
+      // TRAVA DEFINITIVA ANTI-LOOP DE VOZ:
+      // Se o carro estiver parado ou a menos de 5 km/h, o recálculo é BLOQUEADO (ignora oscilações paradas)
       const agora = Date.now();
-      const foraDaLinha = snap.distRota > 22;
+      const carroEmMovimento = this.velocidadeGPS >= 5;
+      const foraDaLinha = carroEmMovimento && snap.distRota > 45;
+
       if (foraDaLinha) {
         this.contadorForaDaRota++;
       } else {
         this.contadorForaDaRota = 0;
       }
 
-      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 2500)) {
+      if (carroEmMovimento && this.contadorForaDaRota >= 3 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 7000)) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
         this.contadorForaDaRota = 0;
@@ -1416,11 +1419,6 @@ function entregaApp() {
       return { icone, texto, rua: step.name || step.ref || this.entregaNavegacao?.endereco || 'Rota' };
     },
 
-    /**
-     * Ao clicar em "Entregue" no navegador 3D:
-     * Dá baixa no pacote atual, encerra o GPS e retorna imediatamente à aba "Rua"
-     * para que o motorista visualize o cockpit completo e eventuais múltiplos pacotes na parada.
-     */
     async concluirEntregaPeloNav(entrega) {
       if (!entrega) return;
       await this.concluirEntrega(entrega);
@@ -1631,7 +1629,6 @@ function entregaApp() {
         let seqVal = null;
         let stpVal = null;
 
-        // Pacotes com traço "-" são marcados com valor negativo para ativação do N. FINAL RASTREIO
         if (rawSeq === '-' || rawStop === '-') {
             seqVal = -contadorExtra;
             stpVal = -contadorExtra;
