@@ -1,0 +1,541 @@
+/* ==========================================================================
+   SPXrotas Pro v1.0.0 - Folha de Estilos Modular Oficial
+   Navegador 3D, Bipador por Voz, Radares na Pista, Wake Lock & S.O.S
+   Arquivo: /spxrotas/app/css/styles.css
+   ========================================================================== */
+
+[x-cloak] { 
+  display: none !important; 
+}
+
+/* ==========================================================================
+   1. MODO DIURNO / ALTO CONTRASTE (Contra reflexo solar no para-brisa)
+   ========================================================================== */
+body.theme-claro {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+body.theme-claro .bg-gray-950,
+body.theme-claro .bg-gray-900,
+body.theme-claro .bg-\[\#121824\],
+body.theme-claro .bg-\[\#0c1322\] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+body.theme-claro .bg-gray-800,
+body.theme-claro .bg-\[\#1c2430\],
+body.theme-claro .bg-\[\#1c1815\],
+body.theme-claro .bg-\[\#141b26\] {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-claro .text-white { 
+  color: #0f172a !important; 
+}
+
+body.theme-claro .text-gray-300,
+body.theme-claro .text-gray-400 { 
+  color: #334155 !important; 
+}
+
+body.theme-claro .text-gray-200 { 
+  color: #1e293b !important; 
+}
+
+body.theme-claro .border-gray-800,
+body.theme-claro .border-gray-700,
+body.theme-claro .border-\[\#2b394a\] { 
+  border-color: #cbd5e1 !important; 
+}
+
+body.theme-claro .bg-black,
+body.theme-claro .bg-black\/95,
+body.theme-claro .bg-black\/90,
+body.theme-claro .bg-black\/80,
+body.theme-claro .bg-black\/60,
+body.theme-claro .bg-black\/50,
+body.theme-claro .bg-black\/40 {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-claro input,
+body.theme-claro select,
+body.theme-claro textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+body.theme-claro input::placeholder,
+body.theme-claro textarea::placeholder { 
+  color: #64748b !important; 
+}
+
+body.theme-claro .text-orange-400 { 
+  color: #c2410c !important; 
+}
+
+body.theme-claro .text-yellow-400,
+body.theme-claro .text-yellow-300 { 
+  color: #b45309 !important; 
+}
+
+body.theme-claro .text-yellow-200 { 
+  color: #78350f !important; 
+}
+
+body.theme-claro .bg-orange-500\/10,
+body.theme-claro .bg-orange-500\/15,
+body.theme-claro .bg-orange-500\/20 {
+  background-color: #ffedd5 !important;
+  border-color: #fb923c !important;
+  color: #9a3412 !important;
+}
+
+body.theme-claro .bg-yellow-500\/10,
+body.theme-claro .bg-yellow-500\/20 {
+  background-color: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+body.theme-claro .bg-emerald-500\/10,
+body.theme-claro .bg-emerald-500\/15,
+body.theme-claro .bg-emerald-500\/20 {
+  background-color: #d1fae5 !important;
+  border-color: #34d399 !important;
+  color: #065f46 !important;
+}
+
+body.theme-claro .text-emerald-400 { 
+  color: #047857 !important; 
+}
+
+body.theme-claro .text-blue-400 { 
+  color: #1d4ed8 !important; 
+}
+
+body.theme-claro .text-amber-400 { 
+  color: #b45309 !important; 
+}
+
+/* ==========================================================================
+   2. MAPA GERAL (Leaflet 2D - Aba Mapa)
+   ========================================================================== */
+.theme-escuro #mapaContainer .leaflet-tile-pane {
+  filter: brightness(0.68) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35);
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-radius: 1rem !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-popup-tip { 
+  background-color: #0f172a !important; 
+}
+
+/* Pingo com efeito ao segurar por 3 segundos para mover (Pingo Inteligente) */
+.pin-arrastando-ativo {
+  z-index: 99999 !important;
+  cursor: grab !important;
+  animation: pulsoArrastoPingo 0.8s infinite alternate !important;
+}
+
+@keyframes pulsoArrastoPingo {
+  from { filter: drop-shadow(0 0 4px rgba(234, 88, 12, 0.7)); }
+  to { filter: drop-shadow(0 0 16px rgba(239, 68, 68, 0.95)); }
+}
+
+/* ==========================================================================
+   3. NAVEGADOR ESTILO WAZE 3D (MapLibre GL)
+   ========================================================================== */
+
+/* Velocímetro Ergonômico Elevado (68px) */
+.waze-speed-circle {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.94);
+  border: 3.5px solid #38bdf8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.waze-speed-circle.alerta-excesso {
+  border-color: #ef4444 !important;
+  background: rgba(185, 28, 28, 0.95) !important;
+  animation: pulseRadar 0.6s infinite alternate;
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.95) !important;
+}
+
+@keyframes pulseRadar {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.10); }
+}
+
+/* Mira de Centralização Elevada (62px) */
+.waze-mira-btn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.94);
+  border: 2.5px solid #ea580c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+/* Plaqueta Flutuante de Alerta de Radar R-19 */
+.waze-radar-badge {
+  position: absolute;
+  top: 140px;
+  right: 14px;
+  z-index: 590;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 2px solid #ef4444;
+  border-radius: 20px;
+  padding: 6px 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85), 0 0 18px rgba(239, 68, 68, 0.5);
+  backdrop-filter: blur(8px);
+  animation: slideDownRadar 0.3s ease-out;
+}
+
+@keyframes slideDownRadar {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.radar-speed-limit-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 4px solid #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.radar-speed-number {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 900;
+  color: #111827;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   4. PINOS DE RADAR NA PISTA 3D (PLACA R-19 FINCADA NO ASFALTO)
+   ========================================================================== */
+.radar-pino-pista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.9));
+  transition: transform 0.2s ease;
+}
+
+.radar-pino-pista:hover {
+  transform: scale(1.15);
+}
+
+.radar-pino-disco {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3.5px solid #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+}
+
+.radar-pino-vel {
+  font-family: monospace;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #111827;
+  line-height: 1;
+}
+
+.radar-pino-haste {
+  width: 3px;
+  height: 8px;
+  background: #cbd5e1;
+  border-radius: 0 0 2px 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+/* Marcador do Veículo no Mapa 3D (Fiorino) */
+.fiorino-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 62px;
+  pointer-events: none;
+}
+
+.fiorino-aura {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.25);
+  border: 2px solid rgba(56, 189, 248, 0.6);
+  position: absolute;
+  z-index: 1;
+}
+
+.fiorino-svg-wrapper {
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.85));
+}
+
+.fiorino-placa-rua {
+  margin-top: 3px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65);
+  letter-spacing: 0.2px;
+  z-index: 3;
+}
+
+/* ==========================================================================
+   5. CÂMERA DO BIPADOR DE SACOLAS COM VOZ (BARCODE SCANNER)
+   ========================================================================== */
+.scanner-camera-card {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: #000000;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 2px solid #ea580c;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+#videoScannerBipador {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Mira Laser de Enquadramento */
+.scanner-mira-overlay {
+  position: absolute;
+  top: 15%;
+  left: 10%;
+  right: 10%;
+  bottom: 15%;
+  border-radius: 1rem;
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.scanner-canto-topo, 
+.scanner-canto-baixo {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px;
+}
+
+.scanner-canto-corpo {
+  width: 18px;
+  height: 18px;
+  border-color: #ea580c;
+  border-style: solid;
+}
+
+.canto-tl { border-width: 3.5px 0 0 3.5px; border-top-left-radius: 8px; }
+.canto-tr { border-width: 3.5px 3.5px 0 0; border-top-right-radius: 8px; }
+.canto-bl { border-width: 0 0 3.5px 3.5px; border-bottom-left-radius: 8px; }
+.canto-br { border-width: 0 3.5px 3.5px 0; border-bottom-right-radius: 8px; }
+
+/* Linha Vermelha de Laser Animada */
+.scanner-linha-laser {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ef4444, #f97316, transparent);
+  box-shadow: 0 0 12px #ef4444;
+  animation: animarLaser 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes animarLaser {
+  0% { top: 15%; }
+  100% { top: 85%; }
+}
+
+.scanner-botoes-topo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.btn-scanner-ctrl {
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s;
+}
+
+.btn-scanner-ctrl:active { 
+  transform: scale(0.92); 
+}
+
+.btn-scanner-ctrl.ativo {
+  background: #ea580c;
+  color: #ffffff;
+  border-color: #ea580c;
+  box-shadow: 0 0 15px rgba(234, 88, 12, 0.6);
+}
+
+.scanner-status-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   6. CARD DE RESPOSTA GIGANTE DO BIPADOR (ÁUDIO + TELA)
+   ========================================================================== */
+.card-bip-resposta {
+  text-align: center;
+  padding: 22px 18px;
+  border-radius: 1.75rem;
+  background: #0c1322;
+  border: 3px solid #ea580c;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  animation: popBipCard 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popBipCard {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.circulo-canetao-gigante {
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px auto;
+  box-shadow: 0 10px 30px rgba(234, 88, 12, 0.55);
+  border: 4px solid #ffffff;
+  outline: 3px solid #ea580c;
+}
+
+.numero-canetao-val {
+  font-size: 60px;
+  font-weight: 900;
+  line-height: 1;
+  font-family: monospace;
+  letter-spacing: -2px;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   7. BOTÃO S.O.S DE EMERGÊNCIA
+   ========================================================================== */
+.btn-sos-flutuante {
+  background: #dc2626;
+  color: #ffffff;
+  border: 2.5px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+  animation: pulseSos 1.8s infinite;
+}
+
+@keyframes pulseSos {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+  70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+/* Badge indicadora do Wake Lock (Tela Acesa) */
+.badge-wakelock {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
