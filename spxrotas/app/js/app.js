@@ -1,6 +1,6 @@
 /* ==========================================================================
    SPXrotas Pro v1.0.0 - Núcleo Mestre Reativo Oficial
-   Bipador com Voz, Wake Lock, Pingo Inteligente, S.O.S e Blindagem de Radares
+   Bipador com Voz, Wake Lock, Pingo Inteligente Blindado, S.O.S e Radares
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -212,7 +212,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // PINGO INTELIGENTE COM MEMÓRIA (CORREÇÃO DE PORTÃO DIRETO NO BANCO)
+    // PINGO INTELIGENTE COM MEMÓRIA & BLINDAGEM DE SANIDADE (MAX 450 METROS)
     // =========================================================================
     async corrigirPingoPeloGPS(entrega) {
       if (!entrega) return;
@@ -225,6 +225,16 @@ function spxRotasApp() {
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const novaLat = pos.coords.latitude;
         const novaLng = pos.coords.longitude;
+
+        // 🛡️ TRAVA DE SEGURANÇA 1: RAIO MÁXIMO DE SANIDADE (450 METROS)
+        if (entrega.latitude && entrega.longitude) {
+          const distOriginal = this.calcularDistancia(novaLat, novaLng, Number(entrega.latitude), Number(entrega.longitude));
+          if (distOriginal > 450) {
+            const distFmt = distOriginal > 1000 ? (distOriginal / 1000).toFixed(1) + ' km' : Math.round(distOriginal) + ' metros';
+            alert(`⚠️ BLOQUEADO POR SEGURANÇA:\n\nVocê está a ${distFmt} de distância do endereço original deste cliente!\n\nPara evitar erros e proteger a rota, o portão só pode ser fixado se você estiver na mesma rua (máximo 450 metros).`);
+            return;
+          }
+        }
 
         const conf = confirm(`Deseja salvar sua posição atual como o portão correto para o endereço:\n\n"${entrega.endereco}"?`);
         if (!conf) return;
@@ -240,11 +250,13 @@ function spxRotasApp() {
         }
 
         try {
+          // Atualiza a parada na rota atual
           await this.fetchDirectus(`/items/entregas/${entrega.id}`, {
             method: 'PATCH',
             body: JSON.stringify({ latitude: novaLat, longitude: novaLng })
           });
 
+          // Grava na coleção de inteligência com o ID do usuário para histórico auditável
           await this.fetchDirectus('/items/spxrotas_pingos_corrigidos', {
             method: 'POST',
             body: JSON.stringify({
@@ -253,14 +265,14 @@ function spxRotasApp() {
               bairro: entrega.bairro,
               latitude: novaLat,
               longitude: novaLng,
-              corrigido_por: this.usuarioId
+              corrigido_por: this.usuarioId || 'motorista_app'
             })
           }).catch(() => {});
 
           if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
-          alert('📍 Pingo Inteligente gravado! Esse portão nunca mais cairá no lugar errado.');
+          alert('📍 Pingo Inteligente gravado com sucesso! Nas próximas rotas, este endereço já cairá no portão exato.');
         } catch (e) {
-          alert('Localização atualizada localmente na rota.');
+          alert('Localização atualizada na rota ativa.');
         }
       }, (err) => {
         alert('Erro ao obter coordenadas do GPS: ' + err.message);
