@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=7.1.0">
+  <link rel="stylesheet" href="./css/styles.css?v=7.2.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=7.1.0"></script>
+  <script src="./js/relatorio.js?v=7.2.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=7.1.0"></script>
+  <script src="./js/app.js?v=7.2.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -100,7 +100,7 @@
     }, 1500);
   </script>
 
-  <!-- 2. TELA DE BLOQUEIO NO NAVEGADOR DO CELULAR (OBRIGAÇÃO PWA) -->
+  <!-- 2. TELA DE BLOQUEIO NO NAVEGADOR DO CELULAR (PWA STANDALONE) -->
   <div x-show="isMobile && !isStandalone" class="fixed inset-0 bg-gray-950 z-[95] flex flex-col items-center justify-between p-6 overflow-y-auto" x-cloak>
     <div class="w-full"></div>
     <div class="bg-gray-900 border-2 border-orange-500/80 rounded-3xl w-full max-w-sm p-7 space-y-6 shadow-2xl text-center my-auto">
@@ -151,8 +151,8 @@
         <div class="flex items-center gap-2"><span class="text-emerald-400">💬</span><span><strong>Zap das Rotas:</strong> Envie o romaneio no WhatsApp e abra pronta</span></div>
         <div class="flex items-center gap-2"><span class="text-amber-400">📸</span><span><strong>Bipador com Voz:</strong> Aponte a câmera e ouça o Canetão e a Sacola</span></div>
         <div class="flex items-center gap-2"><span class="text-red-400">📷</span><span><strong>40 Mil Radares:</strong> Alerta sonoro sem alarmes falsos de rodovia</span></div>
-        <div class="flex items-center gap-2"><span class="text-cyan-400">🧭</span><span><strong>GPS 3D Waze Engine:</strong> Com tela que nunca apaga (Wake Lock)</span></div>
-        <div class="flex items-center gap-2 pt-1 border-t border-gray-800"><span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis (começam na 1ª rota gerada)!</span></div>
+        <div class="flex items-center gap-2"><span class="text-cyan-400">🧭</span><span><strong>GPS 3D Waze Engine:</strong> Com tela que nunca apaga</span></div>
+        <div class="flex items-center gap-2 pt-1 border-t border-gray-800"><span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis na 1ª rota!</span></div>
       </div>
       <div class="space-y-3">
         <button @click="loginGoogle()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-3 cursor-pointer">
@@ -172,7 +172,7 @@
     </div>
   </div>
 
-  <!-- 3. GAVETA DO MENU LATERAL COMPLETA -->
+  <!-- 3. GAVETA DO MENU LATERAL -->
   <div x-show="menuAberto" class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-l border-gray-800 w-full max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto" @click.away="menuAberto = false">
       <div class="space-y-4">
@@ -194,7 +194,7 @@
           <button @click="menuAberto = false; modalAssinatura = true;" class="w-full mt-1 bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 rounded-xl text-xs active:scale-95 transition">Ver / Renovar Planos</button>
         </div>
 
-        <!-- DADOS DO MOTORISTA (SALVA DIRETO NO BANCO DIRECTUS) -->
+        <!-- DADOS DO MOTORISTA (DIRETO NO BANCO DIRECTUS) -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <span class="text-[11px] font-black text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
             <span>👤</span> Meus Dados de Cadastro
@@ -215,7 +215,7 @@
           </div>
         </div>
 
-        <!-- CONTATO DE EMERGÊNCIA S.O.S (SALVO EM CACHE NO CELULAR) -->
+        <!-- CONTATO DE EMERGÊNCIA S.O.S (CACHE NO CELULAR) -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-red-500/40 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-black text-red-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -229,7 +229,7 @@
           </div>
         </div>
 
-        <!-- CONFIGURAÇÃO DO VEÍCULO & COMBUSTÍVEL (SALVO EM CACHE) -->
+        <!-- CONFIGURAÇÃO DO VEÍCULO & COMBUSTÍVEL -->
         <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -372,7 +372,7 @@
       </div>
     </div>
 
-    <!-- CABEÇALHO SUPERIOR (LIMPO: SEM BOTÃO DE WAKE LOCK, TELA SEMPRE ACESA NATIVA) -->
+    <!-- CABEÇALHO SUPERIOR -->
     <div>
       <header class="bg-orange-600 px-3 pt-3.5 pb-3 sticky top-0 shadow-xl space-y-2.5 z-30">
         <div class="flex justify-between items-center">
@@ -418,7 +418,7 @@
       <!-- MODO 1: SACOLAS (ORGANIZAÇÃO EXCLUSIVA NO MÉTODO CANETÃO + BIPADOR) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         
-        <!-- CARD DE AÇÃO DO BIPADOR DE SACOLAS COM VOZ -->
+        <!-- CARD DO BIPADOR DE SACOLAS COM VOZ -->
         <div class="bg-gradient-to-r from-amber-950/40 via-gray-900 to-gray-900 border-2 border-amber-500/60 rounded-3xl p-4 shadow-xl flex items-center justify-between gap-3">
           <div class="space-y-0.5">
             <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider block">Agilidade Máxima na Calçada</span>
@@ -430,7 +430,7 @@
           </button>
         </div>
 
-        <!-- LISTA DAS ENTREGAS NA ABA SACOLAS (MÉTODO CANETÃO OFICIAL) -->
+        <!-- LISTA DAS ENTREGAS NA ABA SACOLAS (ORDENAÇÃO ÚNICA CANETÃO #1, #2...) -->
         <div class="space-y-3">
           <template x-for="item in entregasOrdenadasParaSacola" :key="item.id">
             <div @click="irParaEntregaDireta(item)" 
@@ -597,7 +597,7 @@
               <p class="text-lg sm:text-xl text-gray-200 font-black" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
             </div>
 
-            <!-- PINGO INTELIGENTE: BARRINHA DE CORREÇÃO DE PORTÃO NA PORTA DO CLIENTE -->
+            <!-- PINGO INTELIGENTE: CORREÇÃO DE PORTÃO NA PORTA DO CLIENTE -->
             <div class="bg-black/60 border border-gray-800 rounded-2xl p-2.5 flex items-center justify-between gap-2">
               <div class="text-[11px] text-gray-300">
                 <strong class="text-cyan-400 block">📍 Pingo Inteligente:</strong>
@@ -876,9 +876,9 @@
 
   </div>
 
-  <!-- 8. MODAL ZAP DAS ROTAS & IMPORTAÇÃO DE PLANILHA -->
-  <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-4 backdrop-blur-md" x-cloak>
-    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-6 space-y-5 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
+  <!-- 8. MODAL CARREGAR SUA ROTA (ORDEM CORRIGIDA: 1º PARTIDA/CHEGADA OBRIGATÓRIA -> 2º ZAP OU ARQUIVO) -->
+  <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 sm:p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
       
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <h2 class="font-black text-xl text-orange-500 tracking-wide flex items-center gap-2">
@@ -887,46 +887,80 @@
         <button @click="modalImportar = false" class="text-gray-400 hover:text-white text-3xl font-bold leading-none p-1 transition">&times;</button>
       </div>
 
-      <!-- OPÇÃO 1: O ZAP DAS ROTAS (MÉTODO RECOMENDADO) -->
-      <div class="bg-gradient-to-r from-emerald-950/40 via-gray-950 to-gray-950 border-2 border-emerald-500/70 p-5 rounded-2xl space-y-3 shadow-lg">
-        <div class="flex items-center gap-2.5">
-          <span class="text-2xl">💬</span>
+      <!-- PASSO 1 (NO TOPO E OBRIGATÓRIO): DE ONDE SAI E PARA ONDE VOLTA -->
+      <div class="bg-gray-950 p-4 rounded-2xl border-2 border-orange-500/70 space-y-3 shadow-lg">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 class="text-base font-black text-white leading-tight">O Zap das Rotas (Recomendado)</h3>
-            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Zero pastas do Android</span>
+            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">1º PASSO OBRIGATÓRIO</span>
+            <h3 class="text-sm font-black text-white flex items-center gap-1.5">
+              <span>📍</span> Onde sua rota Começa e Termina?
+            </h3>
           </div>
-        </div>
-        <p class="text-xs text-gray-300 leading-relaxed">
-          No app da Shopee, clique em <strong>Compartilhar via WhatsApp</strong> e envie para o número do SPXrotas. O robô calcula a rota na hora e já abre no app!
-        </p>
-        <a :href="`https://wa.me/5513974251486?text=${encodeURIComponent('Oi SPXrotas! Segue meu romaneio da Shopee para calcular a rota:')}`" target="_blank" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider text-center block shadow-md active:scale-95 transition">
-          📲 Enviar Romaneio no WhatsApp Oficial
-        </a>
-      </div>
-
-      <!-- OPÇÃO 2: SUBIR O ARQUIVO .XLSX MANUALMENTE -->
-      <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800">
-        <span class="text-xs font-black text-gray-300 uppercase tracking-wider block">Ou selecione o arquivo do celular:</span>
-        <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 active:scale-[0.99] transition">
-          <span class="text-4xl block mb-1">📊</span>
-          <span class="text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
-          <span class="text-[10px] text-gray-400 block mt-0.5">Formatos: .xlsx, .xls, .csv</span>
-          <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcel($event)" class="hidden">
-        </label>
-      </div>
-
-      <div class="space-y-3 bg-gray-950 p-4 rounded-2xl border border-gray-800">
-        <div class="flex items-center justify-between">
-          <span class="font-black text-orange-400 uppercase tracking-wider text-xs">📍 Partida e Chegada:</span>
-          <button @click="capturarGPSModal()" class="bg-gray-800 text-emerald-400 px-3 py-1 rounded-xl text-xs font-bold border border-gray-700 active:scale-95 transition">
-            Usar Meu GPS Atual
+          <button @click="capturarGPSModal()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-bold border border-gray-700 active:scale-95 transition flex items-center justify-center gap-1 shrink-0">
+            <span>📍</span> Usar Meu GPS Atual
           </button>
         </div>
-        <div class="space-y-2">
-          <input type="text" x-model="inputPartidaModal" placeholder="Partida (Galpão CD ou sua rua)" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white">
-          <input type="text" x-model="inputChegadaModal" placeholder="Chegada (Sua casa / destino final)" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white">
+        
+        <p class="text-[11px] text-gray-400 leading-snug">
+          O cálculo viário precisa saber de onde seu carro sai e para onde você volta para traçar a rota sem ziguezague.
+        </p>
+
+        <div class="space-y-2 pt-1">
+          <div>
+            <label class="text-[10px] font-bold text-gray-300 block mb-1">Ponto de Partida * (Galpão CD ou endereço onde o carro está):</label>
+            <input type="text" x-model="inputPartidaModal" @change="salvarPartidaChegadaLocal()" placeholder="Ex: Galpão Shopee Mongaguá ou Av. Principal, 100" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-gray-300 block mb-1">Ponto de Retorno * (Sua casa ou onde a rota encerra):</label>
+            <input type="text" x-model="inputChegadaModal" @change="salvarPartidaChegadaLocal()" placeholder="Ex: Minha Casa, Rua das Palmeiras, 200" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+          </div>
+          <button @click="inputChegadaModal = inputPartidaModal; salvarPartidaChegadaLocal();" class="text-[10px] text-orange-400 hover:underline font-bold block pt-0.5">
+            ↺ Voltar para o mesmo local de partida (CD)
+          </button>
         </div>
       </div>
+
+      <!-- PASSO 2: ESCOLHA COMO ENVIAR O ROMANEIO (SÓ LIBERA SE O PASSO 1 ESTIVER PREENCHIDO) -->
+      <div class="space-y-3 pt-1">
+        <span class="text-[10px] font-black uppercase tracking-wider block" :class="temPartidaEChegadaValida ? 'text-emerald-400' : 'text-gray-500'">
+          2º PASSO: ENVIE OU SELECIONE A PLANILHA
+        </span>
+
+        <!-- OPÇÃO A: O ZAP DAS ROTAS -->
+        <div class="bg-gradient-to-r from-emerald-950/40 via-gray-950 to-gray-950 border-2 rounded-2xl p-4 space-y-2.5 shadow-md transition-all"
+             :class="temPartidaEChegadaValida ? 'border-emerald-500/70 opacity-100' : 'border-gray-800 opacity-50 pointer-events-none'">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">💬</span>
+              <div>
+                <h4 class="text-sm font-black text-white leading-tight">O Zap das Rotas (Recomendado)</h4>
+                <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider">Zero pastas do Android</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-300 leading-snug">
+            Compartilhe a planilha direto no WhatsApp do SPXrotas. O robô calcula a rota usando sua partida e chegada acima e abre pronta!
+          </p>
+          <a :href="`https://wa.me/5513974251486?text=${encodeURIComponent('Oi SPXrotas! Segue meu romaneio da Shopee para calcular a rota:')}`" 
+             target="_blank" 
+             class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider text-center block shadow-md active:scale-95 transition">
+            📲 Enviar Romaneio no WhatsApp Oficial
+          </a>
+        </div>
+
+        <!-- OPÇÃO B: SUBIR O ARQUIVO .XLSX DIRETO NO APP -->
+        <div class="space-y-2 bg-gray-950 p-4 rounded-2xl border-2 transition-all"
+             :class="temPartidaEChegadaValida ? 'border-gray-800 opacity-100' : 'border-gray-800 opacity-50 pointer-events-none'">
+          <span class="text-[11px] font-black text-gray-300 uppercase tracking-wider block">Ou selecione o arquivo do celular:</span>
+          <label class="block border-2 border-dashed border-orange-500/50 bg-orange-500/5 rounded-2xl p-5 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 active:scale-[0.99] transition">
+            <span class="text-3xl block mb-1">📊</span>
+            <span class="text-xs sm:text-sm font-black block text-white">Toque para escolher o arquivo .XLSX</span>
+            <span class="text-[10px] text-gray-400 block mt-0.5">Formatos aceitos: .xlsx, .xls, .csv</span>
+            <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcelComValidacao($event)" class="hidden">
+          </label>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -943,12 +977,24 @@
           <h2 class="text-2xl font-black text-white">Planilha Importada</h2>
           <p class="text-xs text-gray-400 font-medium">Pronta para cálculo contínuo no SPXrotas.</p>
         </div>
+        
+        <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs">
+          <div class="flex items-center justify-between border-b border-gray-800/80 pb-1.5">
+            <span class="text-orange-400 font-bold uppercase text-[10px]">📍 Partida:</span>
+            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoPartidaTexto || 'Galpão / Início'"></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-emerald-400 font-bold uppercase text-[10px]">🏠 Retorno:</span>
+            <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoChegadaTexto || 'Residência / Final'"></span>
+          </div>
+        </div>
+
         <div class="flex items-center justify-between border-b border-gray-800 pb-3">
           <span class="text-sm font-bold text-gray-300">Total de Pacotes:</span>
           <span class="text-3xl font-black text-white font-mono" x-text="pacotesExtraidos.length"></span>
         </div>
         <div class="space-y-2 text-xs text-gray-300 font-bold">
-          <div>✔ <span x-text="`${Math.ceil(pacotesExtraidos.length / 10)} Sacolas para organizar no Canetão`"></span></div>
+          <div>✔ <span x-text="`${Math.ceil(pacotesExtraidos.length / 10)} Sacolas no Método Canetão`"></span></div>
           <div>✔ Varredura contínua sem retornos (elimina a marcha à ré)</div>
         </div>
         <div class="pt-2 space-y-2">
@@ -1123,7 +1169,7 @@
     </div>
   </div>
 
-  <!-- 12. MODAL DE CADASTRO OBRIGATÓRIO (APÓS LOGIN COM O GOOGLE) -->
+  <!-- 12. MODAL DE CADASTRO OBRIGATÓRIO (ONBOARDING PÓS-GOOGLE) -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 bg-black/95 z-[95] flex items-center justify-center p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
       
@@ -1182,6 +1228,102 @@
         <button @click="salvarCadastroObrigatorio()" :disabled="salvandoPerfil" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider active:scale-95 transition shadow-xl shadow-orange-600/30 flex items-center justify-center gap-2">
           <span x-show="!salvandoPerfil">✅ Concluir e Acessar o App</span>
           <span x-show="salvandoPerfil">⏳ Salvando Dados...</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 13. MODAL TUTORIAL COMPLETO DE 8 PASSOS (REINTEGRADO OFICIAL) -->
+  <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
+      
+      <!-- Passo 1: Boas-Vindas -->
+      <template x-if="passoTutorial === 1">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👋</div>
+          <h3 class="text-2xl font-black text-white">Bem-vindo ao SPXrotas!</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">O super aplicativo desenhado para você acabar com o ziguezague, organizar sua carga em sacolas e terminar a rota até 2 horas mais rápido.</p>
+          <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 text-[11px] text-emerald-400 font-bold">🎁 Seus 7 dias grátis só começam a valer após você gerar sua 1ª rota!</div>
+        </div>
+      </template>
+
+      <!-- Passo 2: Partida e Chegada -->
+      <template x-if="passoTutorial === 2">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div>
+          <h3 class="text-2xl font-black text-white">Partida e Retorno</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">No modal de rota, informe onde você carrega (o CD) e para onde volta no final do dia. O motor viário calcula o menor caminho sem retornos!</p>
+        </div>
+      </template>
+
+      <!-- Passo 3: O Zap das Rotas -->
+      <template x-if="passoTutorial === 3">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">💬</div>
+          <h3 class="text-2xl font-black text-white">O Zap das Rotas</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Não precisa caçar arquivos na pasta Downloads do Android! No app da Shopee, escolha Compartilhar no WhatsApp do SPXrotas e a rota abre pronta!</p>
+        </div>
+      </template>
+
+      <!-- Passo 4: O Método Canetão -->
+      <template x-if="passoTutorial === 4">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👜</div>
+          <h3 class="text-2xl font-black text-white">Método Canetão (Sacolas)</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Na aba Sacolas, os pacotes vêm organizados de 10 em 10. Você escreve o número #CANETÃO grande em cada caixa e guarda na sacola certa.</p>
+        </div>
+      </template>
+
+      <!-- Passo 5: Bipador com Voz -->
+      <template x-if="passoTutorial === 5">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📸</div>
+          <h3 class="text-2xl font-black text-white">Bipador de Sacolas com Voz</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Na calçada do galpão, toque em Bipar e aponte a câmera pro código de barras. O celular grita o número do Canetão e a Sacola no alto-falante!</p>
+        </div>
+      </template>
+
+      <!-- Passo 6: Cockpit da Rua -->
+      <template x-if="passoTutorial === 6">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🚗</div>
+          <h3 class="text-2xl font-black text-white">Cockpit da Rua & Radares</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Na aba Rua, você vê a entrega atual. O app avisa radares na sua via sem alarmes falsos e vibra se o mesmo cliente tiver 2 ou 3 pacotes juntos!</p>
+        </div>
+      </template>
+
+      <!-- Passo 7: Pingo Inteligente & S.O.S -->
+      <template x-if="passoTutorial === 7">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-red-500/40">🆘</div>
+          <h3 class="text-2xl font-black text-white">Pingo Inteligente & S.O.S</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Pingo da Shopee errado? Toque em Fixar Portão Aqui na porta do cliente. E se tiver algum imprevisto, aperte S.O.S para alertar seu contato de emergência.</p>
+        </div>
+      </template>
+
+      <!-- Passo 8: Rumo à Pista! -->
+      <template x-if="passoTutorial === 8">
+        <div class="space-y-3.5">
+          <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
+          <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Carregue sua rota, organize suas sacolas no Canetão e tenha um dia de entregas muito mais rápido e lucrativo!</p>
+        </div>
+      </template>
+
+      <!-- Navegação dos Passos -->
+      <div class="flex items-center justify-between pt-3 border-t border-gray-800">
+        <div>
+          <button x-show="passoTutorial === 1" @click="concluirTutorial()" class="text-xs text-gray-400 hover:text-white font-bold py-2 px-2.5">Pular</button>
+          <button x-show="passoTutorial > 1" @click="voltarPassoTutorial()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-2 px-3 rounded-xl active:scale-95 transition">← Voltar</button>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <template x-for="p in 8" :key="p">
+            <span class="h-2 rounded-full transition-all" :class="passoTutorial === p ? 'bg-orange-500 w-4' : 'bg-gray-700 w-2'"></span>
+          </template>
+        </div>
+        <button @click="proximoPassoTutorial()" class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-4 rounded-xl active:scale-95 transition shadow-lg shadow-orange-600/30">
+          <span x-text="passoTutorial === 8 ? 'Começar!' : 'Avançar →'"></span>
         </button>
       </div>
 
