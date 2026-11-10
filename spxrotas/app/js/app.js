@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v1.1.0 - Núcleo Mestre Reativo Oficial
-   Wake Lock Automático, Onboarding Obrigatório, Bipador por Voz & Canetão
+   SPXrotas Pro v1.2.0 - Núcleo Mestre Reativo Oficial
+   Trava de Partida/Chegada, Wake Lock Automático, Onboarding & Bipador com Voz
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -27,18 +27,20 @@ function spxRotasApp() {
     modalRelatorio: false,
     dadosRelatorio: null,
 
-    // Configuração do Veículo & Combustível do Motorista (Cache Celular)
+    // Configurações Salvas no Cache do Celular
     configVeiculo: JSON.parse(localStorage.getItem('spxrotas_config_veiculo') || '{"tipoCombustivel":"Gasolina","consumoKmL":10.0,"precoLitro":5.89}'),
     contatoEmergencia: localStorage.getItem('spxrotas_contato_emergencia') || '',
 
-    // Formulários
+    // Partida e Chegada Padrão (Persistidas no Celular)
+    inputPartidaModal: localStorage.getItem('spxrotas_partida_padrao') || '',
+    inputChegadaModal: localStorage.getItem('spxrotas_chegada_padrao') || '',
+    resumoPartidaTexto: '',
+    resumoChegadaTexto: '',
+
+    // Formulários e Estados de Pagamento
     inputNome: '',
     inputEmail: '',
     inputTelefone: '',
-    inputPartidaModal: '',
-    inputChegadaModal: '',
-    resumoPartidaTexto: '',
-    resumoChegadaTexto: '',
     erroCadastroObrigatorio: '',
     planoEscolhido: 'semanal',
     carregandoPix: false,
@@ -143,7 +145,36 @@ function spxRotasApp() {
     isMobile: false,
 
     // =========================================================================
-    // WAKE LOCK API (TELA SEMPRE ACESA AUTOMÁTICA EM SEGUNDO PLANO)
+    // TRAVA E VALIDAÇÃO DE PARTIDA E RETORNO (PASSO 1 OBRIGATÓRIO)
+    // =========================================================================
+    get temPartidaEChegadaValida() {
+      return Boolean(
+        this.inputPartidaModal && this.inputPartidaModal.trim().length >= 3 &&
+        this.inputChegadaModal && this.inputChegadaModal.trim().length >= 3
+      );
+    },
+
+    salvarPartidaChegadaLocal() {
+      if (this.inputPartidaModal) {
+        localStorage.setItem('spxrotas_partida_padrao', this.inputPartidaModal.trim());
+      }
+      if (this.inputChegadaModal) {
+        localStorage.setItem('spxrotas_chegada_padrao', this.inputChegadaModal.trim());
+      }
+    },
+
+    processarArquivoExcelComValidacao(event) {
+      if (!this.temPartidaEChegadaValida) {
+        alert('⚠️ ATENÇÃO:\n\nPreencha o Ponto de Partida e o Ponto de Retorno no Passo 1 antes de selecionar a planilha!\n\nO cálculo viário precisa desses dados para eliminar a marcha à ré.');
+        event.target.value = '';
+        return;
+      }
+      this.salvarPartidaChegadaLocal();
+      this.processarArquivoExcel(event);
+    },
+
+    // =========================================================================
+    // WAKE LOCK API (TELA SEMPRE ACESA EM SEGUNDO PLANO)
     // =========================================================================
     async ativarWakeLock() {
       if ('wakeLock' in navigator) {
@@ -170,7 +201,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // BOTÃO S.O.S DE EMERGÊNCIA (DISPARO VIA WHATSAPP)
+    // BOTÃO S.O.S DE EMERGÊNCIA
     // =========================================================================
     salvarContatoEmergencia() {
       const tel = (this.contatoEmergencia || '').replace(/\D/g, '');
@@ -596,7 +627,6 @@ function spxRotasApp() {
       return val;
     },
 
-    // Ordenação estrita do Método Canetão: #1, #2... e entregues no final
     get entregasOrdenadasParaSacola() {
       return [...this.entregas].sort((a, b) => {
         if (a.status === 'entregue' && b.status !== 'entregue') return 1;
@@ -726,7 +756,6 @@ function spxRotasApp() {
 
       this.escutarArquivosCompartilhados();
 
-      // Se o usuário voltar para o navegador, reativa a tela acesa
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           this.ativarWakeLock();
@@ -847,9 +876,9 @@ function spxRotasApp() {
 
     tocarBipeExcessoVelocidade() {
       try {
-        if (!this.audioContextBipe) {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          if (AudioContextClass) this.audioContextBipe = new AudioContextClass();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!this.audioContextBipe && AudioContextClass) {
+          this.audioContextBipe = new AudioContextClass();
         }
         if (this.audioContextBipe && this.audioContextBipe.state === 'suspended') {
           this.audioContextBipe.resume();
@@ -2025,8 +2054,8 @@ function spxRotasApp() {
           }
           this.pacotesExtraidos = res;
           if (this.pacotesExtraidos.length > 0) {
-            this.resumoPartidaTexto = this.inputPartidaModal?.trim() || 'Localização do 1º Pacote (GPS)';
-            this.resumoChegadaTexto = this.inputChegadaModal?.trim() || 'Retorno ao Ponto Inicial';
+            this.resumoPartidaTexto = this.inputPartidaModal?.trim() || 'Galpão / Início';
+            this.resumoChegadaTexto = this.inputChegadaModal?.trim() || 'Residência / Final';
             this.modalImportar = false;
             this.modalResumoImportacao = true;
           } else {
@@ -2214,7 +2243,6 @@ function spxRotasApp() {
           }
         }
 
-        // Se o nome for genérico ou não tiver telefone, abre o modal obrigatório
         const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista' || userSaas.nome.length < 3;
         const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
         const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
@@ -2377,7 +2405,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // UTILITÁRIOS GERAIS
+    // UTILITÁRIOS, TUTORIAL & PWA
     // =========================================================================
     abrirModalImportar() {
       if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
@@ -2401,15 +2429,30 @@ function spxRotasApp() {
           const latLng = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
           this.inputPartidaModal = latLng;
           this.inputChegadaModal = latLng;
-          alert('📍 Localização atual gravada como Ponto de Partida e Chegada!');
+          this.salvarPartidaChegadaLocal();
+          alert('📍 Localização atual gravada como Ponto de Partida e Retorno!');
         }, err => alert('Erro no GPS: ' + err.message));
       } else {
         alert('Geolocalização indisponível.');
       }
     },
 
-    iniciarTutorial() { this.passoTutorial = 1; this.tutorialAberto = true; },
-    concluirTutorial() { this.tutorialAberto = false; localStorage.setItem('spxrotas_tutorial_visto', 'true'); },
+    // Controle Completo do Tutorial de 8 Passos
+    iniciarTutorial() { 
+      this.passoTutorial = 1; 
+      this.tutorialAberto = true; 
+    },
+    proximoPassoTutorial() { 
+      if (this.passoTutorial < 8) this.passoTutorial++; 
+      else this.concluirTutorial(); 
+    },
+    voltarPassoTutorial() { 
+      if (this.passoTutorial > 1) this.passoTutorial--; 
+    },
+    concluirTutorial() { 
+      this.tutorialAberto = false; 
+      localStorage.setItem('spxrotas_tutorial_visto', 'true'); 
+    },
 
     checarInstalacaoPWA() {
       this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
