@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v1.2.0 - Núcleo Mestre Reativo Oficial
-   Trava de Partida/Chegada, Wake Lock Automático, Onboarding & Bipador com Voz
+   SPXrotas Pro v1.3.0 - Núcleo Mestre Reativo Oficial
+   Navegação 3D, Detector de Retorno Inteligente por Via, Wake Lock & Bipador
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -68,7 +68,7 @@ function spxRotasApp() {
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. NAVEGADOR 3D NATIVO (WAZE MAPLIBRE GL)
+    // 5. NAVEGADOR 3D NATIVO (WAZE MAPLIBRE GL COM MEMÓRIA DE RUMO)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
@@ -86,6 +86,7 @@ function spxRotasApp() {
     passosRota: [],
     passoAtualIndex: 0,
     headingAtual: 0,
+    ultimoHeadingEmMovimento: null, // Memória da direção real de onde o carro parou
     minSpeedKmhNav: 2.5,
     ultimaLatCarro: null,
     ultimaLngCarro: null,
@@ -93,6 +94,7 @@ function spxRotasApp() {
     timeoutRecentralizar: null,
     vozHabilitada: true,
     chegadaAnunciada: false,
+    alertaRetornoFalado: false,
     coordenadasRotaAtual: [],
     recalculandoRota: false,
     contadorForaDaRota: 0,
@@ -1185,7 +1187,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D NATIVA (MAPLIBRE GL)
+    // NAVEGAÇÃO 3D NATIVA (DETECÇÃO DE RETORNO INTELIGENTE POR TIPO DE VIA)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1292,6 +1294,7 @@ function spxRotasApp() {
       this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
       this.iconeManobraNav = '⬆️';
       this.chegadaAnunciada = false;
+      this.alertaRetornoFalado = false;
       this.velocidadeGPS = 0;
       this.mapaArrastadoPeloUsuario = false;
       if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
@@ -1302,7 +1305,6 @@ function spxRotasApp() {
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
 
-      this.falarTexto(`Iniciando rota para Canetão número ${entrega.ordem_entrega}, na ${entrega.endereco}`);
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
 
@@ -1311,13 +1313,17 @@ function spxRotasApp() {
       if (!container) return;
       if (this.mapaNavGL) { this.mapaNavGL.remove(); this.mapaNavGL = null; }
 
+      // Se temos o rumo real de onde o carro parou, mantém ele virado para onde o para-choque está apontado!
+      const bearingInicialSeguro = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : 0;
+      this.headingAtual = bearingInicialSeguro;
+
       this.mapaNavGL = new maplibregl.Map({
         container: 'mapaNavGL',
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
         center: [entrega.longitude, entrega.latitude],
         zoom: 16.8,
         pitch: 42,
-        bearing: 0,
+        bearing: bearingInicialSeguro,
         attributionControl: false
       });
 
@@ -1406,9 +1412,11 @@ function spxRotasApp() {
         this.ultimaLngCarro = sLng;
 
         this.atualizarMarcadorCarroGL(sLat, sLng);
-        const bearingInicial = this.calcularBearing(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
-        this.headingAtual = bearingInicial;
-        this.centralizarNoCarroGL(sLat, sLng, bearingInicial, 0);
+
+        // Não força o carro para o destino! Usa a memória de onde o carro realmente parou
+        const bearingPartida = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : this.headingAtual;
+        this.headingAtual = bearingPartida;
+        this.centralizarNoCarroGL(sLat, sLng, bearingPartida, 0);
 
         await this.calcularRotaRuaARua(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
 
@@ -1471,6 +1479,8 @@ function spxRotasApp() {
           }
         }
 
+        // 🛡️ DETECÇÃO INTELIGENTE DE RETORNO POR TIPO DE VIA (SEM VIOLAR LEIS DE TRÂNSITO)
+        this.avaliarManobraSaida(coordsLngLat);
         this.atualizarInstrucaoUI();
       }
 
@@ -1485,9 +1495,51 @@ function spxRotasApp() {
       this.atualizarMarcadorDestinoGL(eLat, eLng);
 
       if (coordsLngLat.length > 1) {
-        const bearingVia = this.calcularBearing(coordsLngLat[0][1], coordsLngLat[0][0], coordsLngLat[1][1], coordsLngLat[1][0]);
-        this.headingAtual = bearingVia;
-        if (!this.mapaArrastadoPeloUsuario) this.centralizarNoCarroGL(sLat, sLng, bearingVia, 500);
+        const bearingInicialSeguro = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : this.headingAtual;
+        if (!this.mapaArrastadoPeloUsuario) this.centralizarNoCarroGL(sLat, sLng, bearingInicialSeguro, 500);
+      }
+    },
+
+    /**
+     * Avalia se o destino está para trás e gera o alerta correto:
+     * - Rua de Bairro de Mão Dupla: "Faça o retorno na [Rua]"
+     * - Rua de Mão Única: "Siga em frente para contornar a quadra"
+     * - Rodovia / Canteiro Central: "Destino no sentido oposto. Siga até o retorno oficial"
+     */
+    avaliarManobraSaida(coordsRota) {
+      if (!coordsRota || coordsRota.length < 2 || this.alertaRetornoFalado) return;
+
+      const bearingFrenteCarro = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : this.headingAtual;
+      const bearingPrimeiroSegmento = this.calcularBearing(coordsRota[0][1], coordsRota[0][0], coordsRota[1][1], coordsRota[1][0]);
+
+      let diff = Math.abs(bearingFrenteCarro - bearingPrimeiroSegmento);
+      if (diff > 180) diff = 360 - diff;
+
+      const primeiroStep = this.passosRota[0] || {};
+      const nomeViaAtual = (this.nomeRuaAtualCarro || this.nomeRuaPisoAtual || '').toLowerCase().trim();
+      const ehViaExpressaComCanteiro = nomeViaAtual.includes('rodovia') || nomeViaAtual.includes('sp-') || nomeViaAtual.includes('br-') || (nomeViaAtual.includes('avenida') && !nomeViaAtual.includes('rua'));
+
+      // CASO A: O OSRM calculou que a rota deve voltar pela mesma rua (Rua de mão dupla permitida)
+      if (primeiroStep.maneuver?.modifier === 'uturn' || diff > 130) {
+        this.alertaRetornoFalado = true;
+
+        if (ehViaExpressaComCanteiro) {
+          // Rodovia ou Avenida com Canteiro Central / Guardrail
+          this.instrucaoAtual = 'Destino no sentido oposto. Siga até o retorno oficial';
+          this.iconeManobraNav = '⬆️';
+          this.falarTexto(`Atenção: Destino no sentido oposto. Siga em frente até o retorno oficial para o Canetão ${this.entregaNavegacao?.ordem_entrega}`);
+        } else {
+          // Rua Local de Mão Dupla permitida (Ex: Rua Araxá)
+          this.instrucaoAtual = `Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma via'}`;
+          this.iconeManobraNav = '↩️';
+          this.falarTexto(`Atenção: Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma rua'} para o Canetão ${this.entregaNavegacao?.ordem_entrega}`);
+        }
+      } else {
+        // Rota normal para a frente
+        if (!this.alertaRetornoFalado) {
+          this.falarTexto(`Iniciando rota para Canetão número ${this.entregaNavegacao?.ordem_entrega}, na ${this.entregaNavegacao?.endereco}`);
+          this.alertaRetornoFalado = true;
+        }
       }
     },
 
@@ -1589,10 +1641,12 @@ function spxRotasApp() {
       let headingMovimento = null;
       if (pos.coords.heading !== null && !isNaN(pos.coords.heading) && pos.coords.heading >= 0 && this.velocidadeGPS >= this.minSpeedKmhNav) {
         headingMovimento = pos.coords.heading;
+        this.ultimoHeadingEmMovimento = headingMovimento; // Salva o rumo real enquanto o carro está andando
       } else if (this.ultimaLatCarro && this.ultimaLngCarro) {
         const distMov = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
         if (distMov >= 1.8 && this.velocidadeGPS >= this.minSpeedKmhNav) {
           headingMovimento = this.calcularBearing(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
+          this.ultimoHeadingEmMovimento = headingMovimento;
         }
       }
 
@@ -1689,9 +1743,12 @@ function spxRotasApp() {
       const stepManobra = this.passosRota[this.passoAtualIndex];
       const info = this.interpretarManobraWaze(stepManobra);
 
-      this.instrucaoAtual = info.texto;
-      this.nomeProximaRua = info.rua;
-      this.iconeManobraNav = info.icone;
+      // Não sobrescreve a mensagem de retorno na largada se ela estiver ativa
+      if (this.iconeManobraNav !== '↩️') {
+        this.instrucaoAtual = info.texto;
+        this.nomeProximaRua = info.rua;
+        this.iconeManobraNav = info.icone;
+      }
 
       if (this.passosRota[this.passoAtualIndex + 1]) {
         const nextInfo = this.interpretarManobraWaze(this.passosRota[this.passoAtualIndex + 1]);
@@ -1715,6 +1772,9 @@ function spxRotasApp() {
       } else if (type === 'arrive') {
         icone = '🏁';
         texto = `Destino à frente`;
+      } else if (modifier.includes('uturn')) {
+        icone = '↩️';
+        texto = `Faça o retorno ${rua}`;
       } else if (type === 'off ramp' || type === 'on ramp') {
         if (modifier.includes('right')) {
           icone = '↗️';
@@ -1818,6 +1878,7 @@ function spxRotasApp() {
       this.mapaArrastadoPeloUsuario = false;
       this.radarProximoAlerta = null;
       this.radarExcessoVelocidade = false;
+      this.alertaRetornoFalado = false;
       this.modo = 'rua';
     },
 
@@ -2258,7 +2319,6 @@ function spxRotasApp() {
       } catch (e) {}
     },
 
-    // Salvar Dados pelo Menu Lateral (Direto no Banco)
     async salvarDadosCompletosPerfil() {
       if (!this.usuarioId) return;
       const tel = (this.inputTelefone || '').replace(/\D/g, '');
@@ -2293,7 +2353,6 @@ function spxRotasApp() {
       }
     },
 
-    // Salvar Cadastro Obrigatório pós-Google (Banco + Cache)
     async salvarCadastroObrigatorio() {
       const nome = (this.inputNome || '').trim();
       const tel = (this.inputTelefone || '').replace(/\D/g, '');
@@ -2314,7 +2373,6 @@ function spxRotasApp() {
 
       this.salvandoPerfil = true;
       try {
-        // 1. Salva Nome e Telefone no Banco Directus
         const res = await this.fetchDirectus(`/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`);
         const d = await res.json();
         if (d.data && d.data[0]) {
@@ -2327,13 +2385,11 @@ function spxRotasApp() {
           this.inputTelefone = tel;
         }
 
-        // 2. Salva Contato de Emergência no Cache do Celular
         if (this.contatoEmergencia) {
           const telEmergencia = this.contatoEmergencia.replace(/\D/g, '');
           localStorage.setItem('spxrotas_contato_emergencia', telEmergencia);
         }
 
-        // 3. Salva Configurações do Veículo no Cache do Celular
         localStorage.setItem('spxrotas_config_veiculo', JSON.stringify(this.configVeiculo));
 
         this.modalCadastroObrigatorio = false;
@@ -2437,7 +2493,6 @@ function spxRotasApp() {
       }
     },
 
-    // Controle Completo do Tutorial de 8 Passos
     iniciarTutorial() { 
       this.passoTutorial = 1; 
       this.tutorialAberto = true; 
