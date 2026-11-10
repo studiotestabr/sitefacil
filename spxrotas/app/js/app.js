@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v1.3.0 - Núcleo Mestre Reativo Oficial
-   Navegação 3D, Detector de Retorno Inteligente por Via, Wake Lock & Bipador
+   SPXrotas Pro v1.4.0 - Núcleo Mestre Reativo Oficial
+   Caixa-Preta de Telemetria Real, Bipador por Voz, Wake Lock & Navegador 3D
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -63,12 +63,24 @@ function spxRotasApp() {
     coordChegadaSalva: JSON.parse(localStorage.getItem('spxrotas_coord_chegada') || 'null'),
     rotaGeometria: localStorage.getItem('spxrotas_rota_geometria') || null,
 
+    // 5. CAIXA-PRETA DE TELEMETRIA REAL (GRAVAÇÃO SILENCIOSA DE AUDITORIA)
+    telemetria: {
+      inicioTimestamp: null,
+      fimTimestamp: null,
+      odometroMetros: 0,
+      tempoTotalMs: 0,
+      tempoDeslocamentoMs: 0,
+      tempoAtendimentoMs: 0,
+      momentoChegadaUltimaParada: null,
+      momentoSaidaUltimaParada: null
+    },
+
     // Mapa Leaflet 2D
     mapaLeaflet: null,
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 5. NAVEGADOR 3D NATIVO (WAZE MAPLIBRE GL COM MEMÓRIA DE RUMO)
+    // 6. NAVEGADOR 3D NATIVO (WAZE MAPLIBRE GL COM MEMÓRIA DE RUMO)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
@@ -86,7 +98,7 @@ function spxRotasApp() {
     passosRota: [],
     passoAtualIndex: 0,
     headingAtual: 0,
-    ultimoHeadingEmMovimento: null, // Memória da direção real de onde o carro parou
+    ultimoHeadingEmMovimento: null,
     minSpeedKmhNav: 2.5,
     ultimaLatCarro: null,
     ultimaLngCarro: null,
@@ -100,7 +112,7 @@ function spxRotasApp() {
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
 
-    // 6. MOTOR DE RADARES NACIONAL AUDITADO
+    // 7. MOTOR DE RADARES NACIONAL AUDITADO
     listaRadares: [],
     radarProximoAlerta: null,
     distanciaRadarTexto: '',
@@ -109,11 +121,11 @@ function spxRotasApp() {
     audioContextBipe: null,
     intervaloBipeExcesso: null,
 
-    // 7. WAKE LOCK API (TELA 100% ACESA AUTOMÁTICA)
+    // 8. WAKE LOCK API (TELA 100% ACESA AUTOMÁTICA)
     wakeLockSentinel: null,
     wakeLockAtivo: false,
 
-    // 8. BIPADOR DE SACOLAS COM VOZ (BARCODE SCANNER)
+    // 9. BIPADOR DE SACOLAS COM VOZ (BARCODE SCANNER)
     streamCameraBipador: null,
     cameraFacingMode: 'environment',
     lanternaAtiva: false,
@@ -124,7 +136,7 @@ function spxRotasApp() {
     ultimoCodigoLido: '',
     timestampUltimoBip: 0,
 
-    // 9. USUÁRIO E SAAS
+    // 10. USUÁRIO E SAAS
     usuarioLogado: false,
     usuarioEmail: '',
     usuarioNome: '',
@@ -137,7 +149,7 @@ function spxRotasApp() {
     statusAssinatura: 'trial',
     assinaturaValida: true,
 
-    // 10. TUTORIAL & PWA
+    // 11. TUTORIAL & PWA
     tutorialAberto: false,
     passoTutorial: 1,
     mostrarPopupInstalar: false,
@@ -145,6 +157,32 @@ function spxRotasApp() {
     isStandalone: false,
     isIOS: false,
     isMobile: false,
+
+    // =========================================================================
+    // GERENCIAMENTO DA CAIXA-PRETA DE TELEMETRIA
+    // =========================================================================
+    carregarTelemetriaLocal() {
+      if (!this.rotaAtivaId) return;
+      const salva = localStorage.getItem(`spxrotas_telemetria_${this.rotaAtivaId}`);
+      if (salva) {
+        try {
+          this.telemetria = { ...this.telemetria, ...JSON.parse(salva) };
+        } catch (e) {}
+      }
+    },
+
+    salvarTelemetriaLocal() {
+      if (!this.rotaAtivaId) return;
+      localStorage.setItem(`spxrotas_telemetria_${this.rotaAtivaId}`, JSON.stringify(this.telemetria));
+    },
+
+    iniciarTelemetriaSeNecessario() {
+      if (!this.telemetria.inicioTimestamp) {
+        this.telemetria.inicioTimestamp = Date.now();
+        this.telemetria.momentoSaidaUltimaParada = Date.now();
+        this.salvarTelemetriaLocal();
+      }
+    },
 
     // =========================================================================
     // TRAVA E VALIDAÇÃO DE PARTIDA E RETORNO (PASSO 1 OBRIGATÓRIO)
@@ -502,6 +540,8 @@ function spxRotasApp() {
         return;
       }
 
+      this.iniciarTelemetriaSeNecessario();
+
       if (this.appNavegacaoEscolhido === 'waze') {
         window.location.href = `waze://?ll=${entrega.latitude},${entrega.longitude}&navigate=yes`;
         return;
@@ -521,7 +561,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // RELATÓRIOS EXECUTIVOS & COMBUSTÍVEL
+    // RELATÓRIOS EXECUTIVOS & TELEMETRIA REAL AUDITADA
     // =========================================================================
     salvarConfigVeiculo() {
       localStorage.setItem('spxrotas_config_veiculo', JSON.stringify(this.configVeiculo));
@@ -532,7 +572,7 @@ function spxRotasApp() {
       if (!rota) return;
       try {
         let entregasDaRota = [];
-        if (this.rotaAtivaId === rota.id && this.entregas && this.entregas.length > 0) {
+        if (String(this.rotaAtivaId) === String(rota.id) && this.entregas && this.entregas.length > 0) {
           entregasDaRota = this.entregas;
         } else {
           const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rota.id}&sort=ordem_entrega&limit=500`);
@@ -544,7 +584,8 @@ function spxRotasApp() {
 
         const moduloRelatorio = window.SPXrotasRelatorio || window.DriveXPSRelatorio;
         if (moduloRelatorio) {
-          this.dadosRelatorio = moduloRelatorio.compilarDados(rota, entregasDaRota, this.configVeiculo);
+          // Passa a telemetria ao vivo da caixa-preta para compilar números 100% verídicos!
+          this.dadosRelatorio = moduloRelatorio.compilarDados(rota, entregasDaRota, this.configVeiculo, this.telemetria);
           this.modalRelatorio = true;
         } else {
           alert('Módulo de relatórios carregando, tente em instantes.');
@@ -731,7 +772,7 @@ function spxRotasApp() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
 
-      // Ativa o Wake Lock automaticamente em segundo plano
+      // Ativa Wake Lock automaticamente
       this.ativarWakeLock();
 
       const cacheEntregas = localStorage.getItem('spxrotas_entregas_cache');
@@ -750,6 +791,7 @@ function spxRotasApp() {
         await this.sincronizarAssinaturaSaaS();
         if (this.rotaAtivaId) {
           await this.carregarEntregasPorId(this.rotaAtivaId);
+          this.carregarTelemetriaLocal();
         } else {
           await this.carregarUltimaRota();
         }
@@ -1012,7 +1054,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // CONTROLES DE ENTREGA E REABERTURA
+    // CONTROLES DE ENTREGA E GRAVAÇÃO DA CAIXA-PRETA POR PARADA
     // =========================================================================
     async reabrirEntrega(item) {
       if (!item) return;
@@ -1031,28 +1073,76 @@ function spxRotasApp() {
       if (mesmoLocal.length > 1) {
         const conf = confirm(`Há ${mesmoLocal.length} pacotes nesta Parada. Deseja marcar TODOS como entregues?`);
         if (conf) {
-          for (const p of mesmoLocal) { await this.atualizarStatus(p.id, 'entregue'); }
+          for (const p of mesmoLocal) { 
+            await this.registrarConclusaoComTelemetria(p, 'entregue');
+          }
           this.entregaSelecionadaId = null;
           if ('vibrate' in navigator) navigator.vibrate([40, 30, 40]);
           return;
         }
       }
       this.entregaSelecionadaId = null;
-      await this.atualizarStatus(entrega.id, 'entregue');
+      await this.registrarConclusaoComTelemetria(entrega, 'entregue');
       if ('vibrate' in navigator) navigator.vibrate(40);
     },
 
-    async atualizarStatus(id, novoStatus) {
+    /**
+     * Caixa-Preta: Grava o tempo exato parado na porta do cliente e o deslocamento
+     */
+    async registrarConclusaoComTelemetria(entrega, status) {
+      const agora = Date.now();
+      this.iniciarTelemetriaSeNecessario();
+
+      // Calcula o tempo real de atendimento no portão
+      let tempoAtendimentoSec = 60; // 1 min padrão se não registrado
+      if (this.telemetria.momentoChegadaUltimaParada) {
+        tempoAtendimentoSec = Math.max(15, Math.round((agora - this.telemetria.momentoChegadaUltimaParada) / 1000));
+      }
+
+      // Calcula o tempo real de deslocamento no trânsito até este cliente
+      let tempoDeslocamentoSec = 120;
+      if (this.telemetria.momentoSaidaUltimaParada) {
+        const momentoChegada = this.telemetria.momentoChegadaUltimaParada || agora;
+        tempoDeslocamentoSec = Math.max(20, Math.round((momentoChegada - this.telemetria.momentoSaidaUltimaParada) / 1000));
+      }
+
+      // Grava no objeto da entrega
+      entrega.tempo_atendimento_seg = tempoAtendimentoSec;
+      entrega.tempo_deslocamento_seg = tempoDeslocamentoSec;
+      entrega.entregue_em = new Date().toISOString();
+
+      // Atualiza a caixa-preta global da rota
+      this.telemetria.tempoAtendimentoMs += (tempoAtendimentoSec * 1000);
+      this.telemetria.momentoSaidaUltimaParada = agora;
+      this.telemetria.momentoChegadaUltimaParada = null;
+
+      // Se todas as entregas foram concluídas, encerra o cronômetro oficial da viagem
+      const restantesAposEsta = this.entregas.filter(e => e.status !== 'entregue' && e.id !== entrega.id);
+      if (restantesAposEsta.length === 0) {
+        this.telemetria.fimTimestamp = agora;
+        this.telemetria.tempoTotalMs = Math.max(60000, agora - this.telemetria.inicioTimestamp);
+      }
+
+      this.salvarTelemetriaLocal();
+      await this.atualizarStatus(entrega.id, status, {
+        tempo_atendimento_seg: tempoAtendimentoSec,
+        tempo_deslocamento_seg: tempoDeslocamentoSec,
+        entregue_em: entrega.entregue_em
+      });
+    },
+
+    async atualizarStatus(id, novoStatus, camposExtras = {}) {
       const idx = this.entregas.findIndex(e => e.id === id);
       if (idx !== -1) {
         this.entregas[idx].status = novoStatus;
+        Object.assign(this.entregas[idx], camposExtras);
         this.salvarCacheLocal();
         if (this.modo === 'mapa') this.desenharPinosERotaNoMapa();
       }
       try {
         await this.fetchDirectus(`/items/entregas/${id}`, {
           method: 'PATCH',
-          body: JSON.stringify({ status: novoStatus })
+          body: JSON.stringify({ status: novoStatus, ...camposExtras })
         });
       } catch (e) {}
     },
@@ -1187,7 +1277,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D NATIVA (DETECÇÃO DE RETORNO INTELIGENTE POR TIPO DE VIA)
+    // NAVEGAÇÃO 3D NATIVA & CAIXA-PRETA HODÔMETRO DE RUA
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -1284,6 +1374,8 @@ function spxRotasApp() {
       }
 
       this.ativarWakeLock();
+      this.iniciarTelemetriaSeNecessario();
+
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
       this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
@@ -1313,7 +1405,6 @@ function spxRotasApp() {
       if (!container) return;
       if (this.mapaNavGL) { this.mapaNavGL.remove(); this.mapaNavGL = null; }
 
-      // Se temos o rumo real de onde o carro parou, mantém ele virado para onde o para-choque está apontado!
       const bearingInicialSeguro = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : 0;
       this.headingAtual = bearingInicialSeguro;
 
@@ -1413,7 +1504,6 @@ function spxRotasApp() {
 
         this.atualizarMarcadorCarroGL(sLat, sLng);
 
-        // Não força o carro para o destino! Usa a memória de onde o carro realmente parou
         const bearingPartida = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : this.headingAtual;
         this.headingAtual = bearingPartida;
         this.centralizarNoCarroGL(sLat, sLng, bearingPartida, 0);
@@ -1479,7 +1569,6 @@ function spxRotasApp() {
           }
         }
 
-        // 🛡️ DETECÇÃO INTELIGENTE DE RETORNO POR TIPO DE VIA (SEM VIOLAR LEIS DE TRÂNSITO)
         this.avaliarManobraSaida(coordsLngLat);
         this.atualizarInstrucaoUI();
       }
@@ -1500,12 +1589,6 @@ function spxRotasApp() {
       }
     },
 
-    /**
-     * Avalia se o destino está para trás e gera o alerta correto:
-     * - Rua de Bairro de Mão Dupla: "Faça o retorno na [Rua]"
-     * - Rua de Mão Única: "Siga em frente para contornar a quadra"
-     * - Rodovia / Canteiro Central: "Destino no sentido oposto. Siga até o retorno oficial"
-     */
     avaliarManobraSaida(coordsRota) {
       if (!coordsRota || coordsRota.length < 2 || this.alertaRetornoFalado) return;
 
@@ -1519,23 +1602,19 @@ function spxRotasApp() {
       const nomeViaAtual = (this.nomeRuaAtualCarro || this.nomeRuaPisoAtual || '').toLowerCase().trim();
       const ehViaExpressaComCanteiro = nomeViaAtual.includes('rodovia') || nomeViaAtual.includes('sp-') || nomeViaAtual.includes('br-') || (nomeViaAtual.includes('avenida') && !nomeViaAtual.includes('rua'));
 
-      // CASO A: O OSRM calculou que a rota deve voltar pela mesma rua (Rua de mão dupla permitida)
       if (primeiroStep.maneuver?.modifier === 'uturn' || diff > 130) {
         this.alertaRetornoFalado = true;
 
         if (ehViaExpressaComCanteiro) {
-          // Rodovia ou Avenida com Canteiro Central / Guardrail
           this.instrucaoAtual = 'Destino no sentido oposto. Siga até o retorno oficial';
           this.iconeManobraNav = '⬆️';
           this.falarTexto(`Atenção: Destino no sentido oposto. Siga em frente até o retorno oficial para o Canetão ${this.entregaNavegacao?.ordem_entrega}`);
         } else {
-          // Rua Local de Mão Dupla permitida (Ex: Rua Araxá)
           this.instrucaoAtual = `Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma via'}`;
           this.iconeManobraNav = '↩️';
-          this.falarTexto(`Atenção: Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma rua'} para o Canetão ${this.entregaNavegacao?.ordem_entrega}`);
+          this.falarTexto(`Atenção: Destino atrás de você. Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma rua'} para o Canetão ${this.entregaNavegacao?.ordem_entrega}`);
         }
       } else {
-        // Rota normal para a frente
         if (!this.alertaRetornoFalado) {
           this.falarTexto(`Iniciando rota para Canetão número ${this.entregaNavegacao?.ordem_entrega}, na ${this.entregaNavegacao?.endereco}`);
           this.alertaRetornoFalado = true;
@@ -1628,6 +1707,9 @@ function spxRotasApp() {
       }
     },
 
+    /**
+     * PROCESSAMENTO DO GPS & HODÔMETRO REAL DA CAIXA-PRETA
+     */
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
 
@@ -1636,12 +1718,31 @@ function spxRotasApp() {
 
       const rawLat = pos.coords.latitude;
       const rawLng = pos.coords.longitude;
+      const accuracy = pos.coords.accuracy || 15;
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
+
+      // 🛡️ HODÔMETRO REAL DA CAIXA-PRETA (FILTRA OSCILAÇÃO DE GPS PARADO)
+      if (this.ultimaLatCarro && this.ultimaLngCarro) {
+        const distMov = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
+        // Só soma no hodômetro se o carro realmente andou (velocidade > 3 km/h e distância > 3 metros com precisão boa)
+        if (distMov >= 3.0 && this.velocidadeGPS >= 3.0 && accuracy <= 35) {
+          this.telemetria.odometroMetros += distMov;
+          this.telemetria.tempoDeslocamentoMs += 1000;
+          this.salvarTelemetriaLocal();
+        }
+      }
+
+      // DETECÇÃO AUTOMÁTICA DE CHEGADA NO CLIENTE (< 35m e velocidade reduzida)
+      const distDestinoFinal = this.calcularDistancia(rawLat, rawLng, destLat, destLng);
+      if (distDestinoFinal <= 35 && !this.telemetria.momentoChegadaUltimaParada) {
+        this.telemetria.momentoChegadaUltimaParada = Date.now();
+        this.salvarTelemetriaLocal();
+      }
 
       let headingMovimento = null;
       if (pos.coords.heading !== null && !isNaN(pos.coords.heading) && pos.coords.heading >= 0 && this.velocidadeGPS >= this.minSpeedKmhNav) {
         headingMovimento = pos.coords.heading;
-        this.ultimoHeadingEmMovimento = headingMovimento; // Salva o rumo real enquanto o carro está andando
+        this.ultimoHeadingEmMovimento = headingMovimento;
       } else if (this.ultimaLatCarro && this.ultimaLngCarro) {
         const distMov = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
         if (distMov >= 1.8 && this.velocidadeGPS >= this.minSpeedKmhNav) {
@@ -1680,7 +1781,6 @@ function spxRotasApp() {
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
-      const distDestinoFinal = this.calcularDistancia(lat, lng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
       if (distDestinoFinal <= 25 && !this.chegadaAnunciada) {
@@ -1743,7 +1843,6 @@ function spxRotasApp() {
       const stepManobra = this.passosRota[this.passoAtualIndex];
       const info = this.interpretarManobraWaze(stepManobra);
 
-      // Não sobrescreve a mensagem de retorno na largada se ela estiver ativa
       if (this.iconeManobraNav !== '↩️') {
         this.instrucaoAtual = info.texto;
         this.nomeProximaRua = info.rua;
@@ -1893,6 +1992,7 @@ function spxRotasApp() {
           if (dataRota.data && dataRota.data.length > 0) {
             this.rotaAtivaId = dataRota.data[0].id;
             await this.carregarEntregasPorId(this.rotaAtivaId);
+            this.carregarTelemetriaLocal();
           } else {
             this.rotaAtivaId = null;
             this.entregas = [];
@@ -1925,6 +2025,8 @@ function spxRotasApp() {
           }
 
           this.salvarCacheLocal();
+          this.carregarTelemetriaLocal();
+
           if (this.modo === 'mapa') {
             this.$nextTick(() => this.desenharPinosERotaNoMapa());
           }
@@ -1955,6 +2057,7 @@ function spxRotasApp() {
       this.rotaAtivaId = rotaId;
       await this.carregarEntregasPorId(rotaId);
       this.salvarCacheLocal();
+      this.carregarTelemetriaLocal();
       this.modo = 'carregamento';
     },
 
@@ -1985,6 +2088,7 @@ function spxRotasApp() {
           localStorage.removeItem('spxrotas_rota_ativa_id');
           localStorage.removeItem('spxrotas_entregas_cache');
           localStorage.removeItem('spxrotas_rota_geometria');
+          localStorage.removeItem(`spxrotas_telemetria_${rotaId}`);
           await this.carregarUltimaRota();
         }
 
@@ -2200,6 +2304,18 @@ function spxRotasApp() {
           this.modalResumoImportacao = false;
           this.pacotesExtraidos = [];
           this.nomeArquivo = '';
+
+          // Reinicia a caixa-preta para a nova rota gerada
+          this.telemetria = {
+            inicioTimestamp: null,
+            fimTimestamp: null,
+            odometroMetros: 0,
+            tempoTotalMs: 0,
+            tempoDeslocamentoMs: 0,
+            tempoAtendimentoMs: 0,
+            momentoChegadaUltimaParada: null,
+            momentoSaidaUltimaParada: null
+          };
 
           await this.sincronizarAssinaturaSaaS();
 
