@@ -1,6 +1,6 @@
 /* ==========================================================================
    SPXrotas Pro v1.0.0 - Núcleo Mestre Reativo Oficial
-   Bipador com Voz, Wake Lock, Pingo Inteligente Blindado, S.O.S e Radares
+   Bipador com Voz, Wake Lock, Pingo Inteligente, S.O.S e Exclusão Segura
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -155,7 +155,6 @@ function spxRotasApp() {
             this.wakeLockAtivo = false;
           });
         } catch (err) {
-          console.warn('[SPXrotas] Wake Lock não pôde ser ativado:', err);
           this.wakeLockAtivo = false;
         }
       }
@@ -180,7 +179,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // BOTÃO S.O.S DE EMERGÊNCIA (DISPARO VIA WHATSAPP)
+    // BOTÃO S.O.S DE EMERGÊNCIA
     // =========================================================================
     salvarContatoEmergencia() {
       const tel = (this.contatoEmergencia || '').replace(/\D/g, '');
@@ -212,7 +211,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // PINGO INTELIGENTE COM MEMÓRIA & BLINDAGEM DE SANIDADE (MAX 450 METROS)
+    // PINGO INTELIGENTE COM MEMÓRIA & BLINDAGEM DE SANIDADE (450 METROS)
     // =========================================================================
     async corrigirPingoPeloGPS(entrega) {
       if (!entrega) return;
@@ -226,12 +225,11 @@ function spxRotasApp() {
         const novaLat = pos.coords.latitude;
         const novaLng = pos.coords.longitude;
 
-        // 🛡️ TRAVA DE SEGURANÇA 1: RAIO MÁXIMO DE SANIDADE (450 METROS)
         if (entrega.latitude && entrega.longitude) {
           const distOriginal = this.calcularDistancia(novaLat, novaLng, Number(entrega.latitude), Number(entrega.longitude));
           if (distOriginal > 450) {
             const distFmt = distOriginal > 1000 ? (distOriginal / 1000).toFixed(1) + ' km' : Math.round(distOriginal) + ' metros';
-            alert(`⚠️ BLOQUEADO POR SEGURANÇA:\n\nVocê está a ${distFmt} de distância do endereço original deste cliente!\n\nPara evitar erros e proteger a rota, o portão só pode ser fixado se você estiver na mesma rua (máximo 450 metros).`);
+            alert(`⚠️ BLOQUEADO POR SEGURANÇA:\n\nVocê está a ${distFmt} de distância do endereço original!\n\nO portão só pode ser fixado se você estiver na mesma rua (máximo 450 metros).`);
             return;
           }
         }
@@ -250,13 +248,11 @@ function spxRotasApp() {
         }
 
         try {
-          // Atualiza a parada na rota atual
           await this.fetchDirectus(`/items/entregas/${entrega.id}`, {
             method: 'PATCH',
             body: JSON.stringify({ latitude: novaLat, longitude: novaLng })
           });
 
-          // Grava na coleção de inteligência com o ID do usuário para histórico auditável
           await this.fetchDirectus('/items/spxrotas_pingos_corrigidos', {
             method: 'POST',
             body: JSON.stringify({
@@ -280,7 +276,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // BIPADOR DE SACOLAS COM VOZ (BARCODE DETECTOR & ÁUDIO DO CANETÃO)
+    // BIPADOR DE SACOLAS COM VOZ (BARCODE DETECTOR)
     // =========================================================================
     async abrirBipadorVoz() {
       if (!this.entregas || this.entregas.length === 0) {
@@ -514,7 +510,7 @@ function spxRotasApp() {
         if (this.rotaAtivaId === rota.id && this.entregas && this.entregas.length > 0) {
           entregasDaRota = this.entregas;
         } else {
-          const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rota.id}&sort=ordem_entrega&limit=300`);
+          const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rota.id}&sort=ordem_entrega&limit=500`);
           if (res.ok) {
             const data = await res.json();
             entregasDaRota = data.data || [];
@@ -767,7 +763,7 @@ function spxRotasApp() {
     },
 
     salvarCacheLocal() {
-      if (this.rotaAtivaId) localStorage.setItem('spxrotas_rota_ativa_id', this.rotaAtivaId);
+      if (this.rotaAtivaId) localStorage.setItem('spxrotas_rota_ativa_id', String(this.rotaAtivaId));
       if (this.entregas && this.entregas.length > 0) localStorage.setItem('spxrotas_entregas_cache', JSON.stringify(this.entregas));
       if (this.rotaGeometria) localStorage.setItem('spxrotas_rota_geometria', this.rotaGeometria);
       if (this.coordPartidaSalva) localStorage.setItem('spxrotas_coord_partida', JSON.stringify(this.coordPartidaSalva));
@@ -942,12 +938,10 @@ function spxRotasApp() {
           const viaRadar = (r.rodovia_rua || '').toLowerCase().trim();
           const radarEhDeRodoviaExpressa = viaRadar.includes('rodovia') || viaRadar.includes('sp-') || viaRadar.includes('br-') || r.velocidade >= 80;
 
-          // REGRA 1: Descarta radar de rodovia se o carro está no bairro/marginal
           if (radarEhDeRodoviaExpressa && carroEstaEmMarginalOuBairro && carroNaoEstaNaRodovia) {
             continue;
           }
 
-          // REGRA 2: Trava viária de 18 metros da rota
           if (temRotaAtiva) {
             const distRadarAteRota = this.calcularDistanciaPontoAteRota(rLat, rLng);
             if (distRadarAteRota > 18) continue;
@@ -957,7 +951,6 @@ function spxRotasApp() {
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
 
-          // REGRA 3: Cone frontal de 45 graus
           if (diffAngulo <= 45) {
             menorDistancia = dist;
             radarMaisProximo = { ...r, distMetros: Math.round(dist) };
@@ -1812,7 +1805,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // ROTAS, HISTÓRICO E PLANILHAS DA SHOPEE EXPRESS
+    // ROTAS, HISTÓRICO E EXCLUSÃO DEFINITIVA COM LIMPEZA DE BANCO
     // =========================================================================
     async carregarUltimaRota() {
       try {
@@ -1822,6 +1815,14 @@ function spxRotasApp() {
           if (dataRota.data && dataRota.data.length > 0) {
             this.rotaAtivaId = dataRota.data[0].id;
             await this.carregarEntregasPorId(this.rotaAtivaId);
+          } else {
+            // Se não houver mais rotas, limpa o estado
+            this.rotaAtivaId = null;
+            this.entregas = [];
+            this.rotaGeometria = null;
+            localStorage.removeItem('spxrotas_rota_ativa_id');
+            localStorage.removeItem('spxrotas_entregas_cache');
+            localStorage.removeItem('spxrotas_rota_geometria');
           }
         }
       } catch (e) {}
@@ -1829,7 +1830,7 @@ function spxRotasApp() {
 
     async carregarEntregasPorId(rotaId) {
       try {
-        const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=300`);
+        const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=500`);
         const data = await res.json();
 
         const resR = await this.fetchDirectus(`/items/rotas/${rotaId}`);
@@ -1850,6 +1851,12 @@ function spxRotasApp() {
           if (this.modo === 'mapa') {
             this.$nextTick(() => this.desenharPinosERotaNoMapa());
           }
+        } else {
+          // Se não houver pacotes, limpa a tela e o cache
+          this.entregas = [];
+          this.rotaGeometria = null;
+          localStorage.removeItem('spxrotas_entregas_cache');
+          localStorage.removeItem('spxrotas_rota_geometria');
         }
       } catch (e) {}
     },
@@ -1875,25 +1882,51 @@ function spxRotasApp() {
       this.modo = 'carregamento';
     },
 
+    // 🛡️ EXCLUSÃO DEFINITIVA: LIMPA DO BANCO (ENTREGAS + ROTA) E DO CELULAR
     async apagarRota(rotaId) {
-      if (!confirm(`Deseja apagar a Rota #${rotaId}?`)) return;
+      if (!confirm(`Deseja apagar a Rota #${rotaId} e todos os seus pacotes do banco?`)) return;
       try {
-        const res = await this.fetchDirectus(`/items/rotas/${rotaId}`, { method: 'DELETE' });
-        if (res.ok || res.status === 204) {
-          this.rotasHistorico = this.rotasHistorico.filter(r => r.id !== rotaId);
-          localStorage.setItem('spxrotas_rotas_historico_cache', JSON.stringify(this.rotasHistorico));
-          if (this.rotaAtivaId === rotaId) {
-            this.rotaAtivaId = null;
-            this.entregas = [];
-            this.rotaGeometria = null;
-            localStorage.removeItem('spxrotas_rota_ativa_id');
-            localStorage.removeItem('spxrotas_entregas_cache');
-            localStorage.removeItem('spxrotas_rota_geometria');
-            await this.carregarUltimaRota();
+        // 1. Apaga todos os pacotes órfãos da tabela 'entregas' no Directus
+        const resEntregas = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&fields=id&limit=500`);
+        if (resEntregas.ok) {
+          const dataEntregas = await resEntregas.json();
+          const ids = (dataEntregas.data || []).map(e => e.id);
+          if (ids.length > 0) {
+            await this.fetchDirectus('/items/entregas', {
+              method: 'DELETE',
+              body: JSON.stringify(ids)
+            });
           }
-          alert(`Rota #${rotaId} apagada com sucesso!`);
         }
-      } catch (e) {}
+
+        // 2. Apaga a rota da tabela 'rotas'
+        await this.fetchDirectus(`/items/rotas/${rotaId}`, { method: 'DELETE' });
+
+        // 3. Atualiza histórico local
+        this.rotasHistorico = this.rotasHistorico.filter(r => String(r.id) !== String(rotaId));
+        localStorage.setItem('spxrotas_rotas_historico_cache', JSON.stringify(this.rotasHistorico));
+
+        // 4. Limpeza da rota ativa (comparação segura como String)
+        if (String(this.rotaAtivaId) === String(rotaId) || !this.rotaAtivaId) {
+          this.rotaAtivaId = null;
+          this.entregas = [];
+          this.rotaGeometria = null;
+          localStorage.removeItem('spxrotas_rota_ativa_id');
+          localStorage.removeItem('spxrotas_entregas_cache');
+          localStorage.removeItem('spxrotas_rota_geometria');
+          await this.carregarUltimaRota();
+        }
+
+        // Garantia de que a tela Sacolas fique zerada se não houver rota ativa
+        if (!this.rotaAtivaId) {
+          this.entregas = [];
+          localStorage.removeItem('spxrotas_entregas_cache');
+        }
+
+        alert(`✅ Rota #${rotaId} e seus pacotes foram 100% apagados com sucesso!`);
+      } catch (e) {
+        alert('Erro ao apagar rota: ' + e.message);
+      }
     },
 
     parseLinhasShopee(linhasMatriz) {
@@ -1945,7 +1978,7 @@ function spxRotasApp() {
         let seqVal = null;
         let stpVal = null;
 
-        if (rawSeq === '-' || rawStop === '-') {
+        if (rawSeq === '-' || rawStop === '-' || rawSeq === '' || rawStop === '') {
           seqVal = -contadorExtra;
           stpVal = -contadorExtra;
           contadorExtra++;
@@ -2380,6 +2413,6 @@ function spxRotasApp() {
   };
 }
 
-// Compatibilidade com possíveis referências anteriores
+// Compatibilidade com referências globais
 window.spxRotasApp = spxRotasApp;
 window.entregaApp = spxRotasApp;
