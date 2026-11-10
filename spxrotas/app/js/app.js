@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v1.0.0 - Núcleo Mestre Reativo Oficial
-   Bipador com Voz, Wake Lock, Pingo Inteligente, S.O.S e Exclusão Segura
+   SPXrotas Pro v1.1.0 - Núcleo Mestre Reativo Oficial
+   Wake Lock Automático, Onboarding Obrigatório, Bipador por Voz & Canetão
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -14,7 +14,6 @@ function spxRotasApp() {
     // 2. TEMA, MODOS E PREFERÊNCIAS
     tema: localStorage.getItem('spxrotas_tema') || 'escuro',
     modo: 'carregamento', // 'carregamento' | 'rua' | 'mapa' | 'historico' | 'navegacao' | 'bipador'
-    modoVisualizacaoSacola: 'canetao', // 'canetao' | 'shopee'
     appNavegacaoEscolhido: localStorage.getItem('spxrotas_nav_app') || 'spxrotas',
 
     // 3. ESTADOS DE INTERFACE E MODAIS
@@ -28,7 +27,7 @@ function spxRotasApp() {
     modalRelatorio: false,
     dadosRelatorio: null,
 
-    // Configuração do Veículo & Combustível do Motorista
+    // Configuração do Veículo & Combustível do Motorista (Cache Celular)
     configVeiculo: JSON.parse(localStorage.getItem('spxrotas_config_veiculo') || '{"tipoCombustivel":"Gasolina","consumoKmL":10.0,"precoLitro":5.89}'),
     contatoEmergencia: localStorage.getItem('spxrotas_contato_emergencia') || '',
 
@@ -106,7 +105,7 @@ function spxRotasApp() {
     audioContextBipe: null,
     intervaloBipeExcesso: null,
 
-    // 7. WAKE LOCK API (TELA SEMPRE ACESA NO SUPORTE)
+    // 7. WAKE LOCK API (TELA 100% ACESA AUTOMÁTICA)
     wakeLockSentinel: null,
     wakeLockAtivo: false,
 
@@ -144,7 +143,7 @@ function spxRotasApp() {
     isMobile: false,
 
     // =========================================================================
-    // WAKE LOCK API (TELA SEMPRE ACESA)
+    // WAKE LOCK API (TELA SEMPRE ACESA AUTOMÁTICA EM SEGUNDO PLANO)
     // =========================================================================
     async ativarWakeLock() {
       if ('wakeLock' in navigator) {
@@ -170,16 +169,8 @@ function spxRotasApp() {
       }
     },
 
-    alternarWakeLockManual() {
-      if (this.wakeLockAtivo) {
-        this.liberarWakeLock();
-      } else {
-        this.ativarWakeLock();
-      }
-    },
-
     // =========================================================================
-    // BOTÃO S.O.S DE EMERGÊNCIA
+    // BOTÃO S.O.S DE EMERGÊNCIA (DISPARO VIA WHATSAPP)
     // =========================================================================
     salvarContatoEmergencia() {
       const tel = (this.contatoEmergencia || '').replace(/\D/g, '');
@@ -501,6 +492,7 @@ function spxRotasApp() {
     // =========================================================================
     salvarConfigVeiculo() {
       localStorage.setItem('spxrotas_config_veiculo', JSON.stringify(this.configVeiculo));
+      alert('✅ Dados de consumo atualizados com sucesso!');
     },
 
     async abrirModalRelatorio(rota) {
@@ -585,7 +577,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // GETTERS REATIVOS & FILTROS
+    // GETTERS REATIVOS & FILTROS (MÉTODO CANETÃO EXCLUSIVO)
     // =========================================================================
     limparEnderecoVisual(end) {
       if (!end) return '';
@@ -604,16 +596,8 @@ function spxRotasApp() {
       return val;
     },
 
+    // Ordenação estrita do Método Canetão: #1, #2... e entregues no final
     get entregasOrdenadasParaSacola() {
-      if (this.modoVisualizacaoSacola === 'shopee') {
-        return [...this.entregas].sort((a, b) => {
-          const pA = Number(a.parada_shopee) || 9999;
-          const pB = Number(b.parada_shopee) || 9999;
-          if (pA !== pB) return pA - pB;
-          return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
-        });
-      }
-
       return [...this.entregas].sort((a, b) => {
         if (a.status === 'entregue' && b.status !== 'entregue') return 1;
         if (a.status !== 'entregue' && b.status === 'entregue') return -1;
@@ -715,6 +699,9 @@ function spxRotasApp() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
 
+      // Ativa o Wake Lock automaticamente em segundo plano
+      this.ativarWakeLock();
+
       const cacheEntregas = localStorage.getItem('spxrotas_entregas_cache');
       if (cacheEntregas) {
         try { this.entregas = JSON.parse(cacheEntregas); } catch (e) {}
@@ -739,8 +726,9 @@ function spxRotasApp() {
 
       this.escutarArquivosCompartilhados();
 
+      // Se o usuário voltar para o navegador, reativa a tela acesa
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && (this.modo === 'navegacao' || this.wakeLockAtivo)) {
+        if (document.visibilityState === 'visible') {
           this.ativarWakeLock();
         }
       });
@@ -1805,7 +1793,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // ROTAS, HISTÓRICO E EXCLUSÃO DEFINITIVA COM LIMPEZA DE BANCO
+    // ROTAS, HISTÓRICO E EXCLUSÃO DEFINITIVA
     // =========================================================================
     async carregarUltimaRota() {
       try {
@@ -1816,7 +1804,6 @@ function spxRotasApp() {
             this.rotaAtivaId = dataRota.data[0].id;
             await this.carregarEntregasPorId(this.rotaAtivaId);
           } else {
-            // Se não houver mais rotas, limpa o estado
             this.rotaAtivaId = null;
             this.entregas = [];
             this.rotaGeometria = null;
@@ -1852,7 +1839,6 @@ function spxRotasApp() {
             this.$nextTick(() => this.desenharPinosERotaNoMapa());
           }
         } else {
-          // Se não houver pacotes, limpa a tela e o cache
           this.entregas = [];
           this.rotaGeometria = null;
           localStorage.removeItem('spxrotas_entregas_cache');
@@ -1882,11 +1868,9 @@ function spxRotasApp() {
       this.modo = 'carregamento';
     },
 
-    // 🛡️ EXCLUSÃO DEFINITIVA: LIMPA DO BANCO (ENTREGAS + ROTA) E DO CELULAR
     async apagarRota(rotaId) {
       if (!confirm(`Deseja apagar a Rota #${rotaId} e todos os seus pacotes do banco?`)) return;
       try {
-        // 1. Apaga todos os pacotes órfãos da tabela 'entregas' no Directus
         const resEntregas = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&fields=id&limit=500`);
         if (resEntregas.ok) {
           const dataEntregas = await resEntregas.json();
@@ -1899,14 +1883,11 @@ function spxRotasApp() {
           }
         }
 
-        // 2. Apaga a rota da tabela 'rotas'
         await this.fetchDirectus(`/items/rotas/${rotaId}`, { method: 'DELETE' });
 
-        // 3. Atualiza histórico local
         this.rotasHistorico = this.rotasHistorico.filter(r => String(r.id) !== String(rotaId));
         localStorage.setItem('spxrotas_rotas_historico_cache', JSON.stringify(this.rotasHistorico));
 
-        // 4. Limpeza da rota ativa (comparação segura como String)
         if (String(this.rotaAtivaId) === String(rotaId) || !this.rotaAtivaId) {
           this.rotaAtivaId = null;
           this.entregas = [];
@@ -1917,7 +1898,6 @@ function spxRotasApp() {
           await this.carregarUltimaRota();
         }
 
-        // Garantia de que a tela Sacolas fique zerada se não houver rota ativa
         if (!this.rotaAtivaId) {
           this.entregas = [];
           localStorage.removeItem('spxrotas_entregas_cache');
@@ -2234,7 +2214,8 @@ function spxRotasApp() {
           }
         }
 
-        const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista';
+        // Se o nome for genérico ou não tiver telefone, abre o modal obrigatório
+        const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista' || userSaas.nome.length < 3;
         const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
         const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
 
@@ -2249,15 +2230,20 @@ function spxRotasApp() {
       } catch (e) {}
     },
 
-    async salvarCadastroObrigatorio() {
-      this.erroCadastroObrigatorio = '';
-      const nome = (this.inputNome || '').trim();
+    // Salvar Dados pelo Menu Lateral (Direto no Banco)
+    async salvarDadosCompletosPerfil() {
+      if (!this.usuarioId) return;
       const tel = (this.inputTelefone || '').replace(/\D/g, '');
-      const email = (this.inputEmail || '').trim().toLowerCase();
+      const nome = (this.usuarioNome || '').trim();
 
-      if (!nome || nome.length < 3) { alert('Digite seu nome e sobrenome.'); return; }
-      if (tel.length < 10 || tel.length > 11) { alert('WhatsApp inválido com DDD.'); return; }
-      if (!email.includes('@')) { alert('E-mail inválido.'); return; }
+      if (!nome || nome.length < 3) {
+        alert('Digite seu nome e sobrenome completo.');
+        return;
+      }
+      if (tel.length < 10 || tel.length > 11) {
+        alert('Informe um WhatsApp válido com DDD (10 ou 11 números).');
+        return;
+      }
 
       this.salvandoPerfil = true;
       try {
@@ -2265,13 +2251,67 @@ function spxRotasApp() {
         const d = await res.json();
         if (d.data && d.data[0]) {
           await this.fetchDirectus(`/items/drivexps_users/${d.data[0].id}`, {
-            method: 'PATCH', body: JSON.stringify({ nome, telefone: tel, email })
+            method: 'PATCH',
+            body: JSON.stringify({ nome: nome, telefone: tel })
           });
-          this.usuarioNome = nome; this.usuarioEmail = email; this.inputTelefone = tel;
-          this.modalCadastroObrigatorio = false;
+          this.usuarioNome = nome;
+          this.inputTelefone = tel;
+          alert('✅ Dados salvos com sucesso no sistema!');
         }
       } catch (e) {
-        alert('Erro ao salvar cadastro.');
+        alert('Erro ao salvar dados: ' + e.message);
+      } finally {
+        this.salvandoPerfil = false;
+      }
+    },
+
+    // Salvar Cadastro Obrigatório pós-Google (Banco + Cache)
+    async salvarCadastroObrigatorio() {
+      const nome = (this.inputNome || '').trim();
+      const tel = (this.inputTelefone || '').replace(/\D/g, '');
+      const email = (this.inputEmail || '').trim().toLowerCase();
+
+      if (!nome || nome.length < 3) {
+        alert('Por favor, informe seu nome completo.');
+        return;
+      }
+      if (tel.length < 10 || tel.length > 11) {
+        alert('Informe um WhatsApp válido com DDD (10 ou 11 dígitos).');
+        return;
+      }
+      if (!email.includes('@')) {
+        alert('Informe um e-mail válido.');
+        return;
+      }
+
+      this.salvandoPerfil = true;
+      try {
+        // 1. Salva Nome e Telefone no Banco Directus
+        const res = await this.fetchDirectus(`/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`);
+        const d = await res.json();
+        if (d.data && d.data[0]) {
+          await this.fetchDirectus(`/items/drivexps_users/${d.data[0].id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ nome, telefone: tel, email })
+          });
+          this.usuarioNome = nome;
+          this.usuarioEmail = email;
+          this.inputTelefone = tel;
+        }
+
+        // 2. Salva Contato de Emergência no Cache do Celular
+        if (this.contatoEmergencia) {
+          const telEmergencia = this.contatoEmergencia.replace(/\D/g, '');
+          localStorage.setItem('spxrotas_contato_emergencia', telEmergencia);
+        }
+
+        // 3. Salva Configurações do Veículo no Cache do Celular
+        localStorage.setItem('spxrotas_config_veiculo', JSON.stringify(this.configVeiculo));
+
+        this.modalCadastroObrigatorio = false;
+        alert('✅ Cadastro concluído com sucesso! Bem-vindo ao SPXrotas.');
+      } catch (e) {
+        alert('Erro ao salvar cadastro: ' + e.message);
       } finally {
         this.salvandoPerfil = false;
       }
@@ -2413,6 +2453,6 @@ function spxRotasApp() {
   };
 }
 
-// Compatibilidade com referências globais
+// Compatibilidade global
 window.spxRotasApp = spxRotasApp;
 window.entregaApp = spxRotasApp;
