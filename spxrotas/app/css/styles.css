@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v1.0.0 - Folha de Estilos Modular Oficial
-   Navegador 3D, Bipador por Voz, Radares na Pista, Wake Lock & S.O.S
+   SPXrotas Pro v2.0.0 - Folha de Estilos Modular Oficial
+   Navegador 3D, Bipador por Voz (Novo Layout), Radares, Conferência & Offline
    Arquivo: /spxrotas/app/css/styles.css
    ========================================================================== */
 
@@ -19,7 +19,8 @@ body.theme-claro {
 body.theme-claro .bg-gray-950,
 body.theme-claro .bg-gray-900,
 body.theme-claro .bg-\[\#121824\],
-body.theme-claro .bg-\[\#0c1322\] {
+body.theme-claro .bg-\[\#0c1322\],
+body.theme-claro .bg-\[\#161329\] {
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
@@ -125,6 +126,27 @@ body.theme-claro .text-blue-400 {
 
 body.theme-claro .text-amber-400 { 
   color: #b45309 !important; 
+}
+
+/* Modo Claro: Suporte ao Card Roxo de Conferência */
+body.theme-claro .bg-purple-950\/30,
+body.theme-claro .bg-purple-900\/20,
+body.theme-claro .bg-purple-500\/10,
+body.theme-claro .bg-purple-500\/20 {
+  background-color: #f3e8ff !important;
+  border-color: #c084fc !important;
+  color: #6b21a8 !important;
+}
+
+body.theme-claro .text-purple-400,
+body.theme-claro .text-purple-300 {
+  color: #7e22ce !important;
+}
+
+body.theme-claro .border-purple-500\/50,
+body.theme-claro .border-purple-500\/60,
+body.theme-claro .border-purple-600\/80 {
+  border-color: #a855f7 !important;
 }
 
 /* ==========================================================================
@@ -337,17 +359,46 @@ body.theme-claro .text-amber-400 {
 }
 
 /* ==========================================================================
-   5. CÂMERA DO BIPADOR DE SACOLAS COM VOZ (BARCODE SCANNER)
+   5. CÂMERA DO BIPADOR DE SACOLAS COM VOZ (BARCODE SCANNER - NOVO LAYOUT FOTO 1)
    ========================================================================== */
-.scanner-camera-card {
+
+/* Badge Superior Central de Confirmação */
+.badge-bip-identificado {
+  background: rgba(12, 19, 34, 0.92);
+  border: 1.5px solid rgba(56, 189, 248, 0.5);
+  border-radius: 9999px;
+  padding: 8px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.25);
+  backdrop-filter: blur(8px);
+  animation: slideFadeIn 0.25s ease-out;
+}
+
+.badge-bip-identificado.confirmado {
+  border-color: rgba(16, 185, 129, 0.7) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(16, 185, 129, 0.35) !important;
+}
+
+@keyframes slideFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Visor Expandido da Câmera (Tela Ampla conforme Foto 1) */
+.scanner-camera-card-amplo {
   position: relative;
   width: 100%;
-  height: 250px;
+  flex: 1 1 auto;
+  min-height: 220px;
+  max-height: 52vh;
   background: #000000;
   border-radius: 1.5rem;
   overflow: hidden;
-  border: 2px solid #ea580c;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(234, 88, 12, 0.8);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.9);
 }
 
 #videoScannerBipador {
@@ -360,13 +411,13 @@ body.theme-claro .text-amber-400 {
 /* Mira Laser de Enquadramento */
 .scanner-mira-overlay {
   position: absolute;
-  top: 15%;
-  left: 10%;
-  right: 10%;
-  bottom: 15%;
-  border-radius: 1rem;
-  border: 2px dashed rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  top: 10%;
+  left: 6%;
+  right: 6%;
+  bottom: 10%;
+  border-radius: 1.25rem;
+  border: 1.5px dashed rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -377,20 +428,20 @@ body.theme-claro .text-amber-400 {
 .scanner-canto-baixo {
   display: flex;
   justify-content: space-between;
-  padding: 3px;
+  padding: 4px;
 }
 
 .scanner-canto-corpo {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-color: #ea580c;
   border-style: solid;
 }
 
-.canto-tl { border-width: 3.5px 0 0 3.5px; border-top-left-radius: 8px; }
-.canto-tr { border-width: 3.5px 3.5px 0 0; border-top-right-radius: 8px; }
-.canto-bl { border-width: 0 0 3.5px 3.5px; border-bottom-left-radius: 8px; }
-.canto-br { border-width: 0 3.5px 3.5px 0; border-bottom-right-radius: 8px; }
+.canto-tl { border-width: 4px 0 0 4px; border-top-left-radius: 10px; }
+.canto-tr { border-width: 4px 4px 0 0; border-top-right-radius: 10px; }
+.canto-bl { border-width: 0 0 4px 4px; border-bottom-left-radius: 10px; }
+.canto-br { border-width: 0 4px 4px 0; border-bottom-right-radius: 10px; }
 
 /* Linha Vermelha de Laser Animada */
 .scanner-linha-laser {
@@ -405,10 +456,11 @@ body.theme-claro .text-amber-400 {
 }
 
 @keyframes animarLaser {
-  0% { top: 15%; }
-  100% { top: 85%; }
+  0% { top: 12%; }
+  100% { top: 88%; }
 }
 
+/* Botões Superiores do Visor (Lanterna / Trocar Câmera / Fechar) */
 .scanner-botoes-topo {
   position: absolute;
   top: 10px;
@@ -422,16 +474,17 @@ body.theme-claro .text-amber-400 {
   background: rgba(15, 23, 42, 0.85);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   cursor: pointer;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
   transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .btn-scanner-ctrl:active { 
@@ -442,69 +495,144 @@ body.theme-claro .text-amber-400 {
   background: #ea580c;
   color: #ffffff;
   border-color: #ea580c;
-  box-shadow: 0 0 15px rgba(234, 88, 12, 0.6);
+  box-shadow: 0 0 15px rgba(234, 88, 12, 0.7);
 }
 
 .scanner-status-badge {
   position: absolute;
-  bottom: 10px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(15, 23, 42, 0.94);
   color: #f8fafc;
-  padding: 5px 14px;
-  border-radius: 20px;
+  padding: 5px 16px;
+  border-radius: 9999px;
   font-size: 11px;
   font-weight: 800;
   white-space: nowrap;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
   pointer-events: none;
 }
 
 /* ==========================================================================
-   6. CARD DE RESPOSTA GIGANTE DO BIPADOR (ÁUDIO + TELA)
+   6. PAINEL INFERIOR DO BIPADOR (EXATAMENTE COMO A FOTO 1)
    ========================================================================== */
-.card-bip-resposta {
-  text-align: center;
-  padding: 22px 18px;
+.painel-bipador-inferior {
+  background: #0b111e;
+  border: 2px solid #ea580c;
   border-radius: 1.75rem;
-  background: #0c1322;
-  border: 3px solid #ea580c;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-  animation: popBipCard 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 14px 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
+  animation: slideUpPainel 0.3s ease-out;
 }
 
-@keyframes popBipCard {
-  0% { transform: scale(0.7); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+@keyframes slideUpPainel {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.circulo-canetao-gigante {
-  width: 125px;
-  height: 125px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 14px auto;
-  box-shadow: 0 10px 30px rgba(234, 88, 12, 0.55);
-  border: 4px solid #ffffff;
-  outline: 3px solid #ea580c;
-}
-
-.numero-canetao-val {
-  font-size: 60px;
-  font-weight: 900;
-  line-height: 1;
-  font-family: monospace;
-  letter-spacing: -2px;
-  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+.painel-bipador-inferior.sem-pacote {
+  border-color: #1e293b;
+  opacity: 0.85;
 }
 
 /* ==========================================================================
-   7. BOTÃO S.O.S DE EMERGÊNCIA
+   7. FLUXO ANTI-PACOTE TROCADO (ROXO ➔ VERDE ➔ AMARELO ➔ VERMELHO)
+   ========================================================================== */
+
+/* Status ROXO: Aguardando Bipagem no Galpão */
+.card-entrega-roxo {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  background-color: #121021 !important;
+  border-left-width: 6px !important;
+  border-left-color: #a855f7 !important;
+}
+
+.card-entrega-roxo:hover {
+  border-color: rgba(168, 85, 247, 0.8) !important;
+}
+
+/* Status VERDE: Bipado e Conferido no Galpão */
+.card-entrega-verde {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  background-color: #121824 !important;
+  border-left-width: 6px !important;
+  border-left-color: #10b981 !important;
+}
+
+/* Status AMARELO: Ausente / Na Volta */
+.card-entrega-amarelo {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  background-color: rgba(245, 158, 11, 0.05) !important;
+  border-left-width: 6px !important;
+  border-left-color: #f59e0b !important;
+}
+
+/* Status VERMELHO: Entregue (Fim da fila) */
+.card-entrega-vermelho {
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  background-color: rgba(127, 29, 29, 0.15) !important;
+  border-left-width: 6px !important;
+  border-left-color: #ef4444 !important;
+}
+
+/* Banner de Alerta de Pacote Faltando / Não Bipado */
+.banner-alerta-nao-bipados {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(88, 28, 135, 0.4) 100%);
+  border: 2px solid #a855f7;
+  border-radius: 1.25rem;
+  padding: 12px 14px;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.25);
+  animation: pulseRoxo 2s infinite alternate;
+}
+
+@keyframes pulseRoxo {
+  from { box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
+  to { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+}
+
+/* ==========================================================================
+   8. ARQUITETURA OFFLINE & FILA DE SINCRONIZAÇÃO (SYNC QUEUE)
+   ========================================================================== */
+.badge-offline-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+.badge-offline-ativo {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  animation: pulseOffline 1.5s infinite alternate;
+}
+
+.badge-sync-pendente {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.badge-online-ok {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+@keyframes pulseOffline {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* ==========================================================================
+   9. BOTÃO S.O.S DE EMERGÊNCIA & WAKE LOCK
    ========================================================================== */
 .btn-sos-flutuante {
   background: #dc2626;
