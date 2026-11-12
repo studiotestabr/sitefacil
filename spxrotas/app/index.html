@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=7.2.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.0.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=7.2.0"></script>
+  <script src="./js/relatorio.js?v=8.0.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=7.2.0"></script>
+  <script src="./js/app.js?v=8.0.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -150,8 +150,9 @@
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
         <div class="flex items-center gap-2"><span class="text-emerald-400">💬</span><span><strong>Zap das Rotas:</strong> Envie o romaneio no WhatsApp e abra pronta</span></div>
         <div class="flex items-center gap-2"><span class="text-amber-400">📸</span><span><strong>Bipador com Voz:</strong> Aponte a câmera e ouça o Canetão e a Sacola</span></div>
+        <div class="flex items-center gap-2"><span class="text-purple-400">🟣</span><span><strong>Conferência Anti-Troca:</strong> Cheque todas as caixas no galpão</span></div>
         <div class="flex items-center gap-2"><span class="text-red-400">📷</span><span><strong>40 Mil Radares:</strong> Alerta sonoro sem alarmes falsos de rodovia</span></div>
-        <div class="flex items-center gap-2"><span class="text-cyan-400">🧭</span><span><strong>GPS 3D Waze Engine:</strong> Com tela que nunca apaga</span></div>
+        <div class="flex items-center gap-2"><span class="text-cyan-400">🧭</span><span><strong>GPS 3D Waze Engine:</strong> Rotas offline sem perder o sinal</span></div>
         <div class="flex items-center gap-2 pt-1 border-t border-gray-800"><span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis na 1ª rota!</span></div>
       </div>
       <div class="space-y-3">
@@ -320,7 +321,7 @@
     </div>
   </div>
 
-  <!-- 4. BANNER DE TESTE -->
+  <!-- 4. BANNER DE TESTE & SINCRONIZAÇÃO OFFLINE -->
   <div x-show="usuarioLogado && statusAssinatura !== 'ativo'" class="border-b px-4 py-2 flex justify-between items-center text-xs" :class="trialIniciado ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/10 border-emerald-500/30'" x-cloak>
     <div>
       <template x-if="!trialIniciado"><span class="text-emerald-400 font-bold flex items-center gap-1.5"><span>🎁</span> <strong>7 Dias Grátis:</strong> Começam ao gerar sua 1ª rota!</span></template>
@@ -379,7 +380,16 @@
           <h1 class="font-black text-2xl tracking-wide text-white drop-shadow-sm flex items-center gap-1.5">
             SPX<span class="text-slate-950 font-black">rotas</span>
           </h1>
+
+          <!-- STATUS DE CONEXÃO & FILA OFFLINE (IMUNIDADE CONTRA QUEDA DE SINAL) -->
           <div class="flex items-center gap-2">
+            <template x-if="!estaOnline">
+              <span class="badge-offline-status badge-offline-ativo">📡 Sem Sinal (Offline)</span>
+            </template>
+            <template x-if="estaOnline && totalFilaSync > 0">
+              <span class="badge-offline-status badge-sync-pendente" x-text="`⏳ Sincronizando (${totalFilaSync})`"></span>
+            </template>
+
             <button @click="abrirBusca()" class="text-white flex items-center justify-center w-9 h-9 rounded-xl bg-black/20 border border-white/20 active:scale-95 transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
             </button>
@@ -391,7 +401,9 @@
 
         <div class="flex justify-between items-center text-xs font-bold px-0.5 border-t border-orange-500/60 pt-2">
           <span class="bg-black/80 font-mono px-2.5 py-0.5 rounded text-xs tracking-wider text-orange-400" x-text="rotaAtivaId ? `ROTA #${rotaAtivaId}` : 'SEM ROTA'"></span>
-          <div class="text-orange-100 font-semibold text-xs">Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span></div>
+          <div class="text-orange-100 font-semibold text-xs">
+            Restantes: <span class="font-black text-white text-sm" x-text="naoEntregues.length"></span> de <span x-text="entregas.length"></span>
+          </div>
         </div>
 
         <!-- 5 ABAS PRINCIPAIS -->
@@ -415,7 +427,7 @@
         </nav>
       </header>
 
-      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO EXCLUSIVA NO MÉTODO CANETÃO + BIPADOR) -->
+      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO NO MÉTODO CANETÃO + CONFERÊNCIA ROXO ➔ VERDE) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         
         <!-- CARD DO BIPADOR DE SACOLAS COM VOZ -->
@@ -430,22 +442,50 @@
           </button>
         </div>
 
+        <!-- BANNER DE CONFERÊNCIA ANTI-PACOTE TROCADO (ROXO -> VERDE) -->
+        <div x-show="entregas.length > 0 && pacotesAguardandoBipagem.length > 0" class="banner-alerta-nao-bipados flex items-center justify-between gap-2.5 text-xs">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl shrink-0">⏳</span>
+            <div>
+              <h4 class="font-black text-purple-300 leading-tight">Conferência de Carga no Galpão</h4>
+              <p class="text-[11px] text-purple-200 mt-0.5">
+                Restam <strong class="text-white font-mono font-black" x-text="pacotesAguardandoBipagem.length"></strong> caixa(s) aguardando bipagem antes de sair!
+              </p>
+            </div>
+          </div>
+          <button @click="abrirBipadorVoz()" class="bg-purple-600 hover:bg-purple-500 text-white font-black px-3 py-2 rounded-xl text-[10px] uppercase tracking-wider active:scale-95 transition shrink-0 shadow-md">
+            Bipar Agora
+          </button>
+        </div>
+
+        <div x-show="entregas.length > 0 && pacotesAguardandoBipagem.length === 0" class="bg-emerald-950/30 border border-emerald-500/40 p-3 rounded-2xl flex items-center justify-between text-xs text-emerald-300">
+          <span class="flex items-center gap-2 font-bold">
+            <span>🟢</span> Todas as <strong class="text-white" x-text="entregas.length"></strong> caixas foram conferidas e estão prontas nas sacolas!
+          </span>
+        </div>
+
         <!-- LISTA DAS ENTREGAS NA ABA SACOLAS (ORDENAÇÃO ÚNICA CANETÃO #1, #2...) -->
         <div class="space-y-3">
           <template x-for="item in entregasOrdenadasParaSacola" :key="item.id">
             <div @click="irParaEntregaDireta(item)" 
-                 class="rounded-2xl border shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99] border-l-[6px]" 
+                 class="rounded-2xl border shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99]" 
                  :class="{
-                   'border-emerald-500/40 bg-[#121824] border-l-emerald-500 hover:border-emerald-500/70': item.status === 'pendente',
-                   'border-yellow-500/70 bg-yellow-500/5 border-l-yellow-500': item.status === 'ausente',
-                   'border-red-500/50 bg-red-950/20 border-l-red-500': item.status === 'entregue'
+                   'card-entrega-roxo': item.status === 'aguardando_bipagem',
+                   'card-entrega-verde': item.status === 'pendente',
+                   'card-entrega-amarelo': item.status === 'ausente',
+                   'card-entrega-vermelho': item.status === 'entregue'
                  }">
               
               <!-- CASO 1: PACOTES COM ROTA NORMAL (4 QUADRADOS ORIGINAIS) -->
               <template x-if="item.parada_shopee && Number(item.parada_shopee) > 0 && !(typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
                 <div class="grid grid-cols-4 gap-2 text-center">
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
-                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                       :class="{
+                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
+                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
+                         'border-red-500/80 text-red-400': item.status === 'entregue'
+                       }">
                     <span class="text-[10px] font-black tracking-wider uppercase leading-none">CANETÃO</span>
                     <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
                   </div>
@@ -458,7 +498,12 @@
                     <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.ordem_shopee)"></span>
                   </div>
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
-                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                       :class="{
+                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
+                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
+                         'border-red-500/80 text-red-400': item.status === 'entregue'
+                       }">
                     <span class="text-[10px] font-black tracking-wider uppercase leading-none">SACOLA</span>
                     <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
                   </div>
@@ -469,7 +514,12 @@
               <template x-if="!item.parada_shopee || Number(item.parada_shopee) <= 0 || item.parada_shopee === '-' || (typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
                 <div class="grid grid-cols-4 gap-2 text-center">
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
-                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                       :class="{
+                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
+                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
+                         'border-red-500/80 text-red-400': item.status === 'entregue'
+                       }">
                     <span class="text-[10px] font-black tracking-wider uppercase leading-none">CANETÃO</span>
                     <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
                   </div>
@@ -479,18 +529,24 @@
                     <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
                   </div>
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
-                       :class="item.status === 'entregue' ? 'border-red-500/80 text-red-400' : (item.status === 'ausente' ? 'border-yellow-500/80 text-yellow-400' : 'border-orange-500/80 text-orange-400')">
+                       :class="{
+                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
+                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
+                         'border-red-500/80 text-red-400': item.status === 'entregue'
+                       }">
                     <span class="text-[10px] font-black tracking-wider uppercase leading-none">SACOLA</span>
                     <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="Math.ceil(item.ordem_entrega / 10)"></span>
                   </div>
                 </div>
               </template>
 
-              <!-- TAGS VISUAIS -->
+              <!-- TAGS VISUAIS DINÂMICAS -->
               <div class="flex flex-wrap items-center gap-2 pt-1">
-                <span x-show="item.status === 'entregue'" class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">✅ Entregue</span>
+                <span x-show="item.status === 'aguardando_bipagem'" class="bg-purple-500/20 text-purple-300 border border-purple-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">⏳ Aguardando Bipagem</span>
+                <span x-show="item.status === 'pendente'" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">🟢 Pronto / Conferido</span>
                 <span x-show="item.status === 'ausente'" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">⚠️ Ausente / Na Volta</span>
-                <span x-show="item.status === 'pendente'" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">🟢 Pendente</span>
+                <span x-show="item.status === 'entregue'" class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">✅ Entregue</span>
                 <span x-show="item.gps_suspeito" class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">❓ Verificar GPS</span>
                 <span x-show="item.total_no_local > 1" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px]" x-text="`⚠️ ${item.total_no_local} PACOTES NA PARADA`"></span>
               </div>
@@ -647,7 +703,8 @@
         <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs shrink-0">
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 border border-white shrink-0"></span> <strong class="text-slate-200">CD/Casa</strong></span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shrink-0"></span> <strong class="text-slate-200">Pendente</strong></span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 border border-white shrink-0"></span> <strong class="text-slate-200">Aguardando</strong></span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shrink-0"></span> <strong class="text-slate-200">Pronto</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 border border-white shrink-0"></span> <strong class="text-slate-200">Entregue</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-white shrink-0"></span> <strong class="text-slate-200">Ausente</strong></span>
           </div>
@@ -736,7 +793,7 @@
 
       <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL"></div>
 
-      <!-- VELOCÍMETRO ERGONÔMICO ELEVADO (bottom-60 sm:bottom-64) -->
+      <!-- VELOCÍMETRO ERGONÔMICO ELEVADO -->
       <div class="absolute bottom-60 sm:bottom-64 left-4 z-[500]">
         <div class="waze-speed-circle" :class="{'alerta-excesso': radarExcessoVelocidade}">
           <span class="text-2xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
@@ -751,7 +808,7 @@
         </button>
       </div>
 
-      <!-- MIRA CENTRALIZADORA ELEVADA (bottom-60 sm:bottom-64) -->
+      <!-- MIRA CENTRALIZADORA ELEVADA -->
       <div class="absolute bottom-60 sm:bottom-64 right-4 z-[500]">
         <button @click="centralizarCarroManual()" class="waze-mira-btn active:scale-90 transition" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'">
           <span class="text-2xl">🎯</span>
@@ -814,21 +871,45 @@
       </div>
     </main>
 
-    <!-- MODO 7: BIPADOR DE SACOLAS COM VOZ (TELA CHEIA) -->
-    <main x-show="modo === 'bipador'" class="fixed inset-0 z-[260] bg-black flex flex-col justify-between p-4" x-cloak>
-      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">📸</span>
+    <!-- MODO 7: BIPADOR DE SACOLAS COM VOZ (TELA CHEIA - NOVO LAYOUT EXATO DA FOTO 1) -->
+    <main x-show="modo === 'bipador'" class="fixed inset-0 z-[260] bg-black flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden select-none" x-cloak>
+      
+      <!-- CABEÇALHO SUPERIOR COM ÍCONE, TÍTULO E BOTÕES DE CONTROLE -->
+      <div class="flex items-center justify-between border-b border-gray-800/80 pb-2.5 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📸</span>
           <div>
             <h3 class="text-sm font-black text-white leading-tight">Bipador de Sacolas com Voz</h3>
-            <span class="text-[10px] text-amber-400 font-bold">Aponte para o código de barras da caixa</span>
+            <span class="text-[10px] text-amber-400 font-bold block mt-0.5">Aponte para o código de barras da caixa</span>
           </div>
         </div>
-        <button @click="fecharBipadorVoz()" class="w-10 h-10 rounded-2xl bg-gray-800 text-gray-300 hover:text-white flex items-center justify-center font-bold text-lg">&times;</button>
+        <div class="flex items-center gap-2">
+          <button type="button" @click="alternarLanternaBipador()" class="btn-scanner-ctrl" :class="{'ativo': lanternaAtiva}" title="Ligar/Desligar Lanterna">
+            🔦
+          </button>
+          <button type="button" @click="alternarCameraBipador()" class="btn-scanner-ctrl" title="Trocar Câmera">
+            🔄
+          </button>
+          <button type="button" @click="fecharBipadorVoz()" class="btn-scanner-ctrl text-red-400 hover:text-white" title="Fechar Bipador">
+            &times;
+          </button>
+        </div>
       </div>
 
-      <!-- JANELA DA CÂMERA COM MIRA LASER -->
-      <div class="scanner-camera-card my-auto relative">
+      <!-- BADGE CENTRAL SUPERIOR DE IDENTIFICAÇÃO (FOTO 1) -->
+      <div class="flex justify-center my-2 shrink-0">
+        <div class="badge-bip-identificado" :class="{'confirmado': ultimoPacoteBipado}">
+          <template x-if="ultimoPacoteBipado">
+            <span class="text-xs sm:text-sm font-black text-white flex items-center gap-1.5" x-text="`✅ Canetão #${ultimoPacoteBipado.ordem_entrega} identificado!`"></span>
+          </template>
+          <template x-if="!ultimoPacoteBipado">
+            <span class="text-xs sm:text-sm font-bold text-gray-300 flex items-center gap-1.5" x-text="statusTextoBipador || '🎯 Enquadre o código de barras'"></span>
+          </template>
+        </div>
+      </div>
+
+      <!-- VISOR AMPLO DA CÂMERA COM MIRA LASER E CANTONEIRAS (FOTO 1) -->
+      <div class="scanner-camera-card-amplo my-1 relative">
         <video id="videoScannerBipador" playsinline autoplay muted></video>
         
         <div class="scanner-mira-overlay">
@@ -842,41 +923,68 @@
             <div class="scanner-canto-corpo canto-br"></div>
           </div>
         </div>
-
-        <div class="scanner-botoes-topo">
-          <button type="button" @click="alternarLanternaBipador()" class="btn-scanner-ctrl" :class="{'ativo': lanternaAtiva}" title="Ligar/Desligar Lanterna">
-            🔦
-          </button>
-          <button type="button" @click="alternarCameraBipador()" class="btn-scanner-ctrl" title="Trocar Câmera">
-            🔄
-          </button>
-        </div>
-
-        <div class="scanner-status-badge" x-text="statusTextoBipador || '🎯 Enquadre o código de barras'"></div>
       </div>
 
-      <!-- CARD GIGANTE DO RESULTADO DO BIP (CANETÃO E SACOLA) -->
-      <div x-show="ultimoPacoteBipado" class="card-bip-resposta space-y-3" x-cloak>
-        <span class="text-[11px] font-black uppercase text-amber-400 tracking-wider block">PACOTE LOCALIZADO! ESCREVA NA CAIXA:</span>
-        <div class="circulo-canetao-gigante">
-          <span class="numero-canetao-val" x-text="`#${ultimoPacoteBipado?.ordem_entrega || '-'}`"></span>
-        </div>
-        <div class="space-y-1">
-          <div class="inline-block bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-4 py-1.5 rounded-full font-black text-sm uppercase" x-text="`SACOLA ${Math.ceil((ultimoPacoteBipado?.ordem_entrega || 1) / 10)}`"></div>
-          <p class="text-xs text-gray-300 font-bold" x-text="ultimoPacoteBipado?.parada_shopee && Number(ultimoPacoteBipado.parada_shopee) > 0 ? `Parada SPX: ${ultimoPacoteBipado.parada_shopee} • Ordem: ${ultimoPacoteBipado.ordem_shopee}` : `Pacote Avulso • Final ${ultimoPacoteBipado?.codigo_rastreio?.slice(-4)}`"></p>
-        </div>
-      </div>
+      <!-- PAINEL INFERIOR COM OS 4 CARDS PADRÃO E BOTÃO DE CONCLUSÃO (FOTO 1) -->
+      <div class="space-y-2.5 shrink-0 pt-1">
+        <div class="painel-bipador-inferior space-y-2" :class="{'sem-pacote': !ultimoPacoteBipado}">
+          <span class="text-[11px] sm:text-xs font-black uppercase text-amber-400 tracking-wider block text-center">
+            PACOTE LOCALIZADO! ESCREVA NA CAIXA:
+          </span>
 
-      <div class="space-y-2 pt-2">
-        <button @click="fecharBipadorVoz()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition">
-          ✅ Concluir e Ver Sacolas
+          <!-- CASO 1: PACOTES NORMAIS (4 QUADRADOS ORIGINAIS) -->
+          <template x-if="!ultimoPacoteBipado || (ultimoPacoteBipado.parada_shopee && Number(ultimoPacoteBipado.parada_shopee) > 0 && !(typeof ultimoPacoteBipado.parada_shopee === 'string' && ultimoPacoteBipado.parada_shopee.includes('+')))">
+            <div class="grid grid-cols-4 gap-1.5 text-center">
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? `#${ultimoPacoteBipado.ordem_entrega}` : '#--'"></span>
+              </div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                <span class="text-[9px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
+                <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? formatarParada(ultimoPacoteBipado.parada_shopee) : '--'"></span>
+              </div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                <span class="text-[9px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
+                <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? formatarParada(ultimoPacoteBipado.ordem_shopee) : '--'"></span>
+              </div>
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
+                <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? Math.ceil(ultimoPacoteBipado.ordem_entrega / 10) : '--'"></span>
+              </div>
+            </div>
+          </template>
+
+          <!-- CASO 2: PACOTES AVULSOS + + (ADAPTADO COM FINAL DO RASTREIO) -->
+          <template x-if="ultimoPacoteBipado && (!ultimoPacoteBipado.parada_shopee || Number(ultimoPacoteBipado.parada_shopee) <= 0 || ultimoPacoteBipado.parada_shopee === '-' || (typeof ultimoPacoteBipado.parada_shopee === 'string' && ultimoPacoteBipado.parada_shopee.includes('+')))">
+            <div class="grid grid-cols-4 gap-1.5 text-center">
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
+                <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
+                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="`#${ultimoPacoteBipado.ordem_entrega}`"></span>
+              </div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
+                <span class="text-[9px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+                <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="ultimoPacoteBipado.codigo_rastreio ? ultimoPacoteBipado.codigo_rastreio.slice(-4) : '----'"></span>
+                <span class="text-[8px] font-black text-gray-400 tracking-widest uppercase leading-none mt-0.5">PACOTE + +</span>
+              </div>
+              <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
+                <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
+                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="Math.ceil(ultimoPacoteBipado.ordem_entrega / 10)"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- BOTÃO LARGO DE CONCLUSÃO -->
+        <button @click="fecharBipadorVoz()" class="w-full bg-[#ea580c] hover:bg-orange-500 text-white font-black py-3.5 sm:py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+          <span>✅</span> CONCLUIR E VER SACOLAS
         </button>
       </div>
+
     </main>
 
   </div>
 
-  <!-- 8. MODAL CARREGAR SUA ROTA (ORDEM CORRIGIDA: 1º PARTIDA/CHEGADA OBRIGATÓRIA -> 2º ZAP OU ARQUIVO) -->
+  <!-- 8. MODAL CARREGAR SUA ROTA (1º PARTIDA/CHEGADA OBRIGATÓRIA -> 2º ZAP OU ARQUIVO) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 sm:p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
       
@@ -920,7 +1028,7 @@
         </div>
       </div>
 
-      <!-- PASSO 2: ESCOLHA COMO ENVIAR O ROMANEIO (SÓ LIBERA SE O PASSO 1 ESTIVER PREENCHIDO) -->
+      <!-- PASSO 2: ESCOLHA COMO ENVIAR O ROMANEIO -->
       <div class="space-y-3 pt-1">
         <span class="text-[10px] font-black uppercase tracking-wider block" :class="temPartidaEChegadaValida ? 'text-emerald-400' : 'text-gray-500'">
           2º PASSO: ENVIE OU SELECIONE A PLANILHA
@@ -1234,7 +1342,7 @@
     </div>
   </div>
 
-  <!-- 13. MODAL TUTORIAL COMPLETO DE 8 PASSOS (REINTEGRADO OFICIAL) -->
+  <!-- 13. MODAL TUTORIAL COMPLETO DE 8 PASSOS -->
   <div x-show="tutorialAberto" class="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center transition-all z-[120]">
       
@@ -1275,12 +1383,12 @@
         </div>
       </template>
 
-      <!-- Passo 5: Bipador com Voz -->
+      <!-- Passo 5: Bipador com Voz & Conferência -->
       <template x-if="passoTutorial === 5">
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📸</div>
-          <h3 class="text-2xl font-black text-white">Bipador de Sacolas com Voz</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Na calçada do galpão, toque em Bipar e aponte a câmera pro código de barras. O celular grita o número do Canetão e a Sacola no alto-falante!</p>
+          <h3 class="text-2xl font-black text-white">Bipador & Conferência</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Na calçada do galpão, toque em Bipar. O celular grita o número do Canetão e a Sacola no alto-falante. O card roxo vira verde, garantindo que nenhum pacote veio trocado!</p>
         </div>
       </template>
 
