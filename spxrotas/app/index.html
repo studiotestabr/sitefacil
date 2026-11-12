@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.0.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.1.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.0.0"></script>
+  <script src="./js/relatorio.js?v=8.1.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.0.0"></script>
+  <script src="./js/app.js?v=8.1.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -470,8 +470,8 @@
             <div @click="irParaEntregaDireta(item)" 
                  class="rounded-2xl border shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99]" 
                  :class="{
-                   'card-entrega-roxo': item.status === 'aguardando_bipagem',
-                   'card-entrega-verde': item.status === 'pendente',
+                   'card-entrega-roxo': !isPacoteConferido(item),
+                   'card-entrega-verde': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                    'card-entrega-amarelo': item.status === 'ausente',
                    'card-entrega-vermelho': item.status === 'entregue'
                  }">
@@ -481,8 +481,8 @@
                 <div class="grid grid-cols-4 gap-2 text-center">
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                        :class="{
-                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
-                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
+                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -499,8 +499,8 @@
                   </div>
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                        :class="{
-                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
-                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
+                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -515,8 +515,8 @@
                 <div class="grid grid-cols-4 gap-2 text-center">
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
                        :class="{
-                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
-                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
+                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -530,8 +530,8 @@
                   </div>
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
                        :class="{
-                         'border-purple-500/80 text-purple-400': item.status === 'aguardando_bipagem',
-                         'border-orange-500/80 text-orange-400': item.status === 'pendente',
+                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
+                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -543,8 +543,16 @@
 
               <!-- TAGS VISUAIS DINÂMICAS -->
               <div class="flex flex-wrap items-center gap-2 pt-1">
-                <span x-show="item.status === 'aguardando_bipagem'" class="bg-purple-500/20 text-purple-300 border border-purple-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">⏳ Aguardando Bipagem</span>
-                <span x-show="item.status === 'pendente'" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">🟢 Pronto / Conferido</span>
+                <span x-show="!isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente'" 
+                      @click.stop="marcarComoConferidoManual(item)"
+                      class="bg-purple-500/20 text-purple-300 border border-purple-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase cursor-pointer hover:bg-purple-500/30"
+                      title="Toque para marcar conferido manualmente caso a etiqueta esteja ilegível">
+                  ⏳ Aguardando Bipagem
+                </span>
+                <span x-show="isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente'" 
+                      class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">
+                  🟢 Pronto / Conferido
+                </span>
                 <span x-show="item.status === 'ausente'" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">⚠️ Ausente / Na Volta</span>
                 <span x-show="item.status === 'entregue'" class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">✅ Entregue</span>
                 <span x-show="item.gps_suspeito" class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">❓ Verificar GPS</span>
