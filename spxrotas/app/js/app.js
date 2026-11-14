@@ -1,7 +1,7 @@
 /* ==========================================================================
-   SPXrotas Pro v2.2.0 - Núcleo Mestre Reativo Oficial
-   Gravação Cirúrgica no Directus, Motor de Radares Blindado com Cache Offline,
-   Pingo Inteligente no GPS 3D, Ciclo Shopee Laranja ➔ Verde e SyncQueue
+   SPXrotas Pro v2.3.0 - Núcleo Mestre Reativo Oficial
+   Auto-Complete Waze/Uber/iFood, Gravação Cirúrgica no Directus,
+   Radares Blindados com Cache Offline, Pingo no GPS & Ciclo Laranja ➔ Verde
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -32,9 +32,13 @@ function spxRotasApp() {
     configVeiculo: JSON.parse(localStorage.getItem('spxrotas_config_veiculo') || '{"tipoCombustivel":"Gasolina","consumoKmL":10.0,"precoLitro":5.89}'),
     contatoEmergencia: localStorage.getItem('spxrotas_contato_emergencia') || '',
 
-    // Partida e Chegada Padrão (Persistidas no Celular)
+    // Partida e Chegada com Auto-Complete Inteligente (Waze/Uber/iFood)
     inputPartidaModal: localStorage.getItem('spxrotas_partida_padrao') || '',
     inputChegadaModal: localStorage.getItem('spxrotas_chegada_padrao') || '',
+    sugestoesPartida: [],
+    buscandoSugestoesPartida: false,
+    sugestoesChegada: [],
+    buscandoSugestoesChegada: false,
     resumoPartidaTexto: '',
     resumoChegadaTexto: '',
 
@@ -167,6 +171,112 @@ function spxRotasApp() {
     isStandalone: false,
     isIOS: false,
     isMobile: false,
+
+    // =========================================================================
+    // AUTO-COMPLETE DE ENDEREÇO (PADRÃO WAZE / UBER / IFOOD COM NÚMERO EXATO)
+    // =========================================================================
+    async buscarSugestoesEndereco(termo, tipo) {
+      if (!termo || termo.trim().length < 3) {
+        if (tipo === 'partida') this.sugestoesPartida = [];
+        else this.sugestoesChegada = [];
+        return;
+      }
+
+      if (tipo === 'partida') this.buscandoSugestoesPartida = true;
+      else this.buscandoSugestoesChegada = true;
+
+      try {
+        const qLimpa = encodeURIComponent(termo.trim());
+        let resultados = [];
+
+        // 1. Tenta Photon primeiro (super veloz, com suporte a número predial e viés geográfico local)
+        try {
+          const resPhoton = await fetch(`https://photon.komoot.io/api/?q=${qLimpa}&limit=5&lat=-24.16&lon=-46.78`, { signal: AbortSignal.timeout(3000) });
+          if (resPhoton.ok) {
+            const dataP = await resPhoton.json();
+            if (dataP && dataP.features && dataP.features.length > 0) {
+              resultados = dataP.features.map((f, idx) => {
+                const p = f.properties || {};
+                const coords = f.geometry?.coordinates || [0, 0];
+                const nomeRua = p.street || p.name || 'Endereço';
+                const numero = p.housenumber ? `, ${p.housenumber}` : '';
+                const bairro = p.district || p.suburb ? ` - ${p.district || p.suburb}` : '';
+                const cidade = p.city ? `, ${p.city}` : '';
+                const estado = p.state ? ` - ${p.state}` : '';
+
+                return {
+                  id: `p_${idx}_${Date.now()}`,
+                  principal: `${nomeRua}${numero}`,
+                  secundario: `${bairro}${cidade}${estado}`.replace(/^[\s,-]+/, ''),
+                  latitude: coords[1],
+                  longitude: coords[0]
+                };
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 2. Fallback para Nominatim se Photon não retornar
+        if (resultados.length === 0) {
+          const resNom = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${qLimpa}&limit=5&countrycodes=br`, { signal: AbortSignal.timeout(3500) });
+          if (resNom.ok) {
+            const dataN = await resNom.json();
+            resultados = dataN.map((item, idx) => {
+              const a = item.address || {};
+              const rua = a.road || a.pedestrian || a.street || item.display_name.split(',')[0];
+              const num = a.house_number ? `, ${a.house_number}` : '';
+              const bairro = a.suburb || a.neighbourhood || a.residential ? ` - ${a.suburb || a.neighbourhood || a.residential}` : '';
+              const cidade = a.city || a.town || a.municipality || '';
+              const estado = a.state ? ` - ${a.state}` : '';
+
+              return {
+                id: `n_${idx}_${Date.now()}`,
+                principal: `${rua}${num}`,
+                secundario: `${bairro}${cidade ? ', ' + cidade : ''}${estado}`.replace(/^[\s,-]+/, ''),
+                latitude: parseFloat(item.lat),
+                longitude: parseFloat(item.lon)
+              };
+            });
+          }
+        }
+
+        if (tipo === 'partida') this.sugestoesPartida = resultados;
+        else this.sugestoesChegada = resultados;
+      } catch (err) {
+        console.warn('Aviso autocomplete:', err);
+      } finally {
+        if (tipo === 'partida') this.buscandoSugestoesPartida = false;
+        else this.buscandoSugestoesChegada = false;
+      }
+    },
+
+    selecionarSugestaoEndereco(s, tipo) {
+      if (!s) return;
+      const endFormatado = s.secundario ? `${s.principal}, ${s.secundario}` : s.principal;
+
+      if (tipo === 'partida') {
+        this.inputPartidaModal = endFormatado;
+        this.coordPartidaSalva = { latitude: s.latitude, longitude: s.longitude };
+        this.sugestoesPartida = [];
+      } else {
+        this.inputChegadaModal = endFormatado;
+        this.coordChegadaSalva = { latitude: s.latitude, longitude: s.longitude };
+        this.sugestoesChegada = [];
+      }
+
+      this.salvarPartidaChegadaLocal();
+      if ('vibrate' in navigator) navigator.vibrate(30);
+    },
+
+    copiarPartidaParaChegada() {
+      this.inputChegadaModal = this.inputPartidaModal;
+      if (this.coordPartidaSalva) {
+        this.coordChegadaSalva = { ...this.coordPartidaSalva };
+      }
+      this.sugestoesChegada = [];
+      this.salvarPartidaChegadaLocal();
+      if ('vibrate' in navigator) navigator.vibrate(30);
+    },
 
     // =========================================================================
     // CONFERÊNCIA ANTI-PACOTE TROCADO (LARANJA ➔ VERDE)
@@ -302,7 +412,6 @@ function spxRotasApp() {
         const coordsTodas = this.decodePolyline(this.rotaGeometria);
         if (!coordsTodas || coordsTodas.length < 2) return null;
 
-        // Ponto mais próximo da origem na polilinha
         let idxInicio = 0;
         let menorDistInicio = Infinity;
         for (let i = 0; i < coordsTodas.length; i++) {
@@ -313,7 +422,6 @@ function spxRotasApp() {
           }
         }
 
-        // Ponto mais próximo do destino na polilinha
         let idxFim = coordsTodas.length - 1;
         let menorDistFim = Infinity;
         for (let j = idxInicio; j < coordsTodas.length; j++) {
@@ -356,6 +464,12 @@ function spxRotasApp() {
       }
       if (this.inputChegadaModal) {
         localStorage.setItem('spxrotas_chegada_padrao', this.inputChegadaModal.trim());
+      }
+      if (this.coordPartidaSalva) {
+        localStorage.setItem('spxrotas_coord_partida', JSON.stringify(this.coordPartidaSalva));
+      }
+      if (this.coordChegadaSalva) {
+        localStorage.setItem('spxrotas_coord_chegada', JSON.stringify(this.coordChegadaSalva));
       }
     },
 
@@ -1054,7 +1168,6 @@ function spxRotasApp() {
             }
           });
 
-          // Margem confortável de ~15 km ao redor de toda a rota de entrega
           const margem = 0.12;
           const latMin = (minLat - margem).toFixed(4);
           const latMax = (maxLat + margem).toFixed(4);
@@ -1077,7 +1190,6 @@ function spxRotasApp() {
               rodovia_rua: r.rodovia_rua || 'Via Monitorada'
             }));
 
-            // 💾 Salva no celular para apitar no meio do mato mesmo offline
             localStorage.setItem('spxrotas_radares_cache', JSON.stringify(this.listaRadares));
 
             if (this.modo === 'navegacao' && this.mapaNavGL) {
@@ -1086,7 +1198,6 @@ function spxRotasApp() {
           }
         }
       } catch (e) {
-        // Sem sinal: mantém os radares do cache offline ativos
         this.carregarRadaresDoCacheOffline();
       }
     },
@@ -1205,7 +1316,6 @@ function spxRotasApp() {
         const rLng = Number(r.longitude);
         const dist = this.calcularDistancia(lat, lng, rLat, rLng);
 
-        // Cone de 350 metros à frente
         if (dist <= 350 && dist < menorDistancia) {
           const viaRadar = (r.rodovia_rua || '').toLowerCase().trim();
           const radarEhDeRodoviaExpressa = viaRadar.includes('rodovia') || viaRadar.includes('sp-') || viaRadar.includes('br-') || r.velocidade >= 80;
@@ -1214,7 +1324,6 @@ function spxRotasApp() {
             continue;
           }
 
-          // Tolerância calibrada para 35 metros (não descarta radares em curvas/terra)
           if (temRotaAtiva) {
             const distRadarAteRota = this.calcularDistanciaPontoAteRota(rLat, rLng);
             if (distRadarAteRota > 35) continue;
@@ -1224,7 +1333,6 @@ function spxRotasApp() {
           let diffAngulo = Math.abs(anguloAteRadar - headingCarro);
           if (diffAngulo > 180) diffAngulo = 360 - diffAngulo;
 
-          // Se estiver em velocidade baixa no bairro/chácara ou alinhado com o radar
           if (diffAngulo <= 55 || this.velocidadeGPS <= 12) {
             menorDistancia = dist;
             radarMaisProximo = { ...r, distMetros: Math.round(dist) };
@@ -1314,7 +1422,6 @@ function spxRotasApp() {
         tempoDeslocamentoSec = Math.max(20, Math.round((momentoChegada - this.telemetria.momentoSaidaUltimaParada) / 1000));
       }
 
-      // Salva campos ricos apenas no cache local do celular para o PDF
       entrega.tempo_atendimento_seg = tempoAtendimentoSec;
       entrega.tempo_deslocamento_seg = tempoDeslocamentoSec;
       entrega.entregue_em = new Date().toISOString();
@@ -1333,22 +1440,15 @@ function spxRotasApp() {
       await this.atualizarStatus(entrega.id, status);
     },
 
-    /**
-     * 🛡️ GRAVAÇÃO CIRÚRGICA: Envia APENAS o campo 'status' para a tabela 'entregas'
-     * Isso elimina 100% dos erros 400 do Directus e garante que o banco grava de verdade!
-     */
     async atualizarStatus(id, novoStatus) {
-      // 1. Atualiza na memória reativa da tela
       const idx = this.entregas.findIndex(e => e.id === id);
       if (idx !== -1) {
         this.entregas[idx].status = novoStatus;
       }
 
-      // 2. Grava no cache supremo do celular (imunidade contra queda de sinal)
       this.salvarCacheLocal();
       if (this.modo === 'mapa') this.desenharPinosERotaNoMapa();
 
-      // 3. Tenta salvar no Directus imediatamente se online
       const payloadLimpo = { status: novoStatus };
       if (navigator.onLine) {
         try {
@@ -1357,9 +1457,7 @@ function spxRotasApp() {
             body: JSON.stringify(payloadLimpo)
           });
           return;
-        } catch (e) {
-          // Se falhou ou caiu o 4G, enfileira para a SyncQueue garantir!
-        }
+        } catch (e) {}
       }
 
       this.enfileirarSincronizacao('PATCH', `/items/entregas/${id}`, payloadLimpo);
@@ -1748,15 +1846,12 @@ function spxRotasApp() {
       }
     },
 
-    /**
-     * 🛣️ CÁLCULO DE ROTA RUAS-A-RUAS COM SUPORTE A POLILINHA OFFLINE (FIM DA LINHA RETA)
-     */
     async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
       if (!sLat || !sLng || !eLat || !eLng) return;
       let coordsLngLat = [];
       let routeEncontrada = null;
 
-      // 1. SE TIVER INTERNET -> CHAMA O OSRM ONLINE
+      // 1. Online via OSRM
       if (navigator.onLine) {
         try {
           const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
@@ -1779,7 +1874,7 @@ function spxRotasApp() {
         }
       }
 
-      // 2. SE NÃO TIVER INTERNET (ÁREA DE CHÁCARAS) -> RESGATA O TRECHO DA POLILINHA VROOM!
+      // 2. Offline via geometria mestra do VROOM
       if (!routeEncontrada) {
         const trechoViarioOffline = this.obterTrechoViarioOffline(sLat, sLng, eLat, eLng);
         if (trechoViarioOffline && trechoViarioOffline.length >= 2) {
@@ -1809,7 +1904,6 @@ function spxRotasApp() {
         this.atualizarInstrucaoUI();
       }
 
-      // Fallback extremo caso não haja polilinha gravada
       if (!coordsLngLat || coordsLngLat.length === 0) {
         coordsLngLat = [[Number(sLng), Number(sLat)], [Number(eLng), Number(eLat)]];
         const distReta = Math.round(this.calcularDistancia(sLat, sLng, eLat, eLng));
@@ -1862,10 +1956,10 @@ function spxRotasApp() {
     atualizarMarcadorDestinoGL(lat, lng) {
       if (!this.mapaNavGL || !lat || !lng) return;
       const numCanetao = this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : '';
-      let corFundo = '#ea580c'; // Laranja padrão Shopee
-      if (this.isPacoteConferido(this.entregaNavegacao)) corFundo = '#10b981'; // Verde
-      if (this.entregaNavegacao?.status === 'entregue') corFundo = '#ef4444'; // Vermelho
-      if (this.entregaNavegacao?.status === 'ausente') corFundo = '#f59e0b'; // Amarelo
+      let corFundo = '#ea580c';
+      if (this.isPacoteConferido(this.entregaNavegacao)) corFundo = '#10b981';
+      if (this.entregaNavegacao?.status === 'entregue') corFundo = '#ef4444';
+      if (this.entregaNavegacao?.status === 'ausente') corFundo = '#f59e0b';
 
       if (this.marcadorDestinoGL) {
         this.marcadorDestinoGL.setLngLat([lng, lat]);
@@ -1956,7 +2050,6 @@ function spxRotasApp() {
       const accuracy = pos.coords.accuracy || 15;
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
 
-      // Hodômetro real medido
       if (this.ultimaLatCarro && this.ultimaLngCarro) {
         const distMov = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
         if (distMov >= 3.0 && this.velocidadeGPS >= 3.0 && accuracy <= 35) {
@@ -1966,7 +2059,6 @@ function spxRotasApp() {
         }
       }
 
-      // Detecção de chegada no cliente
       const distDestinoFinal = this.calcularDistancia(rawLat, rawLng, destLat, destLng);
       if (distDestinoFinal <= 35 && !this.telemetria.momentoChegadaUltimaParada) {
         this.telemetria.momentoChegadaUltimaParada = Date.now();
@@ -2243,10 +2335,6 @@ function spxRotasApp() {
       }
     },
 
-    /**
-     * 🛡️ MERGE INTELIGENTE DE PROTEÇÃO:
-     * Nunca permite que o servidor reverta para 'pendente' o que o motorista já entregou localmente!
-     */
     async carregarEntregasPorId(rotaId) {
       this.carregarConferidosLocal();
 
@@ -2260,7 +2348,6 @@ function spxRotasApp() {
         if (data.data && data.data.length > 0) {
           const entregasServidor = data.data;
 
-          // Mapa das entregas que o celular já marcou
           const mapaStatusLocal = new Map();
           (this.entregas || []).forEach(e => {
             if (e.status === 'entregue' || e.status === 'ausente') {
@@ -2270,7 +2357,6 @@ function spxRotasApp() {
 
           entregasServidor.forEach(e => {
             if (mapaStatusLocal.has(e.id)) {
-              // PRESERVAÇÃO SUPREMA: O status do celular prevalece!
               e.status = mapaStatusLocal.get(e.id);
             }
           });
@@ -2518,11 +2604,19 @@ function spxRotasApp() {
           }
         }
 
-        let coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
-        let coordChegada = null;
-        if (this.inputChegadaModal) {
-          if (this.inputChegadaModal.toLowerCase() === this.inputPartidaModal.toLowerCase()) coordChegada = coordPartida;
-          else coordChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
+        // Usa as coordenadas exatas da seleção do auto-complete caso existam!
+        let coordPartida = this.coordPartidaSalva;
+        if (!coordPartida || !coordPartida.latitude) {
+          coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
+        }
+
+        let coordChegada = this.coordChegadaSalva;
+        if (!coordChegada || !coordChegada.latitude) {
+          if (this.inputChegadaModal && this.inputChegadaModal.toLowerCase() === this.inputPartidaModal.toLowerCase()) {
+            coordChegada = coordPartida;
+          } else {
+            coordChegada = await this.converterTextoParaCoord(this.inputChegadaModal);
+          }
         }
 
         this.coordPartidaSalva = coordPartida;
@@ -2556,7 +2650,6 @@ function spxRotasApp() {
           this.nomeArquivo = '';
           this.idsConferidos.clear();
 
-          // Reinicia telemetria
           this.telemetria = {
             inicioTimestamp: null,
             fimTimestamp: null,
@@ -2833,6 +2926,8 @@ function spxRotasApp() {
     // =========================================================================
     abrirModalImportar() {
       if (!this.assinaturaValida) { this.modalAssinatura = true; return; }
+      this.sugestoesPartida = [];
+      this.sugestoesChegada = [];
       this.modalImportar = true;
     },
 
@@ -2850,11 +2945,14 @@ function spxRotasApp() {
     capturarGPSModal() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
-          const latLng = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-          this.inputPartidaModal = latLng;
-          this.inputChegadaModal = latLng;
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const latLng = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          this.inputPartidaModal = `${latLng} (Local Atual GPS)`;
+          this.coordPartidaSalva = { latitude: lat, longitude: lng };
+          this.sugestoesPartida = [];
           this.salvarPartidaChegadaLocal();
-          alert('📍 Localização atual gravada como Ponto de Partida e Retorno!');
+          alert('📍 Posição do GPS gravada com precisão máxima no portão atual!');
         }, err => alert('Erro no GPS: ' + err.message));
       } else {
         alert('Geolocalização indisponível.');
