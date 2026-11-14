@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v2.0.0 - Folha de Estilos Modular Oficial
-   Navegador 3D, Bipador por Voz (Novo Layout), Radares, Conferência & Offline
+   SPXrotas Pro v2.2.0 - Folha de Estilos Modular Oficial
+   Navegador 3D (Botões Empilhados Foto 3), Bipador Amplo, Paleta Laranja Shopee
    Arquivo: /spxrotas/app/css/styles.css
    ========================================================================== */
 
@@ -20,7 +20,7 @@ body.theme-claro .bg-gray-950,
 body.theme-claro .bg-gray-900,
 body.theme-claro .bg-\[\#121824\],
 body.theme-claro .bg-\[\#0c1322\],
-body.theme-claro .bg-\[\#161329\] {
+body.theme-claro .bg-\[\#1c1815\] {
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
@@ -29,7 +29,6 @@ body.theme-claro .bg-\[\#161329\] {
 
 body.theme-claro .bg-gray-800,
 body.theme-claro .bg-\[\#1c2430\],
-body.theme-claro .bg-\[\#1c1815\],
 body.theme-claro .bg-\[\#141b26\] {
   background-color: #f8fafc !important;
   border-color: #cbd5e1 !important;
@@ -81,7 +80,7 @@ body.theme-claro textarea::placeholder {
 }
 
 body.theme-claro .text-orange-400 { 
-  color: #c2410c !important; 
+  color: #ea580c !important; 
 }
 
 body.theme-claro .text-yellow-400,
@@ -128,27 +127,6 @@ body.theme-claro .text-amber-400 {
   color: #b45309 !important; 
 }
 
-/* Modo Claro: Suporte ao Card Roxo de Conferência */
-body.theme-claro .bg-purple-950\/30,
-body.theme-claro .bg-purple-900\/20,
-body.theme-claro .bg-purple-500\/10,
-body.theme-claro .bg-purple-500\/20 {
-  background-color: #f3e8ff !important;
-  border-color: #c084fc !important;
-  color: #6b21a8 !important;
-}
-
-body.theme-claro .text-purple-400,
-body.theme-claro .text-purple-300 {
-  color: #7e22ce !important;
-}
-
-body.theme-claro .border-purple-500\/50,
-body.theme-claro .border-purple-500\/60,
-body.theme-claro .border-purple-600\/80 {
-  border-color: #a855f7 !important;
-}
-
 /* ==========================================================================
    2. MAPA GERAL (Leaflet 2D - Aba Mapa)
    ========================================================================== */
@@ -181,10 +159,10 @@ body.theme-claro .border-purple-600\/80 {
 }
 
 /* ==========================================================================
-   3. NAVEGADOR ESTILO WAZE 3D (MapLibre GL)
+   3. NAVEGADOR ESTILO WAZE 3D (MapLibre GL & Botões Empilhados Foto 3)
    ========================================================================== */
 
-/* Velocímetro Ergonômico Elevado (68px) */
+/* Velocímetro Ergonômico Elevado */
 .waze-speed-circle {
   width: 68px;
   height: 68px;
@@ -212,19 +190,89 @@ body.theme-claro .border-purple-600\/80 {
   100% { transform: scale(1.10); }
 }
 
-/* Mira de Centralização Elevada (62px) */
+/* Painel de Botões Empilhados na Direita (Foto 3: Pingo + SOS + Mira) */
+.waze-botoes-laterais {
+  position: absolute;
+  right: 14px;
+  bottom: 235px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 500;
+  align-items: center;
+}
+
+/* Botão Azul do Pingo Inteligente no GPS (Foto 3) */
+.btn-pingo-flutuante {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #0284c7;
+  border: 2.5px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.65), 0 4px 10px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.btn-pingo-flutuante:active {
+  transform: scale(0.90);
+  background-color: #0369a1;
+}
+
+/* Botão Vermelho S.O.S Empilhado (Foto 3) */
+.btn-sos-flutuante {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #ffffff;
+  border: 2.5px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.65), 0 4px 10px rgba(0, 0, 0, 0.8);
+  animation: pulseSos 1.8s infinite;
+  transition: transform 0.15s ease;
+}
+
+.btn-sos-flutuante:active {
+  transform: scale(0.90);
+}
+
+@keyframes pulseSos {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+  70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+/* Botão Mira de Centralização (Foto 3) */
 .waze-mira-btn {
-  width: 62px;
-  height: 62px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   background: rgba(15, 23, 42, 0.94);
   border: 2.5px solid #ea580c;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(8px);
   cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.waze-mira-btn:active {
+  transform: scale(0.90);
 }
 
 /* Plaqueta Flutuante de Alerta de Radar R-19 */
@@ -359,7 +407,7 @@ body.theme-claro .border-purple-600\/80 {
 }
 
 /* ==========================================================================
-   5. CÂMERA DO BIPADOR DE SACOLAS COM VOZ (BARCODE SCANNER - NOVO LAYOUT FOTO 1)
+   5. CÂMERA DO BIPADOR DE SACOLAS COM VOZ (BARCODE SCANNER AMPLO)
    ========================================================================== */
 
 /* Badge Superior Central de Confirmação */
@@ -387,7 +435,7 @@ body.theme-claro .border-purple-600\/80 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Visor Expandido da Câmera (Tela Ampla conforme Foto 1) */
+/* Visor Expandido da Câmera (Tela Ampla) */
 .scanner-camera-card-amplo {
   position: relative;
   width: 100%;
@@ -460,7 +508,7 @@ body.theme-claro .border-purple-600\/80 {
   100% { top: 88%; }
 }
 
-/* Botões Superiores do Visor (Lanterna / Trocar Câmera / Fechar) */
+/* Botões Superiores do Visor */
 .scanner-botoes-topo {
   position: absolute;
   top: 10px;
@@ -515,9 +563,7 @@ body.theme-claro .border-purple-600\/80 {
   pointer-events: none;
 }
 
-/* ==========================================================================
-   6. PAINEL INFERIOR DO BIPADOR (EXATAMENTE COMO A FOTO 1)
-   ========================================================================== */
+/* Painel Inferior do Bipador */
 .painel-bipador-inferior {
   background: #0b111e;
   border: 2px solid #ea580c;
@@ -538,25 +584,36 @@ body.theme-claro .border-purple-600\/80 {
 }
 
 /* ==========================================================================
-   7. FLUXO ANTI-PACOTE TROCADO (ROXO ➔ VERDE ➔ AMARELO ➔ VERMELHO)
+   6. CARD UNIFICADO DO BIPADOR NO TOPO DAS SACOLAS (FOTO 1 RESOLVIDA)
+   ========================================================================== */
+.card-bipador-unificado {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.18) 0%, rgba(15, 23, 42, 0.95) 75%);
+  border: 2px solid rgba(234, 88, 12, 0.7);
+  border-radius: 1.75rem;
+  padding: 16px;
+  box-shadow: 0 10px 25px -5px rgba(234, 88, 12, 0.25), 0 8px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   7. CICLO DE CONFERÊNCIA OFICIAL (LARANJA ➔ VERDE ➔ AMARELO ➔ VERMELHO)
    ========================================================================== */
 
-/* Status ROXO: Aguardando Bipagem no Galpão */
-.card-entrega-roxo {
-  border-color: rgba(168, 85, 247, 0.5) !important;
-  background-color: #121021 !important;
+/* Status LARANJA: Aguardando Bipagem no Galpão (Padrão Shopee) */
+.card-entrega-laranja {
+  border-color: rgba(234, 88, 12, 0.55) !important;
+  background-color: #14111a !important;
   border-left-width: 6px !important;
-  border-left-color: #a855f7 !important;
+  border-left-color: #ea580c !important;
 }
 
-.card-entrega-roxo:hover {
-  border-color: rgba(168, 85, 247, 0.8) !important;
+.card-entrega-laranja:hover {
+  border-color: rgba(234, 88, 12, 0.85) !important;
 }
 
-/* Status VERDE: Bipado e Conferido no Galpão */
+/* Status VERDE: Bipado e Conferido na Sacola */
 .card-entrega-verde {
-  border-color: rgba(16, 185, 129, 0.45) !important;
-  background-color: #121824 !important;
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  background-color: #0c181a !important;
   border-left-width: 6px !important;
   border-left-color: #10b981 !important;
 }
@@ -575,21 +632,6 @@ body.theme-claro .border-purple-600\/80 {
   background-color: rgba(127, 29, 29, 0.15) !important;
   border-left-width: 6px !important;
   border-left-color: #ef4444 !important;
-}
-
-/* Banner de Alerta de Pacote Faltando / Não Bipado */
-.banner-alerta-nao-bipados {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(88, 28, 135, 0.4) 100%);
-  border: 2px solid #a855f7;
-  border-radius: 1.25rem;
-  padding: 12px 14px;
-  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.25);
-  animation: pulseRoxo 2s infinite alternate;
-}
-
-@keyframes pulseRoxo {
-  from { box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
-  to { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
 }
 
 /* ==========================================================================
@@ -629,30 +671,6 @@ body.theme-claro .border-purple-600\/80 {
 @keyframes pulseOffline {
   0% { opacity: 0.7; }
   100% { opacity: 1; }
-}
-
-/* ==========================================================================
-   9. BOTÃO S.O.S DE EMERGÊNCIA & WAKE LOCK
-   ========================================================================== */
-.btn-sos-flutuante {
-  background: #dc2626;
-  color: #ffffff;
-  border: 2.5px solid #ffffff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
-  animation: pulseSos 1.8s infinite;
-}
-
-@keyframes pulseSos {
-  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
-  70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
 }
 
 /* Badge indicadora do Wake Lock (Tela Acesa) */

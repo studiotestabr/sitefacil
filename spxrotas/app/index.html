@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.1.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.2.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.1.0"></script>
+  <script src="./js/relatorio.js?v=8.2.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.1.0"></script>
+  <script src="./js/app.js?v=8.2.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -150,9 +150,9 @@
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
         <div class="flex items-center gap-2"><span class="text-emerald-400">💬</span><span><strong>Zap das Rotas:</strong> Envie o romaneio no WhatsApp e abra pronta</span></div>
         <div class="flex items-center gap-2"><span class="text-amber-400">📸</span><span><strong>Bipador com Voz:</strong> Aponte a câmera e ouça o Canetão e a Sacola</span></div>
-        <div class="flex items-center gap-2"><span class="text-purple-400">🟣</span><span><strong>Conferência Anti-Troca:</strong> Cheque todas as caixas no galpão</span></div>
+        <div class="flex items-center gap-2"><span class="text-orange-400">🟠</span><span><strong>Conferência Shopee:</strong> Laranja no galpão, Verde na sacola</span></div>
         <div class="flex items-center gap-2"><span class="text-red-400">📷</span><span><strong>40 Mil Radares:</strong> Alerta sonoro sem alarmes falsos de rodovia</span></div>
-        <div class="flex items-center gap-2"><span class="text-cyan-400">🧭</span><span><strong>GPS 3D Waze Engine:</strong> Rotas offline sem perder o sinal</span></div>
+        <div class="flex items-center gap-2"><span class="text-cyan-400">🧭</span><span><strong>GPS 3D Waze Engine:</strong> Rotas viárias no asfalto mesmo sem sinal</span></div>
         <div class="flex items-center gap-2 pt-1 border-t border-gray-800"><span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis na 1ª rota!</span></div>
       </div>
       <div class="space-y-3">
@@ -226,7 +226,7 @@
           <div>
             <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">WhatsApp de Confiança com DDD:</label>
             <input type="tel" x-model="contatoEmergencia" @change="salvarContatoEmergencia()" placeholder="Ex: 11988888888" class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500 font-mono">
-            <p class="text-[9px] text-gray-500 mt-1">Ao tocar em S.O.S na rua, sua localização exata é enviada para esta pessoa.</p>
+            <p class="text-[9px] text-gray-500 mt-1">Ao tocar em S.O.S no GPS ou cockpit, sua localização exata é enviada para esta pessoa.</p>
           </div>
         </div>
 
@@ -359,8 +359,8 @@
               <div class="flex gap-2 mt-1.5">
                 <template x-if="item.parada_shopee && Number(item.parada_shopee) > 0 && !(typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
                   <div class="flex gap-2">
-                    <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada SPX: ${formatarParada(item.parada_shopee)}`"></span>
                     <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Ordem: ${formatarParada(item.ordem_shopee)}`"></span>
+                    <span class="text-[10px] bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md text-gray-300 font-bold" x-text="`Parada SPX: ${formatarParada(item.parada_shopee)}`"></span>
                   </div>
                 </template>
                 <template x-if="!item.parada_shopee || Number(item.parada_shopee) <= 0 || item.parada_shopee === '-' || (typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
@@ -427,41 +427,33 @@
         </nav>
       </header>
 
-      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO NO MÉTODO CANETÃO + CONFERÊNCIA ROXO ➔ VERDE) -->
+      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO NO MÉTODO CANETÃO + CONFERÊNCIA LARANJA ➔ VERDE) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         
-        <!-- CARD DO BIPADOR DE SACOLAS COM VOZ -->
-        <div class="bg-gradient-to-r from-amber-950/40 via-gray-900 to-gray-900 border-2 border-amber-500/60 rounded-3xl p-4 shadow-xl flex items-center justify-between gap-3">
-          <div class="space-y-0.5">
-            <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider block">Agilidade Máxima na Calçada</span>
-            <h3 class="text-base font-black text-white leading-tight">Bipador de Sacolas com Voz</h3>
-            <p class="text-xs text-gray-300">Bipe a caixa e ouça o Canetão e a Sacola no som!</p>
+        <!-- CARD UNIFICADO DE BIPAGEM E CONFERÊNCIA NO TOPO (FOTO 1 RESOLVIDA) -->
+        <div class="card-bipador-unificado flex items-center justify-between gap-3">
+          <div class="space-y-1 min-w-0 pr-1">
+            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block leading-none">
+              Agilidade Máxima na Calçada
+            </span>
+            <h3 class="text-base font-black text-white leading-tight truncate">
+              Bipador de Sacolas com Voz
+            </h3>
+            <p class="text-xs text-gray-300 leading-snug">
+              <template x-if="pacotesAguardandoBipagem.length > 0">
+                <span>Restam <strong class="text-orange-400 font-mono font-black" x-text="pacotesAguardandoBipagem.length"></strong> de <span x-text="entregas.length"></span> caixas para bipar!</span>
+              </template>
+              <template x-if="pacotesAguardandoBipagem.length === 0 && entregas.length > 0">
+                <span class="text-emerald-400 font-bold">🟢 Todas as caixas conferidas na sacola!</span>
+              </template>
+              <template x-if="entregas.length === 0">
+                <span>Bipe a caixa e ouça o Canetão e a Sacola no som!</span>
+              </template>
+            </p>
           </div>
           <button @click="abrirBipadorVoz()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 px-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition shrink-0 flex items-center gap-1.5">
             <span>📸</span> Bipar
           </button>
-        </div>
-
-        <!-- BANNER DE CONFERÊNCIA ANTI-PACOTE TROCADO (ROXO -> VERDE) -->
-        <div x-show="entregas.length > 0 && pacotesAguardandoBipagem.length > 0" class="banner-alerta-nao-bipados flex items-center justify-between gap-2.5 text-xs">
-          <div class="flex items-center gap-2.5">
-            <span class="text-2xl shrink-0">⏳</span>
-            <div>
-              <h4 class="font-black text-purple-300 leading-tight">Conferência de Carga no Galpão</h4>
-              <p class="text-[11px] text-purple-200 mt-0.5">
-                Restam <strong class="text-white font-mono font-black" x-text="pacotesAguardandoBipagem.length"></strong> caixa(s) aguardando bipagem antes de sair!
-              </p>
-            </div>
-          </div>
-          <button @click="abrirBipadorVoz()" class="bg-purple-600 hover:bg-purple-500 text-white font-black px-3 py-2 rounded-xl text-[10px] uppercase tracking-wider active:scale-95 transition shrink-0 shadow-md">
-            Bipar Agora
-          </button>
-        </div>
-
-        <div x-show="entregas.length > 0 && pacotesAguardandoBipagem.length === 0" class="bg-emerald-950/30 border border-emerald-500/40 p-3 rounded-2xl flex items-center justify-between text-xs text-emerald-300">
-          <span class="flex items-center gap-2 font-bold">
-            <span>🟢</span> Todas as <strong class="text-white" x-text="entregas.length"></strong> caixas foram conferidas e estão prontas nas sacolas!
-          </span>
         </div>
 
         <!-- LISTA DAS ENTREGAS NA ABA SACOLAS (ORDENAÇÃO ÚNICA CANETÃO #1, #2...) -->
@@ -470,19 +462,19 @@
             <div @click="irParaEntregaDireta(item)" 
                  class="rounded-2xl border shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99]" 
                  :class="{
-                   'card-entrega-roxo': !isPacoteConferido(item),
+                   'card-entrega-laranja': !isPacoteConferido(item),
                    'card-entrega-verde': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                    'card-entrega-amarelo': item.status === 'ausente',
                    'card-entrega-vermelho': item.status === 'entregue'
                  }">
               
-              <!-- CASO 1: PACOTES COM ROTA NORMAL (4 QUADRADOS ORIGINAIS) -->
+              <!-- CASO 1: PACOTES COM ROTA NORMAL (CANETÃO, ORDEM, PARADA SPX, SACOLA) -->
               <template x-if="item.parada_shopee && Number(item.parada_shopee) > 0 && !(typeof item.parada_shopee === 'string' && item.parada_shopee.includes('+'))">
                 <div class="grid grid-cols-4 gap-2 text-center">
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                        :class="{
-                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
-                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
+                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -490,17 +482,17 @@
                     <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
                   </div>
                   <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                    <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
-                    <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.parada_shopee)"></span>
-                  </div>
-                  <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
                     <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
                     <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.ordem_shopee)"></span>
                   </div>
+                  <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                    <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
+                    <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(item.parada_shopee)"></span>
+                  </div>
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                        :class="{
-                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
-                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
+                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -515,8 +507,8 @@
                 <div class="grid grid-cols-4 gap-2 text-center">
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
                        :class="{
-                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
-                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
+                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -530,8 +522,8 @@
                   </div>
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
                        :class="{
-                         'border-purple-500/80 text-purple-400': !isPacoteConferido(item),
-                         'border-orange-500/80 text-orange-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
+                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -545,7 +537,7 @@
               <div class="flex flex-wrap items-center gap-2 pt-1">
                 <span x-show="!isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente'" 
                       @click.stop="marcarComoConferidoManual(item)"
-                      class="bg-purple-500/20 text-purple-300 border border-purple-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase cursor-pointer hover:bg-purple-500/30"
+                      class="bg-orange-500/20 text-orange-400 border border-orange-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase cursor-pointer hover:bg-orange-500/30"
                       title="Toque para marcar conferido manualmente caso a etiqueta esteja ilegível">
                   ⏳ Aguardando Bipagem
                 </span>
@@ -583,7 +575,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM PINGO INTELIGENTE & S.O.S) -->
+      <!-- MODO 2: RUA (COCKPIT INTELIGENTE - SEM PINGO INTELIGENTE AQUI, PINGO MOVIDO AO GPS) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-2">
@@ -596,7 +588,7 @@
               <span class="text-[10px] bg-orange-950 text-orange-400 border border-orange-800 px-2.5 py-1 rounded-full font-mono font-black shrink-0 whitespace-nowrap" x-text="`${entregasNoBairroRestantes} no bairro`"></span>
             </div>
 
-            <!-- CASO 1: PACOTES COM ROTA NORMAL (4 QUADRADOS) -->
+            <!-- CASO 1: PACOTES COM ROTA NORMAL (CANETÃO, ORDEM, PARADA SPX, SACOLA - FOTO 2) -->
             <template x-if="entregaAtual.parada_shopee && Number(entregaAtual.parada_shopee) > 0 && !(typeof entregaAtual.parada_shopee === 'string' && entregaAtual.parada_shopee.includes('+'))">
               <div class="grid grid-cols-4 gap-2 text-center">
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
@@ -604,12 +596,12 @@
                   <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
                 </div>
                 <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
-                  <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.parada_shopee)"></span>
-                </div>
-                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
                   <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
                   <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.ordem_shopee)"></span>
+                </div>
+                <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
+                  <span class="text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaAtual.parada_shopee)"></span>
                 </div>
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
                   <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -661,17 +653,6 @@
               <p class="text-lg sm:text-xl text-gray-200 font-black" x-text="`${entregaAtual.bairro} - ${entregaAtual.cidade}`"></p>
             </div>
 
-            <!-- PINGO INTELIGENTE: CORREÇÃO DE PORTÃO NA PORTA DO CLIENTE -->
-            <div class="bg-black/60 border border-gray-800 rounded-2xl p-2.5 flex items-center justify-between gap-2">
-              <div class="text-[11px] text-gray-300">
-                <strong class="text-cyan-400 block">📍 Pingo Inteligente:</strong>
-                O portão é aqui? Salve para nunca mais errar.
-              </div>
-              <button @click="corrigirPingoPeloGPS(entregaAtual)" class="bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 text-[10px] font-black px-3 py-1.5 rounded-xl transition active:scale-95 shrink-0">
-                Fixar Portão Aqui
-              </button>
-            </div>
-
             <!-- BOTÃO UNIFICADO DE NAVEGAÇÃO -->
             <div class="pt-2">
               <button @click="dispararNavegacaoConfigurada(entregaAtual)" 
@@ -711,7 +692,7 @@
         <div class="bg-gray-900 border border-gray-800 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs shrink-0">
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 border border-white shrink-0"></span> <strong class="text-slate-200">CD/Casa</strong></span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 border border-white shrink-0"></span> <strong class="text-slate-200">Aguardando</strong></span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 border border-white shrink-0"></span> <strong class="text-slate-200">Aguardando</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shrink-0"></span> <strong class="text-slate-200">Pronto</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 border border-white shrink-0"></span> <strong class="text-slate-200">Entregue</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-white shrink-0"></span> <strong class="text-slate-200">Ausente</strong></span>
@@ -762,7 +743,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL, RADARES, TELA SEMPRE ACESA E S.O.S) -->
+    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL, RADARES, TELA SEMPRE ACESA E BOTÕES EMPILHADOS FOTO 3) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -809,21 +790,25 @@
         </div>
       </div>
 
-      <!-- BOTÃO S.O.S DE EMERGÊNCIA FLUTUANTE -->
-      <div class="absolute bottom-60 sm:bottom-64 right-20 z-[500]">
-        <button @click="dispararEmergenciaSOS()" class="w-14 h-14 btn-sos-flutuante active:scale-90 transition" title="Disparar Alerta S.O.S">
-          🆘
+      <!-- BOTÕES EMPILHADOS À DIREITA NO GPS (FOTO 3: PINGO AZUL + SOS VERMELHO + MIRA) -->
+      <div class="waze-botoes-laterais">
+        <!-- 1. Botão Azul do Pingo Inteligente (Foto 3) -->
+        <button @click="corrigirPingoPeloGPS(entregaNavegacao)" class="btn-pingo-flutuante" title="Fixar Portão Aqui (Pingo Inteligente)">
+          📍
         </button>
-      </div>
 
-      <!-- MIRA CENTRALIZADORA ELEVADA -->
-      <div class="absolute bottom-60 sm:bottom-64 right-4 z-[500]">
-        <button @click="centralizarCarroManual()" class="waze-mira-btn active:scale-90 transition" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'">
+        <!-- 2. Botão Vermelho S.O.S (Foto 3) -->
+        <button @click="dispararEmergenciaSOS()" class="btn-sos-flutuante" title="Disparar Alerta S.O.S">
+          SOS
+        </button>
+
+        <!-- 3. Botão Mira de Centralização (Foto 3) -->
+        <button @click="centralizarCarroManual()" class="waze-mira-btn" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'" title="Centralizar no Carro">
           <span class="text-2xl">🎯</span>
         </button>
       </div>
 
-      <!-- PAINEL INFERIOR DO NAVEGADOR -->
+      <!-- PAINEL INFERIOR DO NAVEGADOR (CANETÃO, ORDEM, PARADA SPX, SACOLA - FOTO 3) -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 pb-6">
         
         <template x-if="entregaNavegacao && entregaNavegacao.parada_shopee && Number(entregaNavegacao.parada_shopee) > 0 && !(typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+'))">
@@ -833,12 +818,12 @@
               <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
             </div>
             <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
-              <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
-              <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.parada_shopee : null)"></span>
-            </div>
-            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
               <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
               <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.ordem_shopee : null)"></span>
+            </div>
+            <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center">
+              <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
+              <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-1 leading-tight" x-text="formatarParada(entregaNavegacao ? entregaNavegacao.parada_shopee : null)"></span>
             </div>
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -940,7 +925,7 @@
             PACOTE LOCALIZADO! ESCREVA NA CAIXA:
           </span>
 
-          <!-- CASO 1: PACOTES NORMAIS (4 QUADRADOS ORIGINAIS) -->
+          <!-- CASO 1: PACOTES NORMAIS (CANETÃO, ORDEM, PARADA SPX, SACOLA) -->
           <template x-if="!ultimoPacoteBipado || (ultimoPacoteBipado.parada_shopee && Number(ultimoPacoteBipado.parada_shopee) > 0 && !(typeof ultimoPacoteBipado.parada_shopee === 'string' && ultimoPacoteBipado.parada_shopee.includes('+')))">
             <div class="grid grid-cols-4 gap-1.5 text-center">
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
@@ -948,12 +933,12 @@
                 <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? `#${ultimoPacoteBipado.ordem_entrega}` : '#--'"></span>
               </div>
               <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
-                <span class="text-[9px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
-                <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? formatarParada(ultimoPacoteBipado.parada_shopee) : '--'"></span>
-              </div>
-              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
                 <span class="text-[9px] text-gray-400 font-black tracking-wider uppercase leading-none">ORDEM</span>
                 <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? formatarParada(ultimoPacoteBipado.ordem_shopee) : '--'"></span>
+              </div>
+              <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-2 px-1 flex flex-col justify-center shadow-sm">
+                <span class="text-[9px] text-gray-400 font-black tracking-wider uppercase leading-none">PARADA SPX</span>
+                <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? formatarParada(ultimoPacoteBipado.parada_shopee) : '--'"></span>
               </div>
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
                 <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -1394,9 +1379,9 @@
       <!-- Passo 5: Bipador com Voz & Conferência -->
       <template x-if="passoTutorial === 5">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📸</div>
+          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">📸</div>
           <h3 class="text-2xl font-black text-white">Bipador & Conferência</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Na calçada do galpão, toque em Bipar. O celular grita o número do Canetão e a Sacola no alto-falante. O card roxo vira verde, garantindo que nenhum pacote veio trocado!</p>
+          <p class="text-xs text-gray-300 leading-relaxed">Na calçada do galpão, toque em Bipar. O celular grita o número do Canetão e a Sacola no alto-falante. O card laranja vira verde, garantindo que nenhum pacote veio trocado!</p>
         </div>
       </template>
 
@@ -1414,7 +1399,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-red-500/40">🆘</div>
           <h3 class="text-2xl font-black text-white">Pingo Inteligente & S.O.S</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Pingo da Shopee errado? Toque em Fixar Portão Aqui na porta do cliente. E se tiver algum imprevisto, aperte S.O.S para alertar seu contato de emergência.</p>
+          <p class="text-xs text-gray-300 leading-relaxed">Pingo da Shopee errado? Toque no botão azul 📍 direto no GPS na porta do cliente. E se tiver algum imprevisto, aperte SOS para alertar seu contato de emergência.</p>
         </div>
       </template>
 
