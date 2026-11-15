@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.4.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.5.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.4.0"></script>
+  <script src="./js/relatorio.js?v=8.5.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.4.0"></script>
+  <script src="./js/app.js?v=8.5.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -315,7 +315,7 @@
         </button>
         <p class="text-[10px] text-gray-400 font-medium pt-1">
           SPXrotas • Desenvolvido por 
-          <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 hover:underline transition ml-0.5">STUDIOTESTA</a>
+          <a href="https://studiotesta.com.br/" target="_blank" rel="noopener noreferrer" class="font-black text-amber-400 hover:text-amber-300 tracking-wider transition hover:underline">STUDIOTESTA</a>
         </p>
       </div>
     </div>
@@ -516,9 +516,9 @@
                     <span class="text-2xl sm:text-3xl font-black font-mono mt-1 leading-tight" x-text="`#${item.ordem_entrega}`"></span>
                   </div>
                   <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
-                    <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+                    <span class="text-[11px] text-gray-400 font-black tracking-wider uppercase leading-none">PACOTE + +</span>
                     <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="item.codigo_rastreio ? item.codigo_rastreio.slice(-4) : '----'"></span>
-                    <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
+                    <span class="text-[10px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">Nº FINAL RASTREIO</span>
                   </div>
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
                        :class="{
@@ -535,7 +535,6 @@
 
               <!-- TAGS VISUAIS DINÂMICAS + AVISO FORA DA SACOLA -->
               <div class="flex flex-wrap items-center gap-2 pt-1">
-                <!-- BADGE DE OBJETO VOLUMOSO (FORA DA SACOLA) -->
                 <template x-if="item.is_volumoso">
                   <span class="badge-fora-sacola" @click.stop="abrirModalVolumoso(item)">
                     <span>📦</span>
@@ -581,8 +580,8 @@
                   </button>
 
                   <button x-show="item.status === 'entregue'" 
-                          @click.stop="reabrirEntrega(item)" 
-                          class="bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md">
+                        @click.stop="reabrirEntrega(item)" 
+                        class="bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md">
                     <span>↩️</span> Reabrir
                   </button>
                 </div>
@@ -644,9 +643,9 @@
                   <span class="text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaAtual.ordem_entrega}`"></span>
                 </div>
                 <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
-                  <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+                  <span class="text-[11px] text-gray-400 font-black tracking-wider uppercase leading-none">PACOTE + +</span>
                   <span class="text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="entregaAtual.codigo_rastreio ? entregaAtual.codigo_rastreio.slice(-4) : '----'"></span>
-                  <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
+                  <span class="text-[10px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">Nº FINAL RASTREIO</span>
                 </div>
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
                   <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -769,7 +768,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL, RADARES, TELA SEMPRE ACESA E BOTÕES EMPILHADOS) -->
+    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (COM ELEVAÇÃO DINÂMICA LIVRE DE OBSTRUÇÃO PELO VOLUMOSO) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -808,30 +807,33 @@
 
       <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL"></div>
 
-      <!-- VELOCÍMETRO ERGONÔMICO ELEVADO -->
-      <div class="absolute bottom-60 sm:bottom-64 left-4 z-[500]">
+      <!-- 🏎️ VELOCÍMETRO ERGONÔMICO (COM ELEVAÇÃO DINÂMICA QUANDO HOUVER VOLUMOSO) -->
+      <div class="waze-speed-wrapper" :class="{'com-volumoso': entregaNavegacao?.is_volumoso}">
         <div class="waze-speed-circle" :class="{'alerta-excesso': radarExcessoVelocidade}">
           <span class="text-2xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
           <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
         </div>
       </div>
 
-      <!-- BOTÕES EMPILHADOS À DIREITA NO GPS (PINGO AZUL + SOS VERMELHO + MIRA) -->
-      <div class="waze-botoes-laterais">
+      <!-- 🎯 BOTÕES EMPILHADOS À DIREITA (COM ELEVAÇÃO DINÂMICA LIVRE DA COBERTURA DO PAINEL) -->
+      <div class="waze-botoes-laterais" :class="{'com-volumoso': entregaNavegacao?.is_volumoso}">
+        <!-- 1. Botão Azul do Pingo Inteligente -->
         <button @click="corrigirPingoPeloGPS(entregaNavegacao)" class="btn-pingo-flutuante" title="Fixar Portão Aqui (Pingo Inteligente)">
           📍
         </button>
 
+        <!-- 2. Botão Vermelho S.O.S -->
         <button @click="dispararEmergenciaSOS()" class="btn-sos-flutuante" title="Disparar Alerta S.O.S">
           SOS
         </button>
 
+        <!-- 3. Botão Mira de Centralização -->
         <button @click="centralizarCarroManual()" class="waze-mira-btn" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'" title="Centralizar no Carro">
           <span class="text-2xl">🎯</span>
         </button>
       </div>
 
-      <!-- PAINEL INFERIOR DO NAVEGADOR COM ALERTA DE VOLUMOSOS -->
+      <!-- PAINEL INFERIOR DO NAVEGADOR COM AVISO DE VOLUMOSO -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-2.5 pb-6">
         
         <!-- AVISO DE PACOTE VOLUMOSO NA NAVEGAÇÃO -->
@@ -873,9 +875,9 @@
               <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="`#${entregaNavegacao ? entregaNavegacao.ordem_entrega : '-'}`"></span>
             </div>
             <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center col-span-2">
-              <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+              <span class="text-[11px] text-gray-400 font-black tracking-wider uppercase leading-none">PACOTE + +</span>
               <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="entregaNavegacao && entregaNavegacao.codigo_rastreio ? entregaNavegacao.codigo_rastreio.slice(-4) : '----'"></span>
-              <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">PACOTE + +</span>
+              <span class="text-[10px] font-black text-gray-400 tracking-widest uppercase leading-none mt-1">Nº FINAL RASTREIO</span>
             </div>
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center col-span-1">
               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
@@ -972,7 +974,7 @@
               </div>
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
                 <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="ultimoPacoteBipado ? Math.ceil(ultimoPacoteBipado.ordem_entrega / 10) : '--'"></span>
+                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="ultimoPacoteBipado ? Math.ceil(ultimoPacoteBipado.ordem_entrega / 10) : '--'"></span>
               </div>
             </div>
           </template>
@@ -984,13 +986,13 @@
                 <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="`#${ultimoPacoteBipado.ordem_entrega}`"></span>
               </div>
               <div class="bg-[#1c2430] border-2 border-[#2b394a] rounded-2xl py-1.5 px-2 flex flex-col justify-center items-center shadow-sm col-span-2">
-                <span class="text-[9px] text-gray-400 font-black tracking-wider uppercase leading-none">N. FINAL RASTREIO</span>
+                <span class="text-[11px] text-gray-400 font-black tracking-wider uppercase leading-none">PACOTE + +</span>
                 <span class="text-2xl sm:text-3xl font-black text-white font-mono mt-0.5 leading-tight tracking-wider" x-text="ultimoPacoteBipado.codigo_rastreio ? ultimoPacoteBipado.codigo_rastreio.slice(-4) : '----'"></span>
-                <span class="text-[8px] font-black text-gray-400 tracking-widest uppercase leading-none mt-0.5">PACOTE + +</span>
+                <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase leading-none mt-0.5">Nº FINAL RASTREIO</span>
               </div>
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
                 <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="Math.ceil(ultimoPacoteBipado.ordem_entrega / 10)"></span>
+                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(ultimoPacoteBipado.ordem_entrega / 10)"></span>
               </div>
             </div>
           </template>
@@ -1031,7 +1033,6 @@
         <button @click="fecharModalVolumoso()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none p-1">&times;</button>
       </div>
 
-      <!-- 1. PÍLULAS DE ONDE VAI FICAR NO CARRO (1 TOQUE) -->
       <div class="space-y-1.5">
         <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">1. Onde você guardou no carro?</label>
         <div class="flex flex-wrap gap-1.5">
@@ -1050,7 +1051,6 @@
         </div>
       </div>
 
-      <!-- 2. PÍLULAS DE COMO É A CAIXA (1 TOQUE) -->
       <div class="space-y-1.5 pt-1">
         <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">2. Como é a embalagem?</label>
         <div class="flex flex-wrap gap-1.5">
@@ -1069,7 +1069,6 @@
         </div>
       </div>
 
-      <!-- 3. DETALHE EM TEXTO OU ÁUDIO (OPCIONAL) -->
       <div class="space-y-1 pt-1">
         <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">3. Detalhe Opcional:</label>
         <input type="text" 
@@ -1093,7 +1092,7 @@
     </div>
   </div>
 
-  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE + UPLOAD NO CENTRO + ZAP EMBAIXO) -->
+  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE COM NÚMERO EXATO + UPLOAD NO CENTRO + ZAP EMBAIXO) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 sm:p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
       
@@ -1104,7 +1103,7 @@
         <button @click="modalImportar = false" class="text-gray-400 hover:text-white text-3xl font-bold leading-none p-1 transition">&times;</button>
       </div>
 
-      <!-- 1º PASSO: ONDE A ROTA COMEÇA E TERMINA (COM AUTO-COMPLETE WAZE/UBER/IFOOD) -->
+      <!-- 1º PASSO: ONDE A ROTA COMEÇA E TERMINA (COM AUTO-COMPLETE WAZE/UBER/IFOOD E FIXAÇÃO DE NÚMERO) -->
       <div class="bg-gray-950 p-4 rounded-2xl border-2 border-orange-500/70 space-y-3 shadow-lg">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -1123,6 +1122,7 @@
         </p>
 
         <div class="space-y-3 pt-1">
+          <!-- CAMPO PARTIDA COM AUTO-COMPLETE E DESTAQUE PARA NÚMERO EXATO -->
           <div class="relative">
             <label class="text-[10px] font-bold text-gray-300 block mb-1">Ponto de Partida * (Galpão CD ou onde o carro sai):</label>
             <div class="relative">
@@ -1130,20 +1130,26 @@
                      x-model="inputPartidaModal" 
                      @input.debounce.350ms="buscarSugestoesEndereco(inputPartidaModal, 'partida')" 
                      @change="salvarPartidaChegadaLocal()" 
-                     placeholder="Ex: Av. Jussara, 463 ou Galpão Shopee Mongaguá" 
+                     placeholder="Ex: Av. Princesa Isabel, 463 ou Galpão Shopee" 
                      class="w-full bg-black border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-medium pr-8">
               <span x-show="buscandoSugestoesPartida" class="absolute right-2.5 top-2.5 text-xs text-orange-400 animate-spin">⏳</span>
             </div>
 
+            <!-- LISTA SUSPENSA DE SUGESTÕES ESTILO WAZE / IFOOD -->
             <div x-show="sugestoesPartida.length > 0" 
                  @click.away="sugestoesPartida = []" 
-                 class="absolute z-50 left-0 right-0 mt-1 bg-gray-900 border border-orange-500/70 rounded-xl shadow-2xl overflow-hidden max-h-48 overflow-y-auto">
+                 class="absolute z-50 left-0 right-0 mt-1 bg-gray-900 border border-orange-500/70 rounded-xl shadow-2xl overflow-hidden max-h-52 overflow-y-auto">
               <template x-for="s in sugestoesPartida" :key="s.id">
                 <div @click="selecionarSugestaoEndereco(s, 'partida')" 
                      class="p-2.5 hover:bg-orange-500/20 cursor-pointer border-b border-gray-800 last:border-b-0 text-left transition flex items-start gap-2">
                   <span class="text-base shrink-0 mt-0.5">📍</span>
                   <div class="min-w-0 flex-1">
-                    <span class="text-xs font-bold text-white block truncate" x-text="s.principal"></span>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-black text-white truncate" x-text="s.principal"></span>
+                      <template x-if="s.numero">
+                        <span class="text-[9px] bg-orange-600 text-white px-1.5 py-0.5 rounded font-black font-mono" x-text="`Nº ${s.numero}`"></span>
+                      </template>
+                    </div>
                     <span class="text-[10px] text-gray-400 block truncate" x-text="s.secundario"></span>
                   </div>
                 </div>
@@ -1151,6 +1157,7 @@
             </div>
           </div>
 
+          <!-- CAMPO RETORNO COM AUTO-COMPLETE E DESTAQUE PARA NÚMERO EXATO -->
           <div class="relative">
             <label class="text-[10px] font-bold text-gray-300 block mb-1">Ponto de Retorno * (Sua casa ou onde a rota encerra):</label>
             <div class="relative">
@@ -1163,15 +1170,21 @@
               <span x-show="buscandoSugestoesChegada" class="absolute right-2.5 top-2.5 text-xs text-orange-400 animate-spin">⏳</span>
             </div>
 
+            <!-- LISTA SUSPENSA DE SUGESTÕES ESTILO WAZE / IFOOD -->
             <div x-show="sugestoesChegada.length > 0" 
                  @click.away="sugestoesChegada = []" 
-                 class="absolute z-50 left-0 right-0 mt-1 bg-gray-900 border border-orange-500/70 rounded-xl shadow-2xl overflow-hidden max-h-48 overflow-y-auto">
+                 class="absolute z-50 left-0 right-0 mt-1 bg-gray-900 border border-orange-500/70 rounded-xl shadow-2xl overflow-hidden max-h-52 overflow-y-auto">
               <template x-for="s in sugestoesChegada" :key="s.id">
                 <div @click="selecionarSugestaoEndereco(s, 'chegada')" 
                      class="p-2.5 hover:bg-orange-500/20 cursor-pointer border-b border-gray-800 last:border-b-0 text-left transition flex items-start gap-2">
                   <span class="text-base shrink-0 mt-0.5">🏠</span>
                   <div class="min-w-0 flex-1">
-                    <span class="text-xs font-bold text-white block truncate" x-text="s.principal"></span>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-black text-white truncate" x-text="s.principal"></span>
+                      <template x-if="s.numero">
+                        <span class="text-[9px] bg-orange-600 text-white px-1.5 py-0.5 rounded font-black font-mono" x-text="`Nº ${s.numero}`"></span>
+                      </template>
+                    </div>
                     <span class="text-[10px] text-gray-400 block truncate" x-text="s.secundario"></span>
                   </div>
                 </div>
@@ -1259,7 +1272,7 @@
         </div>
         <div class="space-y-2 text-xs text-gray-300 font-bold">
           <div>✔ <span x-text="`${Math.ceil(pacotesExtraidos.length / 10)} Sacolas no Método Canetão`"></span></div>
-          <div>✔ Varredura em pente contínua (anti-ziguezague e anti-ré)</div>
+          <div>✔ Varredura contínua sem retornos (elimina a marcha à ré)</div>
         </div>
         <div class="pt-2 space-y-2">
           <button @click="enviarParaN8N()" :disabled="carregandoProcesso" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
