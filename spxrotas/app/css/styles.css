@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v2.4.0 - Folha de Estilos Modular Oficial
-   Navegador 3D, Bipador Amplo, Auto-Complete, Ciclo Shopee & Módulo Volumosos
+   SPXrotas Pro v2.5.0 - Folha de Estilos Modular Oficial
+   Navegador 3D (Elevação Dinâmica com Volumosos), Bipador Amplo & Radares
    Arquivo: /spxrotas/app/css/styles.css
    ========================================================================== */
 
@@ -162,7 +162,20 @@ body.theme-claro .text-amber-400 {
    3. NAVEGADOR ESTILO WAZE 3D (MapLibre GL & Botões Empilhados Foto 3)
    ========================================================================== */
 
-/* Velocímetro Ergonômico Elevado */
+/* Wrapper Flutuante do Velocímetro (com elevação suave quando houver Volumoso) */
+.waze-speed-wrapper {
+  position: absolute;
+  left: 14px;
+  bottom: 240px;
+  z-index: 500;
+  transition: bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.waze-speed-wrapper.com-volumoso {
+  bottom: 295px !important; /* Sobe 55px para não encostar na tarja de volumoso */
+}
+
+/* Círculo do Velocímetro */
 .waze-speed-circle {
   width: 68px;
   height: 68px;
@@ -190,29 +203,34 @@ body.theme-claro .text-amber-400 {
   100% { transform: scale(1.10); }
 }
 
-/* Painel de Botões Empilhados na Direita (Foto 3: Pingo + SOS + Mira) */
+/* Coluna de Botões Empilhados na Direita (Foto 3: Pingo + SOS + Mira) */
 .waze-botoes-laterais {
   position: absolute;
   right: 14px;
   bottom: 235px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   z-index: 500;
   align-items: center;
+  transition: bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.waze-botoes-laterais.com-volumoso {
+  bottom: 290px !important; /* Sobe 55px junto com o velocímetro ficando 100% livre! */
 }
 
 /* Botão Azul do Pingo Inteligente no GPS (Foto 3) */
 .btn-pingo-flutuante {
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: #0284c7;
   border: 2.5px solid #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 23px;
   color: #ffffff;
   box-shadow: 0 8px 24px rgba(2, 132, 199, 0.65), 0 4px 10px rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(6px);
@@ -227,8 +245,8 @@ body.theme-claro .text-amber-400 {
 
 /* Botão Vermelho S.O.S Empilhado (Foto 3) */
 .btn-sos-flutuante {
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: #dc2626;
   color: #ffffff;
@@ -236,7 +254,7 @@ body.theme-claro .text-amber-400 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
   letter-spacing: -0.5px;
   cursor: pointer;
@@ -257,8 +275,8 @@ body.theme-claro .text-amber-400 {
 
 /* Botão Mira de Centralização (Foto 3) */
 .waze-mira-btn {
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: rgba(15, 23, 42, 0.94);
   border: 2.5px solid #ea580c;
