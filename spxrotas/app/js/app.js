@@ -1,7 +1,7 @@
 /* ==========================================================================
-   SPXrotas Pro v2.4.0 - Núcleo Mestre Reativo Oficial
-   Módulo de Volumosos com Voz, Auto-Complete Waze/Uber, Gravação Limpa no Directus,
-   Radares Blindados com Cache Offline, Pingo no GPS 3D & Ciclo Shopee Laranja ➔ Verde
+   SPXrotas Pro v2.5.0 - Núcleo Mestre Reativo Oficial
+   Interpolação Métrica de Número Predial (Padrão Waze/Uber), Módulo Volumosos com Voz,
+   Radares Blindados com Cache Offline, Pingo Inteligente 3D & Directus Limpo
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -39,7 +39,7 @@ function spxRotasApp() {
     configVeiculo: JSON.parse(localStorage.getItem('spxrotas_config_veiculo') || '{"tipoCombustivel":"Gasolina","consumoKmL":10.0,"precoLitro":5.89}'),
     contatoEmergencia: localStorage.getItem('spxrotas_contato_emergencia') || '',
 
-    // Partida e Chegada com Auto-Complete Inteligente (Waze/Uber/iFood)
+    // Partida e Chegada com Auto-Complete Inteligente e Fixação de Número
     inputPartidaModal: localStorage.getItem('spxrotas_partida_padrao') || '',
     inputChegadaModal: localStorage.getItem('spxrotas_chegada_padrao') || '',
     sugestoesPartida: [],
@@ -180,7 +180,183 @@ function spxRotasApp() {
     isMobile: false,
 
     // =========================================================================
-    // MÓDULO DE OBJETOS VOLUMOSOS (NOTAS & ALOCAÇÃO COM VOZ INTELIGENTE)
+    // AUTO-COMPLETE COM INTERPOLAÇÃO MÉTRICA DE NÚMERO (PADRÃO WAZE / UBER)
+    // =========================================================================
+    extrairNumeroDoTexto(texto) {
+      if (!texto) return null;
+      const match = texto.match(/,\s*(\d+)|\s+(\d+)\b/);
+      if (match) return match[1] || match[2] || null;
+      return null;
+    },
+
+    interpolarPontoNaViaPorNumero(coords, numeroAlvo) {
+      if (!coords || coords.length < 2) return null;
+      const num = parseInt(numeroAlvo);
+      if (isNaN(num) || num <= 0) return { lat: coords[0][1], lon: coords[0][0] };
+
+      let distAcumulada = 0;
+      const distancias = [0];
+
+      for (let i = 0; i < coords.length - 1; i++) {
+        const d = this.calcularDistancia(coords[i][1], coords[i][0], coords[i + 1][1], coords[i + 1][0]);
+        distAcumulada += d;
+        distancias.push(distAcumulada);
+      }
+
+      if (distAcumulada === 0) return { lat: coords[0][1], lon: coords[0][0] };
+
+      // No sistema viário brasileiro, o número predial corresponde à distância métrica do início da via
+      let dAlvo = Math.max(10, Math.min(num, distAcumulada - 5));
+
+      for (let i = 0; i < distancias.length - 1; i++) {
+        if (dAlvo >= distancias[i] && dAlvo <= distancias[i + 1]) {
+          const segDist = distancias[i + 1] - distancias[i];
+          const t = segDist > 0 ? (dAlvo - distancias[i]) / segDist : 0;
+          const lon = coords[i][0] + t * (coords[i + 1][0] - coords[i][0]);
+          const lat = coords[i][1] + t * (coords[i + 1][1] - coords[i][1]);
+          return { lat, lon };
+        }
+      }
+
+      const ultimo = coords[coords.length - 1];
+      return { lat: ultimo[1], lon: ultimo[0] };
+    },
+
+    async buscarSugestoesEndereco(termo, tipo) {
+      if (!termo || termo.trim().length < 3) {
+        if (tipo === 'partida') this.sugestoesPartida = [];
+        else this.sugestoesChegada = [];
+        return;
+      }
+
+      if (tipo === 'partida') this.buscandoSugestoesPartida = true;
+      else this.buscandoSugestoesChegada = true;
+
+      const numeroDigitado = this.extrairNumeroDoTexto(termo);
+
+      try {
+        const qLimpa = encodeURIComponent(termo.trim());
+        let resultados = [];
+
+        // Consulta Nominatim com geometria completa da via para interpolação métrica
+        try {
+          const urlNom = `https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&addressdetails=1&q=${qLimpa}&limit=5&countrycodes=br`;
+          const resNom = await fetch(urlNom, { signal: AbortSignal.timeout(3500) });
+          if (resNom.ok) {
+            const dataN = await resNom.json();
+            if (dataN && dataN.length > 0) {
+              resultados = dataN.map((item, idx) => {
+                const a = item.address || {};
+                const nomeRua = a.road || a.pedestrian || a.street || item.display_name.split(',')[0].trim();
+                const numReal = a.house_number || numeroDigitado || null;
+                const bairro = a.suburb || a.neighbourhood || a.residential ? ` - ${a.suburb || a.neighbourhood || a.residential}` : '';
+                const cidade = a.city || a.town || a.municipality || 'São Paulo';
+                const estado = a.state ? ` - ${a.state}` : '';
+
+                let latFinal = parseFloat(item.lat);
+                let lonFinal = parseFloat(item.lon);
+
+                // Se o usuário digitou número e a via tem traçado de rua, interpola no portão exato!
+                if (numReal && item.geojson && item.geojson.coordinates) {
+                  let coordsVia = [];
+                  if (item.geojson.type === 'LineString') {
+                    coordsVia = item.geojson.coordinates;
+                  } else if (item.geojson.type === 'MultiLineString' && item.geojson.coordinates.length > 0) {
+                    coordsVia = item.geojson.coordinates[0];
+                  }
+
+                  if (coordsVia.length >= 2) {
+                    const pontoExato = this.interpolarPontoNaViaPorNumero(coordsVia, numReal);
+                    if (pontoExato) {
+                      latFinal = pontoExato.lat;
+                      lonFinal = pontoExato.lon;
+                    }
+                  }
+                }
+
+                return {
+                  id: `n_${idx}_${Date.now()}`,
+                  principal: numReal ? `${nomeRua}, ${numReal}` : nomeRua,
+                  numero: numReal,
+                  secundario: `${bairro}${cidade ? ', ' + cidade : ''}${estado}`.replace(/^[\s,-]+/, ''),
+                  latitude: latFinal,
+                  longitude: lonFinal
+                };
+              });
+            }
+          }
+        } catch (e) {}
+
+        // Fallback Photon se Nominatim não responder
+        if (resultados.length === 0) {
+          try {
+            const resP = await fetch(`https://photon.komoot.io/api/?q=${qLimpa}&limit=5&lat=-24.16&lon=-46.78`, { signal: AbortSignal.timeout(3000) });
+            if (resP.ok) {
+              const dataP = await resP.json();
+              if (dataP && dataP.features && dataP.features.length > 0) {
+                resultados = dataP.features.map((f, idx) => {
+                  const p = f.properties || {};
+                  const coords = f.geometry?.coordinates || [0, 0];
+                  const nomeRua = p.street || p.name || 'Endereço';
+                  const numReal = p.housenumber || numeroDigitado || null;
+                  const bairro = p.district || p.suburb ? ` - ${p.district || p.suburb}` : '';
+                  const cidade = p.city ? `, ${p.city}` : '';
+                  const estado = p.state ? ` - ${p.state}` : '';
+
+                  return {
+                    id: `p_${idx}_${Date.now()}`,
+                    principal: numReal ? `${nomeRua}, ${numReal}` : nomeRua,
+                    numero: numReal,
+                    secundario: `${bairro}${cidade}${estado}`.replace(/^[\s,-]+/, ''),
+                    latitude: coords[1],
+                    longitude: coords[0]
+                  };
+                });
+              }
+            }
+          } catch (e) {}
+        }
+
+        if (tipo === 'partida') this.sugestoesPartida = resultados;
+        else this.sugestoesChegada = resultados;
+      } catch (err) {
+        console.warn('Erro ao buscar sugestões:', err);
+      } finally {
+        if (tipo === 'partida') this.buscandoSugestoesPartida = false;
+        else this.buscandoSugestoesChegada = false;
+      }
+    },
+
+    selecionarSugestaoEndereco(s, tipo) {
+      if (!s) return;
+      const endFormatado = s.secundario ? `${s.principal}, ${s.secundario}` : s.principal;
+
+      if (tipo === 'partida') {
+        this.inputPartidaModal = endFormatado;
+        this.coordPartidaSalva = { latitude: s.latitude, longitude: s.longitude };
+        this.sugestoesPartida = [];
+      } else {
+        this.inputChegadaModal = endFormatado;
+        this.coordChegadaSalva = { latitude: s.latitude, longitude: s.longitude };
+        this.sugestoesChegada = [];
+      }
+
+      this.salvarPartidaChegadaLocal();
+      if ('vibrate' in navigator) navigator.vibrate(30);
+    },
+
+    copiarPartidaParaChegada() {
+      this.inputChegadaModal = this.inputPartidaModal;
+      if (this.coordPartidaSalva) {
+        this.coordChegadaSalva = { ...this.coordPartidaSalva };
+      }
+      this.sugestoesChegada = [];
+      this.salvarPartidaChegadaLocal();
+      if ('vibrate' in navigator) navigator.vibrate(30);
+    },
+
+    // =========================================================================
+    // MÓDULO DE OBJETOS VOLUMOSOS (NOTAS & ALOCAÇÃO NO CARRO COM VOZ)
     // =========================================================================
     abrirModalVolumoso(item) {
       if (!item) return;
@@ -215,7 +391,6 @@ function spxRotasApp() {
       p.nota_tipo = this.notaVolumosoTipo;
       p.nota_volumoso = (this.notaVolumosoTexto || '').trim();
 
-      // Atualiza também no array principal de entregas
       const idx = this.entregas.findIndex(e => e.id === p.id);
       if (idx !== -1) {
         this.entregas[idx].is_volumoso = true;
@@ -226,7 +401,6 @@ function spxRotasApp() {
 
       this.salvarCacheLocal();
 
-      // Confirmação por voz e vibração
       const fala = `Volumoso anotado! Guardado em: ${p.nota_local}!`;
       this.falarTexto(fala);
       if ('vibrate' in navigator) navigator.vibrate([60, 40, 60]);
@@ -252,110 +426,6 @@ function spxRotasApp() {
       this.salvarCacheLocal();
       this.fecharModalVolumoso();
       if ('vibrate' in navigator) navigator.vibrate(40);
-    },
-
-    // =========================================================================
-    // AUTO-COMPLETE DE ENDEREÇO (PADRÃO WAZE / UBER / IFOOD COM NÚMERO EXATO)
-    // =========================================================================
-    async buscarSugestoesEndereco(termo, tipo) {
-      if (!termo || termo.trim().length < 3) {
-        if (tipo === 'partida') this.sugestoesPartida = [];
-        else this.sugestoesChegada = [];
-        return;
-      }
-
-      if (tipo === 'partida') this.buscandoSugestoesPartida = true;
-      else this.buscandoSugestoesChegada = true;
-
-      try {
-        const qLimpa = encodeURIComponent(termo.trim());
-        let resultados = [];
-
-        try {
-          const resPhoton = await fetch(`https://photon.komoot.io/api/?q=${qLimpa}&limit=5&lat=-24.16&lon=-46.78`, { signal: AbortSignal.timeout(3000) });
-          if (resPhoton.ok) {
-            const dataP = await resPhoton.json();
-            if (dataP && dataP.features && dataP.features.length > 0) {
-              resultados = dataP.features.map((f, idx) => {
-                const p = f.properties || {};
-                const coords = f.geometry?.coordinates || [0, 0];
-                const nomeRua = p.street || p.name || 'Endereço';
-                const numero = p.housenumber ? `, ${p.housenumber}` : '';
-                const bairro = p.district || p.suburb ? ` - ${p.district || p.suburb}` : '';
-                const cidade = p.city ? `, ${p.city}` : '';
-                const estado = p.state ? ` - ${p.state}` : '';
-
-                return {
-                  id: `p_${idx}_${Date.now()}`,
-                  principal: `${nomeRua}${numero}`,
-                  secundario: `${bairro}${cidade}${estado}`.replace(/^[\s,-]+/, ''),
-                  latitude: coords[1],
-                  longitude: coords[0]
-                };
-              });
-            }
-          }
-        } catch (e) {}
-
-        if (resultados.length === 0) {
-          const resNom = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${qLimpa}&limit=5&countrycodes=br`, { signal: AbortSignal.timeout(3500) });
-          if (resNom.ok) {
-            const dataN = await resNom.json();
-            resultados = dataN.map((item, idx) => {
-              const a = item.address || {};
-              const rua = a.road || a.pedestrian || a.street || item.display_name.split(',')[0];
-              const num = a.house_number ? `, ${a.house_number}` : '';
-              const bairro = a.suburb || a.neighbourhood || a.residential ? ` - ${a.suburb || a.neighbourhood || a.residential}` : '';
-              const cidade = a.city || a.town || a.municipality || '';
-              const estado = a.state ? ` - ${a.state}` : '';
-
-              return {
-                id: `n_${idx}_${Date.now()}`,
-                principal: `${rua}${num}`,
-                secundario: `${bairro}${cidade ? ', ' + cidade : ''}${estado}`.replace(/^[\s,-]+/, ''),
-                latitude: parseFloat(item.lat),
-                longitude: parseFloat(item.lon)
-              };
-            });
-          }
-        }
-
-        if (tipo === 'partida') this.sugestoesPartida = resultados;
-        else this.sugestoesChegada = resultados;
-      } catch (err) {
-        console.warn('Aviso autocomplete:', err);
-      } finally {
-        if (tipo === 'partida') this.buscandoSugestoesPartida = false;
-        else this.buscandoSugestoesChegada = false;
-      }
-    },
-
-    selecionarSugestaoEndereco(s, tipo) {
-      if (!s) return;
-      const endFormatado = s.secundario ? `${s.principal}, ${s.secundario}` : s.principal;
-
-      if (tipo === 'partida') {
-        this.inputPartidaModal = endFormatado;
-        this.coordPartidaSalva = { latitude: s.latitude, longitude: s.longitude };
-        this.sugestoesPartida = [];
-      } else {
-        this.inputChegadaModal = endFormatado;
-        this.coordChegadaSalva = { latitude: s.latitude, longitude: s.longitude };
-        this.sugestoesChegada = [];
-      }
-
-      this.salvarPartidaChegadaLocal();
-      if ('vibrate' in navigator) navigator.vibrate(30);
-    },
-
-    copiarPartidaParaChegada() {
-      this.inputChegadaModal = this.inputPartidaModal;
-      if (this.coordPartidaSalva) {
-        this.coordChegadaSalva = { ...this.coordPartidaSalva };
-      }
-      this.sugestoesChegada = [];
-      this.salvarPartidaChegadaLocal();
-      if ('vibrate' in navigator) navigator.vibrate(30);
     },
 
     // =========================================================================
@@ -1605,10 +1675,10 @@ function spxRotasApp() {
         const coord = [p.latitude, p.longitude];
         pontosLinha.push(coord);
 
-        let corFundo = '#ea580c'; // Laranja Shopee padrão
-        if (this.isPacoteConferido(p)) corFundo = '#10b981'; // Verde
-        if (p.status === 'entregue') corFundo = '#ef4444'; // Vermelho
-        if (p.status === 'ausente') corFundo = '#f59e0b'; // Amarelo
+        let corFundo = '#ea580c';
+        if (this.isPacoteConferido(p)) corFundo = '#10b981';
+        if (p.status === 'entregue') corFundo = '#ef4444';
+        if (p.status === 'ausente') corFundo = '#f59e0b';
 
         const iconePacote = L.divIcon({
           className: 'custom-pin-pacote',
@@ -1785,7 +1855,7 @@ function spxRotasApp() {
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
 
-      // 🔊 Alerta de voz se o pacote for volumoso logo na saída
+      // 🔊 Alerta de voz inteligente no início se o pacote for volumoso
       if (entrega.is_volumoso) {
         const local = entrega.nota_local || 'veículo';
         setTimeout(() => {
@@ -2682,11 +2752,36 @@ function spxRotasApp() {
       if (partes.length === 2 && !isNaN(parseFloat(partes[0])) && !isNaN(parseFloat(partes[1]))) {
         return { latitude: parseFloat(partes[0]), longitude: parseFloat(partes[1]) };
       }
+
+      const num = this.extrairNumeroDoTexto(texto);
+
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&limit=1&countrycodes=br`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&addressdetails=1&q=${encodeURIComponent(texto)}&limit=1&countrycodes=br`;
         const res = await fetch(url);
         const data = await res.json();
-        if (data && data.length > 0) return { latitude: parseFloat(data[0].lat), longitude: parseFloat(data[0].lon) };
+        if (data && data.length > 0) {
+          const item = data[0];
+          let latFinal = parseFloat(item.lat);
+          let lonFinal = parseFloat(item.lon);
+
+          if (num && item.geojson && item.geojson.coordinates) {
+            let coordsVia = [];
+            if (item.geojson.type === 'LineString') {
+              coordsVia = item.geojson.coordinates;
+            } else if (item.geojson.type === 'MultiLineString' && item.geojson.coordinates.length > 0) {
+              coordsVia = item.geojson.coordinates[0];
+            }
+            if (coordsVia.length >= 2) {
+              const pExato = this.interpolarPontoNaViaPorNumero(coordsVia, num);
+              if (pExato) {
+                latFinal = pExato.lat;
+                lonFinal = pExato.lon;
+              }
+            }
+          }
+
+          return { latitude: latFinal, longitude: lonFinal };
+        }
       } catch (e) {}
       return null;
     },
@@ -2706,6 +2801,7 @@ function spxRotasApp() {
           }
         }
 
+        // Ponto de partida e chegada cravados no portão exato!
         let coordPartida = this.coordPartidaSalva;
         if (!coordPartida || !coordPartida.latitude) {
           coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
