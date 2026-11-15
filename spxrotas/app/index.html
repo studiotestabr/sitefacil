@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.3.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.4.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.3.0"></script>
+  <script src="./js/relatorio.js?v=8.4.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.3.0"></script>
+  <script src="./js/app.js?v=8.4.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -150,7 +150,7 @@
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
         <div class="flex items-center gap-2"><span class="text-emerald-400">💬</span><span><strong>Zap das Rotas:</strong> Envie o romaneio no WhatsApp e abra pronta</span></div>
         <div class="flex items-center gap-2"><span class="text-amber-400">📸</span><span><strong>Bipador com Voz:</strong> Aponte a câmera e ouça o Canetão e a Sacola</span></div>
-        <div class="flex items-center gap-2"><span class="text-orange-400">🟠</span><span><strong>Conferência Shopee:</strong> Laranja no galpão, Verde na sacola</span></div>
+        <div class="flex items-center gap-2"><span class="text-orange-400">📦</span><span><strong>Módulo Volumosos:</strong> Guarde caixas grandes com aviso no GPS</span></div>
         <div class="flex items-center gap-2"><span class="text-red-400">📷</span><span><strong>40 Mil Radares:</strong> Alerta sonoro sem alarmes falsos de rodovia</span></div>
         <div class="flex items-center gap-2"><span class="text-cyan-400">🧭</span><span><strong>GPS 3D Waze Engine:</strong> Rotas viárias no asfalto mesmo sem sinal</span></div>
         <div class="flex items-center gap-2 pt-1 border-t border-gray-800"><span class="text-emerald-400">🎁</span><span class="text-emerald-400 font-bold">7 Dias Grátis na 1ª rota!</span></div>
@@ -427,10 +427,10 @@
         </nav>
       </header>
 
-      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO NO MÉTODO CANETÃO + CONFERÊNCIA LARANJA ➔ VERDE) -->
+      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO NO MÉTODO CANETÃO + CONFERÊNCIA LARANJA ➔ VERDE + VOLUMOSOS) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         
-        <!-- CARD UNIFICADO DE BIPAGEM E CONFERÊNCIA NO TOPO (FOTO 1 RESOLVIDA) -->
+        <!-- CARD UNIFICADO DE BIPAGEM E CONFERÊNCIA NO TOPO -->
         <div class="card-bipador-unificado flex items-center justify-between gap-3">
           <div class="space-y-1 min-w-0 pr-1">
             <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block leading-none">
@@ -533,8 +533,16 @@
                 </div>
               </template>
 
-              <!-- TAGS VISUAIS DINÂMICAS -->
+              <!-- TAGS VISUAIS DINÂMICAS + AVISO FORA DA SACOLA -->
               <div class="flex flex-wrap items-center gap-2 pt-1">
+                <!-- BADGE DE OBJETO VOLUMOSO (FORA DA SACOLA) -->
+                <template x-if="item.is_volumoso">
+                  <span class="badge-fora-sacola" @click.stop="abrirModalVolumoso(item)">
+                    <span>📦</span>
+                    <span x-text="`FORA DA SACOLA • ${item.nota_local || 'VOLUMOSO'}`"></span>
+                  </span>
+                </template>
+
                 <span x-show="!isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente'" 
                       @click.stop="marcarComoConferidoManual(item)"
                       class="bg-orange-500/20 text-orange-400 border border-orange-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase cursor-pointer hover:bg-orange-500/30"
@@ -557,25 +565,34 @@
                 <p class="text-base font-bold text-gray-300" x-text="`${item.bairro} - ${item.cidade}`"></p>
               </div>
 
-              <!-- RASTREIO + BOTÃO REABRIR EM CASO DE BAIXA ACIDENTAL -->
+              <!-- RASTREIO + BOTÃO NOTA VOLUMOSO + BOTÃO REABRIR -->
               <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs">
                 <div class="flex items-center gap-2">
                   <span class="text-gray-400 font-medium">Rastreio:</span>
                   <span class="font-mono font-black text-xs sm:text-sm text-orange-400 bg-black/90 px-2.5 py-1 rounded-xl border border-gray-800 tracking-wider shadow-inner" x-text="item.codigo_rastreio || 'SPX-REGISTRADO'"></span>
                 </div>
 
-                <button x-show="item.status === 'entregue'" 
-                        @click.stop="reabrirEntrega(item)" 
-                        class="bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md">
-                  <span>↩️</span> Reabrir
-                </button>
+                <div class="flex items-center gap-1.5">
+                  <button @click.stop="abrirModalVolumoso(item)" 
+                          class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700 px-2.5 py-1.5 rounded-xl text-[11px] font-bold active:scale-95 transition flex items-center gap-1"
+                          :class="{'text-orange-400 border-orange-500/50': item.is_volumoso}"
+                          title="Anotar onde a caixa está no carro">
+                    <span>📦</span> <span x-text="item.is_volumoso ? 'Nota' : '+ Nota'"></span>
+                  </button>
+
+                  <button x-show="item.status === 'entregue'" 
+                          @click.stop="reabrirEntrega(item)" 
+                          class="bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md">
+                    <span>↩️</span> Reabrir
+                  </button>
+                </div>
               </div>
             </div>
           </template>
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT INTELIGENTE - SEM PINGO INTELIGENTE AQUI, PINGO MOVIDO AO GPS) -->
+      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM ALERTA DE VOLUMOSOS) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-2">
@@ -588,7 +605,16 @@
               <span class="text-[10px] bg-orange-950 text-orange-400 border border-orange-800 px-2.5 py-1 rounded-full font-mono font-black shrink-0 whitespace-nowrap" x-text="`${entregasNoBairroRestantes} no bairro`"></span>
             </div>
 
-            <!-- CASO 1: PACOTES COM ROTA NORMAL (CANETÃO, ORDEM, PARADA SPX, SACOLA - FOTO 2) -->
+            <!-- 📦 BANNER DE ALERTA DE OBJETO VOLUMOSO NA RUA -->
+            <div x-show="entregaAtual.is_volumoso" class="banner-volumoso-alerta space-y-1">
+              <div class="flex items-center gap-2 text-xs font-black text-orange-300 uppercase tracking-wider">
+                <span class="text-xl shrink-0">📦</span>
+                <span>ATENÇÃO: PACOTE VOLUMOSO FORA DA SACOLA!</span>
+              </div>
+              <p class="text-xs text-white font-bold pl-7" x-text="`Guardado em: ${entregaAtual.nota_local || 'Veículo'} • Tipo: ${entregaAtual.nota_tipo || 'Caixa Grande'} ${entregaAtual.nota_volumoso ? '• Obs: ' + entregaAtual.nota_volumoso : ''}`"></p>
+            </div>
+
+            <!-- CASO 1: PACOTES COM ROTA NORMAL (CANETÃO, ORDEM, PARADA SPX, SACOLA) -->
             <template x-if="entregaAtual.parada_shopee && Number(entregaAtual.parada_shopee) > 0 && !(typeof entregaAtual.parada_shopee === 'string' && entregaAtual.parada_shopee.includes('+'))">
               <div class="grid grid-cols-4 gap-2 text-center">
                 <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
@@ -743,7 +769,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL, RADARES, TELA SEMPRE ACESA E BOTÕES EMPILHADOS FOTO 3) -->
+    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (WAZE MAPLIBRE GL, RADARES, TELA SEMPRE ACESA E BOTÕES EMPILHADOS) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -790,27 +816,35 @@
         </div>
       </div>
 
-      <!-- BOTÕES EMPILHADOS À DIREITA NO GPS (FOTO 3: PINGO AZUL + SOS VERMELHO + MIRA) -->
+      <!-- BOTÕES EMPILHADOS À DIREITA NO GPS (PINGO AZUL + SOS VERMELHO + MIRA) -->
       <div class="waze-botoes-laterais">
-        <!-- 1. Botão Azul do Pingo Inteligente (Foto 3) -->
         <button @click="corrigirPingoPeloGPS(entregaNavegacao)" class="btn-pingo-flutuante" title="Fixar Portão Aqui (Pingo Inteligente)">
           📍
         </button>
 
-        <!-- 2. Botão Vermelho S.O.S (Foto 3) -->
         <button @click="dispararEmergenciaSOS()" class="btn-sos-flutuante" title="Disparar Alerta S.O.S">
           SOS
         </button>
 
-        <!-- 3. Botão Mira de Centralização (Foto 3) -->
         <button @click="centralizarCarroManual()" class="waze-mira-btn" :class="mapaArrastadoPeloUsuario ? 'border-orange-500 text-orange-400 animate-pulse' : 'border-gray-600 text-white'" title="Centralizar no Carro">
           <span class="text-2xl">🎯</span>
         </button>
       </div>
 
-      <!-- PAINEL INFERIOR DO NAVEGADOR (CANETÃO, ORDEM, PARADA SPX, SACOLA - FOTO 3) -->
-      <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-3 pb-6">
+      <!-- PAINEL INFERIOR DO NAVEGADOR COM ALERTA DE VOLUMOSOS -->
+      <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-2.5 pb-6">
         
+        <!-- AVISO DE PACOTE VOLUMOSO NA NAVEGAÇÃO -->
+        <template x-if="entregaNavegacao && entregaNavegacao.is_volumoso">
+          <div class="bg-amber-500/20 border border-amber-500/70 p-2 rounded-xl flex items-center justify-between text-xs text-amber-300">
+            <div class="flex items-center gap-2 truncate">
+              <span class="text-base">📦</span>
+              <span class="truncate"><strong>VOLUMOSO:</strong> <span x-text="`${entregaNavegacao.nota_local || 'Veículo'} (${entregaNavegacao.nota_tipo || 'Caixa Grande'})`"></span></span>
+            </div>
+            <span class="text-[10px] bg-amber-950 text-amber-300 px-2 py-0.5 rounded font-black shrink-0">FORA DA SACOLA</span>
+          </div>
+        </template>
+
         <template x-if="entregaNavegacao && entregaNavegacao.parada_shopee && Number(entregaNavegacao.parada_shopee) > 0 && !(typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+'))">
           <div class="grid grid-cols-4 gap-2 text-center">
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
@@ -864,10 +898,9 @@
       </div>
     </main>
 
-    <!-- MODO 7: BIPADOR DE SACOLAS COM VOZ (TELA CHEIA - NOVO LAYOUT EXATO DA FOTO 1) -->
+    <!-- MODO 7: BIPADOR DE SACOLAS COM VOZ (COM BOTÃO DE VOLUMOSOS) -->
     <main x-show="modo === 'bipador'" class="fixed inset-0 z-[260] bg-black flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden select-none" x-cloak>
       
-      <!-- CABEÇALHO SUPERIOR COM ÍCONE, TÍTULO E BOTÕES DE CONTROLE -->
       <div class="flex items-center justify-between border-b border-gray-800/80 pb-2.5 shrink-0">
         <div class="flex items-center gap-2.5">
           <span class="text-2xl">📸</span>
@@ -889,7 +922,6 @@
         </div>
       </div>
 
-      <!-- BADGE CENTRAL SUPERIOR DE IDENTIFICAÇÃO (FOTO 1) -->
       <div class="flex justify-center my-2 shrink-0">
         <div class="badge-bip-identificado" :class="{'confirmado': ultimoPacoteBipado}">
           <template x-if="ultimoPacoteBipado">
@@ -901,7 +933,6 @@
         </div>
       </div>
 
-      <!-- VISOR AMPLO DA CÂMERA COM MIRA LASER E CANTONEIRAS (FOTO 1) -->
       <div class="scanner-camera-card-amplo my-1 relative">
         <video id="videoScannerBipador" playsinline autoplay muted></video>
         
@@ -918,14 +949,13 @@
         </div>
       </div>
 
-      <!-- PAINEL INFERIOR COM OS 4 CARDS PADRÃO E BOTÃO DE CONCLUSÃO (FOTO 1) -->
+      <!-- PAINEL INFERIOR COM OS 4 CARDS + BOTÃO VOLUMOSO -->
       <div class="space-y-2.5 shrink-0 pt-1">
         <div class="painel-bipador-inferior space-y-2" :class="{'sem-pacote': !ultimoPacoteBipado}">
           <span class="text-[11px] sm:text-xs font-black uppercase text-amber-400 tracking-wider block text-center">
             PACOTE LOCALIZADO! ESCREVA NA CAIXA:
           </span>
 
-          <!-- CASO 1: PACOTES NORMAIS (CANETÃO, ORDEM, PARADA SPX, SACOLA) -->
           <template x-if="!ultimoPacoteBipado || (ultimoPacoteBipado.parada_shopee && Number(ultimoPacoteBipado.parada_shopee) > 0 && !(typeof ultimoPacoteBipado.parada_shopee === 'string' && ultimoPacoteBipado.parada_shopee.includes('+')))">
             <div class="grid grid-cols-4 gap-1.5 text-center">
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner">
@@ -947,7 +977,6 @@
             </div>
           </template>
 
-          <!-- CASO 2: PACOTES AVULSOS + + (ADAPTADO COM FINAL DO RASTREIO) -->
           <template x-if="ultimoPacoteBipado && (!ultimoPacoteBipado.parada_shopee || Number(ultimoPacoteBipado.parada_shopee) <= 0 || ultimoPacoteBipado.parada_shopee === '-' || (typeof ultimoPacoteBipado.parada_shopee === 'string' && ultimoPacoteBipado.parada_shopee.includes('+')))">
             <div class="grid grid-cols-4 gap-1.5 text-center">
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
@@ -961,13 +990,23 @@
               </div>
               <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1">
                 <span class="text-[9px] text-orange-400 font-black tracking-wider uppercase leading-none">SACOLA</span>
-                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-1 leading-tight" x-text="Math.ceil(ultimoPacoteBipado.ordem_entrega / 10)"></span>
+                <span class="text-2xl sm:text-3xl font-black text-orange-400 font-mono mt-0.5 leading-tight" x-text="Math.ceil(ultimoPacoteBipado.ordem_entrega / 10)"></span>
               </div>
             </div>
           </template>
+
+          <!-- 📦 BOTÃO DINÂMICO PARA MARCAR VOLUMOSO NO BIPADOR -->
+          <div x-show="ultimoPacoteBipado" class="pt-1">
+            <button type="button" 
+                    @click="abrirModalVolumoso(ultimoPacoteBipado)" 
+                    class="btn-volumoso-bipador w-full"
+                    :class="{'ativo': ultimoPacoteBipado?.is_volumoso}">
+              <span>📦</span>
+              <span x-text="ultimoPacoteBipado?.is_volumoso ? '✅ Volumoso: ' + (ultimoPacoteBipado.nota_local || 'Configurado') : '+ Marcar como Volumoso / Nota no Carro'"></span>
+            </button>
+          </div>
         </div>
 
-        <!-- BOTÃO LARGO DE CONCLUSÃO -->
         <button @click="fecharBipadorVoz()" class="w-full bg-[#ea580c] hover:bg-orange-500 text-white font-black py-3.5 sm:py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
           <span>✅</span> CONCLUIR E VER SACOLAS
         </button>
@@ -977,7 +1016,84 @@
 
   </div>
 
-  <!-- 8. MODAL CARREGAR SUA ROTA (ORDEM CORRIGIDA: 1º PARTIDA/RETORNO AUTO-COMPLETE -> 2º IMPORTAR .XLSX -> 3º ZAP DAS ROTAS) -->
+  <!-- 14. MODAL DE OBJETO VOLUMOSO (PÍLULAS DE 1 TOQUE + NOTA DE ALOCAÇÃO) -->
+  <div x-show="modalVolumoso" class="fixed inset-0 bg-black/90 z-[320] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl text-left" @click.away="fecharModalVolumoso()">
+      
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📦</span>
+          <div>
+            <h3 class="text-base font-black text-white leading-tight">Objeto Volumoso</h3>
+            <span class="text-xs text-orange-400 font-mono font-bold" x-text="`Canetão #${pacoteEditandoVolumoso?.ordem_entrega || '-'} • Fora da Sacola`"></span>
+          </div>
+        </div>
+        <button @click="fecharModalVolumoso()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none p-1">&times;</button>
+      </div>
+
+      <!-- 1. PÍLULAS DE ONDE VAI FICAR NO CARRO (1 TOQUE) -->
+      <div class="space-y-1.5">
+        <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">1. Onde você guardou no carro?</label>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" @click="selecionarTagLocal('Banco Traseiro')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoLocal === 'Banco Traseiro'}">
+            <span>🚗</span> Banco Traseiro
+          </button>
+          <button type="button" @click="selecionarTagLocal('Porta-Malas')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoLocal === 'Porta-Malas'}">
+            <span>📦</span> Porta-Malas
+          </button>
+          <button type="button" @click="selecionarTagLocal('Assoalho Carona')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoLocal === 'Assoalho Carona'}">
+            <span>💺</span> Assoalho Carona
+          </button>
+          <button type="button" @click="selecionarTagLocal('Perto da Tampa')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoLocal === 'Perto da Tampa'}">
+            <span>🚪</span> Perto da Tampa
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. PÍLULAS DE COMO É A CAIXA (1 TOQUE) -->
+      <div class="space-y-1.5 pt-1">
+        <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">2. Como é a embalagem?</label>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" @click="selecionarTagTipo('Caixa Full')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoTipo === 'Caixa Full'}">
+            <span>🟠</span> Caixa Full Shopee
+          </button>
+          <button type="button" @click="selecionarTagTipo('Caixa Grande')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoTipo === 'Caixa Grande'}">
+            <span>📦</span> Caixa Grande
+          </button>
+          <button type="button" @click="selecionarTagTipo('Saco Volumoso')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoTipo === 'Saco Volumoso'}">
+            <span>🛍️</span> Saco Volumoso
+          </button>
+          <button type="button" @click="selecionarTagTipo('Pesado / Pneu')" class="pilula-volumoso" :class="{'selecionada': notaVolumosoTipo === 'Pesado / Pneu'}">
+            <span>🛞</span> Pesado / Pneu
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. DETALHE EM TEXTO OU ÁUDIO (OPCIONAL) -->
+      <div class="space-y-1 pt-1">
+        <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">3. Detalhe Opcional:</label>
+        <input type="text" 
+               x-model="notaVolumosoTexto" 
+               placeholder="Ex: Atrás do motorista, caixa azul..." 
+               class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <button @click="salvarNotaVolumoso()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition flex items-center justify-center gap-1.5">
+          <span>💾</span> Salvar Nota e Alocar Caixa
+        </button>
+        
+        <button x-show="pacoteEditandoVolumoso?.is_volumoso" 
+                @click="removerNotaVolumoso(pacoteEditandoVolumoso)" 
+                class="w-full text-center text-xs text-red-400 hover:text-red-300 font-bold py-1.5 block">
+          Remover Marcação de Volumoso
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE + UPLOAD NO CENTRO + ZAP EMBAIXO) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 sm:p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
       
@@ -988,7 +1104,7 @@
         <button @click="modalImportar = false" class="text-gray-400 hover:text-white text-3xl font-bold leading-none p-1 transition">&times;</button>
       </div>
 
-      <!-- 1º PASSO: ONDE A ROTA COMEÇA E TERMINA (COM AUTO-COMPLETE ESTILO WAZE/UBER/IFOOD) -->
+      <!-- 1º PASSO: ONDE A ROTA COMEÇA E TERMINA (COM AUTO-COMPLETE WAZE/UBER/IFOOD) -->
       <div class="bg-gray-950 p-4 rounded-2xl border-2 border-orange-500/70 space-y-3 shadow-lg">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -1007,7 +1123,6 @@
         </p>
 
         <div class="space-y-3 pt-1">
-          <!-- CAMPO PARTIDA COM LISTA SUSPENSA AUTO-COMPLETE -->
           <div class="relative">
             <label class="text-[10px] font-bold text-gray-300 block mb-1">Ponto de Partida * (Galpão CD ou onde o carro sai):</label>
             <div class="relative">
@@ -1020,7 +1135,6 @@
               <span x-show="buscandoSugestoesPartida" class="absolute right-2.5 top-2.5 text-xs text-orange-400 animate-spin">⏳</span>
             </div>
 
-            <!-- LISTA SUSPENSA DE SUGESTÕES ESTILO WAZE / IFOOD -->
             <div x-show="sugestoesPartida.length > 0" 
                  @click.away="sugestoesPartida = []" 
                  class="absolute z-50 left-0 right-0 mt-1 bg-gray-900 border border-orange-500/70 rounded-xl shadow-2xl overflow-hidden max-h-48 overflow-y-auto">
@@ -1037,7 +1151,6 @@
             </div>
           </div>
 
-          <!-- CAMPO RETORNO COM LISTA SUSPENSA AUTO-COMPLETE -->
           <div class="relative">
             <label class="text-[10px] font-bold text-gray-300 block mb-1">Ponto de Retorno * (Sua casa ou onde a rota encerra):</label>
             <div class="relative">
@@ -1050,7 +1163,6 @@
               <span x-show="buscandoSugestoesChegada" class="absolute right-2.5 top-2.5 text-xs text-orange-400 animate-spin">⏳</span>
             </div>
 
-            <!-- LISTA SUSPENSA DE SUGESTÕES ESTILO WAZE / IFOOD -->
             <div x-show="sugestoesChegada.length > 0" 
                  @click.away="sugestoesChegada = []" 
                  class="absolute z-50 left-0 right-0 mt-1 bg-gray-900 border border-orange-500/70 rounded-xl shadow-2xl overflow-hidden max-h-48 overflow-y-auto">
@@ -1427,12 +1539,12 @@
         </div>
       </template>
 
-      <!-- Passo 5: Bipador com Voz & Conferência -->
+      <!-- Passo 5: Bipador com Voz & Volumosos -->
       <template x-if="passoTutorial === 5">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">📸</div>
-          <h3 class="text-2xl font-black text-white">Bipador & Conferência</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Na calçada do galpão, toque em Bipar. O celular grita o número do Canetão e a Sacola no alto-falante. O card laranja vira verde, garantindo que nenhum pacote veio trocado!</p>
+          <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-500/40">📸</div>
+          <h3 class="text-2xl font-black text-white">Bipador & Volumosos</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Bipou a caixa? O celular fala o número. Se for uma caixa grande que não cabe na sacola, toque em "+ Volumoso" e anote onde guardou no carro com 1 clique!</p>
         </div>
       </template>
 
