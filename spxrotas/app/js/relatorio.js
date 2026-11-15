@@ -487,7 +487,7 @@
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(148, 163, 184);
         doc.text(
-          `SPXrotas • Sistema de Telemetria Logística • STUDIOTESTA (CNPJ: 54.404.992/0001-41) • Página ${i} de ${totalPaginas}`,
+          `SPXrotas • Sistema de Telemetria Logística • STUDIOTESTA - www.studiotesta.com.br • Página ${i} de ${totalPaginas}`,
           margemX,
           290
         );
