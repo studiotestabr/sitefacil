@@ -1,7 +1,8 @@
 /* ==========================================================================
-   SPXrotas Pro v2.5.0 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v2.6.0 - Núcleo Mestre Reativo Oficial
    Interpolação Métrica de Número Predial (Padrão Waze/Uber), Módulo Volumosos com Voz,
-   Radares Blindados com Cache Offline, Pingo Inteligente 3D & Directus Limpo
+   Radares Blindados com Cache Offline, Pingo Inteligente 3D, Status Conferido no Banco
+   & Reordenação Fluida por Toque (Antes da Bipagem)
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -27,7 +28,27 @@ function spxRotasApp() {
     modalCadastroObrigatorio: false,
     modalRelatorio: false,
     modalVolumoso: false,
+    modalMoverPosicao: false,
     dadosRelatorio: null,
+
+    // Toast Flutuante Não-Bloqueante
+    toastMensagem: '',
+    toastTimer: null,
+
+    // Controle de Reordenação Fluida (Segurar & Arrastar + Pulo Direto)
+    cardArrastandoId: null,
+    cardAlvoId: null,
+    cardAlvoPosicao: null, // 'acima' | 'abaixo'
+    longPressTimer: null,
+    touchInicioX: 0,
+    touchInicioY: 0,
+    ultimoClientY: 0,
+    bloqueioClickPosDrag: false,
+    autoScrollInterval: null,
+    pacoteMovendoPosicao: null,
+    novaPosicaoInput: '',
+    _boundMoverToque: null,
+    _boundFinalizarToque: null,
 
     // Módulo de Objetos Volumosos (Notas & Alocação no Veículo)
     pacoteEditandoVolumoso: null,
@@ -178,6 +199,300 @@ function spxRotasApp() {
     isStandalone: false,
     isIOS: false,
     isMobile: false,
+
+    // =========================================================================
+    // TOAST NÃO-BLOQUEANTE & REORDENAÇÃO FLUIDA DE CARDS NA ABA SACOLAS
+    // =========================================================================
+    mostrarToast(msg, duracao = 2600) {
+      this.toastMensagem = msg;
+      if (this.toastTimer) clearTimeout(this.toastTimer);
+      this.toastTimer = setTimeout(() => {
+        this.toastMensagem = '';
+      }, duracao);
+    },
+
+    get podeReordenarSacolas() {
+      if (!this.entregas || this.entregas.length < 2) return false;
+      if (this.idsConferidos && this.idsConferidos.size > 0) return false;
+      const jaIniciou = this.entregas.some(e =>
+        e.status === 'conferido' ||
+        e.status === 'entregue' ||
+        e.status === 'ausente' ||
+        e.status === 'recusado'
+      );
+      return !jaIniciou;
+    },
+
+    clicarCardSacola(item) {
+      if (this.bloqueioClickPosDrag || this.cardArrastandoId !== null) return;
+      this.irParaEntregaDireta(item);
+    },
+
+    iniciarToqueCard(event, item) {
+      if (!item) return;
+      if (event.target && event.target.closest('button, a, input, select, textarea, .js-no-drag')) {
+        return;
+      }
+
+      const touch = event.touches && event.touches.length > 0 ? event.touches[0] : event;
+      this.touchInicioX = touch.clientX;
+      this.touchInicioY = touch.clientY;
+      this.ultimoClientY = touch.clientY;
+
+      if (this.longPressTimer) clearTimeout(this.longPressTimer);
+
+      this.longPressTimer = setTimeout(() => {
+        if (!this.podeReordenarSacolas) {
+          if ('vibrate' in navigator) navigator.vibrate([40, 30, 40]);
+          this.mostrarToast('🔒 Ordem travada: já existem pacotes bipados/marcados nesta rota.', 3200);
+          return;
+        }
+
+        this.cardArrastandoId = item.id;
+        this.cardAlvoId = null;
+        this.cardAlvoPosicao = null;
+        this.bloqueioClickPosDrag = true;
+
+        if ('vibrate' in navigator) navigator.vibrate(55);
+        this.mostrarToast(`↕️ Arraste o #${item.ordem_entrega} para a nova posição e solte`, 2400);
+
+        this._boundMoverToque = (ev) => this.moverToqueCard(ev);
+        this._boundFinalizarToque = () => this.finalizarToqueCard();
+
+        window.addEventListener('touchmove', this._boundMoverToque, { passive: false });
+        window.addEventListener('touchend', this._boundFinalizarToque);
+        window.addEventListener('touchcancel', this._boundFinalizarToque);
+        window.addEventListener('mousemove', this._boundMoverToque);
+        window.addEventListener('mouseup', this._boundFinalizarToque);
+
+        this.iniciarAutoScrollDrag();
+      }, 380);
+    },
+
+    detectarAlvoPorCoordenadaY(clientY) {
+      const cards = document.querySelectorAll('[data-sacola-card-id]');
+      let alvoEncontrado = null;
+      let posicaoEncontrada = null;
+
+      for (const el of cards) {
+        const rect = el.getBoundingClientRect();
+        if (clientY >= rect.top && clientY <= rect.bottom) {
+          const cid = el.getAttribute('data-sacola-card-id');
+          if (String(cid) !== String(this.cardArrastandoId)) {
+            alvoEncontrado = cid;
+            posicaoEncontrada = (clientY < rect.top + rect.height / 2) ? 'acima' : 'abaixo';
+          }
+          break;
+        }
+      }
+
+      if (alvoEncontrado !== null) {
+        this.cardAlvoId = alvoEncontrado;
+        this.cardAlvoPosicao = posicaoEncontrada;
+      }
+    },
+
+    moverToqueCard(event) {
+      const touch = event.touches && event.touches.length > 0 ? event.touches[0] : event;
+      const clientX = touch.clientX;
+      const clientY = touch.clientY;
+
+      if (this.cardArrastandoId === null) {
+        const deltaX = Math.abs(clientX - this.touchInicioX);
+        const deltaY = Math.abs(clientY - this.touchInicioY);
+        if (deltaX > 10 || deltaY > 10) {
+          if (this.longPressTimer) {
+            clearTimeout(this.longPressTimer);
+            this.longPressTimer = null;
+          }
+        }
+        return;
+      }
+
+      if (event.cancelable) event.preventDefault();
+      this.ultimoClientY = clientY;
+      this.detectarAlvoPorCoordenadaY(clientY);
+    },
+
+    iniciarAutoScrollDrag() {
+      this.pararAutoScrollDrag();
+      this.autoScrollInterval = setInterval(() => {
+        if (this.cardArrastandoId === null) {
+          this.pararAutoScrollDrag();
+          return;
+        }
+
+        const y = this.ultimoClientY;
+        const zonaTopo = 205;
+        const zonaBase = window.innerHeight - 95;
+
+        if (y > 0 && y < zonaTopo) {
+          const intensidade = Math.min(18, Math.max(5, Math.round((zonaTopo - y) / 7)));
+          window.scrollBy(0, -intensidade);
+          this.detectarAlvoPorCoordenadaY(y);
+        } else if (y > zonaBase) {
+          const intensidade = Math.min(18, Math.max(5, Math.round((y - zonaBase) / 5)));
+          window.scrollBy(0, intensidade);
+          this.detectarAlvoPorCoordenadaY(y);
+        }
+      }, 20);
+    },
+
+    pararAutoScrollDrag() {
+      if (this.autoScrollInterval) {
+        clearInterval(this.autoScrollInterval);
+        this.autoScrollInterval = null;
+      }
+    },
+
+    cancelarPreToqueCard() {
+      if (this.cardArrastandoId === null && this.longPressTimer) {
+        clearTimeout(this.longPressTimer);
+        this.longPressTimer = null;
+      }
+    },
+
+    finalizarToqueCard() {
+      if (this.longPressTimer) {
+        clearTimeout(this.longPressTimer);
+        this.longPressTimer = null;
+      }
+
+      this.pararAutoScrollDrag();
+
+      if (this._boundMoverToque) {
+        window.removeEventListener('touchmove', this._boundMoverToque);
+        window.removeEventListener('mousemove', this._boundMoverToque);
+      }
+      if (this._boundFinalizarToque) {
+        window.removeEventListener('touchend', this._boundFinalizarToque);
+        window.removeEventListener('touchcancel', this._boundFinalizarToque);
+        window.removeEventListener('mouseup', this._boundFinalizarToque);
+      }
+
+      const idOrigem = this.cardArrastandoId;
+      const idAlvo = this.cardAlvoId;
+      const posicao = this.cardAlvoPosicao;
+
+      this.cardArrastandoId = null;
+      this.cardAlvoId = null;
+      this.cardAlvoPosicao = null;
+
+      if (idOrigem !== null && idAlvo !== null && String(idOrigem) !== String(idAlvo)) {
+        this.reordenarEntregaPorAlvo(idOrigem, idAlvo, posicao);
+      }
+
+      if (this.bloqueioClickPosDrag) {
+        setTimeout(() => {
+          this.bloqueioClickPosDrag = false;
+        }, 350);
+      }
+    },
+
+    reordenarEntregaPorAlvo(idOrigem, idAlvo, posicao) {
+      if (!this.podeReordenarSacolas) {
+        this.mostrarToast('🔒 Reordenação bloqueada após início da bipagem.');
+        return;
+      }
+
+      const lista = [...this.entregasOrdenadasParaSacola];
+      const idxOrigem = lista.findIndex(e => String(e.id) === String(idOrigem));
+      if (idxOrigem === -1) return;
+
+      const [itemMovido] = lista.splice(idxOrigem, 1);
+      let idxAlvo = lista.findIndex(e => String(e.id) === String(idAlvo));
+      if (idxAlvo === -1) return;
+
+      if (posicao === 'abaixo') idxAlvo += 1;
+      lista.splice(idxAlvo, 0, itemMovido);
+
+      this.aplicarNovaOrdemLista(lista, itemMovido);
+    },
+
+    abrirModalMoverPosicao(item) {
+      if (!item) return;
+      if (!this.podeReordenarSacolas) {
+        if ('vibrate' in navigator) navigator.vibrate([40, 30, 40]);
+        this.mostrarToast('🔒 Ordem travada: já existem pacotes bipados nesta rota.', 3200);
+        return;
+      }
+      this.pacoteMovendoPosicao = item;
+      this.novaPosicaoInput = String(item.ordem_entrega || 1);
+      this.modalMoverPosicao = true;
+    },
+
+    fecharModalMoverPosicao() {
+      this.modalMoverPosicao = false;
+      this.pacoteMovendoPosicao = null;
+      this.novaPosicaoInput = '';
+    },
+
+    confirmarMoverPosicao() {
+      if (!this.pacoteMovendoPosicao || !this.podeReordenarSacolas) {
+        this.fecharModalMoverPosicao();
+        return;
+      }
+
+      const lista = [...this.entregasOrdenadasParaSacola];
+      const total = lista.length;
+      let posAlvo = parseInt(this.novaPosicaoInput, 10);
+
+      if (isNaN(posAlvo) || posAlvo < 1) posAlvo = 1;
+      if (posAlvo > total) posAlvo = total;
+
+      const idxOrigem = lista.findIndex(e => String(e.id) === String(this.pacoteMovendoPosicao.id));
+      if (idxOrigem === -1) {
+        this.fecharModalMoverPosicao();
+        return;
+      }
+
+      const [itemMovido] = lista.splice(idxOrigem, 1);
+      lista.splice(posAlvo - 1, 0, itemMovido);
+
+      this.aplicarNovaOrdemLista(lista, itemMovido);
+      this.fecharModalMoverPosicao();
+    },
+
+    aplicarNovaOrdemLista(listaOrdenada, itemMovido) {
+      const total = listaOrdenada.length;
+      const alterados = [];
+
+      listaOrdenada.forEach((p, idx) => {
+        const novaOrdem = idx + 1;
+        const novoCarregamento = (total - novaOrdem) + 1;
+        if (Number(p.ordem_entrega) !== novaOrdem || Number(p.ordem_carregamento) !== novoCarregamento) {
+          p.ordem_entrega = novaOrdem;
+          p.ordem_carregamento = novoCarregamento;
+          alterados.push({
+            id: p.id,
+            ordem_entrega: novaOrdem,
+            ordem_carregamento: novoCarregamento
+          });
+        }
+      });
+
+      this.entregas = [...listaOrdenada];
+      this.salvarCacheLocal();
+
+      if (this.mapaLeaflet && this.grupoMarcadores) {
+        this.desenharPinosERotaNoMapa();
+      }
+
+      if (alterados.length > 0) {
+        alterados.forEach(alt => {
+          this.enfileirarSincronizacao('PATCH', `/items/entregas/${alt.id}`, {
+            ordem_entrega: alt.ordem_entrega,
+            ordem_carregamento: alt.ordem_carregamento
+          });
+        });
+
+        if ('vibrate' in navigator) navigator.vibrate([45, 30, 45]);
+        if (itemMovido) {
+          const novaSacola = Math.ceil(itemMovido.ordem_entrega / 10);
+          this.mostrarToast(`✅ Canetão atualizado! Agora é #${itemMovido.ordem_entrega} (Sacola ${novaSacola})`, 3000);
+        }
+      }
+    },
 
     // =========================================================================
     // AUTO-COMPLETE COM INTERPOLAÇÃO MÉTRICA DE NÚMERO (PADRÃO WAZE / UBER)
@@ -429,7 +744,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // CONFERÊNCIA ANTI-PACOTE TROCADO (LARANJA ➔ VERDE)
+    // CONFERÊNCIA ANTI-PACOTE TROCADO (LARANJA ➔ VERDE VIVO NO APP E NO BANCO)
     // =========================================================================
     carregarConferidosLocal() {
       if (!this.rotaAtivaId) return;
@@ -452,18 +767,30 @@ function spxRotasApp() {
 
     isPacoteConferido(item) {
       if (!item) return false;
-      return this.idsConferidos.has(item.id) || item.status === 'entregue' || item.status === 'ausente';
+      return item.status === 'conferido' || this.idsConferidos.has(item.id) || item.status === 'entregue' || item.status === 'ausente';
     },
 
     marcarComoConferidoManual(item) {
       if (!item) return;
       this.idsConferidos.add(item.id);
       this.salvarConferidosLocal();
+
+      if (item.status === 'pendente' || !item.status) {
+        this.atualizarStatus(item.id, 'conferido');
+      } else {
+        this.salvarCacheLocal();
+      }
+
       if ('vibrate' in navigator) navigator.vibrate(50);
     },
 
     get pacotesAguardandoBipagem() {
-      return this.entregas.filter(e => e.status !== 'entregue' && e.status !== 'ausente' && !this.idsConferidos.has(e.id));
+      return this.entregas.filter(e =>
+        e.status !== 'entregue' &&
+        e.status !== 'ausente' &&
+        e.status !== 'conferido' &&
+        !this.idsConferidos.has(e.id)
+      );
     },
 
     // =========================================================================
@@ -844,10 +1171,15 @@ function spxRotasApp() {
         this.timestampUltimoBip = agora;
         this.ultimoPacoteBipado = match;
 
-        // 🟢 Transição do Ciclo de Conferência: Laranja ➔ Verde
+        // 🟢 Transição do Ciclo de Conferência: Laranja ➔ Verde (Salva no Celular e no Banco Directus)
         this.idsConferidos.add(match.id);
         this.salvarConferidosLocal();
-        this.salvarCacheLocal();
+
+        if (match.status === 'pendente' || !match.status) {
+          this.atualizarStatus(match.id, 'conferido');
+        } else {
+          this.salvarCacheLocal();
+        }
 
         this.tocarBipScanner();
         if ('vibrate' in navigator) navigator.vibrate([80, 40, 80]);
@@ -1111,7 +1443,7 @@ function spxRotasApp() {
         const sel = this.entregas.find(e => e.id === this.entregaSelecionadaId);
         if (sel && sel.status !== 'entregue') return sel;
       }
-      const primeiroPronto = this.entregas.find(e => e.status === 'pendente' && this.idsConferidos.has(e.id));
+      const primeiroPronto = this.entregas.find(e => e.status === 'conferido' || (e.status === 'pendente' && this.idsConferidos.has(e.id)));
       if (primeiroPronto) return primeiroPronto;
       const primeiroNaoEntregue = this.entregas.find(e => e.status === 'pendente');
       if (primeiroNaoEntregue) return primeiroNaoEntregue;
@@ -1520,7 +1852,8 @@ function spxRotasApp() {
     // =========================================================================
     async reabrirEntrega(item) {
       if (!item) return;
-      await this.atualizarStatus(item.id, 'pendente');
+      const statusRetorno = this.idsConferidos.has(item.id) ? 'conferido' : 'pendente';
+      await this.atualizarStatus(item.id, statusRetorno);
       this.entregaSelecionadaId = item.id;
       if ('vibrate' in navigator) navigator.vibrate([40, 40]);
     },
@@ -1587,17 +1920,22 @@ function spxRotasApp() {
         this.entregas[idx].status = novoStatus;
       }
 
+      if (novoStatus === 'conferido') {
+        this.idsConferidos.add(id);
+        this.salvarConferidosLocal();
+      }
+
       this.salvarCacheLocal();
       if (this.modo === 'mapa') this.desenharPinosERotaNoMapa();
 
       const payloadLimpo = { status: novoStatus };
       if (navigator.onLine) {
         try {
-          await this.fetchDirectus(`/items/entregas/${id}`, {
+          const res = await this.fetchDirectus(`/items/entregas/${id}`, {
             method: 'PATCH',
             body: JSON.stringify(payloadLimpo)
           });
-          return;
+          if (res && res.ok) return;
         } catch (e) {}
       }
 
@@ -1676,7 +2014,7 @@ function spxRotasApp() {
         pontosLinha.push(coord);
 
         let corFundo = '#ea580c';
-        if (this.isPacoteConferido(p)) corFundo = '#10b981';
+        if (this.isPacoteConferido(p)) corFundo = '#22c55e';
         if (p.status === 'entregue') corFundo = '#ef4444';
         if (p.status === 'ausente') corFundo = '#f59e0b';
 
@@ -2108,7 +2446,7 @@ function spxRotasApp() {
       if (!this.mapaNavGL || !lat || !lng) return;
       const numCanetao = this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : '';
       let corFundo = '#ea580c';
-      if (this.isPacoteConferido(this.entregaNavegacao)) corFundo = '#10b981';
+      if (this.isPacoteConferido(this.entregaNavegacao)) corFundo = '#22c55e';
       if (this.entregaNavegacao?.status === 'entregue') corFundo = '#ef4444';
       if (this.entregaNavegacao?.status === 'ausente') corFundo = '#f59e0b';
 
@@ -2505,9 +2843,10 @@ function spxRotasApp() {
 
           const mapaStatusLocal = new Map();
           const mapaVolumososLocal = new Map();
+          const mapaOrdemPendenteSync = new Map();
 
           (this.entregas || []).forEach(e => {
-            if (e.status === 'entregue' || e.status === 'ausente') {
+            if (e.status === 'entregue' || e.status === 'ausente' || e.status === 'conferido') {
               mapaStatusLocal.set(e.id, e.status);
             }
             if (e.is_volumoso) {
@@ -2520,10 +2859,34 @@ function spxRotasApp() {
             }
           });
 
-          entregasServidor.forEach(e => {
-            if (mapaStatusLocal.has(e.id)) {
-              e.status = mapaStatusLocal.get(e.id);
+          (this.syncQueue || []).forEach(q => {
+            if (q.endpoint && q.endpoint.startsWith('/items/entregas/') && q.payload && q.payload.ordem_entrega !== undefined) {
+              const idStr = q.endpoint.replace('/items/entregas/', '');
+              mapaOrdemPendenteSync.set(idStr, {
+                ordem_entrega: q.payload.ordem_entrega,
+                ordem_carregamento: q.payload.ordem_carregamento
+              });
             }
+          });
+
+          entregasServidor.forEach(e => {
+            if (e.status === 'conferido') {
+              this.idsConferidos.add(e.id);
+            } else if (mapaStatusLocal.has(e.id)) {
+              const stLocal = mapaStatusLocal.get(e.id);
+              if (e.status === 'pendente' || stLocal === 'entregue' || stLocal === 'ausente') {
+                e.status = stLocal;
+              }
+            } else if (this.idsConferidos.has(e.id) && e.status === 'pendente') {
+              e.status = 'conferido';
+            }
+
+            if (mapaOrdemPendenteSync.has(String(e.id))) {
+              const ord = mapaOrdemPendenteSync.get(String(e.id));
+              e.ordem_entrega = ord.ordem_entrega;
+              e.ordem_carregamento = ord.ordem_carregamento;
+            }
+
             if (mapaVolumososLocal.has(e.id)) {
               const v = mapaVolumososLocal.get(e.id);
               e.is_volumoso = true;
@@ -2533,7 +2896,8 @@ function spxRotasApp() {
             }
           });
 
-          this.entregas = entregasServidor;
+          this.salvarConferidosLocal();
+          this.entregas = entregasServidor.sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
           this.rotaGeometria = dataR?.data?.geometria || this.rotaGeometria;
 
           this.salvarCacheLocal();
