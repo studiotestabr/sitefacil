@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPXrotas - Demo Cinematográfica Oficial (9:16)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #02040a;
+      color: #ffffff;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 12px;
+    }
+
+    /* BARRA DE CONTROLE DO ESTÚDIO (ESCONDIDA NO MODO GRAVAÇÃO LIMPA) */
+    .studio-bar {
+      width: 100%;
+      max-width: 780px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 100;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    }
+    body.clean-mode {
+      padding: 0;
+      background: #000000;
+      overflow: hidden;
+    }
+    body.clean-mode .studio-bar,
+    body.clean-mode .studio-hint {
+      display: none !important;
+    }
+
+    .studio-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .btn-ctrl {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-ctrl:hover { background: #334155; }
+    .btn-ctrl.primary { background: #ea580c; border-color: #f97316; color: #fff; }
+    .btn-ctrl.primary:hover { background: #f97316; }
+    .btn-ctrl.active { background: #0284c7; border-color: #38bdf8; color: #fff; }
+    .btn-ctrl.green { background: #16a34a; border-color: #22c55e; color: #fff; }
+
+    .scene-pills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .pill-scene {
+      background: #020617;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .pill-scene.atual {
+      background: #ea580c;
+      color: #fff;
+      border-color: #fb923c;
+    }
+
+    .studio-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* PALCO 9:16 VERTICAL DO VÍDEO */
+    .stage-9-16 {
+      width: 390px;
+      height: 693px; /* Proporção exata 9:16 */
+      max-height: 92vh;
+      max-width: 96vw;
+      aspect-ratio: 9 / 16;
+      background: radial-gradient(circle at top, #131c31 0%, #050811 65%, #020409 100%);
+      border-radius: 28px;
+      border: 2px solid rgba(234, 88, 12, 0.55);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 50px rgba(234, 88, 12, 0.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    body.clean-mode .stage-9-16 {
+      height: 100vh;
+      max-height: 100vh;
+      width: auto;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* TOPO DO VÍDEO: MARCA + PROGRESSO + LEGENDA VIRAL */
+    .video-top-hud {
+      padding: 16px 16px 8px;
+      z-index: 30;
+      background: linear-gradient(180deg, rgba(2,4,9,0.95) 0%, rgba(2,4,9,0.75) 75%, transparent 100%);
+    }
+    .story-bars {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .story-bar {
+      height: 3.5px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .story-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ea580c, #fbbf24);
+      transition: width 0.1s linear;
+    }
+    .story-bar.done .story-bar-fill { width: 100% !important; }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ea580c, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(234,88,12,0.5);
+    }
+    .scene-tag {
+      background: rgba(234, 88, 12, 0.18);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      color: #fdba74;
+      font-size: 9.5px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 4px 9px;
+      border-radius: 99px;
+    }
+
+    .headline-viral {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      line-height: 1.15;
+      text-align: center;
+      color: #ffffff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .headline-viral span.hl-orange { color: #fb923c; }
+    .headline-viral span.hl-green { color: #4ade80; }
+    .headline-viral span.hl-cyan { color: #38bdf8; }
+    .headline-viral span.hl-red { color: #f87171; }
+
+    /* ÁREA CENTRAL DE CENAS (MOCKUP DO CELULAR INTERNO) */
+    .scenes-viewport {
+      flex: 1;
+      position: relative;
+      padding: 4px 14px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 6px 14px 10px;
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+      transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .scene.ativa {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    /* RODAPÉ DE LEGENDA VIRAL ESTILO REELS */
+    .video-bottom-caption {
+      padding: 10px 16px 16px;
+      background: linear-gradient(0deg, rgba(2,4,9,0.98) 25%, rgba(2,4,9,0.8) 80%, transparent 100%);
+      z-index: 30;
+      text-align: center;
+    }
+    .caption-pill {
+      display: inline-block;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1.5px solid rgba(251, 146, 60, 0.7);
+      border-radius: 16px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.3;
+      color: #f8fafc;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+    }
+
+    /* COMPONENTES REAIS DO APP DENTRO DAS CENAS */
+    .phone-frame {
+      background: #070b14;
+      border: 2px solid #1e293b;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.85);
+      width: 100%;
+      position: relative;
+    }
+    .app-header {
+      background: #ea580c;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .app-header-title {
+      font-weight: 900;
+      font-size: 16px;
+      color: #fff;
+    }
+    .app-header-title span { color: #020617; }
+    .app-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      padding: 6px 8px 8px;
+      background: #ea580c;
+    }
+    .app-tab {
+      background: #c2410c;
+      color: #ffedd5;
+      font-size: 8.5px;
+      font-weight: 900;
+      text-align: center;
+      padding: 5px 2px;
+      border-radius: 8px;
+    }
+    .app-tab.active {
+      background: #020617;
+      color: #fff;
+    }
+    .app-tab.white {
+      background: #ffffff;
+      color: #ea580c;
+    }
+
+    /* CARDS CANETÃO */
+    .card-sacola {
+      background: #14111a;
+      border: 1.5px solid rgba(234,88,12,0.55);
+      border-left: 5px solid #ea580c;
+      border-radius: 16px;
+      padding: 10px;
+      margin-bottom: 8px;
+      transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+    }
+    .card-sacola.verde-vivo {
+      background: #0b1f16;
+      border-color: rgba(34, 197, 94, 0.85);
+      border-left-color: #22c55e;
+      box-shadow: 0 6px 20px rgba(34,197,94,0.22);
+    }
+    .card-sacola.arrastando {
+      border: 2px solid #f97316;
+      border-left-width: 5px;
+      transform: scale(1.04) translateY(-76px);
+      z-index: 25;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.95), 0 0 24px rgba(249,115,22,0.7);
+    }
+    .card-sacola.descendo {
+      transform: translateY(84px);
+    }
+
+    .grid-4-nums {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .num-box-orange {
+      background: #1c1815;
+      border: 1.5px solid rgba(234,88,12,0.8);
+      border-radius: 10px;
+      padding: 4px 2px;
+      color: #fb923c;
+    }
+    .num-box-green {
+      background: #0f261b;
+      border: 1.5px solid #22c55e;
+      border-radius: 10px;
+      padding: 4px 2px;
+      color: #4ade80;
+    }
+    .num-box-dark {
+      background: #1c2430;
+      border: 1.5px solid #2b394a;
+      border-radius: 10px;
+      padding: 4px 2px;
+      color: #ffffff;
+    }
+    .lbl-mini { font-size: 7px; font-weight: 900; display: block; opacity: 0.85; }
+    .val-mini { font-size: 16px; font-weight: 900; font-family: monospace; line-height: 1.1; }
+
+    .badge-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 8.5px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .badge-orange { background: rgba(234,88,12,0.2); color: #fb923c; border: 1px solid rgba(234,88,12,0.5); }
+    .badge-green { background: rgba(34,197,94,0.22); color: #4ade80; border: 1px solid rgba(74,222,128,0.8); }
+    .badge-vol { background: rgba(234,88,12,0.28); color: #fed7aa; border: 1px solid #f97316; }
+
+    .finger-pointer {
+      position: absolute;
+      font-size: 26px;
+      z-index: 40;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9));
+      transition: all 0.4s ease;
+      pointer-events: none;
+    }
+
+    /* CENA 1: ZAP + AUTO COMPLETE */
+    .wa-bubble {
+      background: #005c4b;
+      color: #fff;
+      border-radius: 14px;
+      padding: 9px 11px;
+      font-size: 11px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(37,211,102,0.4);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    }
+    .modal-rota-box {
+      background: #0f172a;
+      border: 1.5px solid rgba(234,88,12,0.7);
+      border-radius: 16px;
+      padding: 10px;
+      font-size: 10.5px;
+    }
+    .sugestao-item {
+      background: #020617;
+      border: 1px solid #f97316;
+      border-radius: 10px;
+      padding: 7px 9px;
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: pulseBorder 1.4s infinite alternate;
+    }
+    @keyframes pulseBorder {
+      from { box-shadow: 0 0 0 rgba(249,115,22,0.2); }
+      to { box-shadow: 0 0 14px rgba(249,115,22,0.55); }
+    }
+
+    /* CENA 3: BIPADOR */
+    .scanner-box {
+      background: #000;
+      border: 2px solid #ea580c;
+      border-radius: 18px;
+      height: 155px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .barcode-sim {
+      background: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .barcode-bars {
+      width: 120px;
+      height: 38px;
+      background: repeating-linear-gradient(90deg, #000 0, #000 3px, #fff 3px, #fff 5px, #000 5px, #000 6px, #fff 6px, #fff 9px, #000 9px, #000 13px, #fff 13px, #fff 15px);
+    }
+    .laser-beam {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #ef4444, #f97316, transparent);
+      box-shadow: 0 0 12px #ef4444;
+      animation: scanLaser 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes scanLaser {
+      from { top: 18%; }
+      to { top: 82%; }
+    }
+    .voz-balao {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1.5px solid #fbbf24;
+      color: #fde68a;
+      border-radius: 12px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 8px;
+      animation: popIn 0.35s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* CENA 4: VOLUMOSOS */
+    .pilula-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin: 8px 0;
+    }
+    .pilula-sim {
+      background: #111827;
+      border: 1.5px solid #374151;
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #e5e7eb;
+    }
+    .pilula-sim.sel {
+      background: rgba(234,88,12,0.24);
+      border-color: #ea580c;
+      color: #fb923c;
+      box-shadow: 0 0 12px rgba(234,88,12,0.35);
+    }
+
+    /* CENA 5: GPS 3D */
+    .gps-3d-canvas {
+      background: #141c2b;
+      height: 255px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1.5px solid #1e293b;
+    }
+    .road-strip {
+      position: absolute;
+      top: -60px;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      background: #25334a;
+      display: flex;
+      justify-content: center;
+    }
+    .road-cyan-line {
+      width: 10px;
+      height: 100%;
+      background: #38bdf8;
+      box-shadow: 0 0 16px #38bdf8;
+    }
+    .cross-road {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 24px;
+      background: #1c283d;
+      animation: moveRoad 2.6s linear infinite;
+    }
+    @keyframes moveRoad {
+      from { top: -30px; }
+      to { top: 270px; }
+    }
+    .radar-sign-3d {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 15;
+      animation: moveRadar 3.8s linear infinite;
+    }
+    @keyframes moveRadar {
+      0% { top: -35px; opacity: 0; }
+      15% { opacity: 1; }
+      75% { top: 165px; opacity: 1; }
+      100% { top: 230px; opacity: 0; }
+    }
+    .radar-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3.5px solid #dc2626;
+      color: #0f172a;
+      font-family: monospace;
+      font-weight: 900;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fiorino-wrap {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .speed-hud {
+      position: absolute;
+      bottom: 12px;
+      left: 10px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(15,23,42,0.95);
+      border: 2.5px solid #38bdf8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 25;
+      animation: speedAlert 3.8s infinite;
+    }
+    @keyframes speedAlert {
+      0%, 40% { border-color: #38bdf8; background: rgba(15,23,42,0.95); }
+      55%, 75% { border-color: #ef4444; background: rgba(185,28,28,0.95); transform: scale(1.08); }
+      90%, 100% { border-color: #38bdf8; background: rgba(15,23,42,0.95); }
+    }
+    .side-btns-3d {
+      position: absolute;
+      bottom: 12px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 25;
+    }
+    .btn-3d-mini {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    }
+
+    /* CENA 6: MAPA + PDF */
+    .pdf-card {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.75);
+      border: 2px solid #cbd5e1;
+    }
+    .pdf-top {
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 12px;
+      border-bottom: 3px solid #ea580c;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pdf-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      padding: 10px;
+      text-align: center;
+    }
+    .pdf-kpi {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 6px 2px;
+    }
+
+    /* CENA 7: CTA FINAL */
+    .cta-box {
+      text-align: center;
+      padding: 18px 14px;
+      background: linear-gradient(160deg, rgba(234,88,12,0.22) 0%, rgba(15,23,42,0.95) 70%);
+      border: 2px solid #f97316;
+      border-radius: 24px;
+      box-shadow: 0 0 40px rgba(234,88,12,0.35);
+    }
+    .price-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .price-card {
+      background: #050811;
+      border: 1.5px solid #334155;
+      border-radius: 14px;
+      padding: 10px 6px;
+    }
+    .price-card.destaque {
+      border-color: #22c55e;
+      background: #081c13;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE CONTROLE (SUMIRÁ NO MODO GRAVAÇÃO LIMPA) -->
+  <div class="studio-bar">
+    <div class="studio-btns">
+      <button id="btnPlayPause" class="btn-ctrl primary" onclick="togglePlay()">⏸ Pausar</button>
+      <button class="btn-ctrl" onclick="reiniciarDemo()">↺ Reiniciar</button>
+      <button id="btnSom" class="btn-ctrl active" onclick="toggleSom()">🔊 Bipes Ligados</button>
+      <button class="btn-ctrl green" onclick="ativarModoGravacao()">🎬 Modo Gravação Limpa (9:16)</button>
+    </div>
+    <div class="scene-pills" id="scenePills"></div>
+  </div>
+
+  <!-- PALCO 9:16 VERTICAL DO VÍDEO -->
+  <div class="stage-9-16" id="stageVideo" onclick="sairModoGravacaoSeClick()">
+
+    <!-- TOPO DO VÍDEO -->
+    <div class="video-top-hud">
+      <div class="story-bars" id="storyBars"></div>
+      <div class="brand-row">
+        <div class="brand-logo">
+          <div class="brand-icon">🧭</div>
+          <span>SPX<span style="color:#ea580c;">rotas</span></span>
+        </div>
+        <div class="scene-tag" id="sceneTag">1/7 • ZAP DAS ROTAS</div>
+      </div>
+      <div class="headline-viral" id="headlineViral"></div>
+    </div>
+
+    <!-- CENAS DINÂMICAS -->
+    <div class="scenes-viewport">
+
+      <!-- CENA 1: ZAP DAS ROTAS + AUTO-COMPLETE + AT ID -->
+      <div class="scene ativa" id="scene-0">
+        <div class="phone-frame" style="padding:12px;">
+          <div class="wa-bubble">
+            <div style="font-weight:900; color:#4ade80; font-size:10px; margin-bottom:4px;">💬 ZAP DAS ROTAS OFICIAL</div>
+            <div style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:7px; border-radius:10px;">
+              <span style="font-size:20px;">📊</span>
+              <div>
+                <div style="font-weight:800; font-size:11px;">23-10-2026 ROMANEIO.xlsx</div>
+                <div style="font-size:9px; color:#cbd5e1;">Compartilhado da Shopee • AT20261023BOIBC</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-rota-box">
+            <div style="font-size:9px; font-weight:900; color:#fb923c; margin-bottom:4px;">📍 PARTIDA & RETORNO (PADRÃO UBER)</div>
+            <div style="background:#020617; border:1px solid #334155; padding:7px 9px; border-radius:9px; font-weight:700; color:#fff;">
+              Av. Princesa Isabel, 463
+            </div>
+            <div class="sugestao-item">
+              <div>
+                <div style="font-weight:900; color:#fff; font-size:10.5px;">📍 Av. Princesa Isabel, 463</div>
+                <div style="font-size:8.5px; color:#94a3b8;">Centro, Itanhaém - SP (Portão Exato)</div>
+              </div>
+              <span style="background:#ea580c; color:#fff; font-size:9px; font-weight:900; padding:2px 6px; border-radius:5px;">Nº 463</span>
+            </div>
+            <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.4); padding:6px 8px; border-radius:9px;">
+              <span style="font-size:9.5px; font-weight:800; color:#6ee7b7;">🔒 Trava AT ID Ativa</span>
+              <span style="font-size:8.5px; color:#a7f3d0; font-weight:700;">Zero duplicidade</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENA 2: REORDENAÇÃO FLUIDA ANTES DA BIPAGEM -->
+      <div class="scene" id="scene-1">
+        <div class="phone-frame">
+          <div class="app-header">
+            <div class="app-header-title">SPX<span>rotas</span></div>
+            <span style="background:#020617; color:#fb923c; font-size:9px; font-weight:900; padding:3px 8px; border-radius:6px;">ROTA #148</span>
+          </div>
+          <div class="app-tabs">
+            <div class="app-tab white">⚡ Rota</div>
+            <div class="app-tab active">👜 Sacolas</div>
+            <div class="app-tab">🚗 Rua</div>
+            <div class="app-tab">🗺️ Mapa</div>
+            <div class="app-tab">📜 Hist.</div>
+          </div>
+
+          <div style="padding:10px; position:relative;">
+            <div style="background:rgba(249,115,22,0.12); border:1px dashed rgba(249,115,22,0.6); color:#fdba74; font-size:9px; font-weight:800; padding:5px 8px; border-radius:9px; margin-bottom:8px; text-align:center;">
+              ↕️ Antes de bipar: segure e arraste ou toque em ⇅ Mover
+            </div>
+
+            <!-- Card Superior -->
+            <div class="card-sacola" id="dragCardTop">
+              <div class="grid-4-nums">
+                <div class="num-box-orange"><span class="lbl-mini">CANETÃO</span><span class="val-mini" id="numTopCanetao">#12</span></div>
+                <div class="num-box-dark"><span class="lbl-mini">ORDEM</span><span class="val-mini">18</span></div>
+                <div class="num-box-dark"><span class="lbl-mini">PARADA</span><span class="val-mini">14</span></div>
+                <div class="num-box-orange"><span class="lbl-mini">SACOLA</span><span class="val-mini" id="numTopSacola">2</span></div>
+              </div>
+              <div style="font-size:11px; font-weight:900; color:#fff;">Rua das Flores, 290</div>
+              <div style="font-size:9px; color:#94a3b8;">Centro • Aguardando Bipagem</div>
+            </div>
+
+            <!-- Card que sobe -->
+            <div class="card-sacola" id="dragCardMoving">
+              <div class="grid-4-nums">
+                <div class="num-box-orange"><span class="lbl-mini">CANETÃO</span><span class="val-mini" id="numMoveCanetao">#13</span></div>
+                <div class="num-box-dark"><span class="lbl-mini">ORDEM</span><span class="val-mini">45</span></div>
+                <div class="num-box-dark"><span class="lbl-mini">PARADA</span><span class="val-mini">38</span></div>
+                <div class="num-box-orange"><span class="lbl-mini">SACOLA</span><span class="val-mini" id="numMoveSacola">2</span></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-size:11px; font-weight:900; color:#fff;">Rua das Flores, 40 (Fora de mão)</div>
+                  <div style="font-size:9px; color:#94a3b8;">Centro • Segure para mover</div>
+                </div>
+                <span style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.5); color:#7dd3fc; font-size:9px; font-weight:900; padding:3px 7px; border-radius:7px;">⇅ Mover</span>
+              </div>
+            </div>
+
+            <div class="finger-pointer" id="dragFinger" style="right:24px; bottom:24px;">👆</div>
+            <div id="toastReordem" style="display:none; background:#0f172a; border:1.5px solid #22c55e; color:#4ade80; font-size:9.5px; font-weight:900; padding:6px 10px; border-radius:99px; text-align:center; margin-top:4px;">
+              ✅ Canetão atualizado! Ordem e Mapa sincronizados
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENA 3: BIPADOR POR VOZ + LARANJA -> VERDE VIVO -->
+      <div class="scene" id="scene-2">
+        <div class="phone-frame" style="padding:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:11px; font-weight:900; color:#fff;">📸 Bipador de Sacolas com Voz</span>
+            <span class="badge-mini badge-green" id="bipBadge">✅ Canetão #12 identificado!</span>
+          </div>
+
+          <div class="scanner-box">
+            <div class="barcode-sim">
+              <div class="barcode-bars"></div>
+              <span style="color:#000; font-family:monospace; font-size:9px; font-weight:900;">BR260004836856T</span>
+            </div>
+            <div class="laser-beam"></div>
+          </div>
+
+          <div class="voz-balao">
+            🗣️ Voz no Carro: "Canetão 12! Sacola 2!"
+          </div>
+
+          <div class="card-sacola verde-vivo" style="margin-bottom:4px;">
+            <div class="grid-4-nums">
+              <div class="num-box-green"><span class="lbl-mini">CANETÃO</span><span class="val-mini">#12</span></div>
+              <div class="num-box-dark"><span class="lbl-mini">ORDEM</span><span class="val-mini">45</span></div>
+              <div class="num-box-dark"><span class="lbl-mini">PARADA</span><span class="val-mini">38</span></div>
+              <div class="num-box-green"><span class="lbl-mini">SACOLA</span><span class="val-mini">2</span></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge-mini badge-green">🟢 Pronto / Conferido</span>
+              <span style="font-size:9px; color:#86efac; font-weight:800;">🔒 Ordem travada</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENA 4: MÓDULO DE VOLUMOSOS COM 1 TOQUE -->
+      <div class="scene" id="scene-3">
+        <div class="phone-frame" style="padding:12px;">
+          <div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid #1e293b; padding-bottom:8px; margin-bottom:8px;">
+            <span style="font-size:20px;">📦</span>
+            <div>
+              <div style="font-size:13px; font-weight:900; color:#fff;">Objeto Volumoso</div>
+              <div style="font-size:9.5px; color:#fb923c; font-weight:800;">Canetão #12 • Fora da Sacola</div>
+            </div>
+          </div>
+
+          <div style="font-size:9px; font-weight:900; color:#94a3b8; text-transform:uppercase;">1. Onde guardou no carro?</div>
+          <div class="pilula-grid">
+            <div class="pilula-sim">🚗 Banco Traseiro</div>
+            <div class="pilula-sim sel">📦 Porta-Malas</div>
+            <div class="pilula-sim">💺 Assoalho</div>
+            <div class="pilula-sim">🚪 Perto da Tampa</div>
+          </div>
+
+          <div style="font-size:9px; font-weight:900; color:#94a3b8; text-transform:uppercase; margin-top:4px;">2. Embalagem:</div>
+          <div class="pilula-grid">
+            <div class="pilula-sim sel">📦 Caixa Grande</div>
+            <div class="pilula-sim">🟠 Caixa Full</div>
+          </div>
+
+          <div class="card-sacola verde-vivo" style="margin-top:6px; margin-bottom:4px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge-mini badge-vol">📦 FORA DA SACOLA • PORTA-MALAS</span>
+              <span style="font-size:10px; font-weight:900; color:#4ade80; font-family:monospace;">#12</span>
+            </div>
+            <div style="font-size:10px; color:#fde68a; font-weight:800; margin-top:5px;">
+              🗣️ GPS avisa na chegada: "Volumoso no Porta-Malas!"
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENA 5: GPS 3D, RADARES, OFFLINE, PINGO AZUL & SOS -->
+      <div class="scene" id="scene-4">
+        <div class="phone-frame" style="padding:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#020617; padding:6px 10px; border-radius:12px; border:1px solid #1e293b; margin-bottom:6px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:16px; color:#38bdf8;">⬆️</span>
+              <div>
+                <div style="font-size:15px; font-weight:900; font-family:monospace; line-height:1;">210 m</div>
+                <div style="font-size:9.5px; color:#38bdf8; font-weight:800;">Av. Flacides Ferreira, 1450</div>
+              </div>
+            </div>
+            <span style="background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.6); color:#fca5a5; font-size:8px; font-weight:900; padding:3px 6px; border-radius:99px;">📡 OFFLINE OK</span>
+          </div>
+
+          <div class="gps-3d-canvas">
+            <div class="cross-road" style="animation-delay: 0s;"></div>
+            <div class="cross-road" style="animation-delay: -1.3s;"></div>
+            <div class="road-strip"><div class="road-cyan-line"></div></div>
+
+            <!-- Placa de Radar animada -->
+            <div class="radar-sign-3d">
+              <div class="radar-circle">50</div>
+              <div style="width:3px; height:8px; background:#cbd5e1;"></div>
+            </div>
+
+            <!-- Plaqueta Alerta Radar -->
+            <div style="position:absolute; top:8px; right:8px; background:rgba(15,23,42,0.95); border:1.5px solid #ef4444; border-radius:12px; padding:4px 8px; display:flex; align-items:center; gap:6px; z-index:25;">
+              <div class="radar-circle" style="width:24px; height:24px; font-size:10px; border-width:2.5px;">50</div>
+              <div style="font-size:8.5px; line-height:1.1;">
+                <span style="color:#f87171; font-weight:900; display:block;">RADAR NA VIA</span>
+                <span style="color:#fff; font-weight:800;">Trava de Pista</span>
+              </div>
+            </div>
+
+            <!-- Fiorino Laranja SVG Oficial -->
+            <div class="fiorino-wrap">
+              <svg width="26" height="44" viewBox="0 0 40 70" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 4px 8px rgba(0,0,0,0.9));">
+                <rect x="2" y="10" width="4" height="12" rx="2" fill="#111"/>
+                <rect x="34" y="10" width="4" height="12" rx="2" fill="#111"/>
+                <rect x="2" y="48" width="4" height="12" rx="2" fill="#111"/>
+                <rect x="34" y="48" width="4" height="12" rx="2" fill="#111"/>
+                <rect x="4" y="4" width="32" height="62" rx="6" fill="#ea580c"/>
+                <path d="M 6 18 L 34 18 L 32 26 L 8 26 Z" fill="#1e293b"/>
+                <rect x="6" y="28" width="28" height="30" rx="2" fill="#c2410c"/>
+                <rect x="6" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
+                <rect x="28" y="2" width="6" height="3" rx="1" fill="#fef08a"/>
+                <rect x="6" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+                <rect x="29" y="65" width="5" height="3" rx="1" fill="#ef4444"/>
+              </svg>
+              <span style="background:#0f172a; border:1px solid rgba(255,255,255,0.3); font-size:8.5px; font-weight:800; padding:2px 8px; border-radius:99px; margin-top:2px;">Av. Flacides Ferreira</span>
+            </div>
+
+            <!-- Velocímetro -->
+            <div class="speed-hud">
+              <span style="font-size:15px; font-weight:900; font-family:monospace; line-height:1;">54</span>
+              <span style="font-size:7px; color:#cbd5e1; font-weight:800;">km/h</span>
+            </div>
+
+            <!-- 3 Botões Empilhados -->
+            <div class="side-btns-3d">
+              <div class="btn-3d-mini" style="background:#0284c7;">📍</div>
+              <div class="btn-3d-mini" style="background:#dc2626; font-size:9px;">SOS</div>
+              <div class="btn-3d-mini" style="background:#0f172a; border-color:#ea580c;">🎯</div>
+            </div>
+          </div>
+
+          <div style="margin-top:6px; background:rgba(245,158,11,0.18); border:1px solid #f59e0b; border-radius:9px; padding:5px 8px; font-size:9.5px; font-weight:800; color:#fde68a; display:flex; justify-content:space-between;">
+            <span>📦 VOLUMOSO: Porta-Malas</span>
+            <span>💡 TELA ACESA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENA 6: MAPA EM 4 CORES + RELATÓRIO PDF -->
+      <div class="scene" id="scene-5">
+        <div style="width:100%; space-y:10px;">
+          <!-- Legenda Mapa -->
+          <div style="background:#0f172a; border:1px solid #334155; border-radius:14px; padding:8px 10px; margin-bottom:10px;">
+            <div style="font-size:10px; font-weight:900; color:#fff; margin-bottom:6px;">🗺️ Pinos Sincronizados no Mapa & Nuvem:</div>
+            <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:800;">
+              <span>🟠 Pendente</span>
+              <span style="color:#4ade80;">🟢 Conferido</span>
+              <span style="color:#facc15;">🟡 Ausente</span>
+              <span style="color:#f87171;">🔴 Entregue</span>
+            </div>
+          </div>
+
+          <!-- Relatório PDF -->
+          <div class="pdf-card">
+            <div class="pdf-top">
+              <div>
+                <div style="font-weight:900; font-size:15px;">SPX<span style="color:#ea580c;">rotas</span></div>
+                <div style="font-size:8px; color:#cbd5e1;">RELATÓRIO DE TELEMETRIA REAL & PDF</div>
+              </div>
+              <div style="text-align:right; font-size:8px; color:#94a3b8; font-weight:700;">
+                ROTA #148<br>103 PACOTES
+              </div>
+            </div>
+            <div class="pdf-kpis">
+              <div class="pdf-kpi">
+                <div style="font-size:7px; color:#64748b; font-weight:800;">ENTREGUES</div>
+                <div style="font-size:12px; color:#ea580c; font-weight:900;">103/103</div>
+              </div>
+              <div class="pdf-kpi">
+                <div style="font-size:7px; color:#64748b; font-weight:800;">DISTÂNCIA</div>
+                <div style="font-size:12px; color:#0284c7; font-weight:900;">38.4 km</div>
+              </div>
+              <div class="pdf-kpi">
+                <div style="font-size:7px; color:#64748b; font-weight:800;">TEMPO</div>
+                <div style="font-size:12px; color:#16a34a; font-weight:900;">3h 42m</div>
+              </div>
+              <div class="pdf-kpi">
+                <div style="font-size:7px; color:#64748b; font-weight:800;">CUSTO</div>
+                <div style="font-size:12px; color:#d97706; font-weight:900;">R$ 19,20</div>
+              </div>
+            </div>
+            <div style="padding:0 10px 10px; font-size:9px; color:#334155;">
+              <div style="background:#f1f5f9; padding:5px 8px; border-radius:6px; font-weight:800; display:flex; justify-content:space-between;">
+                <span>Custo por Pacote Entregue:</span>
+                <span style="color:#ea580c;">R$ 0,19 / entrega</span>
+              </div>
+              <div style="margin-top:5px; background:#fef3c7; border:1px solid #f59e0b; padding:5px 8px; border-radius:6px; font-weight:800; color:#92400e;">
+                📋 Tabela completa com todos os 103+ pacotes e devoluções no CD!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENA 7: CTA FINAL -->
+      <div class="scene" id="scene-6">
+        <div class="cta-box">
+          <div style="font-size:34px; margin-bottom:6px;">🚀</div>
+          <div style="font-family:'Outfit',sans-serif; font-size:24px; font-weight:900; line-height:1.1;">
+            SPX<span style="color:#fb923c;">rotas</span>
+          </div>
+          <div style="display:inline-block; background:rgba(34,197,94,0.2); border:1px solid #22c55e; color:#4ade80; font-size:11px; font-weight:900; padding:5px 12px; border-radius:99px; margin-top:10px;">
+            🎁 7 DIAS GRÁTIS NA 1ª ROTA
+          </div>
+          <div style="font-size:11px; color:#cbd5e1; margin-top:6px; font-weight:700;">
+            Sem cartão de crédito • Android & iPhone
+          </div>
+
+          <div class="price-row">
+            <div class="price-card">
+              <div style="font-size:9px; color:#fb923c; font-weight:900;">SEMANAL</div>
+              <div style="font-size:20px; font-weight:900; color:#fff;">R$ 6,90</div>
+              <div style="font-size:9px; color:#94a3b8;">R$ 0,98 / dia</div>
+            </div>
+            <div class="price-card destaque">
+              <div style="font-size:9px; color:#4ade80; font-weight:900;">MENSAL</div>
+              <div style="font-size:20px; font-weight:900; color:#fff;">R$ 19,90</div>
+              <div style="font-size:9px; color:#86efac; font-weight:700;">R$ 0,66 / dia</div>
+            </div>
+          </div>
+
+          <div style="background:#ea580c; color:#fff; font-weight:900; font-size:12px; padding:12px; border-radius:14px; box-shadow:0 8px 25px rgba(234,88,12,0.5);">
+            📲 studiotesta.com.br/spxrotas
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LEGENDA INFERIOR -->
+    <div class="video-bottom-caption">
+      <div class="caption-pill" id="captionPill"></div>
+    </div>
+
+  </div>
+
+  <p class="studio-hint">
+    💡 Dica: Clique em <strong>"🎬 Modo Gravação Limpa (9:16)"</strong> e grave a tela com OBS Studio ou celular (pressione <strong>ESC</strong> ou toque na tela para sair).
+  </p>
+
+  <script>
+    const CENAS = [
+      {
+        tag: '1/7 • ZAP DAS ROTAS',
+        duracao: 9500,
+        headline: 'Mande no <span class="hl-green">Zap das Rotas</span> com portão exato',
+        caption: 'Chega de caçar planilha na pasta Downloads! Envie no WhatsApp com partida padrão Uber e trava AT ID.'
+      },
+      {
+        tag: '2/7 • FIM DO ZIGUEZAGUE',
+        duracao: 11000,
+        headline: '<span class="hl-cyan">Segure e arraste</span> o card antes de bipar!',
+        caption: 'Casa fora de sequência? Segure por 1s e arraste (ou use ⇅ Mover) para atualizar Canetão, Sacola e Mapa!'
+      },
+      {
+        tag: '3/7 • BIPADOR POR VOZ',
+        duracao: 10500,
+        headline: 'Bipou na esteira, o app <span class="hl-orange">FALA o Canetão</span>!',
+        caption: 'Bipe rápido com voz, o card vira Verde Vivo na nuvem e trava a ordem para zero erros na caixa!'
+      },
+      {
+        tag: '4/7 • MÓDULO VOLUMOSOS',
+        duracao: 9500,
+        headline: 'Caixas grandes: <span class="hl-orange">o GPS lembra pra você</span>!',
+        caption: 'Marque em 1 toque onde guardou no carro (Porta-Malas, Banco...) e ouça o aviso por voz na chegada.'
+      },
+      {
+        tag: '5/7 • GPS 3D + OFFLINE',
+        duracao: 11500,
+        headline: '<span class="hl-red">40 Mil Radares</span> + Blindado <span class="hl-cyan">100% Offline</span>!',
+        caption: 'Trava de pista sem alarme falso, Pingo Azul direto no GPS, botão SOS e rotas viárias mesmo sem 4G!'
+      },
+      {
+        tag: '6/7 • MAPA & PDF REAL',
+        duracao: 9500,
+        headline: '4 cores no Mapa & <span class="hl-green">Relatório em PDF</span>',
+        caption: 'Acompanhe Laranja, Verde, Amarelo e Vermelho no mapa e gere PDF completo com KM e custo de combustível.'
+      },
+      {
+        tag: '7/7 • TESTE GRÁTIS',
+        duracao: 9500,
+        headline: 'Economize <span class="hl-orange">2h de rua</span> e <span class="hl-green">R$ 25/dia</span>!',
+        caption: 'Teste 7 dias grátis na sua 1ª rota sem cartão! Depois apenas R$ 6,90/sem ou R$ 19,90/mês no PIX.'
+      }
+    ];
+
+    let cenaAtual = 0;
+    let rodando = true;
+    let somAtivo = true;
+    let inicioCenaTs = Date.now();
+    let timerAnim = null;
+    let acaoCena2Executada = false;
+    let bipsCena3Executados = false;
+    let audioCtx = null;
+
+    function tocarBipe(freq = 2200, dur = 0.08, tipo = 'square') {
+      if (!somAtivo) return;
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx && Ctx) audioCtx = new Ctx();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = tipo;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur + 0.01);
+      } catch (e) {}
+    }
+
+    function montarHUD() {
+      const bars = document.getElementById('storyBars');
+      const pills = document.getElementById('scenePills');
+      bars.innerHTML = '';
+      pills.innerHTML = '';
+      CENAS.forEach((c, idx) => {
+        const b = document.createElement('div');
+        b.className = 'story-bar';
+        b.id = `bar-${idx}`;
+        b.innerHTML = '<div class="story-bar-fill" id="bar-fill-' + idx + '"></div>';
+        bars.appendChild(b);
+
+        const p = document.createElement('button');
+        p.className = 'pill-scene';
+        p.id = `pill-${idx}`;
+        p.innerText = `Cena ${idx + 1}`;
+        p.onclick = () => irParaCena(idx);
+        pills.appendChild(p);
+      });
+    }
+
+    function resetarAnimacaoCena2() {
+      acaoCena2Executada = false;
+      document.getElementById('dragCardMoving').classList.remove('arrastando');
+      document.getElementById('dragCardTop').classList.remove('descendo');
+      document.getElementById('numMoveCanetao').innerText = '#13';
+      document.getElementById('numTopCanetao').innerText = '#12';
+      document.getElementById('dragFinger').style.opacity = '1';
+      document.getElementById('dragFinger').style.transform = 'translate(0, 0)';
+      document.getElementById('toastReordem').style.display = 'none';
+    }
+
+    function executarAnimacaoCena2(progresso) {
+      if (progresso > 0.25 && !acaoCena2Executada) {
+        acaoCena2Executada = true;
+        tocarBipe(700, 0.05, 'sine');
+        document.getElementById('dragCardMoving').classList.add('arrastando');
+        document.getElementById('dragCardTop').classList.add('descendo');
+        document.getElementById('dragFinger').style.transform = 'translate(0, -76px)';
+
+        setTimeout(() => {
+          if (cenaAtual !== 1) return;
+          document.getElementById('dragCardMoving').classList.remove('arrastando');
+          document.getElementById('dragCardTop').classList.remove('descendo');
+          document.getElementById('numMoveCanetao').innerText = '#12';
+          document.getElementById('numTopCanetao').innerText = '#13';
+          document.getElementById('dragFinger').style.opacity = '0';
+          document.getElementById('toastReordem').style.display = 'block';
+          tocarBipe(1500, 0.08, 'sine');
+        }, 2800);
+      }
+    }
+
+    function irParaCena(idx) {
+      cenaAtual = idx % CENAS.length;
+      inicioCenaTs = Date.now();
+      bipsCena3Executados = false;
+      resetarAnimacaoCena2();
+
+      document.querySelectorAll('.scene').forEach((el, i) => {
+        el.classList.toggle('ativa', i === cenaAtual);
+      });
+      document.querySelectorAll('.pill-scene').forEach((el, i) => {
+        el.classList.toggle('atual', i === cenaAtual);
+      });
+      document.querySelectorAll('.story-bar').forEach((el, i) => {
+        el.classList.toggle('done', i < cenaAtual);
+        const f = document.getElementById(`bar-fill-${i}`);
+        if (i !== cenaAtual) f.style.width = i < cenaAtual ? '100%' : '0%';
+      });
+
+      const cfg = CENAS[cenaAtual];
+      document.getElementById('sceneTag').innerText = cfg.tag;
+      document.getElementById('headlineViral').innerHTML = cfg.headline;
+      document.getElementById('captionPill').innerText = cfg.caption;
+
+      if (cenaAtual === 2) {
+        setTimeout(() => { if (cenaAtual === 2) tocarBipe(2400, 0.09, 'square'); }, 900);
+      }
+      if (cenaAtual === 4) {
+        setTimeout(() => { if (cenaAtual === 4) tocarBipe(880, 0.14, 'sine'); }, 2200);
+        setTimeout(() => { if (cenaAtual === 4) tocarBipe(880, 0.14, 'sine'); }, 2700);
+      }
+    }
+
+    function loopDemo() {
+      if (rodando) {
+        const cfg = CENAS[cenaAtual];
+        const elapsed = Date.now() - inicioCenaTs;
+        const pct = Math.min(1, elapsed / cfg.duracao);
+        const fill = document.getElementById(`bar-fill-${cenaAtual}`);
+        if (fill) fill.style.width = `${pct * 100}%`;
+
+        if (cenaAtual === 1) executarAnimacaoCena2(pct);
+
+        if (elapsed >= cfg.duracao) {
+          irParaCena((cenaAtual + 1) % CENAS.length);
+        }
+      }
+      timerAnim = requestAnimationFrame(loopDemo);
+    }
+
+    function togglePlay() {
+      rodando = !rodando;
+      if (rodando) inicioCenaTs = Date.now();
+      document.getElementById('btnPlayPause').innerText = rodando ? '⏸ Pausar' : '▶ Continuar';
+    }
+
+    function reiniciarDemo() {
+      rodando = true;
+      document.getElementById('btnPlayPause').innerText = '⏸ Pausar';
+      irParaCena(0);
+    }
+
+    function toggleSom() {
+      somAtivo = !somAtivo;
+      const btn = document.getElementById('btnSom');
+      btn.innerText = somAtivo ? '🔊 Bipes Ligados' : '🔇 Mudo';
+      btn.classList.toggle('active', somAtivo);
+    }
+
+    function ativarModoGravacao() {
+      document.body.classList.add('clean-mode');
+      reiniciarDemo();
+    }
+
+    function sairModoGravacaoSeClick() {
+      if (document.body.classList.contains('clean-mode')) {
+        document.body.classList.remove('clean-mode');
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') document.body.classList.remove('clean-mode');
+    });
+
+    montarHUD();
+    irParaCena(0);
+    loopDemo();
+  </script>
+</body>
+</html>
