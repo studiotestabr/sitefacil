@@ -1,7 +1,7 @@
 /* ==========================================================================
-   SPXrotas Pro v2.3.0 - Núcleo Mestre Reativo Oficial
-   Auto-Complete Waze/Uber/iFood, Gravação Cirúrgica no Directus,
-   Radares Blindados com Cache Offline, Pingo no GPS & Ciclo Laranja ➔ Verde
+   SPXrotas Pro v2.4.0 - Núcleo Mestre Reativo Oficial
+   Módulo de Volumosos com Voz, Auto-Complete Waze/Uber, Gravação Limpa no Directus,
+   Radares Blindados com Cache Offline, Pingo no GPS 3D & Ciclo Shopee Laranja ➔ Verde
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -26,7 +26,14 @@ function spxRotasApp() {
     modalAssinatura: false,
     modalCadastroObrigatorio: false,
     modalRelatorio: false,
+    modalVolumoso: false,
     dadosRelatorio: null,
+
+    // Módulo de Objetos Volumosos (Notas & Alocação no Veículo)
+    pacoteEditandoVolumoso: null,
+    notaVolumosoLocal: 'Banco Traseiro',
+    notaVolumosoTipo: 'Caixa Full',
+    notaVolumosoTexto: '',
 
     // Configurações Salvas no Cache do Celular
     configVeiculo: JSON.parse(localStorage.getItem('spxrotas_config_veiculo') || '{"tipoCombustivel":"Gasolina","consumoKmL":10.0,"precoLitro":5.89}'),
@@ -173,6 +180,81 @@ function spxRotasApp() {
     isMobile: false,
 
     // =========================================================================
+    // MÓDULO DE OBJETOS VOLUMOSOS (NOTAS & ALOCAÇÃO COM VOZ INTELIGENTE)
+    // =========================================================================
+    abrirModalVolumoso(item) {
+      if (!item) return;
+      this.pacoteEditandoVolumoso = item;
+      this.notaVolumosoLocal = item.nota_local || 'Banco Traseiro';
+      this.notaVolumosoTipo = item.nota_tipo || 'Caixa Full';
+      this.notaVolumosoTexto = item.nota_volumoso || '';
+      this.modalVolumoso = true;
+    },
+
+    fecharModalVolumoso() {
+      this.modalVolumoso = false;
+      this.pacoteEditandoVolumoso = null;
+    },
+
+    selecionarTagLocal(tag) {
+      this.notaVolumosoLocal = tag;
+      if ('vibrate' in navigator) navigator.vibrate(25);
+    },
+
+    selecionarTagTipo(tag) {
+      this.notaVolumosoTipo = tag;
+      if ('vibrate' in navigator) navigator.vibrate(25);
+    },
+
+    salvarNotaVolumoso() {
+      if (!this.pacoteEditandoVolumoso) return;
+
+      const p = this.pacoteEditandoVolumoso;
+      p.is_volumoso = true;
+      p.nota_local = this.notaVolumosoLocal;
+      p.nota_tipo = this.notaVolumosoTipo;
+      p.nota_volumoso = (this.notaVolumosoTexto || '').trim();
+
+      // Atualiza também no array principal de entregas
+      const idx = this.entregas.findIndex(e => e.id === p.id);
+      if (idx !== -1) {
+        this.entregas[idx].is_volumoso = true;
+        this.entregas[idx].nota_local = p.nota_local;
+        this.entregas[idx].nota_tipo = p.nota_tipo;
+        this.entregas[idx].nota_volumoso = p.nota_volumoso;
+      }
+
+      this.salvarCacheLocal();
+
+      // Confirmação por voz e vibração
+      const fala = `Volumoso anotado! Guardado em: ${p.nota_local}!`;
+      this.falarTexto(fala);
+      if ('vibrate' in navigator) navigator.vibrate([60, 40, 60]);
+
+      this.fecharModalVolumoso();
+    },
+
+    removerNotaVolumoso(p) {
+      if (!p) return;
+      p.is_volumoso = false;
+      p.nota_local = null;
+      p.nota_tipo = null;
+      p.nota_volumoso = null;
+
+      const idx = this.entregas.findIndex(e => e.id === p.id);
+      if (idx !== -1) {
+        this.entregas[idx].is_volumoso = false;
+        delete this.entregas[idx].nota_local;
+        delete this.entregas[idx].nota_tipo;
+        delete this.entregas[idx].nota_volumoso;
+      }
+
+      this.salvarCacheLocal();
+      this.fecharModalVolumoso();
+      if ('vibrate' in navigator) navigator.vibrate(40);
+    },
+
+    // =========================================================================
     // AUTO-COMPLETE DE ENDEREÇO (PADRÃO WAZE / UBER / IFOOD COM NÚMERO EXATO)
     // =========================================================================
     async buscarSugestoesEndereco(termo, tipo) {
@@ -189,7 +271,6 @@ function spxRotasApp() {
         const qLimpa = encodeURIComponent(termo.trim());
         let resultados = [];
 
-        // 1. Tenta Photon primeiro (super veloz, com suporte a número predial e viés geográfico local)
         try {
           const resPhoton = await fetch(`https://photon.komoot.io/api/?q=${qLimpa}&limit=5&lat=-24.16&lon=-46.78`, { signal: AbortSignal.timeout(3000) });
           if (resPhoton.ok) {
@@ -216,7 +297,6 @@ function spxRotasApp() {
           }
         } catch (e) {}
 
-        // 2. Fallback para Nominatim se Photon não retornar
         if (resultados.length === 0) {
           const resNom = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${qLimpa}&limit=5&countrycodes=br`, { signal: AbortSignal.timeout(3500) });
           if (resNom.ok) {
@@ -582,7 +662,6 @@ function spxRotasApp() {
           this.salvarCacheLocal();
         }
 
-        // Gravação limpa apenas nas colunas existentes de 'entregas'
         this.enfileirarSincronizacao('PATCH', `/items/entregas/${entrega.id}`, { latitude: novaLat, longitude: novaLng });
         this.enfileirarSincronizacao('POST', '/items/spxrotas_pingos_corrigidos', {
           endereco: entrega.endereco,
@@ -707,7 +786,9 @@ function spxRotasApp() {
         const sacola = Math.ceil(canetao / 10);
 
         let textoAudio = `Canetão ${canetao}! Sacola ${sacola}!`;
-        if (!match.parada_shopee || Number(match.parada_shopee) <= 0 || match.parada_shopee === '-') {
+        if (match.is_volumoso) {
+          textoAudio = `Canetão ${canetao}! Objeto volumoso no ${match.nota_local || 'veículo'}!`;
+        } else if (!match.parada_shopee || Number(match.parada_shopee) <= 0 || match.parada_shopee === '-') {
           textoAudio = `Canetão ${canetao}! Sacola ${sacola}! Pacote Avulso!`;
         }
 
@@ -960,13 +1041,10 @@ function spxRotasApp() {
         const sel = this.entregas.find(e => e.id === this.entregaSelecionadaId);
         if (sel && sel.status !== 'entregue') return sel;
       }
-      // Prioridade 1: Pacote já pronto e conferido na sacola (verde)
       const primeiroPronto = this.entregas.find(e => e.status === 'pendente' && this.idsConferidos.has(e.id));
       if (primeiroPronto) return primeiroPronto;
-      // Prioridade 2: Qualquer outro pendente
       const primeiroNaoEntregue = this.entregas.find(e => e.status === 'pendente');
       if (primeiroNaoEntregue) return primeiroNaoEntregue;
-      // Prioridade 3: Ausente da volta
       const primeiroAusente = this.entregas.find(e => e.status === 'ausente');
       if (primeiroAusente) return primeiroAusente;
       return null;
@@ -1050,10 +1128,8 @@ function spxRotasApp() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
 
-      // Ativa Wake Lock automaticamente
       this.ativarWakeLock();
 
-      // Monitor de Conexão Online/Offline
       window.addEventListener('online', () => {
         this.estaOnline = true;
         this.processarFilaSync();
@@ -1063,14 +1139,12 @@ function spxRotasApp() {
         this.estaOnline = false;
       });
 
-      // Tenta processar fila offline a cada 10 segundos
       this.intervaloSyncOffline = setInterval(() => {
         if (navigator.onLine && this.syncQueue.length > 0) {
           this.processarFilaSync();
         }
       }, 10000);
 
-      // Carregamento de Cache Offline Imediato (Fonte Suprema da Verdade)
       const cacheEntregas = localStorage.getItem('spxrotas_entregas_cache');
       if (cacheEntregas) {
         try { this.entregas = JSON.parse(cacheEntregas); } catch (e) {}
@@ -1081,10 +1155,7 @@ function spxRotasApp() {
         try { this.rotasHistorico = JSON.parse(cacheHistorico); } catch (e) {}
       }
 
-      // Restaura conferidos locais
       this.carregarConferidosLocal();
-
-      // Carrega radares do cache offline primeiro (garante aviso mesmo no mato)
       this.carregarRadaresDoCacheOffline();
 
       await this.verificarAutenticacao();
@@ -1534,10 +1605,10 @@ function spxRotasApp() {
         const coord = [p.latitude, p.longitude];
         pontosLinha.push(coord);
 
-        let corFundo = '#ea580c'; // Laranja Shopee padrão (Aguardando Bipagem)
-        if (this.isPacoteConferido(p)) corFundo = '#10b981'; // Verde (Pronto / Conferido)
-        if (p.status === 'entregue') corFundo = '#ef4444'; // Vermelho (Entregue)
-        if (p.status === 'ausente') corFundo = '#f59e0b'; // Amarelo (Ausente)
+        let corFundo = '#ea580c'; // Laranja Shopee padrão
+        if (this.isPacoteConferido(p)) corFundo = '#10b981'; // Verde
+        if (p.status === 'entregue') corFundo = '#ef4444'; // Vermelho
+        if (p.status === 'ausente') corFundo = '#f59e0b'; // Amarelo
 
         const iconePacote = L.divIcon({
           className: 'custom-pin-pacote',
@@ -1714,6 +1785,14 @@ function spxRotasApp() {
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
 
+      // 🔊 Alerta de voz se o pacote for volumoso logo na saída
+      if (entrega.is_volumoso) {
+        const local = entrega.nota_local || 'veículo';
+        setTimeout(() => {
+          this.falarTexto(`Atenção: Canetão número ${entrega.ordem_entrega} é pacote volumoso! Guardado em: ${local}`);
+        }, 1200);
+      }
+
       setTimeout(() => { this.inicializarMapaNavGL(entrega); }, 250);
     },
 
@@ -1851,7 +1930,6 @@ function spxRotasApp() {
       let coordsLngLat = [];
       let routeEncontrada = null;
 
-      // 1. Online via OSRM
       if (navigator.onLine) {
         try {
           const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
@@ -1874,7 +1952,6 @@ function spxRotasApp() {
         }
       }
 
-      // 2. Offline via geometria mestra do VROOM
       if (!routeEncontrada) {
         const trechoViarioOffline = this.obterTrechoViarioOffline(sLat, sLng, eLat, eLng);
         if (trechoViarioOffline && trechoViarioOffline.length >= 2) {
@@ -1947,7 +2024,11 @@ function spxRotasApp() {
         }
       } else {
         if (!this.alertaRetornoFalado) {
-          this.falarTexto(`Iniciando rota para Canetão número ${this.entregaNavegacao?.ordem_entrega}, na ${this.entregaNavegacao?.endereco}`);
+          let textoInicio = `Iniciando rota para Canetão número ${this.entregaNavegacao?.ordem_entrega}, na ${this.entregaNavegacao?.endereco}`;
+          if (this.entregaNavegacao?.is_volumoso) {
+            textoInicio += `. Pacote volumoso guardado em: ${this.entregaNavegacao.nota_local || 'veículo'}`;
+          }
+          this.falarTexto(textoInicio);
           this.alertaRetornoFalado = true;
         }
       }
@@ -2111,7 +2192,11 @@ function spxRotasApp() {
 
       if (distDestinoFinal <= 25 && !this.chegadaAnunciada) {
         this.chegadaAnunciada = true;
-        this.falarTexto(`Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}, na ${this.entregaNavegacao?.endereco || ''}`);
+        let falaChegada = `Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}, na ${this.entregaNavegacao?.endereco || ''}`;
+        if (this.entregaNavegacao?.is_volumoso) {
+          falaChegada += `. Atenção: pacote volumoso guardado em: ${this.entregaNavegacao.nota_local || 'veículo'}`;
+        }
+        this.falarTexto(falaChegada);
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
@@ -2349,15 +2434,32 @@ function spxRotasApp() {
           const entregasServidor = data.data;
 
           const mapaStatusLocal = new Map();
+          const mapaVolumososLocal = new Map();
+
           (this.entregas || []).forEach(e => {
             if (e.status === 'entregue' || e.status === 'ausente') {
               mapaStatusLocal.set(e.id, e.status);
+            }
+            if (e.is_volumoso) {
+              mapaVolumososLocal.set(e.id, {
+                is_volumoso: true,
+                nota_local: e.nota_local,
+                nota_tipo: e.nota_tipo,
+                nota_volumoso: e.nota_volumoso
+              });
             }
           });
 
           entregasServidor.forEach(e => {
             if (mapaStatusLocal.has(e.id)) {
               e.status = mapaStatusLocal.get(e.id);
+            }
+            if (mapaVolumososLocal.has(e.id)) {
+              const v = mapaVolumososLocal.get(e.id);
+              e.is_volumoso = true;
+              e.nota_local = v.nota_local;
+              e.nota_tipo = v.nota_tipo;
+              e.nota_volumoso = v.nota_volumoso;
             }
           });
 
@@ -2604,7 +2706,6 @@ function spxRotasApp() {
           }
         }
 
-        // Usa as coordenadas exatas da seleção do auto-complete caso existam!
         let coordPartida = this.coordPartidaSalva;
         if (!coordPartida || !coordPartida.latitude) {
           coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);
