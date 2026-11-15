@@ -1,6 +1,7 @@
 /* ==========================================================================
-   SPXrotas Pro v2.5.0 - Folha de Estilos Modular Oficial
-   Navegador 3D (Elevação Dinâmica com Volumosos), Bipador Amplo & Radares
+   SPXrotas Pro v2.6.0 - Folha de Estilos Modular Oficial
+   Navegador 3D (Elevação Dinâmica com Volumosos), Bipador Amplo, Radares,
+   Verde Vivo Unificado & Reordenação Fluida por Toque (Sacolas)
    Arquivo: /spxrotas/app/css/styles.css
    ========================================================================== */
 
@@ -109,14 +110,18 @@ body.theme-claro .bg-yellow-500\/20 {
 
 body.theme-claro .bg-emerald-500\/10,
 body.theme-claro .bg-emerald-500\/15,
-body.theme-claro .bg-emerald-500\/20 {
-  background-color: #d1fae5 !important;
-  border-color: #34d399 !important;
-  color: #065f46 !important;
+body.theme-claro .bg-emerald-500\/20,
+body.theme-claro .bg-green-500\/10,
+body.theme-claro .bg-green-500\/15,
+body.theme-claro .bg-green-500\/20 {
+  background-color: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #14532d !important;
 }
 
-body.theme-claro .text-emerald-400 { 
-  color: #047857 !important; 
+body.theme-claro .text-emerald-400,
+body.theme-claro .text-green-400 { 
+  color: #15803d !important; 
 }
 
 body.theme-claro .text-blue-400 { 
@@ -444,8 +449,8 @@ body.theme-claro .text-amber-400 {
 }
 
 .badge-bip-identificado.confirmado {
-  border-color: rgba(16, 185, 129, 0.7) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(16, 185, 129, 0.35) !important;
+  border-color: rgba(34, 197, 94, 0.85) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(34, 197, 94, 0.4) !important;
 }
 
 @keyframes slideFadeIn {
@@ -613,7 +618,7 @@ body.theme-claro .text-amber-400 {
 }
 
 /* ==========================================================================
-   7. CICLO DE CONFERÊNCIA OFICIAL (LARANJA ➔ VERDE ➔ AMARELO ➔ VERMELHO)
+   7. CICLO DE CONFERÊNCIA OFICIAL (LARANJA ➔ VERDE VIVO ➔ AMARELO ➔ VERMELHO)
    ========================================================================== */
 
 /* Status LARANJA: Aguardando Bipagem no Galpão (Padrão Shopee) */
@@ -628,12 +633,48 @@ body.theme-claro .text-amber-400 {
   border-color: rgba(234, 88, 12, 0.85) !important;
 }
 
-/* Status VERDE: Bipado e Conferido na Sacola */
+/* Status VERDE: Bipado e Conferido na Sacola (Verde Vivo Unificado) */
 .card-entrega-verde {
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  background-color: #0c181a !important;
+  border-color: rgba(34, 197, 94, 0.78) !important;
+  background-color: #0b1f16 !important;
   border-left-width: 6px !important;
-  border-left-color: #10b981 !important;
+  border-left-color: #22c55e !important;
+  box-shadow: 0 8px 22px -6px rgba(34, 197, 94, 0.28) !important;
+}
+
+.card-entrega-verde:hover {
+  border-color: rgba(74, 222, 128, 0.95) !important;
+}
+
+/* Caixa interna Canetão/Sacola quando Conferido (Verde Vivo Unificado) */
+.caixa-verde-viva {
+  background-color: #0f261b !important;
+  border-color: #22c55e !important;
+  color: #4ade80 !important;
+}
+
+.badge-verde-vivo {
+  background-color: rgba(34, 197, 94, 0.22) !important;
+  border-color: rgba(74, 222, 128, 0.8) !important;
+  color: #4ade80 !important;
+}
+
+body.theme-claro .card-entrega-verde {
+  background-color: #f0fdf4 !important;
+  border-color: #22c55e !important;
+  border-left-color: #16a34a !important;
+}
+
+body.theme-claro .caixa-verde-viva {
+  background-color: #dcfce7 !important;
+  border-color: #16a34a !important;
+  color: #15803d !important;
+}
+
+body.theme-claro .badge-verde-vivo {
+  background-color: #bbf7d0 !important;
+  border-color: #16a34a !important;
+  color: #14532d !important;
 }
 
 /* Status AMARELO: Ausente / Na Volta */
@@ -797,4 +838,109 @@ body.theme-claro .text-amber-400 {
 @keyframes pulseVolumoso {
   0% { border-color: #ea580c; box-shadow: 0 0 10px rgba(234, 88, 12, 0.2); }
   100% { border-color: #f59e0b; box-shadow: 0 0 22px rgba(245, 158, 11, 0.45); }
+}
+
+/* ==========================================================================
+   10. REORDENAÇÃO FLUIDA DE CARDS NA ABA SACOLAS (LONG-PRESS + DRAG)
+   ========================================================================== */
+
+.card-reordenavel {
+  touch-action: pan-y;
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+  will-change: transform;
+  -webkit-touch-callout: none;
+}
+
+/* Card selecionado após segurar ~380ms (Pronto para arrastar) */
+.card-arrastando-ativo {
+  position: relative;
+  z-index: 70 !important;
+  transform: scale(1.025) !important;
+  border-color: #f97316 !important;
+  border-width: 2px !important;
+  border-left-width: 6px !important;
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.9), 0 0 28px rgba(249, 115, 22, 0.65) !important;
+  touch-action: none !important;
+  user-select: none !important;
+  opacity: 0.96;
+}
+
+/* Marcadores visuais de onde o card será encaixado ao soltar */
+.card-alvo-acima {
+  box-shadow: 0 -4px 0 0 #38bdf8, 0 -8px 20px rgba(56, 189, 248, 0.45) !important;
+}
+
+.card-alvo-abaixo {
+  box-shadow: 0 4px 0 0 #38bdf8, 0 8px 20px rgba(56, 189, 248, 0.45) !important;
+}
+
+/* Faixa discreta de orientação / trava de reordenação */
+.banner-reordenacao-info {
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px dashed rgba(249, 115, 22, 0.5);
+  color: #fdba74;
+  border-radius: 1rem;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.banner-reordenacao-travada {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #86efac;
+  border-radius: 1rem;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Botão discreto no rodapé do card para pulo direto de posição */
+.btn-mover-posicao {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+  padding: 5px 10px;
+  border-radius: 0.75rem;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-mover-posicao:active {
+  transform: scale(0.94);
+  background: rgba(56, 189, 248, 0.25);
+}
+
+/* Toast Flutuante Não-Bloqueante (Feedback instantâneo sem travar a tela) */
+.toast-spx-flutuante {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 350;
+  background: rgba(15, 23, 42, 0.96);
+  color: #ffffff;
+  border: 2px solid #f97316;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(249, 115, 22, 0.4);
+  backdrop-filter: blur(8px);
+  max-width: 92vw;
+  text-align: center;
+  pointer-events: none;
+  animation: slideUpPainel 0.2s ease-out;
 }
