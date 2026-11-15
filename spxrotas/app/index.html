@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.5.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.6.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.5.0"></script>
+  <script src="./js/relatorio.js?v=8.6.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.5.0"></script>
+  <script src="./js/app.js?v=8.6.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -427,7 +427,7 @@
         </nav>
       </header>
 
-      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO NO MÉTODO CANETÃO + CONFERÊNCIA LARANJA ➔ VERDE + VOLUMOSOS) -->
+      <!-- MODO 1: SACOLAS (ORGANIZAÇÃO NO MÉTODO CANETÃO + CONFERÊNCIA LARANJA ➔ VERDE VIVO + REORDENAÇÃO FLUIDA + VOLUMOSOS) -->
       <main x-show="modo === 'carregamento'" class="p-4 space-y-3.5 max-w-4xl mx-auto w-full">
         
         <!-- CARD UNIFICADO DE BIPAGEM E CONFERÊNCIA NO TOPO -->
@@ -444,7 +444,7 @@
                 <span>Restam <strong class="text-orange-400 font-mono font-black" x-text="pacotesAguardandoBipagem.length"></strong> de <span x-text="entregas.length"></span> caixas para bipar!</span>
               </template>
               <template x-if="pacotesAguardandoBipagem.length === 0 && entregas.length > 0">
-                <span class="text-emerald-400 font-bold">🟢 Todas as caixas conferidas na sacola!</span>
+                <span class="text-green-400 font-bold">🟢 Todas as caixas conferidas na sacola!</span>
               </template>
               <template x-if="entregas.length === 0">
                 <span>Bipe a caixa e ouça o Canetão e a Sacola no som!</span>
@@ -456,16 +456,39 @@
           </button>
         </div>
 
+        <!-- FAIXA DE ORIENTAÇÃO / TRAVA DA REORDENAÇÃO -->
+        <template x-if="entregas.length > 1">
+          <div>
+            <div x-show="podeReordenarSacolas" class="banner-reordenacao-info">
+              <span>↕️ <strong>Antes de bipar:</strong> segure um card para arrastar ou toque em <strong>⇅ Mover</strong></span>
+            </div>
+            <div x-show="!podeReordenarSacolas" class="banner-reordenacao-travada">
+              <span>🔒 Ordem do Canetão travada após início da bipagem</span>
+            </div>
+          </div>
+        </template>
+
         <!-- LISTA DAS ENTREGAS NA ABA SACOLAS (ORDENAÇÃO ÚNICA CANETÃO #1, #2...) -->
         <div class="space-y-3">
           <template x-for="item in entregasOrdenadasParaSacola" :key="item.id">
-            <div @click="irParaEntregaDireta(item)" 
-                 class="rounded-2xl border shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99]" 
+            <div :data-sacola-card-id="item.id"
+                 @click="clicarCardSacola(item)"
+                 @touchstart="iniciarToqueCard($event, item)"
+                 @touchmove="moverToqueCard($event)"
+                 @touchend="cancelarPreToqueCard()"
+                 @touchcancel="cancelarPreToqueCard()"
+                 @mousedown="iniciarToqueCard($event, item)"
+                 @mousemove="moverToqueCard($event)"
+                 @mouseup="cancelarPreToqueCard()"
+                 class="card-reordenavel rounded-2xl border shadow-xl p-4 space-y-3 transition-all cursor-pointer active:scale-[0.99]" 
                  :class="{
                    'card-entrega-laranja': !isPacoteConferido(item),
                    'card-entrega-verde': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                    'card-entrega-amarelo': item.status === 'ausente',
-                   'card-entrega-vermelho': item.status === 'entregue'
+                   'card-entrega-vermelho': item.status === 'entregue',
+                   'card-arrastando-ativo': String(cardArrastandoId) === String(item.id),
+                   'card-alvo-acima': String(cardAlvoId) === String(item.id) && cardAlvoPosicao === 'acima',
+                   'card-alvo-abaixo': String(cardAlvoId) === String(item.id) && cardAlvoPosicao === 'abaixo'
                  }">
               
               <!-- CASO 1: PACOTES COM ROTA NORMAL (CANETÃO, ORDEM, PARADA SPX, SACOLA) -->
@@ -474,7 +497,7 @@
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                        :class="{
                          'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
-                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'caixa-verde-viva': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -492,7 +515,7 @@
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner"
                        :class="{
                          'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
-                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'caixa-verde-viva': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -508,7 +531,7 @@
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
                        :class="{
                          'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
-                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'caixa-verde-viva': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -523,7 +546,7 @@
                   <div class="bg-[#1c1815] border-2 rounded-2xl py-2 px-1 flex flex-col justify-center shadow-inner col-span-1"
                        :class="{
                          'border-orange-500/80 text-orange-400': !isPacoteConferido(item),
-                         'border-emerald-500/80 text-emerald-400': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
+                         'caixa-verde-viva': isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente',
                          'border-yellow-500/80 text-yellow-400': item.status === 'ausente',
                          'border-red-500/80 text-red-400': item.status === 'entregue'
                        }">
@@ -536,7 +559,7 @@
               <!-- TAGS VISUAIS DINÂMICAS + AVISO FORA DA SACOLA -->
               <div class="flex flex-wrap items-center gap-2 pt-1">
                 <template x-if="item.is_volumoso">
-                  <span class="badge-fora-sacola" @click.stop="abrirModalVolumoso(item)">
+                  <span class="badge-fora-sacola js-no-drag" @click.stop="abrirModalVolumoso(item)">
                     <span>📦</span>
                     <span x-text="`FORA DA SACOLA • ${item.nota_local || 'VOLUMOSO'}`"></span>
                   </span>
@@ -544,12 +567,12 @@
 
                 <span x-show="!isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente'" 
                       @click.stop="marcarComoConferidoManual(item)"
-                      class="bg-orange-500/20 text-orange-400 border border-orange-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase cursor-pointer hover:bg-orange-500/30"
+                      class="js-no-drag bg-orange-500/20 text-orange-400 border border-orange-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase cursor-pointer hover:bg-orange-500/30"
                       title="Toque para marcar conferido manualmente caso a etiqueta esteja ilegível">
                   ⏳ Aguardando Bipagem
                 </span>
                 <span x-show="isPacoteConferido(item) && item.status !== 'entregue' && item.status !== 'ausente'" 
-                      class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">
+                      class="badge-verde-vivo border px-2 py-0.5 rounded-md font-black text-[10px] uppercase">
                   🟢 Pronto / Conferido
                 </span>
                 <span x-show="item.status === 'ausente'" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-2 py-0.5 rounded-md font-black text-[10px] uppercase">⚠️ Ausente / Na Volta</span>
@@ -564,16 +587,23 @@
                 <p class="text-base font-bold text-gray-300" x-text="`${item.bairro} - ${item.cidade}`"></p>
               </div>
 
-              <!-- RASTREIO + BOTÃO NOTA VOLUMOSO + BOTÃO REABRIR -->
-              <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs">
+              <!-- RASTREIO + BOTÃO MOVER POSIÇÃO (ANTES BIPAGEM) + NOTA VOLUMOSO + REABRIR -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-800/80 text-xs">
                 <div class="flex items-center gap-2">
                   <span class="text-gray-400 font-medium">Rastreio:</span>
                   <span class="font-mono font-black text-xs sm:text-sm text-orange-400 bg-black/90 px-2.5 py-1 rounded-xl border border-gray-800 tracking-wider shadow-inner" x-text="item.codigo_rastreio || 'SPX-REGISTRADO'"></span>
                 </div>
 
                 <div class="flex items-center gap-1.5">
+                  <button x-show="podeReordenarSacolas"
+                          @click.stop="abrirModalMoverPosicao(item)" 
+                          class="btn-mover-posicao js-no-drag"
+                          title="Mover pacote para outra posição (#Canetão)">
+                    <span>⇅</span> <span>Mover</span>
+                  </button>
+
                   <button @click.stop="abrirModalVolumoso(item)" 
-                          class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700 px-2.5 py-1.5 rounded-xl text-[11px] font-bold active:scale-95 transition flex items-center gap-1"
+                          class="js-no-drag bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700 px-2.5 py-1.5 rounded-xl text-[11px] font-bold active:scale-95 transition flex items-center gap-1"
                           :class="{'text-orange-400 border-orange-500/50': item.is_volumoso}"
                           title="Anotar onde a caixa está no carro">
                     <span>📦</span> <span x-text="item.is_volumoso ? 'Nota' : '+ Nota'"></span>
@@ -581,7 +611,7 @@
 
                   <button x-show="item.status === 'entregue'" 
                         @click.stop="reabrirEntrega(item)" 
-                        class="bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md">
+                        class="js-no-drag bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-xl font-black text-xs active:scale-95 transition flex items-center gap-1.5 shadow-md">
                     <span>↩️</span> Reabrir
                   </button>
                 </div>
@@ -664,7 +694,7 @@
                   <div class="bg-yellow-500/20 text-yellow-200 border border-yellow-500/40 rounded-xl p-2.5 flex items-center justify-between font-mono text-xs font-bold">
                     <div class="space-x-2">
                       <span class="text-orange-400 font-black text-sm" x-text="`Canetão #${p.ordem_entrega}`"></span>
-                      <span class="text-white text-xs" x-text="p.parada_shopee && Number(p.parada_shopee) > 0 ? `Ordem SPX ${formatarParada(p.ordem_shopee)}` : `Final ${p.codigo_rastreio.slice(-4)}`"></span>
+                      <span class="text-white text-xs" x-text="p.parada_shopee && Number(p.parada_shopee) > 0 ? `Ordem SPX ${formatarParada(p.parada_shopee)}` : `Final ${p.codigo_rastreio.slice(-4)}`"></span>
                     </div>
                     <span class="tracking-wider text-xs" x-text="p.codigo_rastreio"></span>
                   </div>
@@ -718,7 +748,7 @@
           <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap py-0.5">
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 border border-white shrink-0"></span> <strong class="text-slate-200">CD/Casa</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 border border-white shrink-0"></span> <strong class="text-slate-200">Aguardando</strong></span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shrink-0"></span> <strong class="text-slate-200">Pronto</strong></span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500 border border-white shrink-0"></span> <strong class="text-slate-200">Pronto</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 border border-white shrink-0"></span> <strong class="text-slate-200">Entregue</strong></span>
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-white shrink-0"></span> <strong class="text-slate-200">Ausente</strong></span>
           </div>
@@ -1018,6 +1048,45 @@
 
   </div>
 
+  <!-- MODAL RÁPIDO PARA MOVER POSIÇÃO DO CANETÃO (PULO DIRETO ANTES DA BIPAGEM) -->
+  <div x-show="modalMoverPosicao" class="fixed inset-0 bg-black/90 z-[325] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 border-2 border-cyan-500/80 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl text-left" @click.away="fecharModalMoverPosicao()">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">⇅</span>
+          <div>
+            <h3 class="text-base font-black text-white leading-tight">Mover Ordem do Canetão</h3>
+            <span class="text-xs text-cyan-400 font-mono font-bold" x-text="`Atual: #${pacoteMovendoPosicao?.ordem_entrega || '-'} de ${entregas.length}`"></span>
+          </div>
+        </div>
+        <button @click="fecharModalMoverPosicao()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none p-1">&times;</button>
+      </div>
+
+      <p class="text-xs text-gray-300 leading-snug truncate" x-text="pacoteMovendoPosicao?.endereco || ''"></p>
+
+      <div class="space-y-1.5">
+        <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">Mover este pacote para qual posição (#Canetão)?</label>
+        <input type="number" 
+               min="1" 
+               :max="entregas.length" 
+               x-model="novaPosicaoInput" 
+               @keyup.enter="confirmarMoverPosicao()"
+               placeholder="Ex: 12" 
+               class="w-full bg-black border-2 border-cyan-500/60 rounded-xl px-4 py-3 text-xl font-black font-mono text-white text-center focus:outline-none focus:border-orange-500">
+        <p class="text-[10px] text-gray-400 text-center" x-text="`Digite um número de 1 até ${entregas.length}`"></p>
+      </div>
+
+      <div class="flex gap-2 pt-1">
+        <button @click="fecharModalMoverPosicao()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3.5 rounded-2xl text-xs active:scale-95 transition">
+          Cancelar
+        </button>
+        <button @click="confirmarMoverPosicao()" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition">
+          ✅ Salvar Ordem
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 14. MODAL DE OBJETO VOLUMOSO (PÍLULAS DE 1 TOQUE + NOTA DE ALOCAÇÃO) -->
   <div x-show="modalVolumoso" class="fixed inset-0 bg-black/90 z-[320] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 border-2 border-orange-500 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl text-left" @click.away="fecharModalVolumoso()">
@@ -1311,11 +1380,11 @@
           </div>
           <div class="bg-[#141b26] border border-cyan-500/40 p-3 rounded-2xl">
             <span class="text-[9px] text-cyan-400 font-black block uppercase">DISTÂNCIA REAL</span>
-            <span class="text-2xl font-black font-mono text-cyan-300 mt-0.5 block" x-text="`${dadosRelatorio?.kmTotal || 0} km`"></span>
+            <span class="text-2xl font-black font-mono text-cyan-300 mt-0.5 block" x-text="`${dadosRelatorio?.kmRealPercorrido || dadosRelatorio?.kmTotal || 0} km`"></span>
           </div>
           <div class="bg-[#141b26] border border-emerald-500/40 p-3 rounded-2xl">
-            <span class="text-[9px] text-emerald-400 font-black block uppercase">TEMPO ESTIMADO</span>
-            <span class="text-lg font-black font-mono text-emerald-300 mt-1 block" x-text="dadosRelatorio?.tempoEstimadoFormatado || '0h'"></span>
+            <span class="text-[9px] text-emerald-400 font-black block uppercase">TEMPO TOTAL</span>
+            <span class="text-lg font-black font-mono text-emerald-300 mt-1 block" x-text="dadosRelatorio?.tempoTotalTexto || dadosRelatorio?.tempoEstimadoFormatado || '0min'"></span>
           </div>
         </div>
 
@@ -1548,7 +1617,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-orange-500/40">👜</div>
           <h3 class="text-2xl font-black text-white">Método Canetão (Sacolas)</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Na aba Sacolas, os pacotes vêm organizados de 10 em 10. Você escreve o número #CANETÃO grande em cada caixa e guarda na sacola certa.</p>
+          <p class="text-xs text-gray-300 leading-relaxed">Na aba Sacolas, os pacotes vêm organizados de 10 em 10. Antes de bipar, você pode segurar e arrastar um card para ajustar a sequência do Canetão!</p>
         </div>
       </template>
 
@@ -1606,6 +1675,9 @@
 
     </div>
   </div>
+
+  <!-- TOAST FLUTUANTE NÃO-BLOQUEANTE -->
+  <div x-show="toastMensagem" class="toast-spx-flutuante" x-text="toastMensagem" x-cloak></div>
 
 </body>
 </html>
