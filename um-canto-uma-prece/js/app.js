@@ -1,6 +1,7 @@
 /* ==========================================================================
-   Um Canto, Uma Prece! v1.0.0 - Núcleo Reativo Oficial
-   Repertório por Categorias, Karaokê Sincronizado, Áudio Offline & Painel Admin
+   Um Canto, Uma Prece! v1.1.0 - Núcleo Reativo Oficial
+   Login Google + Cadastro Obrigatório (canto_users), Repertório por Categorias,
+   Karaokê Sincronizado, Áudio Offline & Painel Admin
    Arquivo: /um-canto-uma-prece/js/app.js
    ========================================================================== */
 
@@ -89,7 +90,24 @@ function umCantoApp() {
     temPromptInstalacao: false,
     mostrarPopupInstalar: false,
 
-    // 7. ÁREA ADMIN (DIRECTUS AUTH + CADASTRO + EDITOR DE SINCRONIZAÇÃO)
+    // 7. AUTENTICAÇÃO GOOGLE & CADASTRO OBRIGATÓRIO DO MÉDIUM (canto_users)
+    usuarioLogado: false,
+    verificandoAuth: true,
+    usuarioId: localStorage.getItem('canto_user_id') || null,
+    usuarioEmail: '',
+    usuarioNome: '',
+    usuarioWhatsapp: '',
+    usuarioTerreiro: '',
+    cantoUserRecordId: null,
+    modalCadastroObrigatorio: false,
+    inputNome: '',
+    inputEmail: '',
+    inputWhatsapp: '',
+    inputTerreiro: '',
+    erroCadastroObrigatorio: '',
+    salvandoPerfil: false,
+
+    // 8. ÁREA ADMIN (DIRIGENTE) + CADASTRO + EDITOR DE SINCRONIZAÇÃO
     adminLogado: false,
     adminEmail: '',
     adminNome: '',
@@ -130,7 +148,10 @@ function umCantoApp() {
 
       window.addEventListener('online', () => {
         this.estaOnline = true;
-        this.carregarPontos();
+        if (this.usuarioLogado) {
+          this.sincronizarPerfilUsuario();
+          this.carregarPontos();
+        }
       });
 
       window.addEventListener('offline', () => {
@@ -147,9 +168,13 @@ function umCantoApp() {
       }
 
       this.configurarListenersAudio();
-      await this.verificarAutenticacaoAdmin();
-      await this.carregarPontos();
-      await this.sincronizarListaAudiosOffline();
+      await this.verificarAutenticacao();
+
+      if (this.usuarioLogado) {
+        await this.sincronizarPerfilUsuario();
+        await this.carregarPontos();
+        await this.sincronizarListaAudiosOffline();
+      }
 
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && (this.tocando || this.abaAtual === 'karaoke')) {
@@ -261,6 +286,291 @@ function umCantoApp() {
       return false;
     },
 
+    // =========================================================================
+    // AUTENTICAÇÃO GOOGLE & CADASTRO OBRIGATÓRIO (SPXROTAS PATTERN)
+    // =========================================================================
+    async verificarAutenticacao() {
+      this.verificandoAuth = true;
+
+      try {
+        if (localStorage.getItem('canto_deslogado') === 'true') {
+          this.usuarioLogado = false;
+          this.adminLogado = false;
+          return;
+        }
+
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+        const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
+        const refreshUrl = searchParams.get('refresh_token') || hashParams.get('refresh_token');
+
+        if (tokenUrl) {
+          localStorage.setItem('directus_token', tokenUrl);
+          this.tokenAcesso = tokenUrl;
+        }
+        if (refreshUrl) {
+          localStorage.setItem('directus_refresh_token', refreshUrl);
+        }
+
+        if (window.location.search || window.location.hash) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        const res = await this.fetchDirectus('/users/me', { method: 'GET' }, true);
+        if (res && res.ok) {
+          const d = await res.json();
+          if (d?.data?.id) {
+            const u = d.data;
+            this.usuarioId = u.id;
+            this.usuarioEmail = u.email || '';
+            const n = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
+            this.usuarioNome = n || u.email || '';
+            localStorage.setItem('canto_user_id', this.usuarioId);
+            this.usuarioLogado = true;
+
+            // Verifica se o usuário tem permissão de escrita em pontos_umbanda no Directus
+            try {
+              const permRes = await this.fetchDirectus('/permissions/me', { method: 'GET' }, true);
+              if (permRes && permRes.ok) {
+                const permData = await permRes.json();
+                const pontosPerm = permData?.data?.pontos_umbanda;
+                if (pontosPerm && (pontosPerm.create?.access || pontosPerm.update?.access)) {
+                  this.adminLogado = true;
+                  this.adminNome = this.usuarioNome;
+                  this.adminEmail = this.usuarioEmail;
+                }
+              }
+            } catch (e) {}
+            return;
+          }
+        }
+
+        this.usuarioLogado = false;
+        this.adminLogado = false;
+      } catch (networkErr) {
+        // Offline-First: se o médium já entrou antes e está no terreiro sem 4G, mantém sessão local
+        const cachedPerfil = localStorage.getItem('canto_perfil_cache');
+        if (cachedPerfil && localStorage.getItem('canto_user_id')) {
+          try {
+            const p = JSON.parse(cachedPerfil);
+            this.usuarioId = p.user_id || localStorage.getItem('canto_user_id');
+            this.usuarioNome = p.nome || '';
+            this.usuarioEmail = p.email || '';
+            this.usuarioWhatsapp = p.whatsapp || '';
+            this.usuarioTerreiro = p.nome_terreiro || '';
+            this.cantoUserRecordId = p.id || null;
+            this.adminLogado = p.is_admin === true;
+            this.usuarioLogado = true;
+            this.modalCadastroObrigatorio = false;
+          } catch (e) {
+            this.usuarioLogado = false;
+          }
+        } else {
+          this.usuarioLogado = false;
+        }
+      } finally {
+        this.verificandoAuth = false;
+      }
+    },
+
+    async sincronizarPerfilUsuario() {
+      if (!this.usuarioId || !this.usuarioLogado) return;
+
+      try {
+        const res = await this.fetchDirectus(`/items/canto_users?filter[user_id][_eq]=${this.usuarioId}`, { method: 'GET' }, true);
+        if (!res || !res.ok) return;
+
+        const data = await res.json();
+        const registros = data.data || [];
+        let userCanto = registros[0] || null;
+
+        if (!userCanto) {
+          const nomeInicial = (this.usuarioNome && !this.usuarioNome.includes('@')) ? this.usuarioNome : null;
+          const novo = {
+            user_id: this.usuarioId,
+            email: this.usuarioEmail || null,
+            nome: nomeInicial,
+            whatsapp: null,
+            nome_terreiro: null,
+            is_admin: this.adminLogado === true
+          };
+          const p = await this.fetchDirectus('/items/canto_users', {
+            method: 'POST',
+            body: JSON.stringify(novo)
+          }, true);
+          if (p && p.ok) {
+            const pd = await p.json();
+            userCanto = pd.data;
+          }
+        }
+
+        if (userCanto) {
+          this.cantoUserRecordId = userCanto.id;
+          if (userCanto.nome) this.usuarioNome = userCanto.nome;
+          if (userCanto.whatsapp) this.usuarioWhatsapp = userCanto.whatsapp;
+          if (userCanto.nome_terreiro) this.usuarioTerreiro = userCanto.nome_terreiro;
+          if (userCanto.email) this.usuarioEmail = userCanto.email;
+          if (userCanto.is_admin === true) {
+            this.adminLogado = true;
+            this.adminNome = this.usuarioNome;
+            this.adminEmail = this.usuarioEmail;
+          }
+
+          localStorage.setItem('canto_perfil_cache', JSON.stringify(userCanto));
+        }
+
+        const nomeInvalido = !userCanto?.nome || userCanto.nome.trim().length < 3 || userCanto.nome.includes('@');
+        const whatsInvalido = !userCanto?.whatsapp || String(userCanto.whatsapp).replace(/\D/g, '').length < 10;
+        const terreiroInvalido = !userCanto?.nome_terreiro || userCanto.nome_terreiro.trim().length < 2;
+        const emailInvalido = !userCanto?.email || !userCanto.email.includes('@');
+
+        if (this.usuarioLogado && (nomeInvalido || whatsInvalido || terreiroInvalido || emailInvalido)) {
+          this.inputNome = (!nomeInvalido) ? userCanto.nome : (this.usuarioNome && !this.usuarioNome.includes('@') ? this.usuarioNome : '');
+          this.inputEmail = (!emailInvalido) ? userCanto.email : (this.usuarioEmail || '');
+          this.inputWhatsapp = userCanto?.whatsapp || '';
+          this.inputTerreiro = userCanto?.nome_terreiro || '';
+          this.erroCadastroObrigatorio = '';
+          this.modalCadastroObrigatorio = true;
+        } else {
+          this.modalCadastroObrigatorio = false;
+        }
+      } catch (e) {
+        console.warn('[Um Canto] Sincronização de perfil em modo offline:', e);
+      }
+    },
+
+    async salvarCadastroObrigatorio() {
+      this.erroCadastroObrigatorio = '';
+      const nome = (this.inputNome || '').trim();
+      const whats = (this.inputWhatsapp || '').replace(/\D/g, '');
+      const terreiro = (this.inputTerreiro || '').trim();
+      const email = (this.inputEmail || this.usuarioEmail || '').trim().toLowerCase();
+
+      if (!nome || nome.length < 3) {
+        this.erroCadastroObrigatorio = 'Por favor, informe seu nome completo.';
+        return;
+      }
+      if (whats.length < 10 || whats.length > 11) {
+        this.erroCadastroObrigatorio = 'Informe um WhatsApp válido com DDD (10 ou 11 dígitos).';
+        return;
+      }
+      if (!terreiro || terreiro.length < 2) {
+        this.erroCadastroObrigatorio = 'Por favor, informe o nome do seu Terreiro ou Casa.';
+        return;
+      }
+      if (!email || !email.includes('@')) {
+        this.erroCadastroObrigatorio = 'Informe um e-mail válido.';
+        return;
+      }
+
+      this.salvandoPerfil = true;
+      try {
+        let recordId = this.cantoUserRecordId;
+
+        if (!recordId) {
+          const busca = await this.fetchDirectus(`/items/canto_users?filter[user_id][_eq]=${this.usuarioId}`, { method: 'GET' }, true);
+          if (busca && busca.ok) {
+            const bd = await busca.json();
+            if (bd.data && bd.data[0]) recordId = bd.data[0].id;
+          }
+        }
+
+        const payload = {
+          nome,
+          whatsapp: whats,
+          nome_terreiro: terreiro,
+          email
+        };
+
+        let res;
+        if (recordId) {
+          res = await this.fetchDirectus(`/items/canto_users/${recordId}`, {
+            method: 'PATCH',
+            body: JSON.stringify(payload)
+          }, true);
+        } else {
+          res = await this.fetchDirectus('/items/canto_users', {
+            method: 'POST',
+            body: JSON.stringify({
+              user_id: this.usuarioId,
+              is_admin: this.adminLogado === true,
+              ...payload
+            })
+          }, true);
+        }
+
+        if (res && res.ok) {
+          const saved = await res.json();
+          const rec = saved?.data || { id: recordId, user_id: this.usuarioId, ...payload };
+          this.cantoUserRecordId = rec.id || recordId;
+          this.usuarioNome = nome;
+          this.usuarioWhatsapp = whats;
+          this.usuarioTerreiro = terreiro;
+          this.usuarioEmail = email;
+          localStorage.setItem('canto_perfil_cache', JSON.stringify(rec));
+
+          this.modalCadastroObrigatorio = false;
+          if ('vibrate' in navigator) navigator.vibrate([40, 30, 40]);
+          alert('✅ Cadastro concluído! Seja bem-vindo(a) ao Um Canto, Uma Prece!');
+        } else {
+          this.erroCadastroObrigatorio = 'Não foi possível salvar seu cadastro. Verifique as permissões no Directus.';
+        }
+      } catch (e) {
+        this.erroCadastroObrigatorio = 'Erro de conexão ao salvar: ' + e.message;
+      } finally {
+        this.salvandoPerfil = false;
+      }
+    },
+
+    abrirEdicaoPerfilProprio() {
+      this.inputNome = this.usuarioNome || '';
+      this.inputEmail = this.usuarioEmail || '';
+      this.inputWhatsapp = this.usuarioWhatsapp || '';
+      this.inputTerreiro = this.usuarioTerreiro || '';
+      this.erroCadastroObrigatorio = '';
+      this.menuAberto = false;
+      this.modalCadastroObrigatorio = true;
+    },
+
+    loginGoogle() {
+      localStorage.removeItem('canto_deslogado');
+      const urlLimpa = window.location.origin + window.location.pathname;
+      window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
+    },
+
+    async deslogar() {
+      const audio = document.getElementById('audioPlayerPrincipal');
+      if (audio) audio.pause();
+      this.tocando = false;
+      this.liberarWakeLock();
+
+      localStorage.setItem('canto_deslogado', 'true');
+      localStorage.removeItem('directus_token');
+      localStorage.removeItem('directus_refresh_token');
+      localStorage.removeItem('canto_user_id');
+      localStorage.removeItem('canto_perfil_cache');
+
+      this.tokenAcesso = null;
+      this.usuarioId = null;
+      this.usuarioLogado = false;
+      this.adminLogado = false;
+      this.modalCadastroObrigatorio = false;
+      this.menuAberto = false;
+      this.abaAtual = 'repertorio';
+
+      try {
+        await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ mode: 'session' })
+        });
+      } catch (e) {}
+    },
+
+    // =========================================================================
+    // CARREGAMENTO DO REPERTÓRIO DE PONTOS
+    // =========================================================================
     async carregarPontos() {
       if (!navigator.onLine && this.pontos.length > 0) return;
 
@@ -268,7 +578,6 @@ function umCantoApp() {
       this.erroCarregamento = null;
 
       try {
-        // Busca pública sem depender de token de sessão expirado
         const filtro = this.adminLogado ? '' : '&filter[ativo][_eq]=true';
         const res = await this.fetchDirectus(
           `/items/pontos_umbanda?sort=categoria,titulo&limit=500${filtro}`,
@@ -282,7 +591,6 @@ function umCantoApp() {
             this.pontos = json.data;
             localStorage.setItem('canto_pontos_cache', JSON.stringify(this.pontos));
 
-            // Atualiza referência do ponto ativo se estiver aberto no karaokê
             if (this.pontoAtual) {
               const atualizado = this.pontos.find(p => String(p.id) === String(this.pontoAtual.id));
               if (atualizado) {
@@ -345,7 +653,6 @@ function umCantoApp() {
           .filter(v => v.text.length > 0);
       }
 
-      // Fallback para letra completa sem timestamp
       if (ponto.letra_completa && String(ponto.letra_completa).trim()) {
         return String(ponto.letra_completa)
           .split(/\r?\n/)
@@ -695,7 +1002,7 @@ function umCantoApp() {
 
     sincronizarVersoPorTempo(tempoAtual, forcarScroll = false) {
       if (!this.versosAtuais || this.versosAtuais.length === 0) return;
-      if (this.versosAtuais[0].start < 0) return; // Sem timestamps
+      if (this.versosAtuais[0].start < 0) return;
 
       let novoIndice = -1;
       for (let i = 0; i < this.versosAtuais.length; i++) {
@@ -758,51 +1065,8 @@ function umCantoApp() {
     },
 
     // =========================================================================
-    // ÁREA ADMIN (LOGIN DIRECTUS, ENVIO PARA N8N & EDITOR DE SINCRONIZAÇÃO)
+    // ÁREA ADMIN (DIRIGENTE: LOGIN EXTRA POR SENHA, ENVIO N8N & EDITOR)
     // =========================================================================
-    async verificarAutenticacaoAdmin() {
-      if (localStorage.getItem('canto_admin_deslogado') === 'true') {
-        this.adminLogado = false;
-        return;
-      }
-
-      const searchParams = new URLSearchParams(window.location.search);
-      const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
-      const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
-      const refreshUrl = searchParams.get('refresh_token') || hashParams.get('refresh_token');
-
-      if (tokenUrl) {
-        this.tokenAcesso = tokenUrl;
-        localStorage.setItem('directus_token', tokenUrl);
-      }
-      if (refreshUrl) {
-        localStorage.setItem('directus_refresh_token', refreshUrl);
-      }
-
-      if (window.location.search) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-
-      if (!this.tokenAcesso) {
-        this.adminLogado = false;
-        return;
-      }
-
-      try {
-        const res = await this.fetchDirectus('/users/me', { method: 'GET' }, true);
-        if (res && res.ok) {
-          const data = await res.json();
-          if (data?.data?.id) {
-            this.adminLogado = true;
-            this.adminEmail = data.data.email || '';
-            this.adminNome = [data.data.first_name, data.data.last_name].filter(Boolean).join(' ') || data.data.email || 'Dirigente';
-            return;
-          }
-        }
-      } catch (e) {}
-      this.adminLogado = false;
-    },
-
     async loginDirectusEmailSenha() {
       const email = (this.loginEmailInput || '').trim();
       const password = this.loginSenhaInput || '';
@@ -813,7 +1077,7 @@ function umCantoApp() {
 
       this.carregandoLogin = true;
       this.erroLogin = '';
-      localStorage.removeItem('canto_admin_deslogado');
+      localStorage.removeItem('canto_deslogado');
 
       try {
         const res = await fetch(`${this.DIRECTUS_URL}/auth/login`, {
@@ -830,7 +1094,8 @@ function umCantoApp() {
             localStorage.setItem('directus_refresh_token', data.data.refresh_token);
           }
           this.loginSenhaInput = '';
-          await this.verificarAutenticacaoAdmin();
+          await this.verificarAutenticacao();
+          await this.sincronizarPerfilUsuario();
           await this.carregarPontos();
         } else {
           this.erroLogin = 'E-mail ou senha inválidos.';
@@ -843,29 +1108,11 @@ function umCantoApp() {
     },
 
     loginGoogleAdmin() {
-      localStorage.removeItem('canto_admin_deslogado');
-      const urlLimpa = window.location.origin + window.location.pathname;
-      window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
+      this.loginGoogle();
     },
 
     async deslogarAdmin() {
-      localStorage.setItem('canto_admin_deslogado', 'true');
-      localStorage.removeItem('directus_token');
-      localStorage.removeItem('directus_refresh_token');
-      this.tokenAcesso = null;
-      this.adminLogado = false;
-      this.adminEmail = '';
-      this.adminNome = '';
-      try {
-        await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ mode: 'session' })
-        });
-      } catch (e) {}
-      this.abaAtual = 'repertorio';
-      await this.carregarPontos();
+      await this.deslogar();
     },
 
     selecionarArquivoAudioAdmin(event) {
