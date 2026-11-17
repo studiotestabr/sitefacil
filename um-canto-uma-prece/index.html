@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#d97706">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Um Canto, Uma Prece! - Aplicativo de estudo de Pontos de Umbanda com letra completa e sincronizada estilo karaokê em tempo real.">
+  <title>Um Canto, Uma Prece! • Pontos de Umbanda</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css?v=1.0.0">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <script src="./js/app.js?v=1.0.0"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+</head>
+<body x-data="umCantoApp()" x-init="init()" x-cloak class="theme-escuro bg-[#090d16] text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Elemento de Áudio Oculto Controlado pelo App -->
+  <audio id="audioPlayerPrincipal" preload="metadata" class="hidden"></audio>
+
+  <!-- ===================================================================== -->
+  <!-- 1. CABEÇALHO SUPERIOR FIXO                                            -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-40 bg-[#0d1321]/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+    <div class="max-w-3xl mx-auto flex items-center justify-between gap-2">
+      <!-- Marca do App -->
+      <div @click="abaAtual = 'repertorio'" class="flex items-center gap-2.5 cursor-pointer min-w-0">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-xl shadow-lg shadow-amber-600/30 shrink-0">
+          🕊️
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-lg font-black tracking-tight text-white truncate leading-tight">
+            Um Canto, <span class="text-amber-400">Uma Prece!</span>
+          </h1>
+          <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+            <span x-show="estaOnline" class="badge-offline-status badge-online-ok">● Online</span>
+            <span x-show="!estaOnline" class="badge-offline-status badge-offline-ativo">● Offline</span>
+            <span x-show="wakeLockAtivo" class="badge-wakelock">☀️ Tela Acesa</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações do Cabeçalho -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button
+          @click="buscaAberta = !buscaAberta; if (buscaAberta) { abaAtual = 'repertorio'; $nextTick(() => $refs.inputBusca?.focus()); }"
+          :class="buscaAberta ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-800 text-slate-300 border-slate-700'"
+          class="w-10 h-10 rounded-xl border flex items-center justify-center text-base transition active:scale-95"
+          title="Buscar Ponto ou Trecho da Letra">
+          🔍
+        </button>
+
+        <button
+          @click="alternarTema(tema === 'escuro' ? 'claro' : 'escuro')"
+          class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-base transition active:scale-95"
+          :title="tema === 'escuro' ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
+          <span x-text="tema === 'escuro' ? '☀️' : '🌙'"></span>
+        </button>
+
+        <button
+          @click="menuAberto = true"
+          class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-lg transition active:scale-95"
+          title="Menu e Configurações">
+          ☰
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de Busca Expansível -->
+    <div x-show="buscaAberta" x-transition class="max-w-3xl mx-auto mt-3">
+      <div class="relative flex items-center">
+        <input
+          x-ref="inputBusca"
+          x-model="termoBusca"
+          type="text"
+          placeholder="Buscar por nome do ponto, Orixá, toque ou trecho da letra..."
+          class="w-full bg-slate-900 border border-amber-500/50 rounded-xl pl-4 pr-20 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400">
+        <button
+          x-show="termoBusca.length > 0"
+          @click="termoBusca = ''"
+          class="absolute right-10 text-xs font-bold text-slate-400 hover:text-white px-2 py-1">
+          Limpar
+        </button>
+        <button
+          @click="buscaAberta = false; termoBusca = ''"
+          class="absolute right-2.5 text-slate-400 hover:text-white text-sm font-bold px-1.5 py-1">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Navegação Principal em Abas -->
+    <nav class="max-w-3xl mx-auto mt-3 grid grid-cols-4 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
+      <button
+        @click="abaAtual = 'repertorio'"
+        :class="abaAtual === 'repertorio' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
+        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1">
+        <span>🥁</span>
+        <span class="truncate">Pontos</span>
+      </button>
+
+      <button
+        @click="abaAtual = 'karaoke'"
+        :class="abaAtual === 'karaoke' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
+        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1 relative">
+        <span>🎤</span>
+        <span class="truncate">Karaokê</span>
+        <span x-show="tocando" class="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute top-1.5 right-2"></span>
+      </button>
+
+      <button
+        @click="abaAtual = 'favoritos'"
+        :class="abaAtual === 'favoritos' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
+        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1">
+        <span>⭐</span>
+        <span class="truncate">Favoritos</span>
+        <span x-show="favoritosIds.size > 0" class="text-[10px] bg-black/30 px-1.5 rounded-full" x-text="favoritosIds.size"></span>
+      </button>
+
+      <button
+        @click="abaAtual = 'admin'"
+        :class="abaAtual === 'admin' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
+        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1">
+        <span x-text="adminLogado ? '⚙️' : '🔐'"></span>
+        <span class="truncate">Dirigente</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- 2. CONTEÚDO PRINCIPAL                                                 -->
+  <!-- ===================================================================== -->
+  <main class="flex-1 max-w-3xl w-full mx-auto px-4 pt-4" :class="pontoAtual && abaAtual !== 'admin' ? 'pb-48' : 'pb-12'">
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- ABA: REPERTÓRIO & FAVORITOS                                         -->
+    <!-- ------------------------------------------------------------------- -->
+    <section x-show="abaAtual === 'repertorio' || abaAtual === 'favoritos'">
+
+      <!-- Filtro Horizontal por Categorias (Orixás & Linhas) -->
+      <div x-show="abaAtual === 'repertorio'" class="mb-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1.5">
+          <button
+            @click="categoriaSelecionada = 'Todas'"
+            :class="categoriaSelecionada === 'Todas' ? 'ativo' : ''"
+            class="cat-chip">
+            <span>✨</span>
+            <span>Todas</span>
+            <span class="opacity-75 text-[10px]" x-text="'(' + pontos.filter(p => adminLogado || p.ativo !== false).length + ')'"></span>
+          </button>
+
+          <template x-for="cat in categoriasComContagem" :key="cat.nome">
+            <button
+              @click="categoriaSelecionada = cat.nome"
+              :class="categoriaSelecionada === cat.nome ? 'ativo' : ''"
+              class="cat-chip">
+              <span x-text="cat.icone"></span>
+              <span x-text="cat.nome"></span>
+              <span class="opacity-75 text-[10px]" x-text="'(' + cat.total + ')'"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <!-- Barra de Contagem & Download Offline em Lote -->
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <p class="text-xs font-bold text-slate-400">
+          <span x-text="pontosFiltrados.length"></span> ponto(s) encontrado(s)
+          <span x-show="categoriaSelecionada !== 'Todas' && abaAtual === 'repertorio'" class="text-amber-400">
+            • <span x-text="categoriaSelecionada"></span>
+          </span>
+        </p>
+
+        <div class="flex items-center gap-2">
+          <button
+            @click="baixarTodosFiltradosOffline()"
+            :disabled="baixandoLoteOffline || pontosFiltrados.length === 0"
+            class="text-[11px] font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35 px-2.5 py-1.5 rounded-xl hover:bg-emerald-500/25 disabled:opacity-40 transition flex items-center gap-1">
+            <span x-text="baixandoLoteOffline ? '⏳ Baixando...' : '📥 Salvar Offline'"></span>
+          </button>
+
+          <button
+            @click="carregarPontos()"
+            class="text-[11px] font-extrabold bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1.5 rounded-xl hover:text-white transition">
+            🔄
+          </button>
+        </div>
+      </div>
+
+      <!-- Carregando -->
+      <div x-show="carregandoPontos && pontos.length === 0" class="py-16 text-center">
+        <div class="inline-block w-9 h-9 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="text-sm text-slate-400 font-semibold">Buscando pontos cantados no terreiro...</p>
+      </div>
+
+      <!-- Erro de Carregamento -->
+      <div x-show="erroCarregamento && pontos.length === 0" class="bg-red-500/10 border border-red-500/40 rounded-2xl p-5 text-center my-6">
+        <p class="text-sm font-bold text-red-300 mb-3" x-text="erroCarregamento"></p>
+        <button @click="carregarPontos()" class="bg-red-600 text-white text-xs font-black px-4 py-2 rounded-xl">Tentar Novamente</button>
+      </div>
+
+      <!-- Lista Vazia -->
+      <div x-show="!carregandoPontos && pontosFiltrados.length === 0 && !erroCarregamento" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center my-6">
+        <div class="text-4xl mb-3" x-text="abaAtual === 'favoritos' ? '⭐' : '🥁'"></div>
+        <h3 class="text-base font-black text-white mb-1" x-text="abaAtual === 'favoritos' ? 'Nenhum ponto favoritado ainda' : 'Nenhum ponto encontrado'"></h3>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto mb-4" x-text="abaAtual === 'favoritos' ? 'Toque na estrela ⭐ de qualquer ponto para montar seu caderno pessoal de ensaio.' : 'Tente limpar a busca ou trocar a categoria selecionada.'"></p>
+        <button
+          x-show="abaAtual === 'repertorio' && (termoBusca || categoriaSelecionada !== 'Todas')"
+          @click="termoBusca = ''; categoriaSelecionada = 'Todas'"
+          class="bg-amber-600 text-white text-xs font-black px-4 py-2.5 rounded-xl">
+          Mostrar Todos os Pontos
+        </button>
+      </div>
+
+      <!-- Lista de Cards dos Pontos -->
+      <div class="space-y-3">
+        <template x-for="ponto in pontosFiltrados" :key="ponto.id">
+          <article
+            @click="abrirPontoNoKaraoke(ponto, true)"
+            :class="pontoAtual && String(pontoAtual.id) === String(ponto.id) ? 'tocando' : ''"
+            class="ponto-card bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer hover:border-amber-500/50">
+
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wide bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
+                    <span x-text="obterIconeCategoria(ponto.categoria)"></span>
+                    <span x-text="ponto.categoria || 'Outros'"></span>
+                  </span>
+
+                  <span x-show="ponto.tipo_ponto" class="text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded-full" x-text="ponto.tipo_ponto"></span>
+
+                  <span x-show="ponto.toque" class="text-[10px] font-bold text-amber-400/90" x-text="'🥁 ' + ponto.toque"></span>
+
+                  <span x-show="isAudioOffline(ponto)" class="badge-offline-salvo">✓ Offline</span>
+
+                  <span x-show="ponto.ativo === false" class="text-[10px] font-black bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full">Oculto</span>
+
+                  <span x-show="pontoAtual && String(pontoAtual.id) === String(ponto.id) && tocando" class="eq-bars ml-1">
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                  </span>
+                </div>
+
+                <h2 class="text-base sm:text-lg font-black text-white leading-snug" x-text="ponto.titulo"></h2>
+
+                <p x-show="ponto.letra_completa" class="text-xs text-slate-400 line-clamp-2 mt-1 leading-relaxed" x-text="ponto.letra_completa"></p>
+
+                <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-500 font-semibold">
+                  <span x-show="ponto.duracao_seg > 0" x-text="'⏱️ ' + formatarTempoMMSS(ponto.duracao_seg)"></span>
+                  <span x-show="Array.isArray(ponto.letra_sincronizada) && ponto.letra_sincronizada.length > 0" class="text-emerald-400">
+                    🎤 Karaokê Sincronizado
+                  </span>
+                </div>
+              </div>
+
+              <!-- Ações Rápidas do Card -->
+              <div class="flex flex-col items-end gap-1.5 shrink-0">
+                <div class="flex items-center gap-1.5">
+                  <button
+                    @click="alternarFavorito(ponto, $event)"
+                    :class="isFavorito(ponto.id) ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-slate-800 text-slate-400 border-slate-700'"
+                    class="w-9 h-9 rounded-xl border flex items-center justify-center text-base transition active:scale-90"
+                    title="Favoritar Ponto">
+                    <span x-text="isFavorito(ponto.id) ? '⭐' : '☆'"></span>
+                  </button>
+
+                  <button
+                    x-show="obterUrlAudio(ponto)"
+                    @click="alternarAudioOffline(ponto, $event)"
+                    :class="isAudioOffline(ponto) ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-800 text-slate-300 border-slate-700'"
+                    class="w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition active:scale-90"
+                    :title="isAudioOffline(ponto) ? 'Áudio salvo offline (toque para remover)' : 'Baixar áudio para ensaio offline'">
+                    <span x-text="baixandoOfflineId === ponto.id ? '⏳' : (isAudioOffline(ponto) ? '✅' : '📥')"></span>
+                  </button>
+                </div>
+
+                <!-- Botões Admin no Card -->
+                <div x-show="adminLogado" class="flex items-center gap-1.5 mt-1">
+                  <button
+                    @click="abrirEditorPonto(ponto, $event)"
+                    class="px-2.5 py-1 rounded-lg bg-sky-500/15 text-sky-300 border border-sky-500/35 text-[11px] font-bold hover:bg-sky-500/25">
+                    ✏️ Editar
+                  </button>
+                  <button
+                    @click="excluirPontoAdmin(ponto, $event)"
+                    class="px-2 py-1 rounded-lg bg-red-500/15 text-red-300 border border-red-500/35 text-[11px] font-bold hover:bg-red-500/25">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </template>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- ABA: PALCO KARAOKÊ SINCRONIZADO (LETRA INTEIRA NA TELA)             -->
+    <!-- ------------------------------------------------------------------- -->
+    <section x-show="abaAtual === 'karaoke'">
+      <!-- Nenhum ponto selecionado -->
+      <div x-show="!pontoAtual" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center my-8">
+        <div class="text-5xl mb-3">🎤</div>
+        <h2 class="text-lg font-black text-white mb-2">Escolha um Ponto para Ensaiar</h2>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto mb-5">
+          Selecione qualquer ponto na aba Repertório para ouvir a melodia e acompanhar a letra inteira destacando verso por verso.
+        </p>
+        <button @click="abaAtual = 'repertorio'" class="bg-amber-600 hover:bg-amber-500 text-white text-sm font-black px-5 py-3 rounded-2xl shadow-lg shadow-amber-600/30">
+          🥁 Ver Repertório de Pontos
+        </button>
+      </div>
+
+      <!-- Palco Ativo -->
+      <div x-show="pontoAtual" class="flex flex-col">
+        <!-- Cartão de Cabeçalho do Ponto -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 mb-3">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <button @click="abaAtual = 'repertorio'" class="text-xs font-extrabold text-slate-400 hover:text-white flex items-center gap-1">
+              <span>← Voltar aos Pontos</span>
+            </button>
+
+            <!-- Controles de Fonte + Ações -->
+            <div class="flex items-center gap-1.5">
+              <div class="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-0.5">
+                <button @click="alterarTamanhoFonte('normal')" :class="tamanhoFonteKaraoke === 'normal' ? 'bg-amber-600 text-white' : 'text-slate-400'" class="px-2 py-1 rounded-lg text-[11px] font-black">A</button>
+                <button @click="alterarTamanhoFonte('grande')" :class="tamanhoFonteKaraoke === 'grande' ? 'bg-amber-600 text-white' : 'text-slate-400'" class="px-2 py-1 rounded-lg text-xs font-black">A+</button>
+                <button @click="alterarTamanhoFonte('gigante')" :class="tamanhoFonteKaraoke === 'gigante' ? 'bg-amber-600 text-white' : 'text-slate-400'" class="px-2 py-1 rounded-lg text-xs font-black">A++</button>
+              </div>
+
+              <button
+                @click="alternarFavorito(pontoAtual, $event)"
+                :class="pontoAtual && isFavorito(pontoAtual.id) ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-slate-800 text-slate-300 border-slate-700'"
+                class="w-8 h-8 rounded-xl border flex items-center justify-center text-sm">
+                <span x-text="pontoAtual && isFavorito(pontoAtual.id) ? '⭐' : '☆'"></span>
+              </button>
+
+              <button
+                x-show="pontoAtual && obterUrlAudio(pontoAtual)"
+                @click="alternarAudioOffline(pontoAtual, $event)"
+                :class="pontoAtual && isAudioOffline(pontoAtual) ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-800 text-slate-300 border-slate-700'"
+                class="w-8 h-8 rounded-xl border flex items-center justify-center text-xs"
+                title="Salvar para ensaio offline">
+                <span x-text="pontoAtual && baixandoOfflineId === pontoAtual.id ? '⏳' : (pontoAtual && isAudioOffline(pontoAtual) ? '✅' : '📥')"></span>
+              </button>
+
+              <button
+                x-show="adminLogado"
+                @click="abrirEditorPonto(pontoAtual, $event)"
+                class="px-2.5 h-8 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40 text-xs font-bold">
+                ✏️
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <span class="inline-flex items-center gap-1 text-[11px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
+              <span x-text="obterIconeCategoria(pontoAtual?.categoria)"></span>
+              <span x-text="pontoAtual?.categoria || 'Outros'"></span>
+            </span>
+            <span x-show="pontoAtual?.tipo_ponto" class="text-[11px] font-bold text-slate-400" x-text="'• ' + pontoAtual?.tipo_ponto"></span>
+            <span x-show="pontoAtual?.toque" class="text-[11px] font-bold text-amber-400" x-text="'• 🥁 ' + pontoAtual?.toque"></span>
+          </div>
+
+          <h2 class="text-xl sm:text-2xl font-black text-white leading-tight" x-text="pontoAtual?.titulo"></h2>
+
+          <div x-show="pontoAtual?.observacoes" class="mt-2.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-3.5 py-2 text-xs text-amber-200 font-semibold">
+            📌 <span x-text="pontoAtual?.observacoes"></span>
+          </div>
+
+          <div x-show="erroAudio" class="mt-2.5 bg-red-500/15 border border-red-500/40 rounded-2xl px-3.5 py-2 text-xs text-red-200 font-bold" x-text="erroAudio"></div>
+        </div>
+
+        <!-- Aviso de Modo Leitura (caso não tenha timestamps ainda) -->
+        <div x-show="versosAtuais.length > 0 && versosAtuais[0].start < 0" class="mb-3 bg-slate-900 border border-slate-800 rounded-2xl px-4 py-2.5 text-center text-xs text-slate-400 font-semibold">
+          📖 Letra completa em modo leitura. Use o player abaixo para ouvir a melodia.
+        </div>
+
+        <div x-show="versosAtuais.length > 0 && versosAtuais[0].start >= 0" class="mb-2 text-center text-[11px] text-slate-400 font-semibold">
+          💡 Dica: Toque em qualquer verso abaixo para pular a música direto para aquela parte!
+        </div>
+
+        <!-- Palco com a Letra Completa na Tela -->
+        <div
+          id="palcoKaraoke"
+          @scroll="marcarScrollManualPalco()"
+          :class="'fonte-' + tamanhoFonteKaraoke"
+          class="karaoke-palco bg-slate-900/90 border border-slate-800 rounded-3xl px-4 sm:px-8 max-h-[58vh] overflow-y-auto shadow-2xl">
+
+          <div x-show="versosAtuais.length === 0" class="py-12 text-center text-sm text-slate-400">
+            Letra ainda não cadastrada para este ponto.
+          </div>
+
+          <template x-for="(verso, idx) in versosAtuais" :key="idx">
+            <div
+              :id="'verso-karaoke-' + idx"
+              @click="pularParaVerso(verso, idx)"
+              :class="{
+                'verso-ativo': idx === indiceVersoAtivo,
+                'verso-passado': indiceVersoAtivo >= 0 && idx < indiceVersoAtivo,
+                'verso-futuro': indiceVersoAtivo < 0 || idx > indiceVersoAtivo
+              }"
+              class="karaoke-verso">
+              <p x-text="verso.text"></p>
+              <span
+                x-show="verso.start >= 0 && idx === indiceVersoAtivo"
+                class="inline-block mt-1 text-[10px] font-mono font-bold opacity-75"
+                x-text="formatarTempoMMSS(verso.start)">
+              </span>
+            </div>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- ABA: ÁREA DO DIRIGENTE / ADMIN (DIRECTUS + N8N + EDITOR)            -->
+    <!-- ------------------------------------------------------------------- -->
+    <section x-show="abaAtual === 'admin'" class="space-y-4">
+
+      <!-- Tela de Login Admin -->
+      <div x-show="!adminLogado" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md mx-auto mt-4 shadow-2xl">
+        <div class="text-center mb-5">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/15 border border-amber-500/35 flex items-center justify-center text-3xl mb-3">
+            🔐
+          </div>
+          <h2 class="text-xl font-black text-white">Área do Dirigente / Admin</h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Entre com sua conta do Directus para adicionar novos pontos do YouTube, subir áudios ou corrigir letras.
+          </p>
+        </div>
+
+        <div x-show="erroLogin" class="mb-4 bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-bold rounded-xl px-3.5 py-2.5" x-text="erroLogin"></div>
+
+        <form @submit.prevent="loginDirectusEmailSenha()" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">E-mail do Directus</label>
+            <input
+              x-model="loginEmailInput"
+              type="email"
+              required
+              placeholder="seu@email.com"
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Senha</label>
+            <input
+              x-model="loginSenhaInput"
+              type="password"
+              required
+              placeholder="••••••••"
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <button
+            type="submit"
+            :disabled="carregandoLogin"
+            class="w-full bg-amber-600 hover:bg-amber-500 text-white font-black text-sm py-3 rounded-2xl shadow-lg shadow-amber-600/30 transition disabled:opacity-50">
+            <span x-text="carregandoLogin ? 'Entrando...' : 'Entrar no Painel'"></span>
+          </button>
+        </form>
+
+        <div class="flex items-center gap-3 my-4">
+          <div class="h-px bg-slate-800 flex-1"></div>
+          <span class="text-[11px] font-bold text-slate-500 uppercase">ou</span>
+          <div class="h-px bg-slate-800 flex-1"></div>
+        </div>
+
+        <button
+          @click="loginGoogleAdmin()"
+          type="button"
+          class="w-full bg-white text-slate-900 hover:bg-slate-100 font-black text-sm py-3 rounded-2xl flex items-center justify-center gap-2 transition">
+          <span>G</span>
+          <span>Entrar com Google (Directus)</span>
+        </button>
+      </div>
+
+      <!-- Painel Logado -->
+      <div x-show="adminLogado" class="space-y-5">
+        <!-- Info do Admin Logado -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-[11px] font-black uppercase text-emerald-400">● Admin Conectado</p>
+            <p class="text-sm font-black text-white truncate" x-text="adminNome"></p>
+            <p class="text-xs text-slate-400 truncate" x-text="adminEmail"></p>
+          </div>
+          <button @click="deslogarAdmin()" class="bg-red-500/15 text-red-300 border border-red-500/35 text-xs font-black px-3.5 py-2 rounded-xl shrink-0">
+            Sair
+          </button>
+        </div>
+
+        <!-- Formulário: Adicionar Ponto (YouTube ou Arquivo MP3) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+          <h2 class="text-lg font-black text-white mb-1">✨ Cadastrar Novo Ponto</h2>
+          <p class="text-xs text-slate-400 mb-4">
+            Cole o link do YouTube ou suba um áudio do celular. O fluxo extrai o MP3, transcreve a letra com tempos e publica automaticamente.
+          </p>
+
+          <!-- Seletor YouTube vs Arquivo Direto -->
+          <div class="grid grid-cols-2 gap-2 mb-4 bg-slate-950 p-1 rounded-2xl border border-slate-800">
+            <button
+              type="button"
+              @click="formModoEntrada = 'youtube'"
+              :class="formModoEntrada === 'youtube' ? 'bg-amber-600 text-white' : 'text-slate-400'"
+              class="py-2 rounded-xl text-xs font-black transition">
+              ▶️ Link do YouTube
+            </button>
+            <button
+              type="button"
+              @click="formModoEntrada = 'arquivo'"
+              :class="formModoEntrada === 'arquivo' ? 'bg-amber-600 text-white' : 'text-slate-400'"
+              class="py-2 rounded-xl text-xs font-black transition">
+              📁 Enviar Áudio (MP3/OGG)
+            </button>
+          </div>
+
+          <div class="space-y-3">
+            <!-- Campo YouTube -->
+            <div x-show="formModoEntrada === 'youtube'">
+              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Link do YouTube *</label>
+              <input
+                x-model="formYoutubeUrl"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+
+            <!-- Campo Upload Arquivo -->
+            <div x-show="formModoEntrada === 'arquivo'">
+              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Arquivo de Áudio *</label>
+              <label class="flex flex-col items-center justify-center border-2 border-dashed border-amber-500/40 rounded-2xl p-5 cursor-pointer bg-slate-950 hover:border-amber-400 transition">
+                <span class="text-2xl mb-1">🎵</span>
+                <span class="text-xs font-black text-amber-300" x-text="formArquivoNome || 'Toque para selecionar MP3, OGG, M4A ou WAV'"></span>
+                <input type="file" accept="audio/*,.mp3,.ogg,.m4a,.wav" @change="selecionarArquivoAudioAdmin($event)" class="hidden">
+              </label>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Título do Ponto (opcional)</label>
+                <input
+                  x-model="formTitulo"
+                  type="text"
+                  placeholder="Vazio = puxa automático do vídeo"
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Categoria / Linha</label>
+                <select
+                  x-model="formCategoria"
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                  <option value="Auto">🤖 Descobrir Automaticamente (IA)</option>
+                  <template x-for="cat in categoriasLista" :key="cat.nome">
+                    <option :value="cat.nome" x-text="cat.icone + ' ' + cat.nome"></option>
+                  </template>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Tipo do Ponto</label>
+                <select
+                  x-model="formTipoPonto"
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                  <template x-for="tp in tiposPontoLista" :key="tp">
+                    <option :value="tp" x-text="tp"></option>
+                  </template>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Toque do Atabaque (opcional)</label>
+                <input
+                  x-model="formToque"
+                  type="text"
+                  placeholder="Ex: Ijexá, Congo, Barra Vento, Samba Cabula"
+                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Observações do Terreiro (opcional)</label>
+              <input
+                x-model="formObservacoes"
+                type="text"
+                placeholder="Ex: Cantar 3x na abertura da gira de Ogum"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Letra Oficial do Terreiro (opcional)</label>
+              <textarea
+                x-model="formLetraManual"
+                rows="4"
+                placeholder="Se você já tiver a letra exata cantada na casa, cole aqui (1 verso por linha). A IA usará sua letra e alinhará os tempos do áudio nela! Se deixar vazio, o Whisper transcreve tudo sozinho."
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+            </div>
+
+            <div x-show="erroProcessamento" class="bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-bold rounded-xl px-3.5 py-2.5" x-text="erroProcessamento"></div>
+
+            <div x-show="statusProcessamento" class="bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs font-bold rounded-xl px-3.5 py-3 flex items-center gap-2">
+              <span class="inline-block w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin shrink-0"></span>
+              <span x-text="statusProcessamento"></span>
+            </div>
+
+            <button
+              type="button"
+              @click="enviarNovoPontoParaN8N()"
+              :disabled="processandoNovoPonto"
+              class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-black text-sm py-3.5 rounded-2xl shadow-lg shadow-amber-600/30 transition disabled:opacity-50">
+              <span x-text="processandoNovoPonto ? '⏳ Processando Áudio e Letra...' : '🚀 Processar, Transcrever e Publicar'"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Gerenciamento Rápido dos Pontos Cadastrados -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-black text-white">📚 Pontos Cadastrados (<span x-text="pontos.length"></span>)</h3>
+            <button @click="carregarPontos()" class="text-xs font-bold text-amber-400">🔄 Atualizar</button>
+          </div>
+
+          <div class="space-y-2 max-h-96 overflow-y-auto pr-1">
+            <template x-for="p in pontos" :key="p.id">
+              <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs" x-text="obterIconeCategoria(p.categoria)"></span>
+                    <p class="text-sm font-bold text-white truncate" x-text="p.titulo"></p>
+                    <span x-show="p.ativo === false" class="text-[10px] bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded">Oculto</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400" x-text="(p.categoria || 'Outros') + ' • ' + (p.tipo_ponto || 'Ponto')"></p>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button @click="abrirPontoNoKaraoke(p, true)" class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-300 text-xs font-bold">▶️</button>
+                  <button @click="abrirEditorPonto(p, $event)" class="px-2.5 py-1.5 rounded-xl bg-sky-500/15 text-sky-300 text-xs font-bold">✏️ Editar</button>
+                  <button @click="excluirPontoAdmin(p, $event)" class="px-2.5 py-1.5 rounded-xl bg-red-500/15 text-red-300 text-xs font-bold">🗑️</button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- 3. PLAYER DOCK FIXO INFERIOR (CONTROLES DE ESTUDO & VELOCIDADE)       -->
+  <!-- ===================================================================== -->
+  <div x-show="pontoAtual && abaAtual !== 'admin'" x-transition class="player-dock fixed bottom-0 left-0 right-0 z-40 px-4 pt-2.5 pb-3.5">
+    <div class="max-w-3xl mx-auto">
+
+      <!-- Cabeçalho Mini do Player (quando estiver fora da aba Karaokê) -->
+      <div x-show="abaAtual !== 'karaoke'" @click="abaAtual = 'karaoke'" class="flex items-center justify-between gap-2 mb-2 cursor-pointer">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-base" x-text="obterIconeCategoria(pontoAtual?.categoria)"></span>
+          <div class="min-w-0">
+            <p class="text-xs font-black text-white truncate" x-text="pontoAtual?.titulo"></p>
+            <p class="text-[10px] text-amber-400 font-bold">Toque aqui para abrir a letra em Karaokê ↑</p>
+          </div>
+        </div>
+        <span class="text-[11px] font-black bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full shrink-0">🎤 Ver Letra</span>
+      </div>
+
+      <!-- Barra de Progresso -->
+      <div class="flex items-center gap-2.5 mb-2">
+        <span class="text-[11px] font-mono font-bold text-slate-400 w-10 text-right" x-text="formatarTempoMMSS(tempoAtualSeg)"></span>
+        <input
+          type="range"
+          min="0"
+          :max="duracaoTotalSeg || 100"
+          step="0.2"
+          :value="tempoAtualSeg"
+          @input="buscarTempoSlider($event.target.value)"
+          class="barra-progresso-audio flex-1">
+        <span class="text-[11px] font-mono font-bold text-slate-400 w-10" x-text="formatarTempoMMSS(duracaoTotalSeg)"></span>
+      </div>
+
+      <!-- Botões Principais de Reprodução -->
+      <div class="flex items-center justify-between gap-2">
+        <!-- Controles de Velocidade (esquerda) -->
+        <div class="flex items-center gap-1 bg-slate-900/90 border border-slate-700 rounded-xl p-0.5">
+          <template x-for="vel in [0.75, 0.9, 1, 1.25]" :key="vel">
+            <button
+              @click="alterarVelocidade(vel)"
+              :class="velocidadeAudio === vel ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'"
+              class="px-1.5 py-1 rounded-lg text-[10px] font-black transition"
+              x-text="vel + 'x'">
+            </button>
+          </template>
+        </div>
+
+        <!-- Botões Centrais -->
+        <div class="flex items-center gap-1.5 sm:gap-2.5">
+          <button @click="tocarProximoPonto(-1)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-sm active:scale-90" title="Ponto Anterior">
+            ⏮
+          </button>
+          <button @click="avancarOuVoltarSegundos(-5)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-[11px] font-black active:scale-90" title="Voltar 5 segundos">
+            -5s
+          </button>
+          <button
+            @click="alternarPlayPause()"
+            class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center text-xl shadow-lg shadow-amber-600/40 active:scale-95 transition">
+            <span x-show="carregandoAudio" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span x-show="!carregandoAudio" x-text="tocando ? '⏸' : '▶'"></span>
+          </button>
+          <button @click="avancarOuVoltarSegundos(5)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-[11px] font-black active:scale-90" title="Avançar 5 segundos">
+            +5s
+          </button>
+          <button @click="tocarProximoPonto(1)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-sm active:scale-90" title="Próximo Ponto">
+            ⏭
+          </button>
+        </div>
+
+        <!-- Repetir / Reiniciar (direita) -->
+        <div class="flex items-center gap-1">
+          <button
+            @click="alternarLoop()"
+            :class="loopAtivo ? 'bg-amber-600 text-white border-amber-400' : 'bg-slate-800/90 text-slate-400 border-slate-700'"
+            class="w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition active:scale-90"
+            title="Repetir este ponto continuamente">
+            🔁
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 4. MODAL EDITOR FINO DE LETRA & SINCRONIZAÇÃO (ADMIN)                 -->
+  <!-- ===================================================================== -->
+  <div x-show="modalEditorAberto && editandoPonto" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl">
+      <!-- Cabeçalho do Modal -->
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between gap-3">
+        <div>
+          <h3 class="text-base font-black text-white">✏️ Editar Ponto & Sincronização</h3>
+          <p class="text-[11px] text-slate-400">Corrija palavras de Umbanda ou ajuste os segundos exatos do karaokê.</p>
+        </div>
+        <button @click="modalEditorAberto = false" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 font-black">✕</button>
+      </div>
+
+      <!-- Corpo Rolável -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Título</label>
+            <input x-model="editandoPonto.titulo" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Categoria / Linha</label>
+            <select x-model="editandoPonto.categoria" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+              <template x-for="cat in categoriasLista" :key="cat.nome">
+                <option :value="cat.nome" x-text="cat.icone + ' ' + cat.nome"></option>
+              </template>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Tipo</label>
+            <select x-model="editandoPonto.tipo_ponto" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+              <template x-for="tp in tiposPontoLista" :key="tp">
+                <option :value="tp" x-text="tp"></option>
+              </template>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Toque</label>
+            <input x-model="editandoPonto.toque" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Observações</label>
+          <input x-model="editandoPonto.observacoes" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+        </div>
+
+        <label class="flex items-center gap-2.5 cursor-pointer">
+          <input x-model="editandoPonto.ativo" type="checkbox" class="w-4 h-4 accent-amber-500">
+          <span class="text-xs font-bold text-slate-200">Ponto ativo e visível para os médiuns</span>
+        </label>
+
+        <!-- Barra de Ajuste Global de Tempo + Mini Player -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 space-y-2.5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="text-xs font-black text-amber-300">⏱️ Ajuste Fino da Sincronização</span>
+            <div class="flex items-center gap-1">
+              <button type="button" @click="ajustarOffsetGlobalEditor(-1.0)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">-1s</button>
+              <button type="button" @click="ajustarOffsetGlobalEditor(-0.5)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">-0.5s</button>
+              <button type="button" @click="ajustarOffsetGlobalEditor(0.5)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">+0.5s</button>
+              <button type="button" @click="ajustarOffsetGlobalEditor(1.0)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">+1s</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 text-xs">
+            <button
+              type="button"
+              @click="const p = pontos.find(x => String(x.id) === String(editandoPonto.id)); if (!pontoAtual || String(pontoAtual.id) !== String(editandoPonto.id)) { abrirPontoNoKaraoke(p, true); abaAtual = 'admin'; } else { alternarPlayPause(); }"
+              class="bg-amber-600 text-white font-black px-3 py-1.5 rounded-xl">
+              <span x-text="tocando && pontoAtual && String(pontoAtual.id) === String(editandoPonto.id) ? '⏸ Pausar Áudio' : '▶ Ouvir Áudio'"></span>
+            </button>
+            <span class="font-mono text-slate-300 font-bold" x-text="'Tempo atual: ' + formatarTempoMMSS(tempoAtualSeg) + ' (' + tempoAtualSeg.toFixed(1) + 's)'"></span>
+          </div>
+        </div>
+
+        <!-- Lista de Versos Editáveis -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black uppercase text-slate-400">Versos & Tempos (segundos)</span>
+            <button type="button" @click="adicionarLinhaEditor()" class="text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 px-3 py-1 rounded-xl">
+              + Adicionar Verso
+            </button>
+          </div>
+
+          <template x-for="(v, idx) in editandoVersos" :key="idx">
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-2.5 space-y-2">
+              <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] text-slate-500 font-bold">Início</span>
+                  <input x-model.number="v.start" type="number" step="0.1" min="0" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono">
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] text-slate-500 font-bold">Fim</span>
+                  <input x-model.number="v.end" type="number" step="0.1" min="0" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono">
+                </div>
+                <button
+                  type="button"
+                  @click="marcarTempoAtualNaLinhaEditor(idx)"
+                  class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-black"
+                  title="Capturar tempo exato que está tocando agora">
+                  ⏱️ Marcar Agora
+                </button>
+                <button
+                  type="button"
+                  @click="removerLinhaEditor(idx)"
+                  class="ml-auto px-2 py-1 rounded-lg bg-red-500/15 text-red-300 text-xs font-bold">
+                  🗑️
+                </button>
+              </div>
+              <input x-model="v.text" type="text" placeholder="Texto do verso..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-white">
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Rodapé do Modal -->
+      <div class="px-5 py-4 border-t border-slate-800 flex items-center justify-end gap-2">
+        <button type="button" @click="modalEditorAberto = false" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-black">Cancelar</button>
+        <button type="button" @click="salvarEdicaoPonto()" :disabled="salvandoEdicao" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-black disabled:opacity-50">
+          <span x-text="salvandoEdicao ? 'Salvando...' : '💾 Salvar Alterações'"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 5. MENU LATERAL (TEMA, INSTALAÇÃO PWA & INFORMAÇÕES)                  -->
+  <!-- ===================================================================== -->
+  <div x-show="menuAberto" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end" @click.self="menuAberto = false">
+    <aside class="w-80 max-w-[85vw] bg-slate-900 border-l border-slate-800 h-full p-5 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h3 class="text-base font-black text-white">🕊️ Um Canto, Uma Prece!</h3>
+            <p class="text-[11px] text-slate-400">Caderno Digital de Pontos</p>
+          </div>
+          <button @click="menuAberto = false" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 font-black">✕</button>
+        </div>
+
+        <!-- Tema -->
+        <div>
+          <p class="text-[11px] font-black uppercase text-slate-400 mb-2">Aparência da Tela</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button @click="alternarTema('escuro')" :class="tema === 'escuro' ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-800 text-slate-300 border-slate-700'" class="py-2.5 rounded-xl border text-xs font-black">
+              🌙 Modo Gira (Escuro)
+            </button>
+            <button @click="alternarTema('claro')" :class="tema === 'claro' ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-800 text-slate-300 border-slate-700'" class="py-2.5 rounded-xl border text-xs font-black">
+              ☀️ Modo Dia (Claro)
+            </button>
+          </div>
+        </div>
+
+        <!-- Instalar App PWA -->
+        <div x-show="!isStandalone" class="bg-amber-500/10 border border-amber-500/35 rounded-2xl p-4">
+          <p class="text-xs font-black text-amber-300 mb-1">📲 Instalar no Celular</p>
+          <p class="text-[11px] text-slate-300 mb-3 leading-relaxed">
+            Instale como aplicativo na tela inicial para abrir com um toque e ouvir pontos salvos mesmo sem internet.
+          </p>
+          <button
+            x-show="temPromptInstalacao"
+            @click="instalarPWA()"
+            class="w-full bg-amber-600 text-white text-xs font-black py-2.5 rounded-xl">
+            Instalar Aplicativo Agora
+          </button>
+          <p x-show="!temPromptInstalacao && isIOS" class="text-[11px] text-amber-200 font-semibold">
+            No iPhone/Safari: toque no ícone <strong>Compartilhar (⬆️)</strong> e escolha <strong>"Adicionar à Tela de Início"</strong>.
+          </p>
+          <p x-show="!temPromptInstalacao && !isIOS" class="text-[11px] text-amber-200 font-semibold">
+            No Chrome: abra o menu <strong>(⋮)</strong> e toque em <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.
+          </p>
+        </div>
+
+        <!-- Atalhos -->
+        <div class="space-y-2">
+          <button @click="carregarPontos(); menuAberto = false" class="w-full text-left bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs font-bold text-slate-200 flex items-center justify-between">
+            <span>🔄 Sincronizar Novos Pontos</span>
+            <span>→</span>
+          </button>
+          <button @click="abaAtual = 'admin'; menuAberto = false" class="w-full text-left bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs font-bold text-slate-200 flex items-center justify-between">
+            <span>🔐 Área do Dirigente / Admin</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-slate-800 text-center">
+        <p class="text-[11px] text-slate-500 font-semibold">Um Canto, Uma Prece! • v1.0.0</p>
+        <p class="text-[10px] text-slate-600 mt-0.5">Desenvolvido por STUDIOTESTA</p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 6. REGISTRO DO SERVICE WORKER & CAPTURA DE INSTALAÇÃO PWA             -->
+  <!-- ===================================================================== -->
+  <script>
+    window.pwaDeferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.pwaDeferredPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-pronto-para-instalar'));
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('[Um Canto] Service Worker ativo:', reg.scope))
+          .catch((err) => console.warn('[Um Canto] Falha ao registrar SW:', err));
+      });
+    }
+  </script>
+</body>
+</html>
