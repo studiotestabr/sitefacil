@@ -1,10 +1,10 @@
 /* ==========================================================================
-   Um Canto, Uma Prece! v1.0.0 - Service Worker Oficial
+   Um Canto, Uma Prece! v1.1.0 - Service Worker Oficial
    Cache Seguro, PWA Instalável & Reprodução de Áudio Offline com Suporte Range
    Arquivo: /um-canto-uma-prece/sw.js
    ========================================================================== */
 
-const CACHE_NAME = 'um-canto-uma-prece-v1.0.0';
+const CACHE_NAME = 'um-canto-uma-prece-v1.1.0';
 const AUDIO_CACHE_NAME = 'um-canto-uma-prece-audios-v1';
 
 // Recursos essenciais para inicialização offline
@@ -12,8 +12,10 @@ const RECURSOS_ESSENCIAIS = [
   './',
   './index.html',
   './manifest.json',
-  './css/styles.css?v=1.0.0',
-  './js/app.js?v=1.0.0'
+  './icon-192.png',
+  './splash.jpg',
+  './css/styles.css?v=1.1.0',
+  './js/app.js?v=1.1.0'
 ];
 
 // 1. INSTALAÇÃO DO SERVICE WORKER
@@ -32,7 +34,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// 2. ATIVAÇÃO E LIMPEZA DE CACHES OBSOLETOS
+// 2. ATIVAÇÃO E LIMPEZA DE CACHES OBSOLETOS (PRESERVA ÁUDIOS OFFLINE)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((chavesCache) => {
