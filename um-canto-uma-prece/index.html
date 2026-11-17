@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#d97706">
+  <meta name="theme-color" content="#050f29">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Um Canto, Uma Prece! - Aplicativo de estudo de Pontos de Umbanda com letra completa e sincronizada estilo karaokê em tempo real.">
+  <meta name="description" content="Um Canto, Uma Prece! - Aplicativo colaborativo de Pontos de Umbanda com letra completa e sincronizada estilo karaokê em tempo real.">
   <title>Um Canto, Uma Prece! • Pontos de Umbanda</title>
 
   <link rel="manifest" href="./manifest.json">
@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=1.1.0">
+  <link rel="stylesheet" href="./css/styles.css?v=1.2.0">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -29,10 +29,10 @@
       }
     };
   </script>
-  <script src="./js/app.js?v=1.1.0"></script>
+  <script src="./js/app.js?v=1.2.0"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 </head>
-<body x-data="umCantoApp()" x-init="init()" x-cloak class="theme-escuro bg-[#090d16] text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+<body x-data="umCantoApp()" x-init="init()" x-cloak class="theme-escuro bg-[#040b1d] text-slate-100 min-h-screen flex flex-col font-sans antialiased">
 
   <!-- Elemento de Áudio Oculto Controlado pelo App -->
   <audio id="audioPlayerPrincipal" preload="metadata" class="hidden"></audio>
@@ -40,29 +40,28 @@
   <!-- ===================================================================== -->
   <!-- 0. CARREGAMENTO INICIAL DE SESSÃO                                     -->
   <!-- ===================================================================== -->
-  <div x-show="verificandoAuth" class="fixed inset-0 z-50 bg-[#090d16] flex flex-col items-center justify-center p-6 text-center">
-    <img src="./icon-192.png" alt="Um Canto, Uma Prece!" class="w-20 h-20 rounded-3xl shadow-2xl shadow-amber-600/30 mb-4 object-cover" onerror="this.style.display='none'">
-    <div class="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-    <p class="text-sm font-bold text-slate-300">Preparando seu caderno de pontos...</p>
+  <div x-show="verificandoAuth" class="fixed inset-0 z-50 bg-[#040b1d] flex flex-col items-center justify-center p-6 text-center">
+    <img src="./icon-192.png" alt="Um Canto, Uma Prece!" class="w-24 h-24 rounded-full shadow-2xl shadow-amber-500/30 mb-4 object-cover border-2 border-amber-400/60" onerror="this.style.display='none'">
+    <div class="w-9 h-9 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+    <p class="text-base font-bold text-slate-200">Preparando seu caderno de pontos...</p>
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 0.1 TELA DE BOAS-VINDAS / LOGIN COM CONTA GOOGLE (PADRÃO SPXROTAS)    -->
+  <!-- 0.1 TELA DE BOAS-VINDAS / LOGIN COM CONTA GOOGLE                      -->
   <!-- ===================================================================== -->
-  <div x-show="!verificandoAuth && !usuarioLogado" class="min-h-screen flex flex-col items-center justify-center p-4 bg-[#090d16] relative overflow-hidden">
-    <!-- Fundo sutil com a arte splash.jpg -->
-    <div class="absolute inset-0 opacity-20 bg-cover bg-center blur-sm scale-105" style="background-image: url('./splash.jpg');"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-[#090d16]/75 via-[#090d16]/90 to-[#090d16]"></div>
+  <div x-show="!verificandoAuth && !usuarioLogado" class="min-h-screen flex flex-col items-center justify-center p-4 bg-[#040b1d] relative overflow-hidden">
+    <div class="absolute inset-0 opacity-25 bg-cover bg-center blur-sm scale-105" style="background-image: url('./splash.jpg');"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#040b1d]/70 via-[#050f29]/88 to-[#030816]"></div>
 
-    <div class="relative z-10 w-full max-w-md bg-slate-900/95 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+    <div class="relative z-10 w-full max-w-md bg-slate-900 border border-sky-400/30 rounded-3xl overflow-hidden shadow-2xl">
       <!-- Imagem de Capa (splash.jpg) -->
-      <div class="relative h-52 w-full bg-slate-950 overflow-hidden">
+      <div class="relative h-56 w-full bg-[#040b1d] overflow-hidden">
         <img src="./splash.jpg" alt="Um Canto, Uma Prece!" class="w-full h-full object-cover" onerror="this.style.display='none'">
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/30 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#050f29] via-[#050f29]/30 to-transparent"></div>
         <div class="absolute bottom-3 left-5 right-5 flex items-center gap-3">
-          <img src="./icon-192.png" alt="Logo" class="w-12 h-12 rounded-2xl border-2 border-amber-500/70 shadow-lg object-cover bg-slate-950" onerror="this.style.display='none'">
+          <img src="./icon-192.png" alt="Logo" class="w-14 h-14 rounded-full border-2 border-amber-400 shadow-lg object-cover bg-[#040b1d]" onerror="this.style.display='none'">
           <div>
-            <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">Caderno de Pontos</span>
+            <span class="text-xs font-black uppercase tracking-widest text-sky-300">Cantos e Pontos de Umbanda</span>
             <h1 class="text-2xl font-black text-white leading-tight">
               Um Canto, <span class="text-amber-400">Uma Prece!</span>
             </h1>
@@ -72,33 +71,33 @@
 
       <div class="p-6 space-y-5">
         <div class="space-y-2 text-center">
-          <p class="text-sm font-bold text-slate-200">
-            Aprenda os pontos cantados do terreiro no seu ritmo
+          <p class="text-base font-bold text-white">
+            Aprenda e compartilhe pontos cantados
           </p>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Acompanhe a letra inteira em tempo real estilo karaokê, reduza a velocidade para estudar a melodia e salve seus pontos para ouvir offline.
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Acompanhe a letra inteira em tempo real estilo karaokê, reduza a velocidade para estudar a melodia, envie novos pontos e salve para ouvir offline.
           </p>
         </div>
 
         <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5">
-            <div class="text-lg mb-0.5">🎤</div>
-            <p class="text-[10px] font-extrabold text-slate-300">Karaokê Ao Vivo</p>
+          <div class="bg-slate-950 border border-sky-400/20 rounded-2xl p-3">
+            <div class="text-xl mb-1">🎤</div>
+            <p class="text-xs font-extrabold text-slate-200">Karaokê</p>
           </div>
-          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5">
-            <div class="text-lg mb-0.5">🥁</div>
-            <p class="text-[10px] font-extrabold text-slate-300">Por Orixá/Linha</p>
+          <div class="bg-slate-950 border border-sky-400/20 rounded-2xl p-3">
+            <div class="text-xl mb-1">🤝</div>
+            <p class="text-xs font-extrabold text-slate-200">Colaborativo</p>
           </div>
-          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5">
-            <div class="text-lg mb-0.5">📥</div>
-            <p class="text-[10px] font-extrabold text-slate-300">Modo Offline</p>
+          <div class="bg-slate-950 border border-sky-400/20 rounded-2xl p-3">
+            <div class="text-xl mb-1">📥</div>
+            <p class="text-xs font-extrabold text-slate-200">Offline</p>
           </div>
         </div>
 
         <button
           @click="loginGoogle()"
           type="button"
-          class="w-full bg-white hover:bg-slate-100 text-slate-900 font-black text-sm py-3.5 px-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition active:scale-95">
+          class="w-full bg-white hover:bg-slate-100 text-slate-900 font-black text-base py-3.5 px-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition active:scale-95">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
             <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24Z"/>
@@ -108,8 +107,8 @@
           <span>Entrar com Conta Google</span>
         </button>
 
-        <p class="text-[11px] text-center text-slate-500">
-          Acesso rápido e seguro para médiuns, ogãs, cambones e dirigentes.
+        <p class="text-xs text-center text-slate-400">
+          Acesso seguro para médiuns, ogãs, cambones e dirigentes.
         </p>
       </div>
     </div>
@@ -119,64 +118,62 @@
   <!-- 0.2 MODAL DE CADASTRO OBRIGATÓRIO (NOME, WHATSAPP E NOME DO TERREIRO) -->
   <!-- ===================================================================== -->
   <div x-show="usuarioLogado && modalCadastroObrigatorio" class="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-slate-900 border-2 border-amber-500/60 rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+    <div class="bg-slate-900 border-2 border-amber-400/70 rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="text-center">
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-3xl mb-3">
-          🕊️
-        </div>
+        <img src="./icon-192.png" alt="Logo" class="w-16 h-16 mx-auto rounded-full border-2 border-amber-400 shadow-lg mb-3 object-cover" onerror="this.style.display='none'">
         <h2 class="text-xl font-black text-white">Complete seu Cadastro</h2>
-        <p class="text-xs text-slate-400 mt-1">
-          Para acessar os pontos de Umbanda do aplicativo, preencha todos os campos obrigatórios abaixo.
+        <p class="text-sm text-slate-300 mt-1">
+          Seu nome e terreiro aparecerão como assinatura nos pontos que você compartilhar com a comunidade.
         </p>
       </div>
 
-      <div x-show="erroCadastroObrigatorio" class="bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-bold rounded-xl px-3.5 py-2.5" x-text="erroCadastroObrigatorio"></div>
+      <div x-show="erroCadastroObrigatorio" class="bg-red-500/15 border border-red-500/40 text-red-200 text-sm font-bold rounded-xl px-4 py-3" x-text="erroCadastroObrigatorio"></div>
 
       <form @submit.prevent="salvarCadastroObrigatorio()" class="space-y-3.5">
         <div>
-          <label class="block text-[11px] font-black uppercase text-amber-300 mb-1">Nome Completo *</label>
+          <label class="block text-xs font-black uppercase text-amber-300 mb-1.5">Nome Completo *</label>
           <input
             x-model="inputNome"
             type="text"
             required
             placeholder="Digite seu nome e sobrenome"
-            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
         </div>
 
         <div>
-          <label class="block text-[11px] font-black uppercase text-amber-300 mb-1">WhatsApp com DDD *</label>
+          <label class="block text-xs font-black uppercase text-amber-300 mb-1.5">WhatsApp com DDD *</label>
           <input
             x-model="inputWhatsapp"
             type="tel"
             required
             placeholder="Ex: 11999998888"
-            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
         </div>
 
         <div>
-          <label class="block text-[11px] font-black uppercase text-amber-300 mb-1">Nome do Terreiro / Casa *</label>
+          <label class="block text-xs font-black uppercase text-amber-300 mb-1.5">Nome do Terreiro / Casa *</label>
           <input
             x-model="inputTerreiro"
             type="text"
             required
             placeholder="Ex: Tenda de Umbanda Caboclo Sete Flechas"
-            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
         </div>
 
         <div>
-          <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">E-mail (Google) *</label>
+          <label class="block text-xs font-black uppercase text-slate-300 mb-1.5">E-mail (Google) *</label>
           <input
             x-model="inputEmail"
             type="email"
             required
             placeholder="seu@email.com"
-            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-slate-200 focus:outline-none focus:border-amber-400">
         </div>
 
         <button
           type="submit"
           :disabled="salvandoPerfil"
-          class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-black text-sm py-3.5 rounded-2xl shadow-lg shadow-amber-600/30 transition disabled:opacity-50 mt-2">
+          class="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-base py-3.5 rounded-2xl shadow-lg shadow-amber-500/30 transition disabled:opacity-50 mt-2">
           <span x-text="salvandoPerfil ? 'Salvando cadastro...' : '✅ Salvar e Acessar Pontos'"></span>
         </button>
 
@@ -185,13 +182,13 @@
             x-show="usuarioTerreiro && usuarioWhatsapp"
             type="button"
             @click="modalCadastroObrigatorio = false"
-            class="text-xs font-bold text-slate-400 hover:text-white">
+            class="text-sm font-bold text-slate-400 hover:text-white">
             Cancelar
           </button>
           <button
             type="button"
             @click="deslogar()"
-            class="text-xs font-bold text-slate-500 hover:text-red-400 ml-auto">
+            class="text-sm font-bold text-slate-400 hover:text-red-400 ml-auto">
             Trocar conta Google
           </button>
         </div>
@@ -202,13 +199,13 @@
   <!-- ===================================================================== -->
   <!-- 1. CABEÇALHO SUPERIOR FIXO (APP LOGADO)                              -->
   <!-- ===================================================================== -->
-  <header x-show="!verificandoAuth && usuarioLogado" class="sticky top-0 z-40 bg-[#0d1321]/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+  <header x-show="!verificandoAuth && usuarioLogado" class="sticky top-0 z-40 bg-[#050f29]/95 backdrop-blur-md border-b border-sky-400/25 px-3 sm:px-4 py-3">
     <div class="max-w-3xl mx-auto flex items-center justify-between gap-2">
       <!-- Marca do App -->
       <div @click="abaAtual = 'repertorio'" class="flex items-center gap-2.5 cursor-pointer min-w-0">
-        <img src="./icon-192.png" alt="Logo" class="w-10 h-10 rounded-2xl shadow-lg shadow-amber-600/30 shrink-0 object-cover bg-slate-950 border border-amber-500/40" onerror="this.style.display='none'">
+        <img src="./icon-192.png" alt="Logo" class="w-11 h-11 rounded-full shadow-lg shadow-amber-500/25 shrink-0 object-cover bg-[#040b1d] border-2 border-amber-400/70" onerror="this.style.display='none'">
         <div class="min-w-0">
-          <h1 class="text-base sm:text-lg font-black tracking-tight text-white truncate leading-tight">
+          <h1 class="text-lg sm:text-xl font-black tracking-tight text-white truncate leading-tight">
             Um Canto, <span class="text-amber-400">Uma Prece!</span>
           </h1>
           <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -223,22 +220,22 @@
       <div class="flex items-center gap-1.5 shrink-0">
         <button
           @click="buscaAberta = !buscaAberta; if (buscaAberta) { abaAtual = 'repertorio'; $nextTick(() => $refs.inputBusca?.focus()); }"
-          :class="buscaAberta ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-800 text-slate-300 border-slate-700'"
-          class="w-10 h-10 rounded-xl border flex items-center justify-center text-base transition active:scale-95"
+          :class="buscaAberta ? 'bg-amber-500 text-slate-950 border-amber-300' : 'bg-slate-800 text-slate-200 border-slate-700'"
+          class="w-10 h-10 rounded-xl border flex items-center justify-center text-lg transition active:scale-95"
           title="Buscar Ponto ou Trecho da Letra">
           🔍
         </button>
 
         <button
           @click="alternarTema(tema === 'escuro' ? 'claro' : 'escuro')"
-          class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-base transition active:scale-95"
+          class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-lg transition active:scale-95"
           :title="tema === 'escuro' ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
           <span x-text="tema === 'escuro' ? '☀️' : '🌙'"></span>
         </button>
 
         <button
           @click="menuAberto = true"
-          class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-lg transition active:scale-95"
+          class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-xl transition active:scale-95"
           title="Menu e Configurações">
           ☰
         </button>
@@ -252,57 +249,56 @@
           x-ref="inputBusca"
           x-model="termoBusca"
           type="text"
-          placeholder="Buscar por nome do ponto, Orixá, toque ou trecho da letra..."
-          class="w-full bg-slate-900 border border-amber-500/50 rounded-xl pl-4 pr-20 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400">
+          placeholder="Buscar ponto, Orixá, toque, terreiro ou trecho..."
+          class="w-full bg-slate-950 border border-amber-400/60 rounded-xl pl-4 pr-24 py-3 text-base text-white placeholder-slate-400 focus:outline-none focus:border-amber-400">
         <button
           x-show="termoBusca.length > 0"
           @click="termoBusca = ''"
-          class="absolute right-10 text-xs font-bold text-slate-400 hover:text-white px-2 py-1">
+          class="absolute right-11 text-xs font-bold text-slate-300 hover:text-white px-2 py-1">
           Limpar
         </button>
         <button
           @click="buscaAberta = false; termoBusca = ''"
-          class="absolute right-2.5 text-slate-400 hover:text-white text-sm font-bold px-1.5 py-1">
+          class="absolute right-2.5 text-slate-300 hover:text-white text-base font-bold px-1.5 py-1">
           ✕
         </button>
       </div>
     </div>
 
-    <!-- Navegação Principal em Abas -->
-    <nav class="max-w-3xl mx-auto mt-3 grid gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800" :class="adminLogado ? 'grid-cols-4' : 'grid-cols-3'">
+    <!-- Navegação Principal em Abas (Aberta para todos os membros) -->
+    <nav class="max-w-3xl mx-auto mt-3 grid grid-cols-4 gap-1.5 bg-slate-950/80 p-1 rounded-2xl border border-sky-400/20">
       <button
         @click="abaAtual = 'repertorio'"
-        :class="abaAtual === 'repertorio' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
-        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1">
+        :class="abaAtual === 'repertorio' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md shadow-amber-500/30' : 'text-slate-300 hover:text-white'"
+        class="py-2.5 px-1.5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-1">
         <span>🥁</span>
-        <span class="truncate">Pontos</span>
+        <span>Pontos</span>
       </button>
 
       <button
         @click="abaAtual = 'karaoke'"
-        :class="abaAtual === 'karaoke' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
-        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1 relative">
+        :class="abaAtual === 'karaoke' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md shadow-amber-500/30' : 'text-slate-300 hover:text-white'"
+        class="py-2.5 px-1.5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-1 relative">
         <span>🎤</span>
-        <span class="truncate">Karaokê</span>
-        <span x-show="tocando" class="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute top-1.5 right-2"></span>
+        <span>Karaokê</span>
+        <span x-show="tocando" class="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute top-1.5 right-1.5"></span>
       </button>
 
       <button
         @click="abaAtual = 'favoritos'"
-        :class="abaAtual === 'favoritos' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
-        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1">
+        :class="abaAtual === 'favoritos' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md shadow-amber-500/30' : 'text-slate-300 hover:text-white'"
+        class="py-2.5 px-1.5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-1">
         <span>⭐</span>
-        <span class="truncate">Favoritos</span>
-        <span x-show="favoritosIds.size > 0" class="text-[10px] bg-black/30 px-1.5 rounded-full" x-text="favoritosIds.size"></span>
+        <span>Salvos</span>
+        <span x-show="favoritosIds.size > 0" class="text-[11px] bg-black/25 px-1.5 rounded-full" x-text="favoritosIds.size"></span>
       </button>
 
       <button
-        x-show="adminLogado"
-        @click="abaAtual = 'admin'"
-        :class="abaAtual === 'admin' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'text-slate-400 hover:text-white'"
-        class="py-2 px-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1">
-        <span>⚙️</span>
-        <span class="truncate">Dirigente</span>
+        @click="abaAtual = 'enviar'"
+        :class="abaAtual === 'enviar' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md shadow-amber-500/30' : 'text-slate-300 hover:text-white'"
+        class="py-2.5 px-1.5 rounded-xl text-xs sm:text-sm font-black transition flex items-center justify-center gap-1">
+        <span>➕</span>
+        <span>Enviar</span>
       </button>
     </nav>
   </header>
@@ -310,10 +306,10 @@
   <!-- ===================================================================== -->
   <!-- 2. CONTEÚDO PRINCIPAL (APP LOGADO)                                    -->
   <!-- ===================================================================== -->
-  <main x-show="!verificandoAuth && usuarioLogado" class="flex-1 max-w-3xl w-full mx-auto px-4 pt-4" :class="pontoAtual && abaAtual !== 'admin' ? 'pb-48' : 'pb-12'">
+  <main x-show="!verificandoAuth && usuarioLogado" class="flex-1 max-w-3xl w-full mx-auto px-3.5 sm:px-4 pt-4" :class="pontoAtual && abaAtual !== 'enviar' ? 'pb-48' : 'pb-12'">
 
     <!-- ------------------------------------------------------------------- -->
-    <!-- ABA: REPERTÓRIO & FAVORITOS                                         -->
+    <!-- ABA: REPERTÓRIO & SALVOS (FAVORITOS)                                -->
     <!-- ------------------------------------------------------------------- -->
     <section x-show="abaAtual === 'repertorio' || abaAtual === 'favoritos'">
 
@@ -326,7 +322,7 @@
             class="cat-chip">
             <span>✨</span>
             <span>Todas</span>
-            <span class="opacity-75 text-[10px]" x-text="'(' + pontos.filter(p => adminLogado || p.ativo !== false).length + ')'"></span>
+            <span class="opacity-80 text-xs" x-text="'(' + pontos.filter(p => adminLogado || p.ativo !== false).length + ')'"></span>
           </button>
 
           <template x-for="cat in categoriasComContagem" :key="cat.nome">
@@ -336,16 +332,16 @@
               class="cat-chip">
               <span x-text="cat.icone"></span>
               <span x-text="cat.nome"></span>
-              <span class="opacity-75 text-[10px]" x-text="'(' + cat.total + ')'"></span>
+              <span class="opacity-80 text-xs" x-text="'(' + cat.total + ')'"></span>
             </button>
           </template>
         </div>
       </div>
 
       <!-- Barra de Contagem & Download Offline em Lote -->
-      <div class="flex items-center justify-between gap-2 mb-3">
-        <p class="text-xs font-bold text-slate-400">
-          <span x-text="pontosFiltrados.length"></span> ponto(s) encontrado(s)
+      <div class="flex items-center justify-between gap-2 mb-3.5">
+        <p class="text-sm font-bold text-slate-300">
+          <span x-text="pontosFiltrados.length"></span> ponto(s)
           <span x-show="categoriaSelecionada !== 'Todas' && abaAtual === 'repertorio'" class="text-amber-400">
             • <span x-text="categoriaSelecionada"></span>
           </span>
@@ -355,13 +351,14 @@
           <button
             @click="baixarTodosFiltradosOffline()"
             :disabled="baixandoLoteOffline || pontosFiltrados.length === 0"
-            class="text-[11px] font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35 px-2.5 py-1.5 rounded-xl hover:bg-emerald-500/25 disabled:opacity-40 transition flex items-center gap-1">
+            class="text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 px-3 py-2 rounded-xl hover:bg-emerald-500/25 disabled:opacity-40 transition flex items-center gap-1">
             <span x-text="baixandoLoteOffline ? '⏳ Baixando...' : '📥 Salvar Offline'"></span>
           </button>
 
           <button
             @click="carregarPontos()"
-            class="text-[11px] font-extrabold bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1.5 rounded-xl hover:text-white transition">
+            class="text-sm font-extrabold bg-slate-800 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-xl hover:text-white transition"
+            title="Atualizar Lista">
             🔄
           </button>
         </div>
@@ -369,52 +366,60 @@
 
       <!-- Carregando -->
       <div x-show="carregandoPontos && pontos.length === 0" class="py-16 text-center">
-        <div class="inline-block w-9 h-9 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p class="text-sm text-slate-400 font-semibold">Buscando pontos cantados no terreiro...</p>
+        <div class="inline-block w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="text-base text-slate-300 font-semibold">Buscando pontos cantados na comunidade...</p>
       </div>
 
       <!-- Erro de Carregamento -->
-      <div x-show="erroCarregamento && pontos.length === 0" class="bg-red-500/10 border border-red-500/40 rounded-2xl p-5 text-center my-6">
-        <p class="text-sm font-bold text-red-300 mb-3" x-text="erroCarregamento"></p>
-        <button @click="carregarPontos()" class="bg-red-600 text-white text-xs font-black px-4 py-2 rounded-xl">Tentar Novamente</button>
+      <div x-show="erroCarregamento && pontos.length === 0" class="bg-red-500/10 border border-red-500/40 rounded-2xl p-6 text-center my-6">
+        <p class="text-base font-bold text-red-300 mb-3" x-text="erroCarregamento"></p>
+        <button @click="carregarPontos()" class="bg-red-600 text-white text-sm font-black px-5 py-2.5 rounded-xl">Tentar Novamente</button>
       </div>
 
       <!-- Lista Vazia -->
       <div x-show="!carregandoPontos && pontosFiltrados.length === 0 && !erroCarregamento" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center my-6">
-        <div class="text-4xl mb-3" x-text="abaAtual === 'favoritos' ? '⭐' : '🥁'"></div>
-        <h3 class="text-base font-black text-white mb-1" x-text="abaAtual === 'favoritos' ? 'Nenhum ponto favoritado ainda' : 'Nenhum ponto encontrado'"></h3>
-        <p class="text-xs text-slate-400 max-w-sm mx-auto mb-4" x-text="abaAtual === 'favoritos' ? 'Toque na estrela ⭐ de qualquer ponto para montar seu caderno pessoal de ensaio.' : 'Tente limpar a busca ou trocar a categoria selecionada.'"></p>
-        <button
-          x-show="abaAtual === 'repertorio' && (termoBusca || categoriaSelecionada !== 'Todas')"
-          @click="termoBusca = ''; categoriaSelecionada = 'Todas'"
-          class="bg-amber-600 text-white text-xs font-black px-4 py-2.5 rounded-xl">
-          Mostrar Todos os Pontos
-        </button>
+        <div class="text-5xl mb-3" x-text="abaAtual === 'favoritos' ? '⭐' : '🥁'"></div>
+        <h3 class="text-lg font-black text-white mb-2" x-text="abaAtual === 'favoritos' ? 'Nenhum ponto salvo nos favoritos' : 'Nenhum ponto encontrado'"></h3>
+        <p class="text-sm text-slate-300 max-w-sm mx-auto mb-5" x-text="abaAtual === 'favoritos' ? 'Toque na estrela ⭐ de qualquer ponto para montar seu caderno pessoal de ensaio.' : 'Seja o primeiro a colaborar enviando um ponto cantado pela aba + Enviar!'"></p>
+        <div class="flex flex-wrap items-center justify-center gap-2">
+          <button
+            x-show="abaAtual === 'repertorio' && (termoBusca || categoriaSelecionada !== 'Todas')"
+            @click="termoBusca = ''; categoriaSelecionada = 'Todas'"
+            class="bg-slate-800 border border-slate-700 text-white text-sm font-black px-4 py-2.5 rounded-xl">
+            Mostrar Todos
+          </button>
+          <button
+            x-show="abaAtual === 'repertorio'"
+            @click="abaAtual = 'enviar'"
+            class="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-sm font-black px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/25">
+            ➕ Enviar Primeiro Ponto
+          </button>
+        </div>
       </div>
 
       <!-- Lista de Cards dos Pontos -->
-      <div class="space-y-3">
+      <div class="space-y-3.5">
         <template x-for="ponto in pontosFiltrados" :key="ponto.id">
           <article
             @click="abrirPontoNoKaraoke(ponto, true)"
             :class="pontoAtual && String(pontoAtual.id) === String(ponto.id) ? 'tocando' : ''"
-            class="ponto-card bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer hover:border-amber-500/50">
+            class="ponto-card bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer hover:border-amber-400/60">
 
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2 flex-wrap mb-1">
-                  <span class="inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wide bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
+                <div class="flex items-center gap-2 flex-wrap mb-1.5">
+                  <span class="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wide bg-amber-500/15 text-amber-300 border border-amber-400/35 px-2.5 py-0.5 rounded-full">
                     <span x-text="obterIconeCategoria(ponto.categoria)"></span>
                     <span x-text="ponto.categoria || 'Outros'"></span>
                   </span>
 
-                  <span x-show="ponto.tipo_ponto" class="text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded-full" x-text="ponto.tipo_ponto"></span>
+                  <span x-show="ponto.tipo_ponto" class="text-xs font-bold bg-slate-800 text-slate-200 border border-slate-700 px-2.5 py-0.5 rounded-full" x-text="ponto.tipo_ponto"></span>
 
-                  <span x-show="ponto.toque" class="text-[10px] font-bold text-amber-400/90" x-text="'🥁 ' + ponto.toque"></span>
+                  <span x-show="ponto.toque" class="text-xs font-bold text-amber-300" x-text="'🥁 ' + ponto.toque"></span>
 
                   <span x-show="isAudioOffline(ponto)" class="badge-offline-salvo">✓ Offline</span>
 
-                  <span x-show="ponto.ativo === false" class="text-[10px] font-black bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full">Oculto</span>
+                  <span x-show="ponto.ativo === false" class="text-xs font-black bg-red-500/20 text-red-300 border border-red-500/40 px-2.5 py-0.5 rounded-full">Oculto</span>
 
                   <span x-show="pontoAtual && String(pontoAtual.id) === String(ponto.id) && tocando" class="eq-bars ml-1">
                     <span class="eq-bar"></span>
@@ -423,11 +428,19 @@
                   </span>
                 </div>
 
-                <h2 class="text-base sm:text-lg font-black text-white leading-snug" x-text="ponto.titulo"></h2>
+                <h2 class="text-lg sm:text-xl font-black text-white leading-snug" x-text="ponto.titulo"></h2>
 
-                <p x-show="ponto.letra_completa" class="text-xs text-slate-400 line-clamp-2 mt-1 leading-relaxed" x-text="ponto.letra_completa"></p>
+                <p x-show="ponto.letra_completa" class="text-sm text-slate-300 line-clamp-2 mt-1.5 leading-relaxed" x-text="ponto.letra_completa"></p>
 
-                <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-500 font-semibold">
+                <!-- Tag de Assinatura do Colaborador (Nome + Terreiro) -->
+                <div x-show="obterAssinaturaPonto(ponto)" class="mt-2.5">
+                  <span class="badge-colaborador">
+                    <span>🙏</span>
+                    <span class="truncate" x-text="'Enviado por: ' + obterAssinaturaPonto(ponto)"></span>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3 mt-2 text-xs text-slate-400 font-semibold">
                   <span x-show="ponto.duracao_seg > 0" x-text="'⏱️ ' + formatarTempoMMSS(ponto.duracao_seg)"></span>
                   <span x-show="Array.isArray(ponto.letra_sincronizada) && ponto.letra_sincronizada.length > 0" class="text-emerald-400">
                     🎤 Karaokê Sincronizado
@@ -436,12 +449,12 @@
               </div>
 
               <!-- Ações Rápidas do Card -->
-              <div class="flex flex-col items-end gap-1.5 shrink-0">
+              <div class="flex flex-col items-end gap-2 shrink-0">
                 <div class="flex items-center gap-1.5">
                   <button
                     @click="alternarFavorito(ponto, $event)"
-                    :class="isFavorito(ponto.id) ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-slate-800 text-slate-400 border-slate-700'"
-                    class="w-9 h-9 rounded-xl border flex items-center justify-center text-base transition active:scale-90"
+                    :class="isFavorito(ponto.id) ? 'bg-amber-500/20 text-amber-300 border-amber-400/60' : 'bg-slate-800 text-slate-300 border-slate-700'"
+                    class="w-10 h-10 rounded-xl border flex items-center justify-center text-lg transition active:scale-90"
                     title="Favoritar Ponto">
                     <span x-text="isFavorito(ponto.id) ? '⭐' : '☆'"></span>
                   </button>
@@ -449,23 +462,24 @@
                   <button
                     x-show="obterUrlAudio(ponto)"
                     @click="alternarAudioOffline(ponto, $event)"
-                    :class="isAudioOffline(ponto) ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-800 text-slate-300 border-slate-700'"
-                    class="w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition active:scale-90"
+                    :class="isAudioOffline(ponto) ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' : 'bg-slate-800 text-slate-200 border-slate-700'"
+                    class="w-10 h-10 rounded-xl border flex items-center justify-center text-base transition active:scale-90"
                     :title="isAudioOffline(ponto) ? 'Áudio salvo offline (toque para remover)' : 'Baixar áudio para ensaio offline'">
                     <span x-text="baixandoOfflineId === ponto.id ? '⏳' : (isAudioOffline(ponto) ? '✅' : '📥')"></span>
                   </button>
                 </div>
 
-                <!-- Botões Admin no Card -->
-                <div x-show="adminLogado" class="flex items-center gap-1.5 mt-1">
+                <!-- Botões Editar (autor ou admin) & Excluir (admin) -->
+                <div x-show="podeEditarPonto(ponto)" class="flex items-center gap-1.5">
                   <button
                     @click="abrirEditorPonto(ponto, $event)"
-                    class="px-2.5 py-1 rounded-lg bg-sky-500/15 text-sky-300 border border-sky-500/35 text-[11px] font-bold hover:bg-sky-500/25">
+                    class="px-3 py-1.5 rounded-lg bg-sky-500/15 text-sky-300 border border-sky-400/35 text-xs font-bold hover:bg-sky-500/25">
                     ✏️ Editar
                   </button>
                   <button
+                    x-show="adminLogado"
                     @click="excluirPontoAdmin(ponto, $event)"
-                    class="px-2 py-1 rounded-lg bg-red-500/15 text-red-300 border border-red-500/35 text-[11px] font-bold hover:bg-red-500/25">
+                    class="px-2.5 py-1.5 rounded-lg bg-red-500/15 text-red-300 border border-red-500/35 text-xs font-bold hover:bg-red-500/25">
                     🗑️
                   </button>
                 </div>
@@ -483,11 +497,11 @@
       <!-- Nenhum ponto selecionado -->
       <div x-show="!pontoAtual" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center my-8">
         <div class="text-5xl mb-3">🎤</div>
-        <h2 class="text-lg font-black text-white mb-2">Escolha um Ponto para Ensaiar</h2>
-        <p class="text-xs text-slate-400 max-w-sm mx-auto mb-5">
+        <h2 class="text-xl font-black text-white mb-2">Escolha um Ponto para Ensaiar</h2>
+        <p class="text-sm text-slate-300 max-w-sm mx-auto mb-5">
           Selecione qualquer ponto na aba Pontos para ouvir a melodia e acompanhar a letra inteira destacando verso por verso.
         </p>
-        <button @click="abaAtual = 'repertorio'" class="bg-amber-600 hover:bg-amber-500 text-white text-sm font-black px-5 py-3 rounded-2xl shadow-lg shadow-amber-600/30">
+        <button @click="abaAtual = 'repertorio'" class="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-base font-black px-6 py-3 rounded-2xl shadow-lg shadow-amber-500/30">
           🥁 Ver Repertório de Pontos
         </button>
       </div>
@@ -496,69 +510,77 @@
       <div x-show="pontoAtual" class="flex flex-col">
         <!-- Cartão de Cabeçalho do Ponto -->
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 mb-3">
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <button @click="abaAtual = 'repertorio'" class="text-xs font-extrabold text-slate-400 hover:text-white flex items-center gap-1">
+          <div class="flex items-center justify-between gap-2 mb-2.5">
+            <button @click="abaAtual = 'repertorio'" class="text-sm font-extrabold text-sky-300 hover:text-white flex items-center gap-1">
               <span>← Voltar aos Pontos</span>
             </button>
 
             <!-- Controles de Fonte + Ações -->
             <div class="flex items-center gap-1.5">
               <div class="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-0.5">
-                <button @click="alterarTamanhoFonte('normal')" :class="tamanhoFonteKaraoke === 'normal' ? 'bg-amber-600 text-white' : 'text-slate-400'" class="px-2 py-1 rounded-lg text-[11px] font-black">A</button>
-                <button @click="alterarTamanhoFonte('grande')" :class="tamanhoFonteKaraoke === 'grande' ? 'bg-amber-600 text-white' : 'text-slate-400'" class="px-2 py-1 rounded-lg text-xs font-black">A+</button>
-                <button @click="alterarTamanhoFonte('gigante')" :class="tamanhoFonteKaraoke === 'gigante' ? 'bg-amber-600 text-white' : 'text-slate-400'" class="px-2 py-1 rounded-lg text-xs font-black">A++</button>
+                <button @click="alterarTamanhoFonte('normal')" :class="tamanhoFonteKaraoke === 'normal' ? 'bg-amber-500 text-slate-950' : 'text-slate-300'" class="px-2.5 py-1 rounded-lg text-xs font-black">A</button>
+                <button @click="alterarTamanhoFonte('grande')" :class="tamanhoFonteKaraoke === 'grande' ? 'bg-amber-500 text-slate-950' : 'text-slate-300'" class="px-2.5 py-1 rounded-lg text-sm font-black">A+</button>
+                <button @click="alterarTamanhoFonte('gigante')" :class="tamanhoFonteKaraoke === 'gigante' ? 'bg-amber-500 text-slate-950' : 'text-slate-300'" class="px-2.5 py-1 rounded-lg text-sm font-black">A++</button>
               </div>
 
               <button
                 @click="alternarFavorito(pontoAtual, $event)"
-                :class="pontoAtual && isFavorito(pontoAtual.id) ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-slate-800 text-slate-300 border-slate-700'"
-                class="w-8 h-8 rounded-xl border flex items-center justify-center text-sm">
+                :class="pontoAtual && isFavorito(pontoAtual.id) ? 'bg-amber-500/20 text-amber-300 border-amber-400/60' : 'bg-slate-800 text-slate-300 border-slate-700'"
+                class="w-9 h-9 rounded-xl border flex items-center justify-center text-base">
                 <span x-text="pontoAtual && isFavorito(pontoAtual.id) ? '⭐' : '☆'"></span>
               </button>
 
               <button
                 x-show="pontoAtual && obterUrlAudio(pontoAtual)"
                 @click="alternarAudioOffline(pontoAtual, $event)"
-                :class="pontoAtual && isAudioOffline(pontoAtual) ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-800 text-slate-300 border-slate-700'"
-                class="w-8 h-8 rounded-xl border flex items-center justify-center text-xs"
+                :class="pontoAtual && isAudioOffline(pontoAtual) ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' : 'bg-slate-800 text-slate-300 border-slate-700'"
+                class="w-9 h-9 rounded-xl border flex items-center justify-center text-sm"
                 title="Salvar para ensaio offline">
                 <span x-text="pontoAtual && baixandoOfflineId === pontoAtual.id ? '⏳' : (pontoAtual && isAudioOffline(pontoAtual) ? '✅' : '📥')"></span>
               </button>
 
               <button
-                x-show="adminLogado"
+                x-show="podeEditarPonto(pontoAtual)"
                 @click="abrirEditorPonto(pontoAtual, $event)"
-                class="px-2.5 h-8 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40 text-xs font-bold">
+                class="px-3 h-9 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-400/40 text-xs font-bold">
                 ✏️
               </button>
             </div>
           </div>
 
-          <div class="flex items-center gap-2 flex-wrap mb-1">
-            <span class="inline-flex items-center gap-1 text-[11px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
+          <div class="flex items-center gap-2 flex-wrap mb-1.5">
+            <span class="inline-flex items-center gap-1 text-xs font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-400/35 px-3 py-0.5 rounded-full">
               <span x-text="obterIconeCategoria(pontoAtual?.categoria)"></span>
               <span x-text="pontoAtual?.categoria || 'Outros'"></span>
             </span>
-            <span x-show="pontoAtual?.tipo_ponto" class="text-[11px] font-bold text-slate-400" x-text="'• ' + pontoAtual?.tipo_ponto"></span>
-            <span x-show="pontoAtual?.toque" class="text-[11px] font-bold text-amber-400" x-text="'• 🥁 ' + pontoAtual?.toque"></span>
+            <span x-show="pontoAtual?.tipo_ponto" class="text-xs font-bold text-slate-300" x-text="'• ' + pontoAtual?.tipo_ponto"></span>
+            <span x-show="pontoAtual?.toque" class="text-xs font-bold text-amber-300" x-text="'• 🥁 ' + pontoAtual?.toque"></span>
           </div>
 
           <h2 class="text-xl sm:text-2xl font-black text-white leading-tight" x-text="pontoAtual?.titulo"></h2>
 
-          <div x-show="pontoAtual?.observacoes" class="mt-2.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-3.5 py-2 text-xs text-amber-200 font-semibold">
+          <!-- Assinatura do Colaborador no Palco -->
+          <div x-show="obterAssinaturaPonto(pontoAtual)" class="mt-2.5">
+            <span class="badge-colaborador">
+              <span>🙏</span>
+              <span x-text="'Colaboração: ' + obterAssinaturaPonto(pontoAtual)"></span>
+            </span>
+          </div>
+
+          <div x-show="pontoAtual?.observacoes" class="mt-2.5 bg-amber-500/12 border border-amber-400/35 rounded-2xl px-4 py-2.5 text-sm text-amber-200 font-semibold">
             📌 <span x-text="pontoAtual?.observacoes"></span>
           </div>
 
-          <div x-show="erroAudio" class="mt-2.5 bg-red-500/15 border border-red-500/40 rounded-2xl px-3.5 py-2 text-xs text-red-200 font-bold" x-text="erroAudio"></div>
+          <div x-show="erroAudio" class="mt-2.5 bg-red-500/15 border border-red-500/40 rounded-2xl px-4 py-2.5 text-sm text-red-200 font-bold" x-text="erroAudio"></div>
         </div>
 
         <!-- Aviso de Modo Leitura (caso não tenha timestamps ainda) -->
-        <div x-show="versosAtuais.length > 0 && versosAtuais[0].start < 0" class="mb-3 bg-slate-900 border border-slate-800 rounded-2xl px-4 py-2.5 text-center text-xs text-slate-400 font-semibold">
+        <div x-show="versosAtuais.length > 0 && versosAtuais[0].start < 0" class="mb-3 bg-slate-900 border border-slate-800 rounded-2xl px-4 py-2.5 text-center text-xs font-semibold text-slate-300">
           📖 Letra completa em modo leitura. Use o player abaixo para ouvir a melodia.
         </div>
 
-        <div x-show="versosAtuais.length > 0 && versosAtuais[0].start >= 0" class="mb-2 text-center text-[11px] text-slate-400 font-semibold">
-          💡 Dica: Toque em qualquer verso abaixo para pular a música direto para aquela parte!
+        <div x-show="versosAtuais.length > 0 && versosAtuais[0].start >= 0" class="mb-2 text-center text-xs text-sky-300 font-semibold">
+          💡 Toque em qualquer verso abaixo para pular a música direto para aquela parte!
         </div>
 
         <!-- Palco com a Letra Completa na Tela -->
@@ -568,7 +590,7 @@
           :class="'fonte-' + tamanhoFonteKaraoke"
           class="karaoke-palco bg-slate-900/90 border border-slate-800 rounded-3xl px-4 sm:px-8 max-h-[58vh] overflow-y-auto shadow-2xl">
 
-          <div x-show="versosAtuais.length === 0" class="py-12 text-center text-sm text-slate-400">
+          <div x-show="versosAtuais.length === 0" class="py-12 text-center text-base text-slate-300">
             Letra ainda não cadastrada para este ponto.
           </div>
 
@@ -585,7 +607,7 @@
               <p x-text="verso.text"></p>
               <span
                 x-show="verso.start >= 0 && idx === indiceVersoAtivo"
-                class="inline-block mt-1 text-[10px] font-mono font-bold opacity-75"
+                class="inline-block mt-1 text-xs font-mono font-bold opacity-80"
                 x-text="formatarTempoMMSS(verso.start)">
               </span>
             </div>
@@ -595,247 +617,214 @@
     </section>
 
     <!-- ------------------------------------------------------------------- -->
-    <!-- ABA: ÁREA DO DIRIGENTE / ADMIN (DIRECTUS + N8N + EDITOR)            -->
+    <!-- ABA: ENVIAR PONTO (COLABORATIVA PARA QUALQUER MEMBRO LOGADO)        -->
     <!-- ------------------------------------------------------------------- -->
-    <section x-show="abaAtual === 'admin'" class="space-y-4">
+    <section x-show="abaAtual === 'enviar'" class="space-y-4">
 
-      <!-- Tela de Login Admin (caso tenha aberto pelo menu lateral sem permissão) -->
-      <div x-show="!adminLogado" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md mx-auto mt-4 shadow-2xl">
-        <div class="text-center mb-5">
-          <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/15 border border-amber-500/35 flex items-center justify-center text-3xl mb-3">
-            🔐
-          </div>
-          <h2 class="text-xl font-black text-white">Área do Dirigente / Admin</h2>
-          <p class="text-xs text-slate-400 mt-1">
-            Entre com a conta Admin do Directus para adicionar novos pontos do YouTube, subir áudios ou corrigir letras.
-          </p>
+      <!-- Banner do Colaborador Assinando o Ponto -->
+      <div class="bg-slate-900 border border-sky-400/30 rounded-2xl p-4 flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-xs font-black uppercase text-sky-300">🤝 Colaboração da Comunidade</p>
+          <p class="text-base font-black text-white truncate" x-text="usuarioNome || 'Médium'"></p>
+          <p class="text-sm text-amber-300 font-semibold truncate" x-text="'🏛️ ' + (usuarioTerreiro || 'Umbanda')"></p>
+        </div>
+        <button @click="abaAtual = 'repertorio'" class="bg-slate-800 text-slate-200 border border-slate-700 text-xs font-black px-3.5 py-2.5 rounded-xl shrink-0">
+          Ver Pontos
+        </button>
+      </div>
+
+      <!-- Formulário: Adicionar Ponto (YouTube ou Arquivo MP3) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+        <h2 class="text-xl font-black text-white mb-1">✨ Enviar Novo Ponto</h2>
+        <p class="text-sm text-slate-300 mb-4 leading-relaxed">
+          Cole um link do YouTube ou suba um áudio do celular. O sistema transcreve, sincroniza a letra e publica com a sua assinatura e o nome do seu terreiro!
+        </p>
+
+        <!-- Seletor YouTube vs Arquivo Direto -->
+        <div class="grid grid-cols-2 gap-2 mb-4 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+          <button
+            type="button"
+            @click="formModoEntrada = 'youtube'"
+            :class="formModoEntrada === 'youtube' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950' : 'text-slate-300'"
+            class="py-2.5 rounded-xl text-sm font-black transition">
+            ▶️ Link YouTube
+          </button>
+          <button
+            type="button"
+            @click="formModoEntrada = 'arquivo'"
+            :class="formModoEntrada === 'arquivo' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950' : 'text-slate-300'"
+            class="py-2.5 rounded-xl text-sm font-black transition">
+            📁 Subir Áudio
+          </button>
         </div>
 
-        <div x-show="erroLogin" class="mb-4 bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-bold rounded-xl px-3.5 py-2.5" x-text="erroLogin"></div>
-
-        <form @submit.prevent="loginDirectusEmailSenha()" class="space-y-3">
-          <div>
-            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">E-mail do Admin (Directus)</label>
+        <div class="space-y-3.5">
+          <!-- Campo YouTube -->
+          <div x-show="formModoEntrada === 'youtube'">
+            <label class="block text-xs font-black uppercase text-amber-300 mb-1.5">Link do YouTube *</label>
             <input
-              x-model="loginEmailInput"
-              type="email"
-              required
-              placeholder="seu@email.com"
-              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+              x-model="formYoutubeUrl"
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=..."
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
+          </div>
+
+          <!-- Campo Upload Arquivo -->
+          <div x-show="formModoEntrada === 'arquivo'">
+            <label class="block text-xs font-black uppercase text-amber-300 mb-1.5">Arquivo de Áudio *</label>
+            <label class="flex flex-col items-center justify-center border-2 border-dashed border-amber-400/50 rounded-2xl p-6 cursor-pointer bg-slate-950 hover:border-amber-400 transition">
+              <span class="text-3xl mb-1.5">🎵</span>
+              <span class="text-sm font-black text-amber-300 text-center" x-text="formArquivoNome || 'Toque para selecionar MP3, OGG, M4A ou WAV'"></span>
+              <input type="file" accept="audio/*,.mp3,.ogg,.m4a,.wav" @change="selecionarArquivoAudioAdmin($event)" class="hidden">
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-black uppercase text-slate-300 mb-1.5">Título do Ponto (opcional)</label>
+              <input
+                x-model="formTitulo"
+                type="text"
+                placeholder="Vazio = puxa do vídeo"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
+            </div>
+
+            <div>
+              <label class="block text-xs font-black uppercase text-slate-300 mb-1.5">Categoria / Linha</label>
+              <select
+                x-model="formCategoria"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
+                <option value="Auto">🤖 Descobrir Automaticamente (IA)</option>
+                <template x-for="cat in categoriasLista" :key="cat.nome">
+                  <option :value="cat.nome" x-text="cat.icone + ' ' + cat.nome"></option>
+                </template>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-black uppercase text-slate-300 mb-1.5">Tipo do Ponto</label>
+              <select
+                x-model="formTipoPonto"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
+                <template x-for="tp in tiposPontoLista" :key="tp">
+                  <option :value="tp" x-text="tp"></option>
+                </template>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-black uppercase text-slate-300 mb-1.5">Toque do Atabaque (opcional)</label>
+              <input
+                x-model="formToque"
+                type="text"
+                placeholder="Ex: Ijexá, Congo, Barra Vento"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
+            </div>
           </div>
 
           <div>
-            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Senha</label>
+            <label class="block text-xs font-black uppercase text-slate-300 mb-1.5">Observações do Terreiro (opcional)</label>
             <input
-              x-model="loginSenhaInput"
-              type="password"
-              required
-              placeholder="••••••••"
-              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+              x-model="formObservacoes"
+              type="text"
+              placeholder="Ex: Cantar 3x na abertura da gira de Ogum"
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-400">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase text-slate-300 mb-1.5">Letra Oficial do Terreiro (opcional)</label>
+            <textarea
+              x-model="formLetraManual"
+              rows="4"
+              placeholder="Se você já tiver a letra exata, cole aqui (1 verso por linha). A IA alinha os tempos nela! Se deixar vazio, o sistema transcreve tudo sozinho."
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400"></textarea>
+          </div>
+
+          <div x-show="erroProcessamento" class="bg-red-500/15 border border-red-500/40 text-red-200 text-sm font-bold rounded-xl px-4 py-3" x-text="erroProcessamento"></div>
+
+          <div x-show="statusProcessamento" class="bg-amber-500/15 border border-amber-400/50 text-amber-200 text-sm font-bold rounded-xl px-4 py-3.5 flex items-center gap-2.5">
+            <span class="inline-block w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin shrink-0"></span>
+            <span x-text="statusProcessamento"></span>
           </div>
 
           <button
-            type="submit"
-            :disabled="carregandoLogin"
-            class="w-full bg-amber-600 hover:bg-amber-500 text-white font-black text-sm py-3 rounded-2xl shadow-lg shadow-amber-600/30 transition disabled:opacity-50">
-            <span x-text="carregandoLogin ? 'Entrando...' : 'Entrar no Painel'"></span>
+            type="button"
+            @click="enviarNovoPontoParaN8N()"
+            :disabled="processandoNovoPonto"
+            class="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-base py-4 rounded-2xl shadow-lg shadow-amber-500/30 transition disabled:opacity-50">
+            <span x-text="processandoNovoPonto ? '⏳ Processando Áudio e Letra...' : '🚀 Processar, Transcrever e Publicar'"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de Minhas Contribuições (ou Moderação Geral para Admin) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-base font-black text-white" x-text="adminLogado ? '🛡️ Moderação Geral (' + pontos.length + ')' : '🙏 Minhas Contribuições'"></h3>
+          <button @click="carregarPontos()" class="text-xs font-bold text-amber-300">🔄 Atualizar</button>
+        </div>
+
+        <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+          <template x-for="p in pontos.filter(item => adminLogado || (usuarioId && String(item.enviado_por_user_id) === String(usuarioId)))" :key="p.id">
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm" x-text="obterIconeCategoria(p.categoria)"></span>
+                  <p class="text-base font-bold text-white truncate" x-text="p.titulo"></p>
+                  <span x-show="p.ativo === false" class="text-xs bg-red-500/20 text-red-300 px-2 py-0.5 rounded">Oculto</span>
+                </div>
+                <p class="text-xs text-slate-400" x-text="(p.categoria || 'Outros') + ' • ' + (p.tipo_ponto || 'Ponto')"></p>
+                <p x-show="obterAssinaturaPonto(p)" class="text-xs text-sky-300 mt-0.5 truncate" x-text="obterAssinaturaPonto(p)"></p>
+              </div>
+
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button @click="abrirPontoNoKaraoke(p, true)" class="px-3 py-2 rounded-xl bg-amber-500/20 text-amber-300 text-xs font-bold">▶️</button>
+                <button @click="abrirEditorPonto(p, $event)" class="px-3 py-2 rounded-xl bg-sky-500/20 text-sky-300 text-xs font-bold">✏️</button>
+                <button x-show="adminLogado" @click="excluirPontoAdmin(p, $event)" class="px-3 py-2 rounded-xl bg-red-500/20 text-red-300 text-xs font-bold">🗑️</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Acesso Opcional de Moderação Admin (para quem ainda não marcou is_admin) -->
+      <details x-show="!adminLogado" class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <summary class="text-sm font-bold text-slate-400 cursor-pointer">🔐 Sou Administrador (entrar com senha do Directus para moderação)</summary>
+        <form @submit.prevent="loginDirectusEmailSenha()" class="space-y-3 mt-4">
+          <div x-show="erroLogin" class="bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-bold rounded-xl px-3.5 py-2.5" x-text="erroLogin"></div>
+          <input x-model="loginEmailInput" type="email" required placeholder="E-mail Admin" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <input x-model="loginSenhaInput" type="password" required placeholder="Senha" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <button type="submit" :disabled="carregandoLogin" class="w-full bg-sky-600 text-white font-black text-sm py-2.5 rounded-xl">
+            <span x-text="carregandoLogin ? 'Entrando...' : 'Liberar Moderação Admin'"></span>
           </button>
         </form>
-      </div>
-
-      <!-- Painel Logado -->
-      <div x-show="adminLogado" class="space-y-5">
-        <!-- Info do Admin Logado -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3">
-          <div class="min-w-0">
-            <p class="text-[11px] font-black uppercase text-emerald-400">● Dirigente / Admin Autorizado</p>
-            <p class="text-sm font-black text-white truncate" x-text="adminNome || usuarioNome"></p>
-            <p class="text-xs text-slate-400 truncate" x-text="adminEmail || usuarioEmail"></p>
-          </div>
-          <button @click="abaAtual = 'repertorio'" class="bg-slate-800 text-slate-200 border border-slate-700 text-xs font-black px-3.5 py-2 rounded-xl shrink-0">
-            Ver Pontos
-          </button>
-        </div>
-
-        <!-- Formulário: Adicionar Ponto (YouTube ou Arquivo MP3) -->
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
-          <h2 class="text-lg font-black text-white mb-1">✨ Cadastrar Novo Ponto</h2>
-          <p class="text-xs text-slate-400 mb-4">
-            Cole o link do YouTube ou suba um áudio do celular. O fluxo extrai o MP3, transcreve a letra com tempos e publica automaticamente.
-          </p>
-
-          <!-- Seletor YouTube vs Arquivo Direto -->
-          <div class="grid grid-cols-2 gap-2 mb-4 bg-slate-950 p-1 rounded-2xl border border-slate-800">
-            <button
-              type="button"
-              @click="formModoEntrada = 'youtube'"
-              :class="formModoEntrada === 'youtube' ? 'bg-amber-600 text-white' : 'text-slate-400'"
-              class="py-2 rounded-xl text-xs font-black transition">
-              ▶️ Link do YouTube
-            </button>
-            <button
-              type="button"
-              @click="formModoEntrada = 'arquivo'"
-              :class="formModoEntrada === 'arquivo' ? 'bg-amber-600 text-white' : 'text-slate-400'"
-              class="py-2 rounded-xl text-xs font-black transition">
-              📁 Enviar Áudio (MP3/OGG)
-            </button>
-          </div>
-
-          <div class="space-y-3">
-            <!-- Campo YouTube -->
-            <div x-show="formModoEntrada === 'youtube'">
-              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Link do YouTube *</label>
-              <input
-                x-model="formYoutubeUrl"
-                type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
-                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
-            </div>
-
-            <!-- Campo Upload Arquivo -->
-            <div x-show="formModoEntrada === 'arquivo'">
-              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Arquivo de Áudio *</label>
-              <label class="flex flex-col items-center justify-center border-2 border-dashed border-amber-500/40 rounded-2xl p-5 cursor-pointer bg-slate-950 hover:border-amber-400 transition">
-                <span class="text-2xl mb-1">🎵</span>
-                <span class="text-xs font-black text-amber-300" x-text="formArquivoNome || 'Toque para selecionar MP3, OGG, M4A ou WAV'"></span>
-                <input type="file" accept="audio/*,.mp3,.ogg,.m4a,.wav" @change="selecionarArquivoAudioAdmin($event)" class="hidden">
-              </label>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Título do Ponto (opcional)</label>
-                <input
-                  x-model="formTitulo"
-                  type="text"
-                  placeholder="Vazio = puxa automático do vídeo"
-                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
-              </div>
-
-              <div>
-                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Categoria / Linha</label>
-                <select
-                  x-model="formCategoria"
-                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
-                  <option value="Auto">🤖 Descobrir Automaticamente (IA)</option>
-                  <template x-for="cat in categoriasLista" :key="cat.nome">
-                    <option :value="cat.nome" x-text="cat.icone + ' ' + cat.nome"></option>
-                  </template>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Tipo do Ponto</label>
-                <select
-                  x-model="formTipoPonto"
-                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
-                  <template x-for="tp in tiposPontoLista" :key="tp">
-                    <option :value="tp" x-text="tp"></option>
-                  </template>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Toque do Atabaque (opcional)</label>
-                <input
-                  x-model="formToque"
-                  type="text"
-                  placeholder="Ex: Ijexá, Congo, Barra Vento, Samba Cabula"
-                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Observações do Terreiro (opcional)</label>
-              <input
-                x-model="formObservacoes"
-                type="text"
-                placeholder="Ex: Cantar 3x na abertura da gira de Ogum"
-                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Letra Oficial do Terreiro (opcional)</label>
-              <textarea
-                x-model="formLetraManual"
-                rows="4"
-                placeholder="Se você já tiver a letra exata cantada na casa, cole aqui (1 verso por linha). A IA usará sua letra e alinhará os tempos do áudio nela! Se deixar vazio, o Whisper transcreve tudo sozinho."
-                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
-            </div>
-
-            <div x-show="erroProcessamento" class="bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-bold rounded-xl px-3.5 py-2.5" x-text="erroProcessamento"></div>
-
-            <div x-show="statusProcessamento" class="bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs font-bold rounded-xl px-3.5 py-3 flex items-center gap-2">
-              <span class="inline-block w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin shrink-0"></span>
-              <span x-text="statusProcessamento"></span>
-            </div>
-
-            <button
-              type="button"
-              @click="enviarNovoPontoParaN8N()"
-              :disabled="processandoNovoPonto"
-              class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-black text-sm py-3.5 rounded-2xl shadow-lg shadow-amber-600/30 transition disabled:opacity-50">
-              <span x-text="processandoNovoPonto ? '⏳ Processando Áudio e Letra...' : '🚀 Processar, Transcrever e Publicar'"></span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Gerenciamento Rápido dos Pontos Cadastrados -->
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-base font-black text-white">📚 Pontos Cadastrados (<span x-text="pontos.length"></span>)</h3>
-            <button @click="carregarPontos()" class="text-xs font-bold text-amber-400">🔄 Atualizar</button>
-          </div>
-
-          <div class="space-y-2 max-h-96 overflow-y-auto pr-1">
-            <template x-for="p in pontos" :key="p.id">
-              <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-2">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-xs" x-text="obterIconeCategoria(p.categoria)"></span>
-                    <p class="text-sm font-bold text-white truncate" x-text="p.titulo"></p>
-                    <span x-show="p.ativo === false" class="text-[10px] bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded">Oculto</span>
-                  </div>
-                  <p class="text-[11px] text-slate-400" x-text="(p.categoria || 'Outros') + ' • ' + (p.tipo_ponto || 'Ponto')"></p>
-                </div>
-
-                <div class="flex items-center gap-1.5 shrink-0">
-                  <button @click="abrirPontoNoKaraoke(p, true)" class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-300 text-xs font-bold">▶️</button>
-                  <button @click="abrirEditorPonto(p, $event)" class="px-2.5 py-1.5 rounded-xl bg-sky-500/15 text-sky-300 text-xs font-bold">✏️ Editar</button>
-                  <button @click="excluirPontoAdmin(p, $event)" class="px-2.5 py-1.5 rounded-xl bg-red-500/15 text-red-300 text-xs font-bold">🗑️</button>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
+      </details>
     </section>
   </main>
 
   <!-- ===================================================================== -->
   <!-- 3. PLAYER DOCK FIXO INFERIOR (CONTROLES DE ESTUDO & VELOCIDADE)       -->
   <!-- ===================================================================== -->
-  <div x-show="!verificandoAuth && usuarioLogado && pontoAtual && abaAtual !== 'admin'" x-transition class="player-dock fixed bottom-0 left-0 right-0 z-40 px-4 pt-2.5 pb-3.5">
+  <div x-show="!verificandoAuth && usuarioLogado && pontoAtual && abaAtual !== 'enviar'" x-transition class="player-dock fixed bottom-0 left-0 right-0 z-40 px-4 pt-3 pb-4">
     <div class="max-w-3xl mx-auto">
 
       <!-- Cabeçalho Mini do Player (quando estiver fora da aba Karaokê) -->
-      <div x-show="abaAtual !== 'karaoke'" @click="abaAtual = 'karaoke'" class="flex items-center justify-between gap-2 mb-2 cursor-pointer">
+      <div x-show="abaAtual !== 'karaoke'" @click="abaAtual = 'karaoke'" class="flex items-center justify-between gap-2 mb-2.5 cursor-pointer">
         <div class="flex items-center gap-2 min-w-0">
-          <span class="text-base" x-text="obterIconeCategoria(pontoAtual?.categoria)"></span>
+          <span class="text-lg" x-text="obterIconeCategoria(pontoAtual?.categoria)"></span>
           <div class="min-w-0">
-            <p class="text-xs font-black text-white truncate" x-text="pontoAtual?.titulo"></p>
-            <p class="text-[10px] text-amber-400 font-bold">Toque aqui para abrir a letra em Karaokê ↑</p>
+            <p class="text-sm font-black text-white truncate" x-text="pontoAtual?.titulo"></p>
+            <p class="text-xs text-amber-300 font-bold">Toque aqui para abrir a letra em Karaokê ↑</p>
           </div>
         </div>
-        <span class="text-[11px] font-black bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full shrink-0">🎤 Ver Letra</span>
+        <span class="text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-400/40 px-3 py-1.5 rounded-full shrink-0">🎤 Ver Letra</span>
       </div>
 
       <!-- Barra de Progresso -->
-      <div class="flex items-center gap-2.5 mb-2">
-        <span class="text-[11px] font-mono font-bold text-slate-400 w-10 text-right" x-text="formatarTempoMMSS(tempoAtualSeg)"></span>
+      <div class="flex items-center gap-2.5 mb-2.5">
+        <span class="text-xs font-mono font-bold text-slate-300 w-11 text-right" x-text="formatarTempoMMSS(tempoAtualSeg)"></span>
         <input
           type="range"
           min="0"
@@ -844,18 +833,18 @@
           :value="tempoAtualSeg"
           @input="buscarTempoSlider($event.target.value)"
           class="barra-progresso-audio flex-1">
-        <span class="text-[11px] font-mono font-bold text-slate-400 w-10" x-text="formatarTempoMMSS(duracaoTotalSeg)"></span>
+        <span class="text-xs font-mono font-bold text-slate-300 w-11" x-text="formatarTempoMMSS(duracaoTotalSeg)"></span>
       </div>
 
       <!-- Botões Principais de Reprodução -->
       <div class="flex items-center justify-between gap-2">
         <!-- Controles de Velocidade (esquerda) -->
-        <div class="flex items-center gap-1 bg-slate-900/90 border border-slate-700 rounded-xl p-0.5">
+        <div class="flex items-center gap-1 bg-slate-950/90 border border-slate-700 rounded-xl p-0.5">
           <template x-for="vel in [0.75, 0.9, 1, 1.25]" :key="vel">
             <button
               @click="alterarVelocidade(vel)"
-              :class="velocidadeAudio === vel ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'"
-              class="px-1.5 py-1 rounded-lg text-[10px] font-black transition"
+              :class="velocidadeAudio === vel ? 'bg-amber-500 text-slate-950' : 'text-slate-300 hover:text-white'"
+              class="px-2 py-1.5 rounded-lg text-xs font-black transition"
               x-text="vel + 'x'">
             </button>
           </template>
@@ -863,22 +852,22 @@
 
         <!-- Botões Centrais -->
         <div class="flex items-center gap-1.5 sm:gap-2.5">
-          <button @click="tocarProximoPonto(-1)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-sm active:scale-90" title="Ponto Anterior">
+          <button @click="tocarProximoPonto(-1)" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white flex items-center justify-center text-base active:scale-90" title="Ponto Anterior">
             ⏮
           </button>
-          <button @click="avancarOuVoltarSegundos(-5)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-[11px] font-black active:scale-90" title="Voltar 5 segundos">
+          <button @click="avancarOuVoltarSegundos(-5)" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white flex items-center justify-center text-xs font-black active:scale-90" title="Voltar 5 segundos">
             -5s
           </button>
           <button
             @click="alternarPlayPause()"
-            class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center text-xl shadow-lg shadow-amber-600/40 active:scale-95 transition">
-            <span x-show="carregandoAudio" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center text-xl shadow-lg shadow-amber-500/40 active:scale-95 transition">
+            <span x-show="carregandoAudio" class="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
             <span x-show="!carregandoAudio" x-text="tocando ? '⏸' : '▶'"></span>
           </button>
-          <button @click="avancarOuVoltarSegundos(5)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-[11px] font-black active:scale-90" title="Avançar 5 segundos">
+          <button @click="avancarOuVoltarSegundos(5)" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white flex items-center justify-center text-xs font-black active:scale-90" title="Avançar 5 segundos">
             +5s
           </button>
-          <button @click="tocarProximoPonto(1)" class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 flex items-center justify-center text-sm active:scale-90" title="Próximo Ponto">
+          <button @click="tocarProximoPonto(1)" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-white flex items-center justify-center text-base active:scale-90" title="Próximo Ponto">
             ⏭
           </button>
         </div>
@@ -887,8 +876,8 @@
         <div class="flex items-center gap-1">
           <button
             @click="alternarLoop()"
-            :class="loopAtivo ? 'bg-amber-600 text-white border-amber-400' : 'bg-slate-800/90 text-slate-400 border-slate-700'"
-            class="w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition active:scale-90"
+            :class="loopAtivo ? 'bg-amber-500 text-slate-950 border-amber-300' : 'bg-slate-800 text-slate-300 border-slate-700'"
+            class="w-10 h-10 rounded-xl border flex items-center justify-center text-base transition active:scale-90"
             title="Repetir este ponto continuamente">
             🔁
           </button>
@@ -898,29 +887,29 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 4. MODAL EDITOR FINO DE LETRA & SINCRONIZAÇÃO (ADMIN)                 -->
+  <!-- 4. MODAL EDITOR FINO DE LETRA & SINCRONIZAÇÃO (AUTOR / ADMIN)         -->
   <!-- ===================================================================== -->
   <div x-show="modalEditorAberto && editandoPonto" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl">
+    <div class="bg-slate-900 border border-sky-400/30 rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl">
       <!-- Cabeçalho do Modal -->
       <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between gap-3">
         <div>
-          <h3 class="text-base font-black text-white">✏️ Editar Ponto & Sincronização</h3>
-          <p class="text-[11px] text-slate-400">Corrija palavras de Umbanda ou ajuste os segundos exatos do karaokê.</p>
+          <h3 class="text-lg font-black text-white">✏️ Editar Ponto & Sincronização</h3>
+          <p class="text-xs text-slate-300">Corrija palavras de Umbanda ou ajuste os segundos exatos do karaokê.</p>
         </div>
-        <button @click="modalEditorAberto = false" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 font-black">✕</button>
+        <button @click="modalEditorAberto = false" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-200 font-black">✕</button>
       </div>
 
       <!-- Corpo Rolável -->
       <div class="p-5 overflow-y-auto space-y-4 flex-1">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Título</label>
-            <input x-model="editandoPonto.titulo" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+            <label class="block text-xs font-black uppercase text-slate-300 mb-1">Título</label>
+            <input x-model="editandoPonto.titulo" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base text-white">
           </div>
           <div>
-            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Categoria / Linha</label>
-            <select x-model="editandoPonto.categoria" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+            <label class="block text-xs font-black uppercase text-slate-300 mb-1">Categoria / Linha</label>
+            <select x-model="editandoPonto.categoria" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base text-white">
               <template x-for="cat in categoriasLista" :key="cat.nome">
                 <option :value="cat.nome" x-text="cat.icone + ' ' + cat.nome"></option>
               </template>
@@ -930,87 +919,87 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Tipo</label>
-            <select x-model="editandoPonto.tipo_ponto" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+            <label class="block text-xs font-black uppercase text-slate-300 mb-1">Tipo</label>
+            <select x-model="editandoPonto.tipo_ponto" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base text-white">
               <template x-for="tp in tiposPontoLista" :key="tp">
                 <option :value="tp" x-text="tp"></option>
               </template>
             </select>
           </div>
           <div>
-            <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Toque</label>
-            <input x-model="editandoPonto.toque" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+            <label class="block text-xs font-black uppercase text-slate-300 mb-1">Toque</label>
+            <input x-model="editandoPonto.toque" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base text-white">
           </div>
         </div>
 
         <div>
-          <label class="block text-[11px] font-black uppercase text-slate-400 mb-1">Observações</label>
-          <input x-model="editandoPonto.observacoes" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+          <label class="block text-xs font-black uppercase text-slate-300 mb-1">Observações</label>
+          <input x-model="editandoPonto.observacoes" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base text-white">
         </div>
 
-        <label class="flex items-center gap-2.5 cursor-pointer">
-          <input x-model="editandoPonto.ativo" type="checkbox" class="w-4 h-4 accent-amber-500">
-          <span class="text-xs font-bold text-slate-200">Ponto ativo e visível para os médiuns</span>
+        <label x-show="adminLogado" class="flex items-center gap-2.5 cursor-pointer">
+          <input x-model="editandoPonto.ativo" type="checkbox" class="w-5 h-5 accent-amber-500">
+          <span class="text-sm font-bold text-slate-200">Ponto ativo e visível para os médiuns</span>
         </label>
 
         <!-- Barra de Ajuste Global de Tempo + Mini Player -->
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 space-y-2.5">
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <span class="text-xs font-black text-amber-300">⏱️ Ajuste Fino da Sincronização</span>
-            <div class="flex items-center gap-1">
-              <button type="button" @click="ajustarOffsetGlobalEditor(-1.0)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">-1s</button>
-              <button type="button" @click="ajustarOffsetGlobalEditor(-0.5)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">-0.5s</button>
-              <button type="button" @click="ajustarOffsetGlobalEditor(0.5)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">+0.5s</button>
-              <button type="button" @click="ajustarOffsetGlobalEditor(1.0)" class="px-2 py-1 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-200">+1s</button>
+            <div class="flex items-center gap-1.5">
+              <button type="button" @click="ajustarOffsetGlobalEditor(-1.0)" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-xs font-bold text-slate-200">-1s</button>
+              <button type="button" @click="ajustarOffsetGlobalEditor(-0.5)" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-xs font-bold text-slate-200">-0.5s</button>
+              <button type="button" @click="ajustarOffsetGlobalEditor(0.5)" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-xs font-bold text-slate-200">+0.5s</button>
+              <button type="button" @click="ajustarOffsetGlobalEditor(1.0)" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-xs font-bold text-slate-200">+1s</button>
             </div>
           </div>
 
           <div class="flex items-center justify-between gap-2 text-xs">
             <button
               type="button"
-              @click="const p = pontos.find(x => String(x.id) === String(editandoPonto.id)); if (!pontoAtual || String(pontoAtual.id) !== String(editandoPonto.id)) { abrirPontoNoKaraoke(p, true); abaAtual = 'admin'; } else { alternarPlayPause(); }"
-              class="bg-amber-600 text-white font-black px-3 py-1.5 rounded-xl">
+              @click="const p = pontos.find(x => String(x.id) === String(editandoPonto.id)); if (!pontoAtual || String(pontoAtual.id) !== String(editandoPonto.id)) { const abaOld = abaAtual; abrirPontoNoKaraoke(p, true); abaAtual = abaOld; } else { alternarPlayPause(); }"
+              class="bg-amber-500 text-slate-950 font-black px-3.5 py-2 rounded-xl">
               <span x-text="tocando && pontoAtual && String(pontoAtual.id) === String(editandoPonto.id) ? '⏸ Pausar Áudio' : '▶ Ouvir Áudio'"></span>
             </button>
-            <span class="font-mono text-slate-300 font-bold" x-text="'Tempo atual: ' + formatarTempoMMSS(tempoAtualSeg) + ' (' + tempoAtualSeg.toFixed(1) + 's)'"></span>
+            <span class="font-mono text-slate-200 font-bold" x-text="formatarTempoMMSS(tempoAtualSeg) + ' (' + tempoAtualSeg.toFixed(1) + 's)'"></span>
           </div>
         </div>
 
         <!-- Lista de Versos Editáveis -->
-        <div class="space-y-2">
+        <div class="space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-black uppercase text-slate-400">Versos & Tempos (segundos)</span>
-            <button type="button" @click="adicionarLinhaEditor()" class="text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 px-3 py-1 rounded-xl">
+            <span class="text-xs font-black uppercase text-slate-300">Versos & Tempos (segundos)</span>
+            <button type="button" @click="adicionarLinhaEditor()" class="text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 rounded-xl">
               + Adicionar Verso
             </button>
           </div>
 
           <template x-for="(v, idx) in editandoVersos" :key="idx">
-            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-2.5 space-y-2">
-              <div class="flex items-center gap-2">
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 space-y-2">
+              <div class="flex items-center gap-2 flex-wrap">
                 <div class="flex items-center gap-1">
-                  <span class="text-[10px] text-slate-500 font-bold">Início</span>
+                  <span class="text-xs text-slate-400 font-bold">Início</span>
                   <input x-model.number="v.start" type="number" step="0.1" min="0" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono">
                 </div>
                 <div class="flex items-center gap-1">
-                  <span class="text-[10px] text-slate-500 font-bold">Fim</span>
+                  <span class="text-xs text-slate-400 font-bold">Fim</span>
                   <input x-model.number="v.end" type="number" step="0.1" min="0" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono">
                 </div>
                 <button
                   type="button"
                   @click="marcarTempoAtualNaLinhaEditor(idx)"
-                  class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-black"
+                  class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-xs font-black"
                   title="Capturar tempo exato que está tocando agora">
                   ⏱️ Marcar Agora
                 </button>
                 <button
                   type="button"
                   @click="removerLinhaEditor(idx)"
-                  class="ml-auto px-2 py-1 rounded-lg bg-red-500/15 text-red-300 text-xs font-bold">
+                  class="ml-auto px-2.5 py-1 rounded-lg bg-red-500/15 text-red-300 text-xs font-bold">
                   🗑️
                 </button>
               </div>
-              <input x-model="v.text" type="text" placeholder="Texto do verso..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-white">
+              <input x-model="v.text" type="text" placeholder="Texto do verso..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-base text-white">
             </div>
           </template>
         </div>
@@ -1018,8 +1007,8 @@
 
       <!-- Rodapé do Modal -->
       <div class="px-5 py-4 border-t border-slate-800 flex items-center justify-end gap-2">
-        <button type="button" @click="modalEditorAberto = false" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-black">Cancelar</button>
-        <button type="button" @click="salvarEdicaoPonto()" :disabled="salvandoEdicao" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-black disabled:opacity-50">
+        <button type="button" @click="modalEditorAberto = false" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-200 text-sm font-black">Cancelar</button>
+        <button type="button" @click="salvarEdicaoPonto()" :disabled="salvandoEdicao" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-black disabled:opacity-50">
           <span x-text="salvandoEdicao ? 'Salvando...' : '💾 Salvar Alterações'"></span>
         </button>
       </div>
@@ -1027,74 +1016,77 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 5. MENU LATERAL (PERFIL DO MÉDIUM, TEMA, PWA & ÁREA DIRIGENTE)        -->
+  <!-- 5. MENU LATERAL (PERFIL DO MÉDIUM, TEMA, PWA & ENVIAR PONTO)          -->
   <!-- ===================================================================== -->
   <div x-show="menuAberto" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end" @click.self="menuAberto = false">
-    <aside class="w-80 max-w-[85vw] bg-slate-900 border-l border-slate-800 h-full p-5 flex flex-col justify-between overflow-y-auto">
+    <aside class="w-80 max-w-[88vw] bg-slate-900 border-l border-sky-400/25 h-full p-5 flex flex-col justify-between overflow-y-auto">
       <div class="space-y-5">
         <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div>
-            <h3 class="text-base font-black text-white">🕊️ Um Canto, Uma Prece!</h3>
-            <p class="text-[11px] text-slate-400">Caderno Digital de Pontos</p>
+          <div class="flex items-center gap-2.5">
+            <img src="./icon-192.png" alt="Logo" class="w-10 h-10 rounded-full border border-amber-400 object-cover" onerror="this.style.display='none'">
+            <div>
+              <h3 class="text-base font-black text-white">Um Canto, Uma Prece!</h3>
+              <p class="text-xs text-sky-300">Cantos e Pontos de Umbanda</p>
+            </div>
           </div>
-          <button @click="menuAberto = false" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 font-black">✕</button>
+          <button @click="menuAberto = false" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-200 font-black">✕</button>
         </div>
 
         <!-- Dados do Médium Logado -->
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-1.5">
-          <p class="text-[10px] font-black uppercase text-amber-400">Seu Perfil no Terreiro</p>
-          <p class="text-sm font-black text-white truncate" x-text="usuarioNome || 'Médium'"></p>
-          <p x-show="usuarioTerreiro" class="text-xs font-semibold text-slate-300 truncate" x-text="'🏛️ ' + usuarioTerreiro"></p>
-          <p x-show="usuarioWhatsapp" class="text-xs text-slate-400 truncate" x-text="'📱 ' + usuarioWhatsapp"></p>
-          <button @click="abrirEdicaoPerfilProprio()" class="mt-2 w-full bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-black py-2 rounded-xl border border-slate-700 transition">
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1.5">
+          <p class="text-xs font-black uppercase text-amber-400">Seu Perfil no Terreiro</p>
+          <p class="text-base font-black text-white truncate" x-text="usuarioNome || 'Médium'"></p>
+          <p x-show="usuarioTerreiro" class="text-sm font-semibold text-sky-300 truncate" x-text="'🏛️ ' + usuarioTerreiro"></p>
+          <p x-show="usuarioWhatsapp" class="text-xs text-slate-300 truncate" x-text="'📱 ' + usuarioWhatsapp"></p>
+          <button @click="abrirEdicaoPerfilProprio()" class="mt-2.5 w-full bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-black py-2.5 rounded-xl border border-slate-700 transition">
             ✏️ Editar Meus Dados
           </button>
         </div>
 
         <!-- Tema -->
         <div>
-          <p class="text-[11px] font-black uppercase text-slate-400 mb-2">Aparência da Tela</p>
+          <p class="text-xs font-black uppercase text-slate-300 mb-2">Aparência da Tela</p>
           <div class="grid grid-cols-2 gap-2">
-            <button @click="alternarTema('escuro')" :class="tema === 'escuro' ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-800 text-slate-300 border-slate-700'" class="py-2.5 rounded-xl border text-xs font-black">
-              🌙 Modo Gira (Escuro)
+            <button @click="alternarTema('escuro')" :class="tema === 'escuro' ? 'bg-amber-500 text-slate-950 border-amber-300' : 'bg-slate-800 text-slate-200 border-slate-700'" class="py-2.5 rounded-xl border text-xs font-black">
+              🌙 Modo Gira
             </button>
-            <button @click="alternarTema('claro')" :class="tema === 'claro' ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-800 text-slate-300 border-slate-700'" class="py-2.5 rounded-xl border text-xs font-black">
-              ☀️ Modo Dia (Claro)
+            <button @click="alternarTema('claro')" :class="tema === 'claro' ? 'bg-amber-500 text-slate-950 border-amber-300' : 'bg-slate-800 text-slate-200 border-slate-700'" class="py-2.5 rounded-xl border text-xs font-black">
+              ☀️ Modo Dia
             </button>
           </div>
         </div>
 
         <!-- Instalar App PWA -->
-        <div x-show="!isStandalone" class="bg-amber-500/10 border border-amber-500/35 rounded-2xl p-4">
-          <p class="text-xs font-black text-amber-300 mb-1">📲 Instalar no Celular</p>
-          <p class="text-[11px] text-slate-300 mb-3 leading-relaxed">
+        <div x-show="!isStandalone" class="bg-amber-500/10 border border-amber-400/40 rounded-2xl p-4">
+          <p class="text-sm font-black text-amber-300 mb-1">📲 Instalar no Celular</p>
+          <p class="text-xs text-slate-200 mb-3 leading-relaxed">
             Instale como aplicativo na tela inicial para abrir com um toque e ouvir pontos salvos mesmo sem internet.
           </p>
           <button
             x-show="temPromptInstalacao"
             @click="instalarPWA()"
-            class="w-full bg-amber-600 text-white text-xs font-black py-2.5 rounded-xl">
+            class="w-full bg-amber-500 text-slate-950 text-sm font-black py-2.5 rounded-xl">
             Instalar Aplicativo Agora
           </button>
-          <p x-show="!temPromptInstalacao && isIOS" class="text-[11px] text-amber-200 font-semibold">
+          <p x-show="!temPromptInstalacao && isIOS" class="text-xs text-amber-200 font-semibold">
             No iPhone/Safari: toque no ícone <strong>Compartilhar (⬆️)</strong> e escolha <strong>"Adicionar à Tela de Início"</strong>.
           </p>
-          <p x-show="!temPromptInstalacao && !isIOS" class="text-[11px] text-amber-200 font-semibold">
+          <p x-show="!temPromptInstalacao && !isIOS" class="text-xs text-amber-200 font-semibold">
             No Chrome: abra o menu <strong>(⋮)</strong> e toque em <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.
           </p>
         </div>
 
         <!-- Atalhos -->
         <div class="space-y-2">
-          <button @click="carregarPontos(); menuAberto = false" class="w-full text-left bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs font-bold text-slate-200 flex items-center justify-between">
+          <button @click="carregarPontos(); menuAberto = false" class="w-full text-left bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-slate-100 flex items-center justify-between">
             <span>🔄 Sincronizar Novos Pontos</span>
             <span>→</span>
           </button>
-          <button @click="abaAtual = 'admin'; menuAberto = false" class="w-full text-left bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs font-bold text-slate-200 flex items-center justify-between">
-            <span x-text="adminLogado ? '⚙️ Painel do Dirigente / Admin' : '🔐 Acesso Dirigente (Admin)'"></span>
+          <button @click="abaAtual = 'enviar'; menuAberto = false" class="w-full text-left bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-slate-100 flex items-center justify-between">
+            <span>➕ Enviar Novo Ponto</span>
             <span>→</span>
           </button>
-          <button @click="deslogar()" class="w-full text-left bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-xs font-bold text-red-300 flex items-center justify-between">
+          <button @click="deslogar()" class="w-full text-left bg-red-500/10 border border-red-500/35 rounded-xl px-4 py-3 text-sm font-bold text-red-300 flex items-center justify-between">
             <span>🚪 Sair da Conta</span>
             <span>→</span>
           </button>
@@ -1102,8 +1094,8 @@
       </div>
 
       <div class="pt-4 border-t border-slate-800 text-center">
-        <p class="text-[11px] text-slate-500 font-semibold">Um Canto, Uma Prece! • v1.1.0</p>
-        <p class="text-[10px] text-slate-600 mt-0.5">Desenvolvido por STUDIOTESTA</p>
+        <p class="text-xs text-slate-400 font-semibold">Um Canto, Uma Prece! • v1.2.0</p>
+        <p class="text-xs text-slate-500 mt-0.5">Desenvolvido por STUDIOTESTA</p>
       </div>
     </aside>
   </div>

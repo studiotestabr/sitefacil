@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Um Canto, Uma Prece! v1.1.0 - Núcleo Reativo Oficial
-   Login Google + Cadastro Obrigatório (canto_users), Repertório por Categorias,
-   Karaokê Sincronizado, Áudio Offline & Painel Admin
+   Um Canto, Uma Prece! v1.2.0 - Núcleo Reativo Oficial Colaborativo
+   Login Google + Cadastro Obrigatório, Envio Colaborativo por Qualquer Membro,
+   Assinatura (Nome + Terreiro), Karaokê Sincronizado, Áudio Offline & Admin
    Arquivo: /um-canto-uma-prece/js/app.js
    ========================================================================== */
 
@@ -15,7 +15,7 @@ function umCantoApp() {
     // 2. PREFERÊNCIAS VISUAIS E NAVEGAÇÃO
     tema: localStorage.getItem('canto_tema') || 'escuro',
     tamanhoFonteKaraoke: localStorage.getItem('canto_fonte') || 'normal', // 'normal' | 'grande' | 'gigante'
-    abaAtual: 'repertorio', // 'repertorio' | 'karaoke' | 'favoritos' | 'admin'
+    abaAtual: 'repertorio', // 'repertorio' | 'karaoke' | 'favoritos' | 'enviar'
     menuAberto: false,
     buscaAberta: false,
     termoBusca: '',
@@ -107,7 +107,7 @@ function umCantoApp() {
     erroCadastroObrigatorio: '',
     salvandoPerfil: false,
 
-    // 8. ÁREA ADMIN (DIRIGENTE) + CADASTRO + EDITOR DE SINCRONIZAÇÃO
+    // 8. MODERAÇÃO ADMIN + ENVIO COLABORATIVO + EDITOR DE SINCRONIZAÇÃO
     adminLogado: false,
     adminEmail: '',
     adminNome: '',
@@ -117,7 +117,7 @@ function umCantoApp() {
     carregandoLogin: false,
     erroLogin: '',
 
-    // Formulário de Novo Ponto (YouTube ou Upload Direto)
+    // Formulário de Novo Ponto (Aberto a todos os membros logados)
     formModoEntrada: 'youtube', // 'youtube' | 'arquivo'
     formYoutubeUrl: '',
     formArquivoNome: '',
@@ -158,7 +158,6 @@ function umCantoApp() {
         this.estaOnline = false;
       });
 
-      // Carrega cache instantâneo para abrir rápido mesmo sem sinal no terreiro
       const cachePontos = localStorage.getItem('canto_pontos_cache');
       if (cachePontos) {
         try {
@@ -234,7 +233,7 @@ function umCantoApp() {
     },
 
     // =========================================================================
-    // DIRECTUS API (PÚBLICO + ADMIN COM REFRESH AUTOMÁTICO)
+    // DIRECTUS API (PÚBLICO + AUTH COM REFRESH AUTOMÁTICO)
     // =========================================================================
     async fetchDirectus(path, options = {}, usarAuth = true) {
       const url = path.startsWith('http') ? path : `${this.DIRECTUS_URL}${path}`;
@@ -287,7 +286,7 @@ function umCantoApp() {
     },
 
     // =========================================================================
-    // AUTENTICAÇÃO GOOGLE & CADASTRO OBRIGATÓRIO (SPXROTAS PATTERN)
+    // AUTENTICAÇÃO GOOGLE & CADASTRO OBRIGATÓRIO (canto_users)
     // =========================================================================
     async verificarAutenticacao() {
       this.verificandoAuth = true;
@@ -328,13 +327,12 @@ function umCantoApp() {
             localStorage.setItem('canto_user_id', this.usuarioId);
             this.usuarioLogado = true;
 
-            // Verifica se o usuário tem permissão de escrita em pontos_umbanda no Directus
             try {
               const permRes = await this.fetchDirectus('/permissions/me', { method: 'GET' }, true);
               if (permRes && permRes.ok) {
                 const permData = await permRes.json();
                 const pontosPerm = permData?.data?.pontos_umbanda;
-                if (pontosPerm && (pontosPerm.create?.access || pontosPerm.update?.access)) {
+                if (pontosPerm && (pontosPerm.create?.access || pontosPerm.delete?.access)) {
                   this.adminLogado = true;
                   this.adminNome = this.usuarioNome;
                   this.adminEmail = this.usuarioEmail;
@@ -348,7 +346,6 @@ function umCantoApp() {
         this.usuarioLogado = false;
         this.adminLogado = false;
       } catch (networkErr) {
-        // Offline-First: se o médium já entrou antes e está no terreiro sem 4G, mantém sessão local
         const cachedPerfil = localStorage.getItem('canto_perfil_cache');
         if (cachedPerfil && localStorage.getItem('canto_user_id')) {
           try {
@@ -612,11 +609,30 @@ function umCantoApp() {
     },
 
     // =========================================================================
-    // HELPERS DE REPERTÓRIO, FILTROS & FAVORITOS
+    // HELPERS DE REPERTÓRIO, ASSINATURA COLABORATIVA, FILTROS & FAVORITOS
     // =========================================================================
     obterIconeCategoria(nomeCat) {
       const cat = this.categoriasLista.find(c => c.nome.toLowerCase() === String(nomeCat || '').toLowerCase());
       return cat ? cat.icone : '🥁';
+    },
+
+    obterAssinaturaPonto(ponto) {
+      if (!ponto) return '';
+      const nome = String(ponto.enviado_por_nome || '').trim();
+      const terreiro = String(ponto.enviado_por_terreiro || '').trim();
+      if (!nome && !terreiro) return '';
+      if (nome && terreiro) return `${nome} • ${terreiro}`;
+      return nome || terreiro;
+    },
+
+    podeEditarPonto(ponto) {
+      if (!ponto) return false;
+      if (this.adminLogado) return true;
+      return Boolean(
+        this.usuarioId &&
+        ponto.enviado_por_user_id &&
+        String(ponto.enviado_por_user_id) === String(this.usuarioId)
+      );
     },
 
     obterUrlAudio(ponto) {
@@ -701,7 +717,16 @@ function umCantoApp() {
           .trim();
 
         lista = lista.filter(p => {
-          const texto = [p.titulo, p.categoria, p.tipo_ponto, p.toque, p.letra_completa, p.observacoes]
+          const texto = [
+            p.titulo,
+            p.categoria,
+            p.tipo_ponto,
+            p.toque,
+            p.letra_completa,
+            p.observacoes,
+            p.enviado_por_nome,
+            p.enviado_por_terreiro
+          ]
             .filter(Boolean)
             .join(' ')
             .toLowerCase()
@@ -1065,7 +1090,7 @@ function umCantoApp() {
     },
 
     // =========================================================================
-    // ÁREA ADMIN (DIRIGENTE: LOGIN EXTRA POR SENHA, ENVIO N8N & EDITOR)
+    // ENVIO COLABORATIVO (QUALQUER MEMBRO) + MODERAÇÃO ADMIN
     // =========================================================================
     async loginDirectusEmailSenha() {
       const email = (this.loginEmailInput || '').trim();
@@ -1133,7 +1158,11 @@ function umCantoApp() {
     },
 
     async enviarNovoPontoParaN8N() {
-      if (!this.adminLogado) return;
+      if (!this.usuarioLogado) {
+        alert('Faça login com sua conta Google para enviar um ponto.');
+        return;
+      }
+
       this.erroProcessamento = '';
 
       if (this.formModoEntrada === 'youtube' && !this.formYoutubeUrl.trim()) {
@@ -1161,7 +1190,10 @@ function umCantoApp() {
           tipo_ponto: this.formTipoPonto,
           toque: this.formToque.trim(),
           observacoes: this.formObservacoes.trim(),
-          letra_manual: this.formLetraManual.trim()
+          letra_manual: this.formLetraManual.trim(),
+          enviado_por_nome: this.usuarioNome || 'Médium Colaborador',
+          enviado_por_terreiro: this.usuarioTerreiro || 'Umbanda',
+          enviado_por_user_id: this.usuarioId || ''
         };
 
         const res = await fetch(this.N8N_WEBHOOK_URL, {
@@ -1189,7 +1221,7 @@ function umCantoApp() {
           } else {
             this.abaAtual = 'repertorio';
           }
-          alert('✅ Ponto processado e publicado com sucesso!');
+          alert('✅ Ponto processado e publicado com sua assinatura!');
         } else {
           this.erroProcessamento = data?.mensagem || 'Erro no servidor n8n ao processar o ponto.';
         }
@@ -1201,11 +1233,11 @@ function umCantoApp() {
     },
 
     // =========================================================================
-    // EDITOR FINO DE LETRA & TIMESTAMPS (ADMIN)
+    // EDITOR FINO DE LETRA & TIMESTAMPS (AUTOR DO PONTO OU ADMIN)
     // =========================================================================
     abrirEditorPonto(ponto, event) {
       if (event) event.stopPropagation();
-      if (!ponto || !this.adminLogado) return;
+      if (!ponto || !this.podeEditarPonto(ponto)) return;
 
       this.editandoPonto = {
         id: ponto.id,
