@@ -1,7 +1,8 @@
 /* ==========================================================================
-   SPXrotas Pro v2.7.0 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v2.8.0 - Núcleo Mestre Reativo Oficial
    Interpolação Métrica de Número Predial (Padrão Waze/Uber), Módulo Volumosos com Voz,
-   Radares Blindados com Cache Offline, Pingo Inteligente 3D, Status Conferido no Banco,
+   Radares Blindados com Cache Offline, Pinagem Inteligente em 3 Camadas,
+   GPS Pós-Rota (Casa & Modo Waze Livre), Status Conferido no Banco,
    Reordenação Fluida por Toque, Trava Anti-Duplicidade por AT ID & Telemetria na Nuvem
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
@@ -29,7 +30,18 @@ function spxRotasApp() {
     modalRelatorio: false,
     modalVolumoso: false,
     modalMoverPosicao: false,
+    modalConfirmarPingo: false,
+    modalGpsLivre: false,
     dadosRelatorio: null,
+
+    // Dados da Pinagem Inteligente (> 450m até 4 km)
+    pingoPendenteDados: null,
+
+    // Dados do GPS Livre (Modo Waze / Volta para Casa)
+    inputDestinoLivre: '',
+    sugestoesDestinoLivre: [],
+    buscandoSugestoesLivre: false,
+    coordDestinoLivreSalva: null,
 
     // Toast Flutuante Não-Bloqueante
     toastMensagem: '',
@@ -543,12 +555,14 @@ function spxRotasApp() {
     async buscarSugestoesEndereco(termo, tipo) {
       if (!termo || termo.trim().length < 3) {
         if (tipo === 'partida') this.sugestoesPartida = [];
-        else this.sugestoesChegada = [];
+        else if (tipo === 'chegada') this.sugestoesChegada = [];
+        else if (tipo === 'livre') this.sugestoesDestinoLivre = [];
         return;
       }
 
       if (tipo === 'partida') this.buscandoSugestoesPartida = true;
-      else this.buscandoSugestoesChegada = true;
+      else if (tipo === 'chegada') this.buscandoSugestoesChegada = true;
+      else if (tipo === 'livre') this.buscandoSugestoesLivre = true;
 
       const numeroDigitado = this.extrairNumeroDoTexto(termo);
 
@@ -636,12 +650,14 @@ function spxRotasApp() {
         }
 
         if (tipo === 'partida') this.sugestoesPartida = resultados;
-        else this.sugestoesChegada = resultados;
+        else if (tipo === 'chegada') this.sugestoesChegada = resultados;
+        else if (tipo === 'livre') this.sugestoesDestinoLivre = resultados;
       } catch (err) {
         console.warn('Erro ao buscar sugestões:', err);
       } finally {
         if (tipo === 'partida') this.buscandoSugestoesPartida = false;
-        else this.buscandoSugestoesChegada = false;
+        else if (tipo === 'chegada') this.buscandoSugestoesChegada = false;
+        else if (tipo === 'livre') this.buscandoSugestoesLivre = false;
       }
     },
 
@@ -653,13 +669,18 @@ function spxRotasApp() {
         this.inputPartidaModal = endFormatado;
         this.coordPartidaSalva = { latitude: s.latitude, longitude: s.longitude };
         this.sugestoesPartida = [];
-      } else {
+        this.salvarPartidaChegadaLocal();
+      } else if (tipo === 'chegada') {
         this.inputChegadaModal = endFormatado;
         this.coordChegadaSalva = { latitude: s.latitude, longitude: s.longitude };
         this.sugestoesChegada = [];
+        this.salvarPartidaChegadaLocal();
+      } else if (tipo === 'livre') {
+        this.inputDestinoLivre = endFormatado;
+        this.coordDestinoLivreSalva = { latitude: s.latitude, longitude: s.longitude };
+        this.sugestoesDestinoLivre = [];
       }
 
-      this.salvarPartidaChegadaLocal();
       if ('vibrate' in navigator) navigator.vibrate(30);
     },
 
@@ -671,6 +692,108 @@ function spxRotasApp() {
       this.sugestoesChegada = [];
       this.salvarPartidaChegadaLocal();
       if ('vibrate' in navigator) navigator.vibrate(30);
+    },
+
+    // =========================================================================
+    // GPS PÓS-ROTA (VOLTAR PARA CASA + MODO WAZE LIVRE + COPILOTO RADARES)
+    // =========================================================================
+    async navegarParaCasa() {
+      let coord = this.coordChegadaSalva;
+      if ((!coord || !coord.latitude) && this.inputChegadaModal && this.inputChegadaModal.trim().length >= 3) {
+        coord = await this.converterTextoParaCoord(this.inputChegadaModal);
+        if (coord && coord.latitude) {
+          this.coordChegadaSalva = coord;
+          this.salvarPartidaChegadaLocal();
+        }
+      }
+
+      if (!coord || !coord.latitude || !coord.longitude) {
+        this.mostrarToast('🏠 Configure o endereço da sua casa para navegar!', 3000);
+        this.abrirModalGpsLivre();
+        return;
+      }
+
+      const destinoCasa = {
+        id: 'gps_casa',
+        is_gps_livre: true,
+        is_sem_destino: false,
+        ordem_entrega: '🏠',
+        endereco: this.inputChegadaModal ? this.limparEnderecoVisual(this.inputChegadaModal) : 'Minha Casa (Retorno)',
+        bairro: 'Volta para Casa',
+        cidade: 'SPXrotas 3D',
+        latitude: Number(coord.latitude),
+        longitude: Number(coord.longitude),
+        parada_shopee: null,
+        codigo_rastreio: 'RETORNO-CASA'
+      };
+
+      this.dispararNavegacaoConfigurada(destinoCasa);
+    },
+
+    abrirModalGpsLivre() {
+      this.sugestoesDestinoLivre = [];
+      this.inputDestinoLivre = '';
+      this.coordDestinoLivreSalva = null;
+      this.modalGpsLivre = true;
+    },
+
+    fecharModalGpsLivre() {
+      this.modalGpsLivre = false;
+      this.sugestoesDestinoLivre = [];
+    },
+
+    async iniciarGpsLivreComDestino() {
+      if (!this.inputDestinoLivre || this.inputDestinoLivre.trim().length < 3) {
+        alert('Digite o endereço de destino ou toque em "Modo Radar Livre".');
+        return;
+      }
+
+      let coord = this.coordDestinoLivreSalva;
+      if (!coord || !coord.latitude) {
+        coord = await this.converterTextoParaCoord(this.inputDestinoLivre);
+      }
+
+      if (!coord || !coord.latitude || !coord.longitude) {
+        alert('Não foi possível localizar esse endereço. Selecione uma sugestão da lista.');
+        return;
+      }
+
+      const destinoLivre = {
+        id: 'gps_livre',
+        is_gps_livre: true,
+        is_sem_destino: false,
+        ordem_entrega: '🧭',
+        endereco: this.limparEnderecoVisual(this.inputDestinoLivre),
+        bairro: 'Navegação Livre',
+        cidade: 'SPXrotas 3D',
+        latitude: Number(coord.latitude),
+        longitude: Number(coord.longitude),
+        parada_shopee: null,
+        codigo_rastreio: 'GPS-LIVRE'
+      };
+
+      this.fecharModalGpsLivre();
+      this.dispararNavegacaoConfigurada(destinoLivre);
+    },
+
+    iniciarModoRadarLivre() {
+      this.fecharModalGpsLivre();
+
+      const copiloto = {
+        id: 'gps_radar_livre',
+        is_gps_livre: true,
+        is_sem_destino: true,
+        ordem_entrega: '📡',
+        endereco: 'Modo Copiloto • 40 Mil Radares',
+        bairro: 'Monitoramento na Pista',
+        cidade: 'SPXrotas 3D',
+        latitude: this.ultimaLatCarro || -24.1667,
+        longitude: this.ultimaLngCarro || -46.7800,
+        parada_shopee: null,
+        codigo_rastreio: 'RADAR-LIVRE'
+      };
+
+      this.iniciarNavegacaoNativa(copiloto);
     },
 
     // =========================================================================
@@ -856,7 +979,6 @@ function spxRotasApp() {
     },
 
     enfileirarSincronizacao(metodo, endpoint, payload) {
-      // Se já houver um PATCH pendente para a tabela rotas, substitui pelo mais recente para não acumular fila
       if (metodo === 'PATCH' && endpoint.startsWith('/items/rotas/') && payload.telemetria) {
         this.syncQueue = this.syncQueue.filter(q => !(q.metodo === 'PATCH' && q.endpoint === endpoint && q.payload?.telemetria));
       }
@@ -1050,10 +1172,10 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // PINGO INTELIGENTE COM MEMÓRIA & BLINDAGEM DE SANIDADE (450 METROS)
+    // PINGO INTELIGENTE EM 3 CAMADAS (RESOLVE DESVIOS > 450m SEM ABRIR BRECHA)
     // =========================================================================
     async corrigirPingoPeloGPS(entrega) {
-      if (!entrega) {
+      if (!entrega || entrega.is_gps_livre) {
         alert('Nenhum pacote selecionado para fixar o portão.');
         return;
       }
@@ -1066,44 +1188,130 @@ function spxRotasApp() {
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const novaLat = pos.coords.latitude;
         const novaLng = pos.coords.longitude;
+        const precisao = Math.round(pos.coords.accuracy || 15);
+        const velKmh = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : (this.velocidadeGPS || 0);
 
+        let distOriginal = 0;
         if (entrega.latitude && entrega.longitude) {
-          const distOriginal = this.calcularDistancia(novaLat, novaLng, Number(entrega.latitude), Number(entrega.longitude));
-          if (distOriginal > 450) {
-            const distFmt = distOriginal > 1000 ? (distOriginal / 1000).toFixed(1) + ' km' : Math.round(distOriginal) + ' metros';
-            alert(`⚠️ BLOQUEADO POR SEGURANÇA:\n\nVocê está a ${distFmt} de distância do endereço original!\n\nO portão só pode ser fixado se você estiver na mesma rua (máximo 450 metros).`);
-            return;
-          }
+          distOriginal = this.calcularDistancia(novaLat, novaLng, Number(entrega.latitude), Number(entrega.longitude));
         }
 
-        const conf = confirm(`Deseja salvar sua posição atual como o portão correto para o endereço:\n\n"${entrega.endereco}"?`);
-        if (!conf) return;
-
-        entrega.latitude = novaLat;
-        entrega.longitude = novaLng;
-
-        const idx = this.entregas.findIndex(e => e.id === entrega.id);
-        if (idx !== -1) {
-          this.entregas[idx].latitude = novaLat;
-          this.entregas[idx].longitude = novaLng;
-          this.salvarCacheLocal();
+        // CAMADA 3: Trava absoluta > 4.000 metros (4 km) contra sabotagem / clique no galpão
+        if (distOriginal > 4000) {
+          const distKm = (distOriginal / 1000).toFixed(1);
+          alert(`⚠️ BLOQUEADO POR SEGURANÇA:\n\nVocê está a ${distKm} km de distância do endereço da planilha!\n\nO limite máximo para correção de pino desviado é de 4 km.`);
+          return;
         }
 
-        this.enfileirarSincronizacao('PATCH', `/items/entregas/${entrega.id}`, { latitude: novaLat, longitude: novaLng });
-        this.enfileirarSincronizacao('POST', '/items/spxrotas_pingos_corrigidos', {
-          endereco: entrega.endereco,
-          cidade: entrega.cidade,
-          bairro: entrega.bairro,
-          latitude: novaLat,
-          longitude: novaLng,
-          corrigido_por: this.usuarioId || 'motorista_app'
-        });
+        // CAMADA 1: Ajuste fino até 450m -> fluxo rápido
+        if (distOriginal <= 450) {
+          const conf = confirm(`Deseja salvar sua posição atual como o portão correto para o endereço:\n\n"${entrega.endereco}"?`);
+          if (!conf) return;
+          this.executarGravacaoPingo(entrega, novaLat, novaLng);
+          return;
+        }
 
-        if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
-        alert('📍 Pingo Inteligente gravado com sucesso! Nas próximas rotas, este endereço já cairá no portão exato.');
+        // CAMADA 2: Desvio grande (451m a 4.000m) -> Trava de velocidade e precisão + validação de via
+        if (velKmh > 15) {
+          alert(`⚠️ DESACELERE PARA PINAR:\n\nEste pino tem um desvio grande (${Math.round(distOriginal)}m).\nPare o veículo na porta do cliente antes de fixar (velocidade atual: ${velKmh} km/h).`);
+          return;
+        }
+
+        if (precisao > 55) {
+          alert(`📡 SINAL GPS FRACO (±${precisao}m):\n\nAguarde alguns segundos no local até o GPS estabilizar antes de fixar um desvio grande.`);
+          return;
+        }
+
+        let ruaGPS = '';
+        let ruaBateu = false;
+        const ruaPacote = (entrega.endereco || '').split(',')[0].toLowerCase().trim();
+
+        if (navigator.onLine) {
+          try {
+            const resRev = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${novaLat}&lon=${novaLng}&addressdetails=1`, {
+              signal: AbortSignal.timeout(2500)
+            });
+            if (resRev.ok) {
+              const dataRev = await resRev.json();
+              const a = dataRev?.address || {};
+              ruaGPS = a.road || a.pedestrian || a.street || '';
+              if (ruaGPS && ruaPacote) {
+                const rGpsNorm = ruaGPS.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const rPctNorm = ruaPacote.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const palavras = rPctNorm
+                  .replace(/\b(rua|r|avenida|av|alameda|al|travessa|trav|estrada|est|rodovia|rod)\b/g, '')
+                  .trim()
+                  .split(/\s+/)
+                  .filter(w => w.length >= 3);
+
+                if (rGpsNorm.includes(rPctNorm) || rPctNorm.includes(rGpsNorm) || (palavras.length > 0 && palavras.some(w => rGpsNorm.includes(w)))) {
+                  ruaBateu = true;
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
+        this.pingoPendenteDados = {
+          entrega: entrega,
+          novaLat: novaLat,
+          novaLng: novaLng,
+          distMetros: Math.round(distOriginal),
+          precisaoMetros: precisao,
+          ruaGPS: ruaGPS || this.nomeRuaAtualCarro || 'Via sem nome no mapa',
+          ruaBateu: ruaBateu
+        };
+        this.modalConfirmarPingo = true;
       }, (err) => {
         alert('Erro ao obter coordenadas do GPS: ' + err.message);
       }, { enableHighAccuracy: true });
+    },
+
+    fecharModalConfirmarPingo() {
+      this.modalConfirmarPingo = false;
+      this.pingoPendenteDados = null;
+    },
+
+    confirmarPingoForcado() {
+      if (!this.pingoPendenteDados) return;
+      const d = this.pingoPendenteDados;
+      this.modalConfirmarPingo = false;
+      this.pingoPendenteDados = null;
+      this.executarGravacaoPingo(d.entrega, d.novaLat, d.novaLng);
+    },
+
+    executarGravacaoPingo(entrega, novaLat, novaLng) {
+      if (!entrega) return;
+      entrega.latitude = novaLat;
+      entrega.longitude = novaLng;
+
+      const idx = this.entregas.findIndex(e => e.id === entrega.id);
+      if (idx !== -1) {
+        this.entregas[idx].latitude = novaLat;
+        this.entregas[idx].longitude = novaLng;
+        this.salvarCacheLocal();
+      }
+
+      this.enfileirarSincronizacao('PATCH', `/items/entregas/${entrega.id}`, { latitude: novaLat, longitude: novaLng });
+      this.enfileirarSincronizacao('POST', '/items/spxrotas_pingos_corrigidos', {
+        endereco: entrega.endereco,
+        cidade: entrega.cidade,
+        bairro: entrega.bairro,
+        latitude: novaLat,
+        longitude: novaLng,
+        corrigido_por: this.usuarioId || 'motorista_app'
+      });
+
+      if (this.modo === 'navegacao' && this.entregaNavegacao && String(this.entregaNavegacao.id) === String(entrega.id)) {
+        this.entregaNavegacao.latitude = novaLat;
+        this.entregaNavegacao.longitude = novaLng;
+        this.atualizarMarcadorDestinoGL(novaLat, novaLng);
+        this.atualizarLinhaNavGL([[Number(novaLng), Number(novaLat)]]);
+        this.distanciaProximaManobra = '0 m';
+      }
+
+      if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+      this.mostrarToast('📍 Portão exato gravado! Nas próximas rotas este endereço já cai aqui.', 3200);
     },
 
     // =========================================================================
@@ -1316,19 +1524,21 @@ function spxRotasApp() {
     },
 
     dispararNavegacaoConfigurada(entrega) {
-      if (!entrega || !entrega.latitude || !entrega.longitude) {
-        alert('Coordenadas indisponíveis para este pacote.');
+      if (!entrega || (!entrega.is_sem_destino && (!entrega.latitude || !entrega.longitude))) {
+        alert('Coordenadas indisponíveis para este destino.');
         return;
       }
 
-      this.iniciarTelemetriaSeNecessario();
+      if (!entrega.is_gps_livre) {
+        this.iniciarTelemetriaSeNecessario();
+      }
 
-      if (this.appNavegacaoEscolhido === 'waze') {
+      if (!entrega.is_sem_destino && this.appNavegacaoEscolhido === 'waze') {
         window.location.href = `waze://?ll=${entrega.latitude},${entrega.longitude}&navigate=yes`;
         return;
       }
 
-      if (this.appNavegacaoEscolhido === 'maps') {
+      if (!entrega.is_sem_destino && this.appNavegacaoEscolhido === 'maps') {
         const isAndroid = /android/i.test(navigator.userAgent);
         if (isAndroid) {
           window.location.href = `google.navigation:q=${entrega.latitude},${entrega.longitude}`;
@@ -1377,7 +1587,6 @@ function spxRotasApp() {
             }
           } catch (netErr) {}
 
-          // Restaura dados locais de auditoria daquela rota (se existirem no aparelho)
           try {
             const aud = JSON.parse(localStorage.getItem(`spxrotas_auditoria_${rota.id}`) || '{}');
             entregasDaRota.forEach(e => {
@@ -1392,7 +1601,6 @@ function spxRotasApp() {
 
         const moduloRelatorio = window.SPXrotasRelatorio || window.DriveXPSRelatorio;
         if (moduloRelatorio) {
-          // Só passa this.telemetria ao vivo se for a ROTA ATIVA! Senão passa null para não sobrescrever rotas antigas.
           const telemetriaPassar = isRotaAtiva ? this.telemetria : null;
           this.dadosRelatorio = moduloRelatorio.compilarDados(rotaCompleta, entregasDaRota, this.configVeiculo, telemetriaPassar);
           this.modalRelatorio = true;
@@ -1705,6 +1913,13 @@ function spxRotasApp() {
           const latMax = (maxLat + margem).toFixed(4);
           const lngMin = (minLng - margem).toFixed(4);
           const lngMax = (maxLng + margem).toFixed(4);
+
+          endpoint = `/items/drivexps_radares?filter[latitude][_gte]=${latMin}&filter[latitude][_lte]=${latMax}&filter[longitude][_gte]=${lngMin}&filter[longitude][_lte]=${lngMax}&limit=3500`;
+        } else if (this.ultimaLatCarro && this.ultimaLngCarro) {
+          const latMin = (this.ultimaLatCarro - 0.18).toFixed(4);
+          const latMax = (this.ultimaLatCarro + 0.18).toFixed(4);
+          const lngMin = (this.ultimaLngCarro - 0.18).toFixed(4);
+          const lngMax = (this.ultimaLngCarro + 0.18).toFixed(4);
 
           endpoint = `/items/drivexps_radares?filter[latitude][_gte]=${latMin}&filter[latitude][_lte]=${latMax}&filter[longitude][_gte]=${lngMin}&filter[longitude][_lte]=${lngMax}&limit=3500`;
         }
@@ -2154,7 +2369,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D NATIVA (COM SUPORTE A POLILINHA VIÁRIA OFFLINE)
+    // NAVEGAÇÃO 3D NATIVA (SUPORTE A ROTA SHOPPE + GPS LIVRE + COPILOTO RADAR)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -2251,18 +2466,33 @@ function spxRotasApp() {
       }
 
       this.ativarWakeLock();
-      this.iniciarTelemetriaSeNecessario();
+      if (!entrega.is_gps_livre) {
+        this.iniciarTelemetriaSeNecessario();
+      }
       this._ultimoTickMovimentoMs = Date.now();
 
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
-      this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
-      this.nomeRuaPisoAtual = entrega?.endereco?.split(',')[0] || 'Via Atual';
-      this.nomeRuaAtualCarro = this.nomeRuaPisoAtual;
-      this.instrucaoAtual = `Iniciando rota para o Canetão #${entrega?.ordem_entrega}...`;
-      this.distanciaProximaManobra = '...';
-      this.subInstrucaoEmSeguida = `Canetão #${entrega?.ordem_entrega}`;
-      this.iconeManobraNav = '⬆️';
+
+      if (entrega.is_sem_destino) {
+        this.nomeProximaRua = 'Modo Copiloto • Radares Ativos';
+        this.nomeRuaPisoAtual = 'Monitorando Via';
+        this.nomeRuaAtualCarro = 'Monitorando Via';
+        this.instrucaoAtual = 'Monitorando radares na pista...';
+        this.distanciaProximaManobra = 'LIVRE';
+        this.subInstrucaoEmSeguida = '40 Mil Radares Ativos';
+      } else {
+        this.nomeProximaRua = entrega ? entrega.endereco : 'Destino';
+        this.nomeRuaPisoAtual = entrega?.endereco?.split(',')[0] || 'Via Atual';
+        this.nomeRuaAtualCarro = this.nomeRuaPisoAtual;
+        this.instrucaoAtual = entrega.is_gps_livre
+          ? `Calculando rota para ${entrega.endereco}...`
+          : `Iniciando rota para o Canetão #${entrega?.ordem_entrega}...`;
+        this.distanciaProximaManobra = '...';
+        this.subInstrucaoEmSeguida = entrega.is_gps_livre ? entrega.bairro : `Canetão #${entrega?.ordem_entrega}`;
+      }
+
+      this.iconeManobraNav = entrega.is_sem_destino ? '📡' : '⬆️';
       this.chegadaAnunciada = false;
       this.alertaRetornoFalado = false;
       this.velocidadeGPS = 0;
@@ -2276,7 +2506,7 @@ function spxRotasApp() {
       this.radarVozAnunciadaId = null;
 
       // 🔊 Alerta de voz inteligente no início se o pacote for volumoso
-      if (entrega.is_volumoso) {
+      if (!entrega.is_gps_livre && entrega.is_volumoso) {
         const local = entrega.nota_local || 'veículo';
         setTimeout(() => {
           this.falarTexto(`Atenção: Canetão número ${entrega.ordem_entrega} é pacote volumoso! Guardado em: ${local}`);
@@ -2297,7 +2527,7 @@ function spxRotasApp() {
       this.mapaNavGL = new maplibregl.Map({
         container: 'mapaNavGL',
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-        center: [entrega.longitude, entrega.latitude],
+        center: [entrega.longitude || -46.7800, entrega.latitude || -24.1667],
         zoom: 16.8,
         pitch: 42,
         bearing: bearingInicialSeguro,
@@ -2388,13 +2618,22 @@ function spxRotasApp() {
         this.ultimaLatCarro = sLat;
         this.ultimaLngCarro = sLng;
 
+        if (!this.listaRadares || this.listaRadares.length === 0) {
+          this.carregarRadaresDoBanco();
+        }
+
         this.atualizarMarcadorCarroGL(sLat, sLng);
 
         const bearingPartida = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : this.headingAtual;
         this.headingAtual = bearingPartida;
         this.centralizarNoCarroGL(sLat, sLng, bearingPartida, 0);
 
-        await this.calcularRotaRuaARua(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
+        if (this.entregaNavegacao.is_sem_destino) {
+          this.distanciaProximaManobra = 'LIVRE';
+          this.falarTexto('Modo copiloto ativado. Radares monitorados na via!');
+        } else {
+          await this.calcularRotaRuaARua(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
+        }
 
         this.watchPositionId = navigator.geolocation.watchPosition(
           (novaPos) => this.processarPosicaoGPS(novaPos),
@@ -2442,7 +2681,7 @@ function spxRotasApp() {
         }
       }
 
-      if (!routeEncontrada) {
+      if (!routeEncontrada && !this.entregaNavegacao?.is_gps_livre) {
         const trechoViarioOffline = this.obterTrechoViarioOffline(sLat, sLng, eLat, eLng);
         if (trechoViarioOffline && trechoViarioOffline.length >= 2) {
           coordsLngLat = trechoViarioOffline;
@@ -2499,6 +2738,9 @@ function spxRotasApp() {
       const primeiroStep = this.passosRota[0] || {};
       const nomeViaAtual = (this.nomeRuaAtualCarro || this.nomeRuaPisoAtual || '').toLowerCase().trim();
       const ehViaExpressaComCanteiro = nomeViaAtual.includes('rodovia') || nomeViaAtual.includes('sp-') || nomeViaAtual.includes('br-') || (nomeViaAtual.includes('avenida') && !nomeViaAtual.includes('rua'));
+      const alvoFala = this.entregaNavegacao?.is_gps_livre
+        ? (this.entregaNavegacao?.endereco || 'seu destino')
+        : `o Canetão ${this.entregaNavegacao?.ordem_entrega}`;
 
       if (primeiroStep.maneuver?.modifier === 'uturn' || diff > 130) {
         this.alertaRetornoFalado = true;
@@ -2506,16 +2748,18 @@ function spxRotasApp() {
         if (ehViaExpressaComCanteiro) {
           this.instrucaoAtual = 'Destino no sentido oposto. Siga até o retorno oficial';
           this.iconeManobraNav = '⬆️';
-          this.falarTexto(`Atenção: Destino no sentido oposto. Siga em frente até o retorno oficial para o Canetão ${this.entregaNavegacao?.ordem_entrega}`);
+          this.falarTexto(`Atenção: Destino no sentido oposto. Siga em frente até o retorno oficial para ${alvoFala}`);
         } else {
           this.instrucaoAtual = `Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma via'}`;
           this.iconeManobraNav = '↩️';
-          this.falarTexto(`Atenção: Destino atrás de você. Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma rua'} para o Canetão ${this.entregaNavegacao?.ordem_entrega}`);
+          this.falarTexto(`Atenção: Destino atrás de você. Faça o retorno na ${this.nomeRuaAtualCarro || 'mesma rua'} para ${alvoFala}`);
         }
       } else {
         if (!this.alertaRetornoFalado) {
-          let textoInicio = `Iniciando rota para Canetão número ${this.entregaNavegacao?.ordem_entrega}, na ${this.entregaNavegacao?.endereco}`;
-          if (this.entregaNavegacao?.is_volumoso) {
+          let textoInicio = this.entregaNavegacao?.is_gps_livre
+            ? `Iniciando navegação para ${this.entregaNavegacao?.endereco || 'seu destino'}`
+            : `Iniciando rota para Canetão número ${this.entregaNavegacao?.ordem_entrega}, na ${this.entregaNavegacao?.endereco}`;
+          if (!this.entregaNavegacao?.is_gps_livre && this.entregaNavegacao?.is_volumoso) {
             textoInicio += `. Pacote volumoso guardado em: ${this.entregaNavegacao.nota_local || 'veículo'}`;
           }
           this.falarTexto(textoInicio);
@@ -2528,21 +2772,27 @@ function spxRotasApp() {
       if (!this.mapaNavGL || !lat || !lng) return;
       const numCanetao = this.entregaNavegacao ? this.entregaNavegacao.ordem_entrega : '';
       let corFundo = '#ea580c';
-      if (this.isPacoteConferido(this.entregaNavegacao)) corFundo = '#22c55e';
-      if (this.entregaNavegacao?.status === 'entregue') corFundo = '#ef4444';
-      if (this.entregaNavegacao?.status === 'ausente') corFundo = '#f59e0b';
+      if (this.entregaNavegacao?.is_gps_livre) {
+        corFundo = '#0284c7';
+      } else {
+        if (this.isPacoteConferido(this.entregaNavegacao)) corFundo = '#22c55e';
+        if (this.entregaNavegacao?.status === 'entregue') corFundo = '#ef4444';
+        if (this.entregaNavegacao?.status === 'ausente') corFundo = '#f59e0b';
+      }
+
+      const textoPin = this.entregaNavegacao?.is_gps_livre ? `${numCanetao}` : `#${numCanetao}`;
 
       if (this.marcadorDestinoGL) {
         this.marcadorDestinoGL.setLngLat([lng, lat]);
         const elPin = document.getElementById('pinDestinoNav');
-        if (elPin) { elPin.style.backgroundColor = corFundo; elPin.innerText = `#${numCanetao}`; }
+        if (elPin) { elPin.style.backgroundColor = corFundo; elPin.innerText = textoPin; }
         return;
       }
 
       const el = document.createElement('div');
       el.innerHTML = `
         <div id="pinDestinoNav" style="background-color: ${corFundo}; color: #ffffff; font-weight: 900; font-family: monospace; font-size: 11px; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid #ffffff; box-shadow: 0 3px 10px rgba(0,0,0,0.85); cursor: pointer;">
-          #${numCanetao}
+          ${textoPin}
         </div>
       `;
       this.marcadorDestinoGL = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(this.mapaNavGL);
@@ -2613,6 +2863,8 @@ function spxRotasApp() {
     async processarPosicaoGPS(pos) {
       if (!this.entregaNavegacao) return;
 
+      const isGpsLivre = Boolean(this.entregaNavegacao.is_gps_livre);
+      const isSemDestino = Boolean(this.entregaNavegacao.is_sem_destino);
       const destLat = this.entregaNavegacao.latitude;
       const destLng = this.entregaNavegacao.longitude;
 
@@ -2622,7 +2874,7 @@ function spxRotasApp() {
       this.velocidadeGPS = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
       const agoraGps = Date.now();
 
-      if (this.ultimaLatCarro && this.ultimaLngCarro) {
+      if (!isGpsLivre && this.ultimaLatCarro && this.ultimaLngCarro) {
         const distMov = this.calcularDistancia(this.ultimaLatCarro, this.ultimaLngCarro, rawLat, rawLng);
         if (distMov >= 3.0 && this.velocidadeGPS >= 3.0 && accuracy <= 35) {
           const deltaMs = this._ultimoTickMovimentoMs ? Math.min(15000, Math.max(500, agoraGps - this._ultimoTickMovimentoMs)) : 1000;
@@ -2637,10 +2889,12 @@ function spxRotasApp() {
       }
       this._ultimoTickMovimentoMs = agoraGps;
 
-      const distDestinoFinal = this.calcularDistancia(rawLat, rawLng, destLat, destLng);
-      if (distDestinoFinal <= 35 && !this.telemetria.momentoChegadaUltimaParada) {
-        this.telemetria.momentoChegadaUltimaParada = agoraGps;
-        this.salvarTelemetriaLocal();
+      if (!isGpsLivre && !isSemDestino) {
+        const distDestinoFinalCheck = this.calcularDistancia(rawLat, rawLng, destLat, destLng);
+        if (distDestinoFinalCheck <= 35 && !this.telemetria.momentoChegadaUltimaParada) {
+          this.telemetria.momentoChegadaUltimaParada = agoraGps;
+          this.salvarTelemetriaLocal();
+        }
       }
 
       let headingMovimento = null;
@@ -2655,7 +2909,9 @@ function spxRotasApp() {
         }
       }
 
-      const snap = this.projetarPontoNaRota(rawLat, rawLng, headingMovimento);
+      const snap = isSemDestino
+        ? { lat: rawLat, lng: rawLng, distRota: 0, headingSegmento: null }
+        : this.projetarPontoNaRota(rawLat, rawLng, headingMovimento);
       const lat = snap.lat;
       const lng = snap.lng;
 
@@ -2669,7 +2925,9 @@ function spxRotasApp() {
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.45);
       }
 
-      if (this.nomeRuaPisoAtual && this.nomeRuaPisoAtual.trim() !== '') {
+      if (isSemDestino) {
+        this.nomeRuaAtualCarro = 'Modo Copiloto';
+      } else if (this.nomeRuaPisoAtual && this.nomeRuaPisoAtual.trim() !== '') {
         this.nomeRuaAtualCarro = this.nomeRuaPisoAtual;
       } else if (this.passosRota.length > 0) {
         this.nomeRuaAtualCarro = this.passosRota[0].name || this.passosRota[0].ref || 'Sua Rota';
@@ -2685,12 +2943,20 @@ function spxRotasApp() {
       this.ultimaLatCarro = lat;
       this.ultimaLngCarro = lng;
 
+      if (isSemDestino) {
+        this.distanciaProximaManobra = 'LIVRE';
+        return;
+      }
+
+      const distDestinoFinal = this.calcularDistancia(rawLat, rawLng, destLat, destLng);
       this.distanciaProximaManobra = distDestinoFinal > 1000 ? (distDestinoFinal / 1000).toFixed(1) + ' km' : Math.round(distDestinoFinal) + ' m';
 
       if (distDestinoFinal <= 25 && !this.chegadaAnunciada) {
         this.chegadaAnunciada = true;
-        let falaChegada = `Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}, na ${this.entregaNavegacao?.endereco || ''}`;
-        if (this.entregaNavegacao?.is_volumoso) {
+        let falaChegada = isGpsLivre
+          ? `Você chegou ao seu destino: ${this.entregaNavegacao?.endereco || ''}`
+          : `Você chegou ao destino! Canetão número ${this.entregaNavegacao?.ordem_entrega || ''}, na ${this.entregaNavegacao?.endereco || ''}`;
+        if (!isGpsLivre && this.entregaNavegacao?.is_volumoso) {
           falaChegada += `. Atenção: pacote volumoso guardado em: ${this.entregaNavegacao.nota_local || 'veículo'}`;
         }
         this.falarTexto(falaChegada);
@@ -2825,6 +3091,12 @@ function spxRotasApp() {
 
     async concluirEntregaPeloNav(entrega) {
       if (!entrega) return;
+
+      if (entrega.is_gps_livre) {
+        this.pararNavegacao();
+        return;
+      }
+
       await this.concluirEntrega(entrega);
 
       this.pararNavegacao();
@@ -2870,7 +3142,10 @@ function spxRotasApp() {
         this.watchPositionId = null;
       }
       this._ultimoTickMovimentoMs = null;
-      this.sincronizarTelemetriaRotaBanco(true);
+
+      if (!this.entregaNavegacao?.is_gps_livre) {
+        this.sincronizarTelemetriaRotaBanco(true);
+      }
 
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
@@ -2889,6 +3164,7 @@ function spxRotasApp() {
       this.radarProximoAlerta = null;
       this.radarExcessoVelocidade = false;
       this.alertaRetornoFalado = false;
+      this.entregaNavegacao = null;
       this.modo = 'rua';
     },
 
@@ -3002,7 +3278,6 @@ function spxRotasApp() {
           this.entregas = entregasServidor.sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
           this.rotaGeometria = dataR?.data?.geometria || this.rotaGeometria;
 
-          // Mescla telemetria da nuvem se o celular não tiver dados mais recentes
           let telNuvem = dataR?.data?.telemetria || null;
           if (typeof telNuvem === 'string') {
             try { telNuvem = JSON.parse(telNuvem); } catch (e) { telNuvem = null; }
@@ -3104,7 +3379,6 @@ function spxRotasApp() {
       const cabecalho = linhasMatriz[idxCabecalho].map(c => String(c || '').trim().toLowerCase());
       const acharIdx = (termos) => cabecalho.findIndex(h => termos.some(t => h === t || h.includes(t)));
 
-      // Busca exata da coluna AT ID sem confundir com Latitude
       let iAtId = cabecalho.findIndex(h =>
         h === 'at id' || h === 'at_id' || h === 'at' || h === 'at code' || h === 'codigo at' || h === 'código at' || h.startsWith('at id')
       );
@@ -3294,7 +3568,6 @@ function spxRotasApp() {
           }
         }
 
-        // TRAVA ANTI-ROMANEIO DUPLICADO PELO AT ID (Não sobrescreve rota existente!)
         if (this.codigoATExtraido) {
           try {
             const filtroUser = this.usuarioId ? `&filter[user_created][_eq]=${this.usuarioId}` : '';
@@ -3316,7 +3589,6 @@ function spxRotasApp() {
           } catch (e) {}
         }
 
-        // Ponto de partida e chegada cravados no portão exato!
         let coordPartida = this.coordPartidaSalva;
         if (!coordPartida || !coordPartida.latitude) {
           coordPartida = await this.converterTextoParaCoord(this.inputPartidaModal);

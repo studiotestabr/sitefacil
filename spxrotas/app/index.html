@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.6.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.7.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.6.0"></script>
+  <script src="./js/relatorio.js?v=8.7.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.6.0"></script>
+  <script src="./js/app.js?v=8.7.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -303,6 +303,9 @@
         </div>
 
         <nav class="space-y-2">
+          <button @click="menuAberto = false; abrirModalGpsLivre();" class="w-full bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 border border-cyan-500/40 transition">
+            <span class="text-base">🧭</span> GPS Livre / Modo Radares (Waze)
+          </button>
           <button @click="menuAberto = false; iniciarTutorial();" class="w-full bg-gray-800/80 hover:bg-gray-800 text-white font-bold text-xs p-3.5 rounded-2xl flex items-center gap-3 transition">
             <span class="text-base">❓</span> Como Usar o SPXrotas (Tutorial)
           </button>
@@ -621,7 +624,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM ALERTA DE VOLUMOSOS) -->
+      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM ALERTA DE VOLUMOSOS + GPS PÓS-ROTA) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-2">
@@ -733,11 +736,48 @@
           </div>
         </template>
 
+        <!-- TELA DE ROTA 100% CONCLUÍDA COM GPS PARA VOLTA PRA CASA E MODO WAZE LIVRE -->
         <template x-if="!entregaAtual && entregas.length > 0 && naoEntregues.length === 0">
-          <div class="text-center py-24 space-y-4">
-            <span class="text-7xl block">🏁</span>
-            <h2 class="text-3xl font-black text-white" x-text="`Rota #${rotaAtivaId || ''} 100% Concluída!`"></h2>
-            <p class="text-gray-400 text-sm max-w-xs mx-auto">Parabéns! Todos os pacotes da carga foram entregues com sucesso.</p>
+          <div class="text-center py-10 space-y-5 bg-[#121824] rounded-3xl p-6 border border-gray-800 shadow-2xl mt-2">
+            <span class="text-6xl block">🏁</span>
+            <div class="space-y-1.5">
+              <h2 class="text-2xl sm:text-3xl font-black text-white" x-text="`Rota #${rotaAtivaId || ''} 100% Concluída!`"></h2>
+              <p class="text-gray-400 text-xs max-w-xs mx-auto leading-relaxed">Parabéns! Todos os pacotes da carga foram entregues com sucesso. Precisa do GPS com os 40 mil radares para voltar?</p>
+            </div>
+
+            <div class="space-y-2.5 pt-2">
+              <button @click="navegarParaCasa()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 px-4 rounded-2xl text-sm shadow-xl shadow-emerald-600/30 active:scale-95 transition flex flex-col items-center justify-center gap-0.5">
+                <span class="flex items-center gap-2 text-base"><span>🏠</span> Voltar para Casa (GPS + Radares)</span>
+                <span x-show="inputChegadaModal" class="text-[10px] font-medium text-emerald-100 truncate max-w-[260px]" x-text="limparEnderecoVisual(inputChegadaModal)"></span>
+              </button>
+
+              <button @click="abrirModalGpsLivre()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3.5 px-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-cyan-600/25 active:scale-95 transition flex items-center justify-center gap-2">
+                <span>🧭</span> GPS Livre (Outro Destino - Modo Waze)
+              </button>
+
+              <button @click="iniciarModoRadarLivre()" class="w-full bg-gray-800 hover:bg-gray-700 text-amber-300 border border-amber-500/40 font-black py-3.5 px-4 rounded-2xl text-xs uppercase tracking-wider active:scale-95 transition flex items-center justify-center gap-2">
+                <span>📡</span> Modo Copiloto (Só Mapa 3D + 40 Mil Radares)
+              </button>
+            </div>
+          </div>
+        </template>
+
+        <!-- QUANDO NÃO HÁ NENHUMA ROTA CARREGADA NA ABA RUA -->
+        <template x-if="!entregaAtual && entregas.length === 0">
+          <div class="text-center py-12 space-y-5 bg-[#121824] rounded-3xl p-6 border border-gray-800 shadow-2xl mt-2">
+            <span class="text-6xl block">🧭</span>
+            <div class="space-y-1.5">
+              <h2 class="text-2xl font-black text-white">Nenhuma Rota Ativa</h2>
+              <p class="text-gray-400 text-xs max-w-xs mx-auto leading-relaxed">Importe um romaneio da Shopee ou use o GPS 3D do SPXrotas livremente com alerta dos 40 mil radares.</p>
+            </div>
+            <div class="space-y-2.5 pt-2">
+              <button @click="abrirModalImportar()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
+                <span>⚡</span> Carregar Romaneio Shopee
+              </button>
+              <button @click="abrirModalGpsLivre()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider active:scale-95 transition flex items-center justify-center gap-2">
+                <span>🧭</span> Usar GPS Livre / Só Radares
+              </button>
+            </div>
           </div>
         </template>
       </main>
@@ -798,7 +838,7 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (COM ELEVAÇÃO DINÂMICA LIVRE DE OBSTRUÇÃO PELO VOLUMOSO) -->
+    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (SUPORTE A ROTA + VOLTA PRA CASA + GPS LIVRE) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
@@ -810,7 +850,7 @@
             <div class="flex-1 min-w-0">
               <div class="flex items-baseline gap-2">
                 <span class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight leading-none" x-text="distanciaProximaManobra || '0 m'"></span>
-                <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">até o destino</span>
+                <span class="text-xs text-gray-400 font-bold uppercase tracking-wider" x-text="entregaNavegacao?.is_sem_destino ? 'radares ativos' : 'até o destino'"></span>
               </div>
               <h3 class="text-base sm:text-lg font-black text-cyan-400 truncate leading-tight mt-1" x-text="nomeProximaRua || entregaNavegacao?.endereco"></h3>
             </div>
@@ -838,7 +878,7 @@
       <div class="absolute inset-0 w-full h-full z-10" id="mapaNavGL"></div>
 
       <!-- 🏎️ VELOCÍMETRO ERGONÔMICO (COM ELEVAÇÃO DINÂMICA QUANDO HOUVER VOLUMOSO) -->
-      <div class="waze-speed-wrapper" :class="{'com-volumoso': entregaNavegacao?.is_volumoso}">
+      <div class="waze-speed-wrapper" :class="{'com-volumoso': !entregaNavegacao?.is_gps_livre && entregaNavegacao?.is_volumoso}">
         <div class="waze-speed-circle" :class="{'alerta-excesso': radarExcessoVelocidade}">
           <span class="text-2xl font-black text-white font-mono leading-none" x-text="velocidadeGPS">0</span>
           <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">km/h</span>
@@ -846,9 +886,9 @@
       </div>
 
       <!-- 🎯 BOTÕES EMPILHADOS À DIREITA (COM ELEVAÇÃO DINÂMICA LIVRE DA COBERTURA DO PAINEL) -->
-      <div class="waze-botoes-laterais" :class="{'com-volumoso': entregaNavegacao?.is_volumoso}">
-        <!-- 1. Botão Azul do Pingo Inteligente -->
-        <button @click="corrigirPingoPeloGPS(entregaNavegacao)" class="btn-pingo-flutuante" title="Fixar Portão Aqui (Pingo Inteligente)">
+      <div class="waze-botoes-laterais" :class="{'com-volumoso': !entregaNavegacao?.is_gps_livre && entregaNavegacao?.is_volumoso}">
+        <!-- 1. Botão Azul do Pingo Inteligente (Oculto no modo GPS Livre) -->
+        <button x-show="!entregaNavegacao?.is_gps_livre" @click="corrigirPingoPeloGPS(entregaNavegacao)" class="btn-pingo-flutuante" title="Fixar Portão Aqui (Pingo Inteligente)">
           📍
         </button>
 
@@ -863,11 +903,19 @@
         </button>
       </div>
 
-      <!-- PAINEL INFERIOR DO NAVEGADOR COM AVISO DE VOLUMOSO -->
+      <!-- PAINEL INFERIOR DO NAVEGADOR COM AVISO DE VOLUMOSO OU MODO LIVRE -->
       <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-2.5 pb-6">
         
+        <!-- AVISO DE MODO LIVRE / VOLTA PARA CASA -->
+        <template x-if="entregaNavegacao && entregaNavegacao.is_gps_livre">
+          <div class="bg-cyan-500/15 border border-cyan-500/50 px-3 py-1.5 rounded-xl flex items-center justify-between text-[11px] text-cyan-300 font-black">
+            <span x-text="entregaNavegacao.is_sem_destino ? '📡 MODO COPILOTO • 40 MIL RADARES ATIVOS' : (entregaNavegacao.id === 'gps_casa' ? '🏠 NAVEGAÇÃO PARA CASA • RADARES ATIVOS' : '🧭 GPS LIVRE SPXROTAS • RADARES ATIVOS')"></span>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-black">TELA ACESA</span>
+          </div>
+        </template>
+
         <!-- AVISO DE PACOTE VOLUMOSO NA NAVEGAÇÃO -->
-        <template x-if="entregaNavegacao && entregaNavegacao.is_volumoso">
+        <template x-if="entregaNavegacao && !entregaNavegacao.is_gps_livre && entregaNavegacao.is_volumoso">
           <div class="bg-amber-500/20 border border-amber-500/70 p-2 rounded-xl flex items-center justify-between text-xs text-amber-300">
             <div class="flex items-center gap-2 truncate">
               <span class="text-base">📦</span>
@@ -877,7 +925,7 @@
           </div>
         </template>
 
-        <template x-if="entregaNavegacao && entregaNavegacao.parada_shopee && Number(entregaNavegacao.parada_shopee) > 0 && !(typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+'))">
+        <template x-if="entregaNavegacao && !entregaNavegacao.is_gps_livre && entregaNavegacao.parada_shopee && Number(entregaNavegacao.parada_shopee) > 0 && !(typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+'))">
           <div class="grid grid-cols-4 gap-2 text-center">
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center">
               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
@@ -898,7 +946,7 @@
           </div>
         </template>
 
-        <template x-if="entregaNavegacao && (!entregaNavegacao.parada_shopee || Number(entregaNavegacao.parada_shopee) <= 0 || entregaNavegacao.parada_shopee === '-' || (typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+')))">
+        <template x-if="entregaNavegacao && !entregaNavegacao.is_gps_livre && (!entregaNavegacao.parada_shopee || Number(entregaNavegacao.parada_shopee) <= 0 || entregaNavegacao.parada_shopee === '-' || (typeof entregaNavegacao.parada_shopee === 'string' && entregaNavegacao.parada_shopee.includes('+')))">
           <div class="grid grid-cols-4 gap-2 text-center">
             <div class="bg-[#1c1815] border-2 border-orange-500/80 rounded-2xl py-2 px-1 flex flex-col justify-center col-span-1">
               <span class="text-[10px] text-orange-400 font-black tracking-wider uppercase leading-none">CANETÃO</span>
@@ -919,12 +967,15 @@
         <div class="flex items-center justify-between gap-3 pt-1">
           <div class="flex-1 min-w-0 pr-1">
             <h4 class="text-base sm:text-lg font-black text-white leading-tight break-words" 
-                x-text="entregaNavegacao ? limparEnderecoVisual(entregaNavegacao.endereco) : ''"></h4>
+                x-text="entregaNavegacao ? (entregaNavegacao.is_gps_livre ? entregaNavegacao.endereco : limparEnderecoVisual(entregaNavegacao.endereco)) : ''"></h4>
             <p class="text-xs sm:text-sm font-bold text-gray-300 truncate mt-0.5" 
                x-text="entregaNavegacao ? `${entregaNavegacao.bairro} - ${entregaNavegacao.cidade}` : ''"></p>
           </div>
-          <button @click="concluirEntregaPeloNav(entregaNavegacao)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm px-5 py-3.5 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5">
-            <span>✅</span> Entregue
+          <button @click="concluirEntregaPeloNav(entregaNavegacao)" 
+                  class="text-white font-black text-sm px-5 py-3.5 rounded-2xl shadow-xl active:scale-95 transition shrink-0 flex items-center gap-1.5"
+                  :class="entregaNavegacao?.is_gps_livre ? 'bg-red-600 hover:bg-red-500' : 'bg-emerald-600 hover:bg-emerald-500'">
+            <span x-text="entregaNavegacao?.is_gps_livre ? '🏁' : '✅'"></span>
+            <span x-text="entregaNavegacao?.is_gps_livre ? 'Encerrar GPS' : 'Entregue'"></span>
           </button>
         </div>
       </div>
@@ -1046,6 +1097,119 @@
 
     </main>
 
+  </div>
+
+  <!-- MODAL DE CONFIRMAÇÃO INTELIGENTE DO PINGO (DESVIOS > 450m ATÉ 4km) -->
+  <div x-show="modalConfirmarPingo" class="fixed inset-0 bg-black/90 z-[340] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 border-2 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl text-left"
+         :class="pingoPendenteDados?.ruaBateu ? 'border-emerald-500' : 'border-amber-500'"
+         @click.away="fecharModalConfirmarPingo()">
+      
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📍</span>
+          <div>
+            <h3 class="text-base font-black text-white leading-tight">Fixar Portão Desviado</h3>
+            <span class="text-xs text-orange-400 font-mono font-bold" x-text="`Canetão #${pingoPendenteDados?.entrega?.ordem_entrega || '-'} • Desvio de ${pingoPendenteDados?.distMetros || 0}m`"></span>
+          </div>
+        </div>
+        <button @click="fecharModalConfirmarPingo()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none p-1">&times;</button>
+      </div>
+
+      <div class="bg-gray-950 p-3.5 rounded-2xl border border-gray-800 space-y-1.5 text-xs">
+        <span class="text-[10px] font-black uppercase text-gray-400 block">Endereço da Entrega:</span>
+        <p class="text-sm font-black text-white leading-snug" x-text="pingoPendenteDados?.entrega?.endereco || ''"></p>
+        <div class="flex items-center justify-between pt-1 border-t border-gray-800/80 text-[10px] text-gray-400 font-mono">
+          <span x-text="`GPS Atual: ${pingoPendenteDados?.ruaGPS || 'Via atual'}`"></span>
+          <span x-text="`Precisão: ±${pingoPendenteDados?.precisaoMetros || 10}m`"></span>
+        </div>
+      </div>
+
+      <template x-if="pingoPendenteDados?.ruaBateu">
+        <div class="bg-emerald-500/15 border border-emerald-500/60 p-3 rounded-2xl text-xs text-emerald-300 font-bold leading-snug">
+          ✅ <strong>Rua confirmada pelo GPS!</strong> O pino da Shopee estava errado, mas seu GPS confirma que você está na rua certa do cliente.
+        </div>
+      </template>
+
+      <template x-if="!pingoPendenteDados?.ruaBateu">
+        <div class="bg-amber-500/15 border border-amber-500/60 p-3 rounded-2xl text-xs text-amber-200 font-bold leading-snug">
+          ⚠️ <strong>Atenção (Desvio de <span x-text="`${pingoPendenteDados?.distMetros || 0}m`"></span>):</strong> Só confirme se você estiver fisicamente parado na porta exata deste cliente agora!
+        </div>
+      </template>
+
+      <div class="flex gap-2 pt-1">
+        <button @click="fecharModalConfirmarPingo()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3.5 rounded-2xl text-xs active:scale-95 transition">
+          Cancelar
+        </button>
+        <button @click="confirmarPingoForcado()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition">
+          📍 Fixar Aqui
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GPS LIVRE / MODO WAZE & COPILOTO RADARES -->
+  <div x-show="modalGpsLivre" class="fixed inset-0 bg-black/90 z-[330] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 border-2 border-cyan-500/80 rounded-3xl w-full max-w-md p-5 space-y-4 shadow-2xl text-left" @click.away="fecharModalGpsLivre()">
+      
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🧭</span>
+          <div>
+            <h3 class="text-base font-black text-white leading-tight">GPS Livre SPXrotas</h3>
+            <span class="text-[11px] text-cyan-400 font-bold">Navegação 3D + 40 Mil Radares + Tela Acesa</span>
+          </div>
+        </div>
+        <button @click="fecharModalGpsLivre()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none p-1">&times;</button>
+      </div>
+
+      <div class="relative space-y-1.5">
+        <label class="text-[10px] font-black uppercase text-gray-400 tracking-wider block">Para onde você quer ir?</label>
+        <div class="relative">
+          <input type="text" 
+                 x-model="inputDestinoLivre" 
+                 @input.debounce.350ms="buscarSugestoesEndereco(inputDestinoLivre, 'livre')" 
+                 @keyup.enter="iniciarGpsLivreComDestino()"
+                 placeholder="Digite rua e número (ex: Av. Paulista, 1000)" 
+                 class="w-full bg-black border border-gray-700 rounded-xl px-3.5 py-3 text-xs text-white focus:outline-none focus:border-cyan-500 font-medium pr-8">
+          <span x-show="buscandoSugestoesLivre" class="absolute right-2.5 top-3 text-xs text-cyan-400 animate-spin">⏳</span>
+        </div>
+
+        <div x-show="sugestoesDestinoLivre.length > 0" 
+             @click.away="sugestoesDestinoLivre = []" 
+             class="absolute z-50 left-0 right-0 mt-1 bg-gray-900 border border-cyan-500/70 rounded-xl shadow-2xl overflow-hidden max-h-52 overflow-y-auto">
+          <template x-for="s in sugestoesDestinoLivre" :key="s.id">
+            <div @click="selecionarSugestaoEndereco(s, 'livre')" 
+                 class="p-2.5 hover:bg-cyan-500/20 cursor-pointer border-b border-gray-800 last:border-b-0 text-left transition flex items-start gap-2">
+              <span class="text-base shrink-0 mt-0.5">📍</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-black text-white truncate" x-text="s.principal"></span>
+                  <template x-if="s.numero">
+                    <span class="text-[9px] bg-cyan-600 text-white px-1.5 py-0.5 rounded font-black font-mono" x-text="`Nº ${s.numero}`"></span>
+                  </template>
+                </div>
+                <span class="text-[10px] text-gray-400 block truncate" x-text="s.secundario"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button @click="iniciarGpsLivreComDestino()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+          <span>🧭</span> Traçar Rota & Navegar Agora
+        </button>
+
+        <button x-show="coordChegadaSalva || inputChegadaModal" @click="fecharModalGpsLivre(); navegarParaCasa();" class="w-full bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 font-black py-3 rounded-2xl text-xs active:scale-95 transition flex items-center justify-center gap-2">
+          <span>🏠</span> Ir para Minha Casa (Retorno Salvo)
+        </button>
+
+        <button @click="iniciarModoRadarLivre()" class="w-full bg-gray-800 hover:bg-gray-700 text-amber-300 border border-amber-500/40 font-black py-3 rounded-2xl text-xs active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📡</span> Modo Copiloto (Sem destino • Só Radares)
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL RÁPIDO PARA MOVER POSIÇÃO DO CANETÃO (PULO DIRETO ANTES DA BIPAGEM) -->
@@ -1653,7 +1817,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-purple-500/40">🏁</div>
           <h3 class="text-2xl font-black text-white">Tudo Pronto para Rodar!</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Carregue sua rota, organize suas sacolas no Canetão e tenha um dia de entregas muito mais rápido e lucrativo!</p>
+          <p class="text-xs text-gray-300 leading-relaxed">Mesmo após concluir todas as entregas, você pode usar o GPS 3D com os 40 mil radares para voltar para casa ou rodar no modo livre!</p>
         </div>
       </template>
 
