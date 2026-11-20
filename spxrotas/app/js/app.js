@@ -1,9 +1,10 @@
 /* ==========================================================================
-   SPXrotas Pro v2.8.0 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v2.9.0 - Núcleo Mestre Reativo Oficial
    Interpolação Métrica de Número Predial (Padrão Waze/Uber), Módulo Volumosos com Voz,
    Radares Blindados com Cache Offline, Pinagem Inteligente em 3 Camadas,
    GPS Pós-Rota (Casa & Modo Waze Livre), Status Conferido no Banco,
-   Reordenação Fluida por Toque, Trava Anti-Duplicidade por AT ID & Telemetria na Nuvem
+   Reordenação Fluida por Toque, Trava Anti-Duplicidade por AT ID, Telemetria na Nuvem
+   & Blindagem de Sessão Offline (Anti-Error 1033 Cloudflare Tunnel)
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -535,7 +536,6 @@ function spxRotasApp() {
 
       if (distAcumulada === 0) return { lat: coords[0][1], lon: coords[0][0] };
 
-      // No sistema viário brasileiro, o número predial corresponde à distância métrica do início da via
       let dAlvo = Math.max(10, Math.min(num, distAcumulada - 5));
 
       for (let i = 0; i < distancias.length - 1; i++) {
@@ -570,7 +570,6 @@ function spxRotasApp() {
         const qLimpa = encodeURIComponent(termo.trim());
         let resultados = [];
 
-        // Consulta Nominatim com geometria completa da via para interpolação métrica
         try {
           const urlNom = `https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&addressdetails=1&q=${qLimpa}&limit=5&countrycodes=br`;
           const resNom = await fetch(urlNom, { signal: AbortSignal.timeout(3500) });
@@ -588,7 +587,6 @@ function spxRotasApp() {
                 let latFinal = parseFloat(item.lat);
                 let lonFinal = parseFloat(item.lon);
 
-                // Se o usuário digitou número e a via tem traçado de rua, interpola no portão exato!
                 if (numReal && item.geojson && item.geojson.coordinates) {
                   let coordsVia = [];
                   if (item.geojson.type === 'LineString') {
@@ -619,7 +617,6 @@ function spxRotasApp() {
           }
         } catch (e) {}
 
-        // Fallback Photon se Nominatim não responder
         if (resultados.length === 0) {
           try {
             const resP = await fetch(`https://photon.komoot.io/api/?q=${qLimpa}&limit=5&lat=-24.16&lon=-46.78`, { signal: AbortSignal.timeout(3000) });
@@ -1017,6 +1014,7 @@ function spxRotasApp() {
           });
 
           if (res && (res.ok || res.status === 404)) {
+            if (res.ok) this.estaOnline = true;
             this.syncQueue = this.syncQueue.filter(q => q.id !== item.id);
             this.salvarFilaSyncLocal();
           } else {
@@ -1196,14 +1194,12 @@ function spxRotasApp() {
           distOriginal = this.calcularDistancia(novaLat, novaLng, Number(entrega.latitude), Number(entrega.longitude));
         }
 
-        // CAMADA 3: Trava absoluta > 4.000 metros (4 km) contra sabotagem / clique no galpão
         if (distOriginal > 4000) {
           const distKm = (distOriginal / 1000).toFixed(1);
           alert(`⚠️ BLOQUEADO POR SEGURANÇA:\n\nVocê está a ${distKm} km de distância do endereço da planilha!\n\nO limite máximo para correção de pino desviado é de 4 km.`);
           return;
         }
 
-        // CAMADA 1: Ajuste fino até 450m -> fluxo rápido
         if (distOriginal <= 450) {
           const conf = confirm(`Deseja salvar sua posição atual como o portão correto para o endereço:\n\n"${entrega.endereco}"?`);
           if (!conf) return;
@@ -1211,7 +1207,6 @@ function spxRotasApp() {
           return;
         }
 
-        // CAMADA 2: Desvio grande (451m a 4.000m) -> Trava de velocidade e precisão + validação de via
         if (velKmh > 15) {
           alert(`⚠️ DESACELERE PARA PINAR:\n\nEste pino tem um desvio grande (${Math.round(distOriginal)}m).\nPare o veículo na porta do cliente antes de fixar (velocidade atual: ${velKmh} km/h).`);
           return;
@@ -1409,7 +1404,6 @@ function spxRotasApp() {
         this.timestampUltimoBip = agora;
         this.ultimoPacoteBipado = match;
 
-        // 🟢 Transição do Ciclo de Conferência: Laranja ➔ Verde (Salva no Celular e no Banco Directus)
         this.idsConferidos.add(match.id);
         this.salvarConferidosLocal();
 
@@ -1619,7 +1613,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // COMUNICAÇÃO DIRECTUS (COM BLINDAGEM DE SINAL OFFLINE)
+    // COMUNICAÇÃO DIRECTUS (COM BLINDAGEM DE SINAL OFFLINE & ANTI-ERROR 1033)
     // =========================================================================
     async fetchDirectus(path, options = {}) {
       const url = path.startsWith('http') ? path : `${this.DIRECTUS_URL}${path}`;
@@ -1634,12 +1628,21 @@ function spxRotasApp() {
       try {
         let res = await fetch(url, fetchOpts);
 
+        if (res.status >= 500) {
+          this.estaOnline = false;
+          return res;
+        }
+
         if (res.status === 401) {
           const renovou = await this.tentarRenovarTokenDirectus();
           if (renovou) {
             headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
             res = await fetch(url, { ...fetchOpts, headers });
           }
+        }
+
+        if (res.ok) {
+          this.estaOnline = navigator.onLine;
         }
         return res;
       } catch (networkError) {
@@ -2369,7 +2372,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // NAVEGAÇÃO 3D NATIVA (SUPORTE A ROTA SHOPPE + GPS LIVRE + COPILOTO RADAR)
+    // NAVEGAÇÃO 3D NATIVA (SUPORTE A ROTA SHOPEE + GPS LIVRE + COPILOTO RADAR)
     // =========================================================================
     falarTexto(texto) {
       if (!this.vozHabilitada || !('speechSynthesis' in window)) return;
@@ -2505,7 +2508,6 @@ function spxRotasApp() {
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
 
-      // 🔊 Alerta de voz inteligente no início se o pacote for volumoso
       if (!entrega.is_gps_livre && entrega.is_volumoso) {
         const local = entrega.nota_local || 'veículo';
         setTimeout(() => {
@@ -3201,10 +3203,11 @@ function spxRotasApp() {
 
       try {
         const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=500`);
+        if (!res || !res.ok) return;
         const data = await res.json();
 
         const resR = await this.fetchDirectus(`/items/rotas/${rotaId}`);
-        const dataR = await resR.json();
+        const dataR = (resR && resR.ok) ? await resR.json() : {};
 
         if (data.data && data.data.length > 0) {
           const entregasServidor = data.data;
@@ -3673,23 +3676,24 @@ function spxRotasApp() {
           this.salvarCacheLocal();
           this.modo = 'carregamento';
         } else {
-          alert('Erro no servidor ao calcular rota.');
+          alert('Erro no servidor ao calcular rota (verifique se o servidor está ligado).');
         }
       } catch (e) {
-        alert('Erro de conexão: ' + e.message);
+        alert('Erro de conexão com o servidor ao calcular rota: ' + e.message);
       } finally {
         this.carregandoProcesso = false;
       }
     },
 
     // =========================================================================
-    // AUTENTICAÇÃO E SAAS
+    // AUTENTICAÇÃO E SAAS (BLINDADO CONTRA QUEDA DO SERVIDOR / ERROR 1033)
     // =========================================================================
     async verificarAutenticacao() {
       if (localStorage.getItem('usuario_deslogado') === 'true') {
         this.usuarioLogado = false;
         return;
       }
+
       const searchParams = new URLSearchParams(window.location.search);
       const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
       const tokenUrl = searchParams.get('access_token') || hashParams.get('access_token') || searchParams.get('token');
@@ -3709,25 +3713,97 @@ function spxRotasApp() {
         this.usuarioId = u.id;
         this.usuarioEmail = u.email || '';
         const n = [u.first_name, u.last_name].filter(Boolean).join(' ');
-        this.usuarioNome = n.trim() || u.email || '';
+        this.usuarioNome = n.trim() || u.nome || u.email || '';
         localStorage.setItem('directus_user_id', this.usuarioId);
+        localStorage.setItem('spxrotas_usuario_cache', JSON.stringify({
+          id: this.usuarioId,
+          email: this.usuarioEmail,
+          nome: this.usuarioNome
+        }));
         this.usuarioLogado = true;
       };
 
-      const res = await this.fetchDirectus('/users/me');
-      if (res && res.ok) {
-        const d = await res.json();
-        if (d?.data?.id) { extrair(d.data); return; }
+      const restaurarSessaoLocalOffline = () => {
+        try {
+          const cacheUser = JSON.parse(localStorage.getItem('spxrotas_usuario_cache') || 'null');
+          const savedId = cacheUser?.id || localStorage.getItem('directus_user_id');
+          if (savedId && (this.tokenAcesso || localStorage.getItem('directus_refresh_token') || cacheUser)) {
+            this.usuarioId = savedId;
+            this.usuarioEmail = cacheUser?.email || '';
+            this.usuarioNome = cacheUser?.nome || 'Motorista SPX';
+            this.usuarioLogado = true;
+            return true;
+          }
+        } catch (e) {}
+        return false;
+      };
+
+      if (!navigator.onLine) {
+        if (restaurarSessaoLocalOffline()) return;
+      }
+
+      try {
+        const res = await this.fetchDirectus('/users/me');
+        if (res && res.ok) {
+          const d = await res.json();
+          if (d?.data?.id) { extrair(d.data); return; }
+        }
+
+        // Servidor/Cloudflare fora do ar (500, 502, 503, 504, 530 Error 1033) -> NÃO desloga!
+        if (res && res.status >= 500) {
+          this.estaOnline = false;
+          if (restaurarSessaoLocalOffline()) {
+            this.mostrarToast('📡 Servidor indisponível — rodando no modo local!', 3500);
+            return;
+          }
+        }
+
+        if (res && (res.status === 401 || res.status === 403)) {
+          this.usuarioLogado = false;
+          return;
+        }
+      } catch (e) {
+        this.estaOnline = false;
+        if (restaurarSessaoLocalOffline()) {
+          this.mostrarToast('📡 Sem conexão com o servidor — rodando no modo local!', 3500);
+          return;
+        }
       }
 
       this.usuarioLogado = false;
     },
 
+    restaurarAssinaturaLocalOffline() {
+      try {
+        const cacheSaas = JSON.parse(localStorage.getItem('spxrotas_saas_cache') || 'null');
+        if (cacheSaas) {
+          this.statusAssinatura = cacheSaas.statusAssinatura || 'trial';
+          this.planoAtivo = cacheSaas.planoAtivo || 'gratuito';
+          this.dataExpiracao = cacheSaas.dataExpiracao || null;
+          this.trialIniciado = Boolean(cacheSaas.trialIniciado);
+          this.diasRestantesTrial = cacheSaas.diasRestantesTrial ?? 7;
+          this.assinaturaValida = cacheSaas.assinaturaValida !== false;
+          if (cacheSaas.nome) this.usuarioNome = cacheSaas.nome;
+          if (cacheSaas.telefone) this.inputTelefone = cacheSaas.telefone;
+        }
+      } catch (e) {}
+    },
+
     async sincronizarAssinaturaSaaS() {
       if (!this.usuarioId || !this.usuarioLogado) return;
 
+      if (!navigator.onLine) {
+        this.restaurarAssinaturaLocalOffline();
+        return;
+      }
+
       try {
         const res = await this.fetchDirectus(`/items/drivexps_users?filter[user_id][_eq]=${this.usuarioId}`);
+        if (!res || !res.ok) {
+          this.restaurarAssinaturaLocalOffline();
+          return;
+        }
+
         const data = await res.json();
         const registros = data.data || [];
         let userSaas = registros[0] || null;
@@ -3741,8 +3817,10 @@ function spxRotasApp() {
           const p = await this.fetchDirectus('/items/drivexps_users', {
             method: 'POST', body: JSON.stringify(novo)
           });
-          const pd = await p.json();
-          userSaas = pd.data;
+          if (p && p.ok) {
+            const pd = await p.json();
+            userSaas = pd.data;
+          }
           this.trialIniciado = false; this.diasRestantesTrial = 7; this.assinaturaValida = true;
         } else {
           this.statusAssinatura = userSaas.status_assinatura || 'trial';
@@ -3764,6 +3842,23 @@ function spxRotasApp() {
           }
         }
 
+        localStorage.setItem('spxrotas_saas_cache', JSON.stringify({
+          statusAssinatura: this.statusAssinatura,
+          planoAtivo: this.planoAtivo,
+          dataExpiracao: this.dataExpiracao,
+          trialIniciado: this.trialIniciado,
+          diasRestantesTrial: this.diasRestantesTrial,
+          assinaturaValida: this.assinaturaValida,
+          nome: this.usuarioNome,
+          telefone: this.inputTelefone
+        }));
+
+        localStorage.setItem('spxrotas_usuario_cache', JSON.stringify({
+          id: this.usuarioId,
+          email: this.usuarioEmail,
+          nome: this.usuarioNome
+        }));
+
         const nomeInvalido = !userSaas?.nome || userSaas.nome.trim().toLowerCase() === 'motorista' || userSaas.nome.length < 3;
         const telInvalido = !userSaas?.telefone || String(userSaas.telefone).replace(/\D/g, '').length < 10;
         const emailInvalido = !userSaas?.email || !userSaas.email.includes('@');
@@ -3776,7 +3871,9 @@ function spxRotasApp() {
         } else {
           this.modalCadastroObrigatorio = false;
         }
-      } catch (e) {}
+      } catch (e) {
+        this.restaurarAssinaturaLocalOffline();
+      }
     },
 
     async salvarDadosCompletosPerfil() {
@@ -3908,6 +4005,8 @@ function spxRotasApp() {
       localStorage.removeItem('directus_token');
       localStorage.removeItem('directus_user_id');
       localStorage.removeItem('directus_refresh_token');
+      localStorage.removeItem('spxrotas_usuario_cache');
+      localStorage.removeItem('spxrotas_saas_cache');
       localStorage.removeItem('spxrotas_rota_ativa_id');
       localStorage.removeItem('spxrotas_entregas_cache');
       localStorage.removeItem('spxrotas_rota_geometria');
