@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.7.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.8.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.7.0"></script>
+  <script src="./js/relatorio.js?v=8.8.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.7.0"></script>
+  <script src="./js/app.js?v=8.8.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -624,11 +624,23 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM ALERTA DE VOLUMOSOS + GPS PÓS-ROTA) -->
+      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM SWIPE LATERAL + ALERTA VOLUMOSOS + GPS PÓS-ROTA) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
-          <div class="bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-2">
+          <div @touchstart="iniciarSwipeRua($event)"
+               @touchmove="moverSwipeRua($event)"
+               @touchend="finalizarSwipeRua($event)"
+               @touchcancel="finalizarSwipeRua($event)"
+               :style="ruaSwipeDeltaX ? `transform: translateX(${ruaSwipeDeltaX}px)` : ''"
+               class="cockpit-rua-swipe bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-2">
             
+            <!-- BARRA DISCRETA DE NAVEGAÇÃO LATERAL ENTRE PACOTES -->
+            <div x-show="naoEntreguesOrdenados.length > 1" class="barra-swipe-rua">
+              <button @click="navegarPacoteRua(-1)" :disabled="indiceEntregaAtualNaRua <= 0" class="btn-seta-rua" title="Pacote Anterior">◀</button>
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider" x-text="`◀ Deslize para trocar • ${indiceEntregaAtualNaRua + 1} de ${naoEntreguesOrdenados.length} ▶`"></span>
+              <button @click="navegarPacoteRua(1)" :disabled="indiceEntregaAtualNaRua >= naoEntreguesOrdenados.length - 1" class="btn-seta-rua" title="Próximo Pacote">▶</button>
+            </div>
+
             <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300 shadow-md">
               <div class="flex items-center gap-2 truncate pr-2">
                 <span class="text-base shrink-0">📍</span>
@@ -838,11 +850,11 @@
 
     </div>
 
-    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (SUPORTE A ROTA + VOLTA PRA CASA + GPS LIVRE) -->
+    <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (OTIMIZADA PARA ECONOMIA DE BATERIA SEM BLUR SOBRE WEBGL) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
       <!-- PAINEL SUPERIOR FLUTUANTE ESTILO WAZE -->
-      <div class="absolute top-0 left-0 right-0 z-[600] bg-black/90 backdrop-blur-md text-white px-4 pt-4 pb-3 shadow-2xl border-b border-gray-800/80">
+      <div class="absolute top-0 left-0 right-0 z-[600] bg-black/95 text-white px-4 pt-4 pb-3 shadow-2xl border-b border-gray-800/80">
         <div class="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-2 opacity-60"></div>
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -904,7 +916,7 @@
       </div>
 
       <!-- PAINEL INFERIOR DO NAVEGADOR COM AVISO DE VOLUMOSO OU MODO LIVRE -->
-      <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 backdrop-blur-md border-t-2 border-gray-800 p-4 space-y-2.5 pb-6">
+      <div class="absolute bottom-0 left-0 right-0 z-[600] bg-gray-950/95 border-t-2 border-gray-800 p-4 space-y-2.5 pb-6">
         
         <!-- AVISO DE MODO LIVRE / VOLTA PARA CASA -->
         <template x-if="entregaNavegacao && entregaNavegacao.is_gps_livre">
@@ -1325,7 +1337,7 @@
     </div>
   </div>
 
-  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE COM NÚMERO EXATO + UPLOAD NO CENTRO + ZAP EMBAIXO) -->
+  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE COM NÚMERO EXATO + ESTRATÉGIA + UPLOAD + ZAP) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 sm:p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
       
@@ -1428,6 +1440,25 @@
           <button @click="copiarPartidaParaChegada()" class="text-[10px] text-orange-400 hover:underline font-bold block pt-0.5">
             ↺ Voltar para o mesmo local de partida (CD)
           </button>
+
+          <!-- SELETOR DO SENTIDO DA ROTA (MAIS LONGE -> CASA vs CONTÍNUO CD -> CASA) -->
+          <div class="pt-2 border-t border-gray-800/80 space-y-1.5">
+            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Sentido da Otimização:</span>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" @click="selecionarEstrategiaRota('mais_longe_casa')"
+                      class="p-2.5 rounded-xl border text-left transition active:scale-95"
+                      :class="estrategiaRota === 'mais_longe_casa' ? 'bg-orange-600/20 border-orange-500 text-white shadow-md' : 'bg-black border-gray-800 text-gray-400'">
+                <span class="text-[11px] font-black block">🚀 Mais Longe ➔ Casa</span>
+                <span class="text-[9px] leading-tight block opacity-80 mt-0.5">Vai pro fim e volta varrendo sentido casa</span>
+              </button>
+              <button type="button" @click="selecionarEstrategiaRota('padrao_cd')"
+                      class="p-2.5 rounded-xl border text-left transition active:scale-95"
+                      :class="estrategiaRota === 'padrao_cd' ? 'bg-cyan-600/20 border-cyan-500 text-white shadow-md' : 'bg-black border-gray-800 text-gray-400'">
+                <span class="text-[11px] font-black block">🔄 Contínuo CD ➔ Casa</span>
+                <span class="text-[9px] leading-tight block opacity-80 mt-0.5">Laço padrão partindo direto do galpão</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1493,9 +1524,13 @@
             <span class="text-orange-400 font-bold uppercase text-[10px]">📍 Partida:</span>
             <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoPartidaTexto || 'Galpão / Início'"></span>
           </div>
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between border-b border-gray-800/80 pb-1.5">
             <span class="text-emerald-400 font-bold uppercase text-[10px]">🏠 Retorno:</span>
             <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoChegadaTexto || 'Residência / Final'"></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-cyan-400 font-bold uppercase text-[10px]">🧭 Sentido:</span>
+            <span class="text-white font-bold text-[11px]" x-text="estrategiaRota === 'mais_longe_casa' ? '🚀 Mais Longe ➔ Casa' : '🔄 Contínuo CD ➔ Casa'"></span>
           </div>
         </div>
 
@@ -1799,7 +1834,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🚗</div>
           <h3 class="text-2xl font-black text-white">Cockpit da Rua & Radares</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Na aba Rua, você vê a entrega atual. O app avisa radares na sua via sem alarmes falsos e vibra se o mesmo cliente tiver 2 ou 3 pacotes juntos!</p>
+          <p class="text-xs text-gray-300 leading-relaxed">Na aba Rua, deslize pro lado para trocar rapidamente de Canetão! O app avisa radares na sua via sem alarmes falsos e vibra se tiver múltiplos pacotes juntos.</p>
         </div>
       </template>
 
