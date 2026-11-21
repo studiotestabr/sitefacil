@@ -1,5 +1,6 @@
 /* ==========================================================================
-   SPXrotas Pro v3.0.0 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v3.1.0 - Núcleo Mestre Reativo Oficial
+   Isolamento Estrito por Usuário (filter user_created + trava de dono),
    Interpolação Métrica de Número Predial, Volumosos com Voz, Radares Otimizados,
    Pinagem Inteligente em 3 Camadas, GPS Pós-Rota (Casa & Modo Waze Livre),
    Swipe Lateral na Aba Rua, Estratégia Mais Longe -> Casa, Economia de Bateria,
@@ -1887,8 +1888,21 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // INICIALIZAÇÃO DO APP
+    // INICIALIZAÇÃO DO APP (COM ISOLAMENTO ESTRITO DE USUÁRIO)
     // =========================================================================
+    limparCachesRotaLocal() {
+      this.rotaAtivaId = null;
+      this.entregas = [];
+      this.rotaGeometria = null;
+      this.rotasHistorico = [];
+      this.idsConferidos.clear();
+      this.entregaSelecionadaId = null;
+      localStorage.removeItem('spxrotas_rota_ativa_id');
+      localStorage.removeItem('spxrotas_entregas_cache');
+      localStorage.removeItem('spxrotas_rota_geometria');
+      localStorage.removeItem('spxrotas_rotas_historico_cache');
+    },
+
     async init() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
@@ -1926,6 +1940,15 @@ function spxRotasApp() {
       await this.verificarAutenticacao();
 
       if (this.usuarioLogado) {
+        // Se outro usuário logou no mesmo dispositivo, limpa cache local da conta anterior
+        const ultimoUserId = localStorage.getItem('spxrotas_ultimo_user_id');
+        if (this.usuarioId && ultimoUserId && String(ultimoUserId) !== String(this.usuarioId)) {
+          this.limparCachesRotaLocal();
+        }
+        if (this.usuarioId) {
+          localStorage.setItem('spxrotas_ultimo_user_id', String(this.usuarioId));
+        }
+
         await this.sincronizarAssinaturaSaaS();
         if (this.rotaAtivaId) {
           await this.carregarEntregasPorId(this.rotaAtivaId);
@@ -2052,7 +2075,6 @@ function spxRotasApp() {
       const cLat = refLat || this.ultimaLatCarro || this.entregaNavegacao?.latitude;
       const cLng = refLng || this.ultimaLngCarro || this.entregaNavegacao?.longitude;
 
-      // Só recalcula os pinos próximos se moveu > 800m (poupa muita bateria e CPU)
       if (cLat && cLng && this._ultimoRadaresRenderLat && this._ultimoRadaresRenderLng) {
         const distDesdeUltimo = this.calcularDistancia(this._ultimoRadaresRenderLat, this._ultimoRadaresRenderLng, cLat, cLng);
         if (distDesdeUltimo < 800 && this.marcadoresRadaresGL.length > 0) {
@@ -2070,7 +2092,6 @@ function spxRotasApp() {
       this._ultimoRadaresRenderLat = cLat;
       this._ultimoRadaresRenderLng = cLng;
 
-      // Filtra apenas os radares num raio de ~3 km (~0.028 graus) e limita a 25 marcadores DOM para fluidez máxima
       let candidatos = [];
       for (const r of this.listaRadares) {
         const lat = Number(r.latitude);
@@ -2192,7 +2213,6 @@ function spxRotasApp() {
         const rLat = Number(r.latitude);
         const rLng = Number(r.longitude);
 
-        // Pré-filtro instantâneo (~450m) antes de rodar trigonometria (economia extrema de CPU/bateria)
         if (Math.abs(lat - rLat) > 0.0045 || Math.abs(lng - rLng) > 0.0045) continue;
 
         const dist = this.calcularDistancia(lat, lng, rLat, rLng);
@@ -3083,7 +3103,6 @@ function spxRotasApp() {
       this.renderizarRadaresNaPistaGL(lat, lng);
       this.atualizarMarcadorCarroGL(lat, lng);
 
-      // Câmera inteligente: só anima GPU quando o carro anda >= 2m ou gira >= 4° (economiza muita bateria parado!)
       if (!this.mapaArrastadoPeloUsuario) {
         const distCam = (this._ultimaCamLat && this._ultimaCamLng)
           ? this.calcularDistancia(this._ultimaCamLat, this._ultimaCamLng, lat, lng)
@@ -3333,11 +3352,12 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // ROTAS, HISTÓRICO E BLINDAGEM DE MERGE (FIM DO RESET DE ENTREGAS)
+    // ROTAS, HISTÓRICO & ISOLAMENTO ESTRITO POR USUÁRIO (FIM DA MISTURA)
     // =========================================================================
     async carregarUltimaRota() {
+      if (!this.usuarioId) return;
       try {
-        const resRota = await this.fetchDirectus('/items/rotas?sort=-id&limit=1');
+        const resRota = await this.fetchDirectus(`/items/rotas?filter[user_created][_eq]=${encodeURIComponent(this.usuarioId)}&sort=-id&limit=1`);
         if (resRota && resRota.ok) {
           const dataRota = await resRota.json();
           if (dataRota.data && dataRota.data.length > 0) {
@@ -3345,14 +3365,12 @@ function spxRotasApp() {
             await this.carregarEntregasPorId(this.rotaAtivaId);
             this.carregarTelemetriaLocal();
           } else {
-            if (!this.entregas || this.entregas.length === 0) {
-              this.rotaAtivaId = null;
-              this.entregas = [];
-              this.rotaGeometria = null;
-              localStorage.removeItem('spxrotas_rota_ativa_id');
-              localStorage.removeItem('spxrotas_entregas_cache');
-              localStorage.removeItem('spxrotas_rota_geometria');
-            }
+            this.rotaAtivaId = null;
+            this.entregas = [];
+            this.rotaGeometria = null;
+            localStorage.removeItem('spxrotas_rota_ativa_id');
+            localStorage.removeItem('spxrotas_entregas_cache');
+            localStorage.removeItem('spxrotas_rota_geometria');
           }
         }
       } catch (e) {
@@ -3364,12 +3382,22 @@ function spxRotasApp() {
       this.carregarConferidosLocal();
 
       try {
-        const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&sort=ordem_entrega&limit=500`);
+        const resR = await this.fetchDirectus(`/items/rotas/${rotaId}`);
+        if (!resR || !resR.ok) return;
+        const dataR = await resR.json();
+
+        // SEGURANÇA ABSOLUTA: Bloqueia se a rota no banco pertencer a outro usuário (protege até Admin!)
+        if (dataR?.data?.user_created && this.usuarioId && String(dataR.data.user_created) !== String(this.usuarioId)) {
+          console.warn('[SPXrotas] Rota de outro usuário ignorada com segurança:', rotaId);
+          this.limparCachesRotaLocal();
+          await this.carregarUltimaRota();
+          return;
+        }
+
+        const filtroUser = this.usuarioId ? `&filter[user_created][_eq]=${encodeURIComponent(this.usuarioId)}` : '';
+        const res = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}${filtroUser}&sort=ordem_entrega&limit=500`);
         if (!res || !res.ok) return;
         const data = await res.json();
-
-        const resR = await this.fetchDirectus(`/items/rotas/${rotaId}`);
-        const dataR = (resR && resR.ok) ? await resR.json() : {};
 
         if (data.data && data.data.length > 0) {
           const entregasServidor = data.data;
@@ -3466,8 +3494,9 @@ function spxRotasApp() {
 
     async abrirHistorico() {
       this.modo = 'historico';
+      if (!this.usuarioId) return;
       try {
-        const resRota = await this.fetchDirectus('/items/rotas?sort=-id&limit=30');
+        const resRota = await this.fetchDirectus(`/items/rotas?filter[user_created][_eq]=${encodeURIComponent(this.usuarioId)}&sort=-id&limit=30`);
         if (resRota && resRota.ok) {
           const dataRota = await resRota.json();
           this.rotasHistorico = dataRota.data || [];
@@ -3488,9 +3517,20 @@ function spxRotasApp() {
     },
 
     async apagarRota(rotaId) {
-      if (!confirm(`Deseja apagar a Rota #${rotaId} e todos os seus pacotes do banco?`)) return;
+      if (!confirm(`Deseja apagar a Rota #${rotaId} e todos os seus pacotes?`)) return;
       try {
-        const resEntregas = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}&fields=id&limit=500`);
+        // Verifica se a rota realmente pertence ao usuário logado antes de apagar
+        const resCheck = await this.fetchDirectus(`/items/rotas/${rotaId}`);
+        if (resCheck && resCheck.ok) {
+          const dCheck = await resCheck.json();
+          if (dCheck?.data?.user_created && this.usuarioId && String(dCheck.data.user_created) !== String(this.usuarioId)) {
+            alert('⚠️ Ação bloqueada: esta rota pertence a outro usuário.');
+            return;
+          }
+        }
+
+        const filtroUser = this.usuarioId ? `&filter[user_created][_eq]=${encodeURIComponent(this.usuarioId)}` : '';
+        const resEntregas = await this.fetchDirectus(`/items/entregas?filter[rota_id][_eq]=${rotaId}${filtroUser}&fields=id&limit=500`);
         if (resEntregas && resEntregas.ok) {
           const dataEntregas = await resEntregas.json();
           const ids = (dataEntregas.data || []).map(e => e.id);
@@ -3735,7 +3775,7 @@ function spxRotasApp() {
 
         if (this.codigoATExtraido) {
           try {
-            const filtroUser = this.usuarioId ? `&filter[user_created][_eq]=${this.usuarioId}` : '';
+            const filtroUser = this.usuarioId ? `&filter[user_created][_eq]=${encodeURIComponent(this.usuarioId)}` : '';
             const resDup = await this.fetchDirectus(`/items/rotas?filter[codigo_at][_eq]=${encodeURIComponent(this.codigoATExtraido)}${filtroUser}&sort=-id&limit=1`);
             if (resDup && resDup.ok) {
               const dataDup = await resDup.json();
@@ -3776,6 +3816,8 @@ function spxRotasApp() {
           codigo_at: this.codigoATExtraido || null,
           estrategia_rota: this.estrategiaRota || 'mais_longe_casa',
           user_id: this.usuarioId,
+          nome_motorista: this.usuarioNome || null,
+          telefone_motorista: this.inputTelefone || null,
           cd_lat: coordPartida ? coordPartida.latitude : (this.pacotesExtraidos[0]?.latitude || -24.1667),
           cd_lng: coordPartida ? coordPartida.longitude : (this.pacotesExtraidos[0]?.longitude || -46.7800),
           casa_lat: coordChegada ? coordChegada.latitude : (coordPartida ? coordPartida.latitude : -24.1739),
@@ -4169,11 +4211,9 @@ function spxRotasApp() {
       localStorage.removeItem('directus_refresh_token');
       localStorage.removeItem('spxrotas_usuario_cache');
       localStorage.removeItem('spxrotas_saas_cache');
-      localStorage.removeItem('spxrotas_rota_ativa_id');
-      localStorage.removeItem('spxrotas_entregas_cache');
-      localStorage.removeItem('spxrotas_rota_geometria');
+      localStorage.removeItem('spxrotas_ultimo_user_id');
+      this.limparCachesRotaLocal();
       this.tokenAcesso = null; this.usuarioId = null; this.usuarioLogado = false;
-      this.entregas = []; this.rotaAtivaId = null;
       try {
         await fetch(`${this.DIRECTUS_URL}/auth/logout`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mode: 'session' })

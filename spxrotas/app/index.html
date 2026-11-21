@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SPXrotas - Rotas Inteligentes Shopee Express</title>
   
-  <meta name="description" content="O super app do entregador da Shopee Express (SPX). Rota pronta no WhatsApp, Bipador de sacolas com voz, Alerta de Radares e Navegador 3D.">
+  <meta name="description" content="O super app do entregador da Shopee Express (SPX). Otimização de rotas, Bipador de sacolas com voz, Controle de Volumosos, Alerta de Radares e Navegador 3D.">
   <meta name="theme-color" content="#ea580c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.8.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.9.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Módulo Dedicado de Relatórios e Custos SPXrotas -->
-  <script src="./js/relatorio.js?v=8.8.0"></script>
+  <script src="./js/relatorio.js?v=8.9.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.8.0"></script>
+  <script src="./js/app.js?v=8.9.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -148,7 +148,7 @@
         </p>
       </div>
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
-        <div class="flex items-center gap-2"><span class="text-emerald-400">💬</span><span><strong>Zap das Rotas:</strong> Envie o romaneio no WhatsApp e abra pronta</span></div>
+        <div class="flex items-center gap-2"><span class="text-emerald-400">⚡</span><span><strong>Importação Direta:</strong> Suba o .xlsx em 2s e edite a ordem com o dedo</span></div>
         <div class="flex items-center gap-2"><span class="text-amber-400">📸</span><span><strong>Bipador com Voz:</strong> Aponte a câmera e ouça o Canetão e a Sacola</span></div>
         <div class="flex items-center gap-2"><span class="text-orange-400">📦</span><span><strong>Módulo Volumosos:</strong> Guarde caixas grandes com aviso no GPS</span></div>
         <div class="flex items-center gap-2"><span class="text-red-400">📷</span><span><strong>40 Mil Radares:</strong> Alerta sonoro sem alarmes falsos de rodovia</span></div>
@@ -1337,7 +1337,7 @@
     </div>
   </div>
 
-  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE COM NÚMERO EXATO + ESTRATÉGIA + UPLOAD + ZAP) -->
+  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE COM NÚMERO EXATO + ESTRATÉGIA + UPLOAD .XLSX) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 sm:p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
       
@@ -1462,14 +1462,14 @@
         </div>
       </div>
 
-      <!-- 2º PASSO (CENTRO): SUBIR O ARQUIVO .XLSX DIRETO NO APP -->
+      <!-- 2º PASSO: SUBIR O ARQUIVO .XLSX DIRETO NO APP -->
       <div class="space-y-2 bg-gray-950 p-4 rounded-2xl border-2 transition-all"
            :class="temPartidaEChegadaValida ? 'border-orange-500/70 shadow-lg' : 'border-gray-800 opacity-50 pointer-events-none'">
         <div class="flex items-center justify-between">
           <span class="text-[10px] font-black uppercase tracking-wider block" :class="temPartidaEChegadaValida ? 'text-orange-400' : 'text-gray-500'">
             2º PASSO: IMPORTAR ROMANEIO (.XLSX)
           </span>
-          <span class="text-[9px] text-gray-400 font-bold">Arquivo do Celular</span>
+          <span class="text-[9px] text-gray-400 font-bold">Pasta Downloads / Celular</span>
         </div>
 
         <label class="block border-2 border-dashed border-orange-500/60 bg-orange-500/5 rounded-2xl p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-500/10 active:scale-[0.99] transition">
@@ -1478,28 +1478,6 @@
           <span class="text-[10px] text-gray-400 block mt-0.5">Formatos aceitos: .xlsx, .xls, .csv</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcelComValidacao($event)" class="hidden">
         </label>
-      </div>
-
-      <!-- 3º PASSO (EMBAIXO): O ZAP DAS ROTAS (WHATSAPP) -->
-      <div class="bg-gradient-to-r from-emerald-950/40 via-gray-950 to-gray-950 border-2 rounded-2xl p-4 space-y-2.5 shadow-md transition-all"
-           :class="temPartidaEChegadaValida ? 'border-emerald-500/70 opacity-100' : 'border-gray-800 opacity-50 pointer-events-none'">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="text-2xl">💬</span>
-            <div>
-              <h4 class="text-sm font-black text-white leading-tight">Ou envie via Zap das Rotas</h4>
-              <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider">Zero pastas do Android</span>
-            </div>
-          </div>
-        </div>
-        <p class="text-[11px] text-gray-300 leading-snug">
-          Mande a planilha no WhatsApp do SPXrotas. O robô calcula usando sua partida e chegada acima e abre pronta!
-        </p>
-        <a :href="`https://wa.me/5513988082105?text=${encodeURIComponent('Oi SPXrotas! Segue meu romaneio da Shopee para calcular a rota:')}`" 
-           target="_blank" 
-           class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider text-center block shadow-md active:scale-95 transition">
-          📲 Enviar Romaneio no WhatsApp Oficial
-        </a>
       </div>
 
     </div>
@@ -1734,7 +1712,7 @@
           <input type="text" x-model="inputNome" placeholder="Seu nome e sobrenome" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
         </div>
         <div>
-          <label class="text-[10px] text-gray-300 font-bold block mb-1">WhatsApp com DDD (Zap das Rotas) *</label>
+          <label class="text-[10px] text-gray-300 font-bold block mb-1">WhatsApp com DDD *</label>
           <input type="tel" x-model="inputTelefone" placeholder="Ex: 11999999999" maxlength="15" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
         </div>
         <div>
@@ -1798,16 +1776,16 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📍</div>
           <h3 class="text-2xl font-black text-white">Partida e Retorno</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">No modal de rota, informe onde você carrega (o CD) e para onde volta no final do dia. O motor viário calcula o menor caminho sem retornos!</p>
+          <p class="text-xs text-gray-300 leading-relaxed">No modal de rota, informe onde você carrega (o CD) e para onde volta no final do dia. Escolha o modo "Mais Longe ➔ Casa" para não repetir bairros!</p>
         </div>
       </template>
 
-      <!-- Passo 3: O Zap das Rotas -->
+      <!-- Passo 3: Importar Romaneio -->
       <template x-if="passoTutorial === 3">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">💬</div>
-          <h3 class="text-2xl font-black text-white">O Zap das Rotas</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Não precisa caçar arquivos na pasta Downloads do Android! No app da Shopee, escolha Compartilhar no WhatsApp do SPXrotas e a rota abre pronta!</p>
+          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📊</div>
+          <h3 class="text-2xl font-black text-white">Importar Romaneio (.XLSX)</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Baixe a planilha da Shopee no celular, toque em <strong>Rota</strong> e escolha o arquivo .xlsx na pasta Downloads (ou use "Compartilhar com SPXrotas" direto no Android)!</p>
         </div>
       </template>
 
