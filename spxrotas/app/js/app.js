@@ -1,10 +1,9 @@
 /* ==========================================================================
-   SPXrotas Pro v2.9.0 - Núcleo Mestre Reativo Oficial
-   Interpolação Métrica de Número Predial (Padrão Waze/Uber), Módulo Volumosos com Voz,
-   Radares Blindados com Cache Offline, Pinagem Inteligente em 3 Camadas,
-   GPS Pós-Rota (Casa & Modo Waze Livre), Status Conferido no Banco,
-   Reordenação Fluida por Toque, Trava Anti-Duplicidade por AT ID, Telemetria na Nuvem
-   & Blindagem de Sessão Offline (Anti-Error 1033 Cloudflare Tunnel)
+   SPXrotas Pro v3.0.0 - Núcleo Mestre Reativo Oficial
+   Interpolação Métrica de Número Predial, Volumosos com Voz, Radares Otimizados,
+   Pinagem Inteligente em 3 Camadas, GPS Pós-Rota (Casa & Modo Waze Livre),
+   Swipe Lateral na Aba Rua, Estratégia Mais Longe -> Casa, Economia de Bateria,
+   Status Conferido no Banco, Reordenação por Toque, Trava AT ID & Sessão Blindada
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -19,6 +18,7 @@ function spxRotasApp() {
     tema: localStorage.getItem('spxrotas_tema') || 'escuro',
     modo: 'carregamento', // 'carregamento' | 'rua' | 'mapa' | 'historico' | 'navegacao' | 'bipador'
     appNavegacaoEscolhido: localStorage.getItem('spxrotas_nav_app') || 'spxrotas',
+    estrategiaRota: localStorage.getItem('spxrotas_estrategia_rota') || 'mais_longe_casa', // 'mais_longe_casa' | 'padrao_cd'
 
     // 3. ESTADOS DE INTERFACE E MODAIS
     menuAberto: false,
@@ -43,6 +43,12 @@ function spxRotasApp() {
     sugestoesDestinoLivre: [],
     buscandoSugestoesLivre: false,
     coordDestinoLivreSalva: null,
+
+    // Swipe Lateral na Aba Rua (#1 <-> #2 <-> #3)
+    ruaSwipeInicioX: 0,
+    ruaSwipeInicioY: 0,
+    ruaSwipeDeltaX: 0,
+    ruaSwipeAtivo: false,
 
     // Toast Flutuante Não-Bloqueante
     toastMensagem: '',
@@ -138,12 +144,17 @@ function spxRotasApp() {
     grupoMarcadores: null,
     linhaTrajeto: null,
 
-    // 8. NAVEGADOR 3D NATIVO (WAZE MAPLIBRE GL COM MEMÓRIA DE RUMO)
+    // 8. NAVEGADOR 3D NATIVO (WAZE MAPLIBRE GL COM ECONOMIA DE BATERIA)
     entregaNavegacao: null,
     mapaNavGL: null,
     marcadorCarroGL: null,
     marcadorDestinoGL: null,
     marcadoresRadaresGL: [],
+    _ultimoRadaresRenderLat: null,
+    _ultimoRadaresRenderLng: null,
+    _ultimaCamLat: null,
+    _ultimaCamLng: null,
+    _ultimaCamBearing: null,
     watchPositionId: null,
     instrucaoAtual: 'Calculando melhor trajeto...',
     distanciaProximaManobra: '',
@@ -215,6 +226,88 @@ function spxRotasApp() {
     isStandalone: false,
     isIOS: false,
     isMobile: false,
+
+    // =========================================================================
+    // ESTRATÉGIA DE ROTEIRIZAÇÃO & SWIPE LATERAL NA ABA RUA
+    // =========================================================================
+    selecionarEstrategiaRota(tipo) {
+      this.estrategiaRota = tipo;
+      localStorage.setItem('spxrotas_estrategia_rota', tipo);
+      if ('vibrate' in navigator) navigator.vibrate(25);
+    },
+
+    get naoEntreguesOrdenados() {
+      return [...this.naoEntregues].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
+    },
+
+    get indiceEntregaAtualNaRua() {
+      const lista = this.naoEntreguesOrdenados;
+      if (!this.entregaAtual || lista.length === 0) return -1;
+      return lista.findIndex(e => String(e.id) === String(this.entregaAtual.id));
+    },
+
+    navegarPacoteRua(direcao) {
+      const lista = this.naoEntreguesOrdenados;
+      if (!lista || lista.length <= 1) return;
+      const idxAtual = this.indiceEntregaAtualNaRua;
+      if (idxAtual === -1) return;
+
+      const novoIdx = idxAtual + direcao;
+      if (novoIdx < 0) {
+        this.mostrarToast('Você já está no 1º pacote restante!', 1500);
+        return;
+      }
+      if (novoIdx >= lista.length) {
+        this.mostrarToast('Você já está no último pacote restante!', 1500);
+        return;
+      }
+
+      this.entregaSelecionadaId = lista[novoIdx].id;
+      if ('vibrate' in navigator) navigator.vibrate(25);
+    },
+
+    iniciarSwipeRua(event) {
+      if (event.target && event.target.closest('button, a, input, select, textarea')) return;
+      const t = event.touches && event.touches.length > 0 ? event.touches[0] : event;
+      this.ruaSwipeInicioX = t.clientX;
+      this.ruaSwipeInicioY = t.clientY;
+      this.ruaSwipeDeltaX = 0;
+      this.ruaSwipeAtivo = true;
+    },
+
+    moverSwipeRua(event) {
+      if (!this.ruaSwipeAtivo) return;
+      const t = event.touches && event.touches.length > 0 ? event.touches[0] : event;
+      const dx = t.clientX - this.ruaSwipeInicioX;
+      const dy = t.clientY - this.ruaSwipeInicioY;
+
+      if (Math.abs(dx) > 15 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        this.ruaSwipeDeltaX = Math.max(-70, Math.min(70, dx * 0.45));
+      } else if (Math.abs(dy) > 20 && Math.abs(dy) > Math.abs(dx)) {
+        this.ruaSwipeAtivo = false;
+        this.ruaSwipeDeltaX = 0;
+      }
+    },
+
+    finalizarSwipeRua(event) {
+      if (!this.ruaSwipeAtivo) {
+        this.ruaSwipeDeltaX = 0;
+        return;
+      }
+      const t = (event.changedTouches && event.changedTouches.length > 0) ? event.changedTouches[0] : event;
+      const dx = t.clientX - this.ruaSwipeInicioX;
+      const dy = t.clientY - this.ruaSwipeInicioY;
+      this.ruaSwipeAtivo = false;
+      this.ruaSwipeDeltaX = 0;
+
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        if (dx < 0) {
+          this.navegarPacoteRua(1);
+        } else {
+          this.navegarPacoteRua(-1);
+        }
+      }
+    },
 
     // =========================================================================
     // TOAST NÃO-BLOQUEANTE & REORDENAÇÃO FLUIDA DE CARDS NA ABA SACOLAS
@@ -1878,7 +1971,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // MOTOR DE RADARES BLINDADO COM CACHE OFFLINE & CALIBRAÇÃO DE CHÁCARAS
+    // MOTOR DE RADARES BLINDADO & ECONÔMICO (RAIO DE 3KM, ZERO LAG WEBGL)
     // =========================================================================
     carregarRadaresDoCacheOffline() {
       const cacheRadares = localStorage.getItem('spxrotas_radares_cache');
@@ -1943,7 +2036,8 @@ function spxRotasApp() {
             localStorage.setItem('spxrotas_radares_cache', JSON.stringify(this.listaRadares));
 
             if (this.modo === 'navegacao' && this.mapaNavGL) {
-              this.renderizarRadaresNaPistaGL();
+              this._ultimoRadaresRenderLat = null;
+              this.renderizarRadaresNaPistaGL(this.ultimaLatCarro, this.ultimaLngCarro);
             }
           }
         }
@@ -1952,8 +2046,19 @@ function spxRotasApp() {
       }
     },
 
-    renderizarRadaresNaPistaGL() {
+    renderizarRadaresNaPistaGL(refLat = null, refLng = null) {
       if (!this.mapaNavGL) return;
+
+      const cLat = refLat || this.ultimaLatCarro || this.entregaNavegacao?.latitude;
+      const cLng = refLng || this.ultimaLngCarro || this.entregaNavegacao?.longitude;
+
+      // Só recalcula os pinos próximos se moveu > 800m (poupa muita bateria e CPU)
+      if (cLat && cLng && this._ultimoRadaresRenderLat && this._ultimoRadaresRenderLng) {
+        const distDesdeUltimo = this.calcularDistancia(this._ultimoRadaresRenderLat, this._ultimoRadaresRenderLng, cLat, cLng);
+        if (distDesdeUltimo < 800 && this.marcadoresRadaresGL.length > 0) {
+          return;
+        }
+      }
 
       if (this.marcadoresRadaresGL && this.marcadoresRadaresGL.length > 0) {
         this.marcadoresRadaresGL.forEach(m => m.remove());
@@ -1962,10 +2067,32 @@ function spxRotasApp() {
 
       if (!this.listaRadares || this.listaRadares.length === 0) return;
 
-      this.listaRadares.forEach(r => {
+      this._ultimoRadaresRenderLat = cLat;
+      this._ultimoRadaresRenderLng = cLng;
+
+      // Filtra apenas os radares num raio de ~3 km (~0.028 graus) e limita a 25 marcadores DOM para fluidez máxima
+      let candidatos = [];
+      for (const r of this.listaRadares) {
         const lat = Number(r.latitude);
         const lng = Number(r.longitude);
-        if (!lat || !lng || isNaN(lat) || isNaN(lng)) return;
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) continue;
+        if (cLat && cLng) {
+          if (Math.abs(lat - cLat) > 0.028 || Math.abs(lng - cLng) > 0.028) continue;
+          const d = (lat - cLat) * (lat - cLat) + (lng - cLng) * (lng - cLng);
+          candidatos.push({ r, d });
+        } else {
+          candidatos.push({ r, d: 0 });
+          if (candidatos.length >= 25) break;
+        }
+      }
+
+      if (cLat && cLng) {
+        candidatos.sort((a, b) => a.d - b.d);
+      }
+
+      candidatos.slice(0, 25).forEach(({ r }) => {
+        const lat = Number(r.latitude);
+        const lng = Number(r.longitude);
 
         const el = document.createElement('div');
         el.className = 'radar-pino-pista';
@@ -2064,6 +2191,10 @@ function spxRotasApp() {
       for (const r of this.listaRadares) {
         const rLat = Number(r.latitude);
         const rLng = Number(r.longitude);
+
+        // Pré-filtro instantâneo (~450m) antes de rodar trigonometria (economia extrema de CPU/bateria)
+        if (Math.abs(lat - rLat) > 0.0045 || Math.abs(lng - rLng) > 0.0045) continue;
+
         const dist = this.calcularDistancia(lat, lng, rLat, rLng);
 
         if (dist <= 350 && dist < menorDistancia) {
@@ -2473,6 +2604,11 @@ function spxRotasApp() {
         this.iniciarTelemetriaSeNecessario();
       }
       this._ultimoTickMovimentoMs = Date.now();
+      this._ultimaCamLat = null;
+      this._ultimaCamLng = null;
+      this._ultimaCamBearing = null;
+      this._ultimoRadaresRenderLat = null;
+      this._ultimoRadaresRenderLng = null;
 
       this.entregaNavegacao = entrega;
       this.modo = 'navegacao';
@@ -2606,7 +2742,7 @@ function spxRotasApp() {
           });
         }
 
-        this.renderizarRadaresNaPistaGL();
+        this.renderizarRadaresNaPistaGL(entrega.latitude, entrega.longitude);
         this.iniciarGPSContinuoNavegacao();
       });
     },
@@ -2624,10 +2760,14 @@ function spxRotasApp() {
           this.carregarRadaresDoBanco();
         }
 
+        this.renderizarRadaresNaPistaGL(sLat, sLng);
         this.atualizarMarcadorCarroGL(sLat, sLng);
 
         const bearingPartida = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : this.headingAtual;
         this.headingAtual = bearingPartida;
+        this._ultimaCamLat = sLat;
+        this._ultimaCamLng = sLng;
+        this._ultimaCamBearing = bearingPartida;
         this.centralizarNoCarroGL(sLat, sLng, bearingPartida, 0);
 
         if (this.entregaNavegacao.is_sem_destino) {
@@ -2856,8 +2996,12 @@ function spxRotasApp() {
 
     centralizarCarroManual() {
       this.mapaArrastadoPeloUsuario = false;
+      this._ultimaCamLat = null;
       if (this.timeoutRecentralizar) clearTimeout(this.timeoutRecentralizar);
       if (this.ultimaLatCarro && this.ultimaLngCarro) {
+        this._ultimaCamLat = this.ultimaLatCarro;
+        this._ultimaCamLng = this.ultimaLngCarro;
+        this._ultimaCamBearing = this.headingAtual;
         this.centralizarNoCarroGL(this.ultimaLatCarro, this.ultimaLngCarro, this.headingAtual, 400);
       }
     },
@@ -2936,10 +3080,23 @@ function spxRotasApp() {
       }
 
       this.verificarRadaresProximos(lat, lng, this.headingAtual);
+      this.renderizarRadaresNaPistaGL(lat, lng);
       this.atualizarMarcadorCarroGL(lat, lng);
 
+      // Câmera inteligente: só anima GPU quando o carro anda >= 2m ou gira >= 4° (economiza muita bateria parado!)
       if (!this.mapaArrastadoPeloUsuario) {
-        this.centralizarNoCarroGL(lat, lng, this.headingAtual, 900);
+        const distCam = (this._ultimaCamLat && this._ultimaCamLng)
+          ? this.calcularDistancia(this._ultimaCamLat, this._ultimaCamLng, lat, lng)
+          : 999;
+        let diffCamHeading = Math.abs((this._ultimaCamBearing || 0) - this.headingAtual);
+        if (diffCamHeading > 180) diffCamHeading = 360 - diffCamHeading;
+
+        if (distCam >= 2.0 || diffCamHeading >= 4) {
+          this._ultimaCamLat = lat;
+          this._ultimaCamLng = lng;
+          this._ultimaCamBearing = this.headingAtual;
+          this.centralizarNoCarroGL(lat, lng, this.headingAtual, 850);
+        }
       }
 
       this.ultimaLatCarro = lat;
@@ -3144,6 +3301,11 @@ function spxRotasApp() {
         this.watchPositionId = null;
       }
       this._ultimoTickMovimentoMs = null;
+      this._ultimaCamLat = null;
+      this._ultimaCamLng = null;
+      this._ultimaCamBearing = null;
+      this._ultimoRadaresRenderLat = null;
+      this._ultimoRadaresRenderLng = null;
 
       if (!this.entregaNavegacao?.is_gps_livre) {
         this.sincronizarTelemetriaRotaBanco(true);
@@ -3612,6 +3774,7 @@ function spxRotasApp() {
         const payload = {
           entregas: this.pacotesExtraidos,
           codigo_at: this.codigoATExtraido || null,
+          estrategia_rota: this.estrategiaRota || 'mais_longe_casa',
           user_id: this.usuarioId,
           cd_lat: coordPartida ? coordPartida.latitude : (this.pacotesExtraidos[0]?.latitude || -24.1667),
           cd_lng: coordPartida ? coordPartida.longitude : (this.pacotesExtraidos[0]?.longitude || -46.7800),
@@ -3749,7 +3912,6 @@ function spxRotasApp() {
           if (d?.data?.id) { extrair(d.data); return; }
         }
 
-        // Servidor/Cloudflare fora do ar (500, 502, 503, 504, 530 Error 1033) -> NÃO desloga!
         if (res && res.status >= 500) {
           this.estaOnline = false;
           if (restaurarSessaoLocalOffline()) {
