@@ -1,7 +1,7 @@
 /* ==========================================================================
-   SPXrotas Pro v2.6.0 - Folha de Estilos Modular Oficial
+   SPXrotas Pro v2.7.0 - Folha de Estilos Modular Oficial
    Navegador 3D (Elevação Dinâmica com Volumosos), Bipador Amplo, Radares,
-   Verde Vivo Unificado & Reordenação Fluida por Toque (Sacolas)
+   Verde Vivo Unificado, Reordenação Fluida por Toque & Swipe Lateral na Rua
    Arquivo: /spxrotas/app/css/styles.css
    ========================================================================== */
 
@@ -185,20 +185,19 @@ body.theme-claro .text-amber-400 {
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.94);
+  background: rgba(15, 23, 42, 0.96);
   border: 3.5px solid #38bdf8;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .waze-speed-circle.alerta-excesso {
   border-color: #ef4444 !important;
-  background: rgba(185, 28, 28, 0.95) !important;
+  background: rgba(185, 28, 28, 0.96) !important;
   animation: pulseRadar 0.6s infinite alternate;
   box-shadow: 0 0 28px rgba(239, 68, 68, 0.95) !important;
 }
@@ -238,7 +237,6 @@ body.theme-claro .text-amber-400 {
   font-size: 23px;
   color: #ffffff;
   box-shadow: 0 8px 24px rgba(2, 132, 199, 0.65), 0 4px 10px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(6px);
   cursor: pointer;
   transition: transform 0.15s ease, background-color 0.2s ease;
 }
@@ -283,13 +281,12 @@ body.theme-claro .text-amber-400 {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.94);
+  background: rgba(15, 23, 42, 0.96);
   border: 2.5px solid #ea580c;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
   cursor: pointer;
   transition: transform 0.15s ease;
 }
@@ -307,12 +304,11 @@ body.theme-claro .text-amber-400 {
   display: flex;
   align-items: center;
   gap: 9px;
-  background: rgba(15, 23, 42, 0.96);
+  background: rgba(15, 23, 42, 0.97);
   border: 2px solid #ef4444;
   border-radius: 20px;
   padding: 6px 12px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85), 0 0 18px rgba(239, 68, 68, 0.5);
-  backdrop-filter: blur(8px);
   animation: slideDownRadar 0.3s ease-out;
 }
 
@@ -938,9 +934,52 @@ body.theme-claro .badge-verde-vivo {
   font-size: 12px;
   font-weight: 900;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(249, 115, 22, 0.4);
-  backdrop-filter: blur(8px);
   max-width: 92vw;
   text-align: center;
   pointer-events: none;
   animation: slideUpPainel 0.2s ease-out;
+}
+
+/* ==========================================================================
+   11. NAVEGAÇÃO POR SWIPE LATERAL NA ABA RUA (#1 <-> #2 <-> #3)
+   ========================================================================== */
+
+.cockpit-rua-swipe {
+  touch-action: pan-y;
+  transition: transform 0.16s ease-out, opacity 0.16s ease-out;
+}
+
+.barra-swipe-rua {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px 2px;
+}
+
+.btn-seta-rua {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  font-size: 14px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.15s ease;
+}
+
+.btn-seta-rua:active:not(:disabled) {
+  transform: scale(0.92);
+  background: #ea580c;
+  border-color: #f97316;
+}
+
+.btn-seta-rua:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
