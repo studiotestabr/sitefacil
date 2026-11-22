@@ -1,10 +1,11 @@
 /* ==========================================================================
-   SPXrotas Pro v3.1.0 - Núcleo Mestre Reativo Oficial
-   Isolamento Estrito por user_created (App + Cache), Motorista Nome/Telefone,
-   Interpolação Métrica de Número Predial, Volumosos com Voz, Radares Otimizados,
-   Pinagem Inteligente em 3 Camadas, GPS Pós-Rota (Casa & Modo Waze Livre),
-   Swipe Lateral na Aba Rua, Economia de Bateria, Status Conferido no Banco,
-   Reordenação por Toque, Trava AT ID & Sessão Blindada
+   SPXrotas Pro v3.2.0 - Núcleo Mestre Reativo Oficial
+   GPS Ao Vivo da Frota (telemetria.gps_ao_vivo), Isolamento Estrito por
+   user_created (App + Cache), Motorista Nome/Telefone, Interpolação Métrica
+   de Número Predial, Volumosos com Voz, Radares Otimizados, Pinagem Inteligente
+   em 3 Camadas, GPS Pós-Rota (Casa & Modo Waze Livre), Swipe Lateral na Aba Rua,
+   Economia de Bateria, Status Conferido no Banco, Reordenação por Toque,
+   Trava AT ID & Sessão Blindada
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -116,7 +117,7 @@ function spxRotasApp() {
     coordChegadaSalva: JSON.parse(localStorage.getItem('spxrotas_coord_chegada') || 'null'),
     rotaGeometria: localStorage.getItem('spxrotas_rota_geometria') || null,
 
-    // 5. CAIXA-PRETA DE TELEMETRIA REAL (GRAVAÇÃO SILENCIOSA DE AUDITORIA NO CELULAR + NUVEM)
+    // 5. CAIXA-PRETA DE TELEMETRIA REAL + GPS AO VIVO DA FROTA
     telemetria: {
       inicioTimestamp: null,
       fimTimestamp: null,
@@ -125,10 +126,13 @@ function spxRotasApp() {
       tempoDeslocamentoMs: 0,
       tempoAtendimentoMs: 0,
       momentoChegadaUltimaParada: null,
-      momentoSaidaUltimaParada: null
+      momentoSaidaUltimaParada: null,
+      gps_ao_vivo: null
     },
     _ultimoTickMovimentoMs: null,
     _ultimoSyncTelemetriaBancoMs: 0,
+    _ultimoPingGpsSilenciosoMs: 0,
+    intervaloGpsAoVivo: null,
 
     // 6. ARQUITETURA OFFLINE-FIRST & FILA DE SINCRONIZAÇÃO (SYNCQUEUE)
     estaOnline: navigator.onLine,
@@ -1004,7 +1008,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // CAIXA-PRETA DE TELEMETRIA REAL (CELULAR + SINCRONIZAÇÃO NO DIRECTUS)
+    // CAIXA-PRETA DE TELEMETRIA REAL + GPS AO VIVO DA FROTA
     // =========================================================================
     carregarTelemetriaLocal() {
       if (!this.rotaAtivaId) return;
@@ -1030,6 +1034,39 @@ function spxRotasApp() {
       } catch (e) { mapa = {}; }
       mapa[String(entregaId)] = { ...(mapa[String(entregaId)] || {}), ...dados };
       localStorage.setItem(chave, JSON.stringify(mapa));
+    },
+
+    atualizarPosicaoAoVivoTelemetria(lat, lng, velocidade = 0, heading = 0, forcarSync = false) {
+      if (!this.rotaAtivaId || !lat || !lng) return;
+      this.telemetria.gps_ao_vivo = {
+        lat: Number(lat),
+        lng: Number(lng),
+        velocidade: Number(velocidade) || 0,
+        heading: Math.round(Number(heading) || 0),
+        modo: this.modo || 'rua',
+        atualizado_em: new Date().toISOString()
+      };
+      this.salvarTelemetriaLocal();
+      this.sincronizarTelemetriaRotaBanco(forcarSync);
+    },
+
+    capturarPosicaoAoVivoSilenciosa(forcarSync = false) {
+      if (!this.usuarioLogado || !this.rotaAtivaId || !navigator.geolocation || !navigator.onLine) return;
+      const agora = Date.now();
+      if (!forcarSync && (agora - this._ultimoPingGpsSilenciosoMs < 35000)) return;
+      this._ultimoPingGpsSilenciosoMs = agora;
+
+      try {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const vel = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
+          const hdg = (pos.coords.heading !== null && !isNaN(pos.coords.heading)) ? pos.coords.heading : 0;
+          this.ultimaLatCarro = lat;
+          this.ultimaLngCarro = lng;
+          this.atualizarPosicaoAoVivoTelemetria(lat, lng, vel, hdg, forcarSync);
+        }, () => {}, { enableHighAccuracy: true, maximumAge: 15000, timeout: 4000 });
+      } catch (e) {}
     },
 
     sincronizarTelemetriaRotaBanco(forcar = false) {
@@ -1615,11 +1652,13 @@ function spxRotasApp() {
       }
 
       if (!entrega.is_sem_destino && this.appNavegacaoEscolhido === 'waze') {
+        this.capturarPosicaoAoVivoSilenciosa(true);
         window.location.href = `waze://?ll=${entrega.latitude},${entrega.longitude}&navigate=yes`;
         return;
       }
 
       if (!entrega.is_sem_destino && this.appNavegacaoEscolhido === 'maps') {
+        this.capturarPosicaoAoVivoSilenciosa(true);
         const isAndroid = /android/i.test(navigator.userAgent);
         if (isAndroid) {
           window.location.href = `google.navigation:q=${entrega.latitude},${entrega.longitude}`;
@@ -1892,7 +1931,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // INICIALIZAÇÃO DO APP (COM ISOLAMENTO DE CACHE POR USUÁRIO)
+    // INICIALIZAÇÃO DO APP (COM ISOLAMENTO DE CACHE & HEARTBEAT GPS AO VIVO)
     // =========================================================================
     limparCacheRotasLocal() {
       this.rotaAtivaId = null;
@@ -1929,6 +1968,13 @@ function spxRotasApp() {
         }
       }, 10000);
 
+      // Heartbeat leve de posição ao vivo (para quem usa o app na rua ou com Waze/Maps)
+      this.intervaloGpsAoVivo = setInterval(() => {
+        if (document.visibilityState === 'visible' && this.modo !== 'navegacao') {
+          this.capturarPosicaoAoVivoSilenciosa(false);
+        }
+      }, 45000);
+
       this.carregarRadaresDoCacheOffline();
 
       await this.verificarAutenticacao();
@@ -1937,7 +1983,6 @@ function spxRotasApp() {
         const cacheOwnerId = localStorage.getItem('spxrotas_cache_owner_id');
 
         if (cacheOwnerId && String(cacheOwnerId) !== String(this.usuarioId)) {
-          // Outra conta entrou neste aparelho: limpa completamente os dados locais da conta anterior
           this.limparCacheRotasLocal();
         } else {
           const cacheEntregas = localStorage.getItem('spxrotas_entregas_cache');
@@ -1972,6 +2017,7 @@ function spxRotasApp() {
           await this.carregarUltimaRota();
         }
         this.carregarRadaresDoBanco();
+        setTimeout(() => this.capturarPosicaoAoVivoSilenciosa(false), 3000);
       } else {
         this.limparCacheRotasLocal();
       }
@@ -1981,7 +2027,12 @@ function spxRotasApp() {
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           this.ativarWakeLock();
-          if (navigator.onLine) this.processarFilaSync();
+          if (navigator.onLine) {
+            this.processarFilaSync();
+            if (this.modo !== 'navegacao') {
+              this.capturarPosicaoAoVivoSilenciosa(false);
+            }
+          }
         }
       });
     },
@@ -2310,6 +2361,7 @@ function spxRotasApp() {
     async pularEntrega(entrega) {
       await this.atualizarStatus(entrega.id, 'ausente');
       this.entregaSelecionadaId = null;
+      this.capturarPosicaoAoVivoSilenciosa(false);
     },
 
     async concluirEntrega(entrega) {
@@ -2321,12 +2373,14 @@ function spxRotasApp() {
             await this.registrarConclusaoComTelemetria(p, 'entregue');
           }
           this.entregaSelecionadaId = null;
+          this.capturarPosicaoAoVivoSilenciosa(false);
           if ('vibrate' in navigator) navigator.vibrate([40, 30, 40]);
           return;
         }
       }
       this.entregaSelecionadaId = null;
       await this.registrarConclusaoComTelemetria(entrega, 'entregue');
+      this.capturarPosicaoAoVivoSilenciosa(false);
       if ('vibrate' in navigator) navigator.vibrate(40);
     },
 
@@ -2798,6 +2852,7 @@ function spxRotasApp() {
           this.carregarRadaresDoBanco();
         }
 
+        this.atualizarPosicaoAoVivoTelemetria(sLat, sLng, pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0, this.headingAtual, true);
         this.renderizarRadaresNaPistaGL(sLat, sLng);
         this.atualizarMarcadorCarroGL(sLat, sLng);
 
@@ -3068,7 +3123,6 @@ function spxRotasApp() {
             this.telemetria.tempoTotalMs = Math.max(1000, agoraGps - this.telemetria.inicioTimestamp);
           }
           this.salvarTelemetriaLocal();
-          this.sincronizarTelemetriaRotaBanco(false);
         }
       }
       this._ultimoTickMovimentoMs = agoraGps;
@@ -3108,6 +3162,9 @@ function spxRotasApp() {
         }
         this.headingAtual = this.smoothHeadingApp(this.headingAtual, headingAlvo, 0.45);
       }
+
+      // Atualiza localização ao vivo da frota no JSON telemetria (sem afetar odômetro se for GPS Livre)
+      this.atualizarPosicaoAoVivoTelemetria(rawLat, rawLng, this.velocidadeGPS, this.headingAtual, false);
 
       if (isSemDestino) {
         this.nomeRuaAtualCarro = 'Modo Copiloto';
@@ -3346,6 +3403,8 @@ function spxRotasApp() {
 
       if (!this.entregaNavegacao?.is_gps_livre) {
         this.sincronizarTelemetriaRotaBanco(true);
+      } else {
+        this.capturarPosicaoAoVivoSilenciosa(true);
       }
 
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -3405,7 +3464,6 @@ function spxRotasApp() {
         if (resR && resR.ok) {
           const dataR = await resR.json();
           if (dataR?.data?.user_created && String(dataR.data.user_created) !== String(this.usuarioId)) {
-            // Esta rota pertence a outro usuário: limpa e busca a última rota do usuário real
             this.rotaAtivaId = null;
             this.entregas = [];
             this.rotaGeometria = null;
@@ -3542,7 +3600,6 @@ function spxRotasApp() {
       if (!this.usuarioId || !rotaId) return;
       if (!confirm(`Deseja apagar a Rota #${rotaId} e todos os seus pacotes do banco?`)) return;
       try {
-        // Confirma propriedade da rota antes de apagar (proteção extra contra conta Admin)
         const resCheck = await this.fetchDirectus(`/items/rotas/${rotaId}?fields=id,user_created`);
         if (resCheck && resCheck.ok) {
           const dCheck = await resCheck.json();
@@ -3890,7 +3947,8 @@ function spxRotasApp() {
             tempoDeslocamentoMs: 0,
             tempoAtendimentoMs: 0,
             momentoChegadaUltimaParada: null,
-            momentoSaidaUltimaParada: null
+            momentoSaidaUltimaParada: null,
+            gps_ao_vivo: null
           };
 
           await this.sincronizarAssinaturaSaaS();
@@ -3904,6 +3962,7 @@ function spxRotasApp() {
           }
 
           this.salvarCacheLocal();
+          this.capturarPosicaoAoVivoSilenciosa(true);
           this.modo = 'carregamento';
         } else {
           alert('Erro no servidor ao calcular rota (verifique se o servidor está ligado).');
@@ -4230,6 +4289,7 @@ function spxRotasApp() {
 
     async deslogar() {
       if (this.intervaloPollingPagamento) clearInterval(this.intervaloPollingPagamento);
+      if (this.intervaloGpsAoVivo) clearInterval(this.intervaloGpsAoVivo);
       localStorage.setItem('usuario_deslogado', 'true');
       localStorage.removeItem('directus_token');
       localStorage.removeItem('directus_user_id');
