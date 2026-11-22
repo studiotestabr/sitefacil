@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SPXrotas - Rotas Inteligentes Shopee Express</title>
   
-  <meta name="description" content="O super app do entregador da Shopee Express (SPX). Rota pronta no WhatsApp, Bipador de sacolas com voz, Alerta de Radares e Navegador 3D.">
+  <meta name="description" content="O super app do entregador da Shopee Express (SPX). Importação direta do romaneio, Bipador de sacolas com voz, Alerta de Radares e Navegador 3D.">
   <meta name="theme-color" content="#ea580c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -39,7 +39,7 @@
   <script src="./js/relatorio.js?v=8.8.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=8.8.0"></script>
+  <script src="./js/app.js?v=8.9.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -148,7 +148,7 @@
         </p>
       </div>
       <div class="bg-gray-950/80 border border-gray-800/80 rounded-2xl p-3.5 space-y-2 text-left text-xs text-gray-300">
-        <div class="flex items-center gap-2"><span class="text-emerald-400">💬</span><span><strong>Zap das Rotas:</strong> Envie o romaneio no WhatsApp e abra pronta</span></div>
+        <div class="flex items-center gap-2"><span class="text-emerald-400">⚡</span><span><strong>Rota Inteligente:</strong> Importe seu romaneio da Shopee em 2 segundos</span></div>
         <div class="flex items-center gap-2"><span class="text-amber-400">📸</span><span><strong>Bipador com Voz:</strong> Aponte a câmera e ouça o Canetão e a Sacola</span></div>
         <div class="flex items-center gap-2"><span class="text-orange-400">📦</span><span><strong>Módulo Volumosos:</strong> Guarde caixas grandes com aviso no GPS</span></div>
         <div class="flex items-center gap-2"><span class="text-red-400">📷</span><span><strong>40 Mil Radares:</strong> Alerta sonoro sem alarmes falsos de rodovia</span></div>
@@ -921,7 +921,7 @@
         <!-- AVISO DE MODO LIVRE / VOLTA PARA CASA -->
         <template x-if="entregaNavegacao && entregaNavegacao.is_gps_livre">
           <div class="bg-cyan-500/15 border border-cyan-500/50 px-3 py-1.5 rounded-xl flex items-center justify-between text-[11px] text-cyan-300 font-black">
-            <span x-text="entregaNavegacao.is_sem_destino ? '📡 MODO COPILOTO • 40 MIL RADARES ATIVOS' : (entregaNavegacao.id === 'gps_casa' ? '🏠 NAVEGAÇÃO PARA CASA • RADARES ATIVOS' : '🧭 GPS LIVRE SPXROTAS • RADARES ATIVOS')"></span>
+            <span x-text="entregaNavegacao.is_sem_destino ? '📡 MODO COPILOTO • 40 MIL RADARES ATIVOS' : (entregaNavegacao.id === 'gps_casa' ? '🏠 NAVEGÇÃO PARA CASA • RADARES ATIVOS' : '🧭 GPS LIVRE SPXROTAS • RADARES ATIVOS')"></span>
             <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-black">TELA ACESA</span>
           </div>
         </template>
@@ -1337,7 +1337,7 @@
     </div>
   </div>
 
-  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE COM NÚMERO EXATO + ESTRATÉGIA + UPLOAD + ZAP) -->
+  <!-- 8. MODAL CARREGAR SUA ROTA (AUTO-COMPLETE COM NÚMERO EXATO + UPLOAD DIRETO DO CELULAR) -->
   <div x-show="modalImportar" class="fixed inset-0 bg-black/90 z-[140] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
     <div class="bg-gray-900 rounded-3xl w-full max-w-lg border border-gray-800 p-5 sm:p-6 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto" @click.away="modalImportar = false">
       
@@ -1440,29 +1440,10 @@
           <button @click="copiarPartidaParaChegada()" class="text-[10px] text-orange-400 hover:underline font-bold block pt-0.5">
             ↺ Voltar para o mesmo local de partida (CD)
           </button>
-
-          <!-- SELETOR DO SENTIDO DA ROTA (MAIS LONGE -> CASA vs CONTÍNUO CD -> CASA) -->
-          <div class="pt-2 border-t border-gray-800/80 space-y-1.5">
-            <span class="text-[10px] font-black text-orange-400 uppercase tracking-wider block">Sentido da Otimização:</span>
-            <div class="grid grid-cols-2 gap-2">
-              <button type="button" @click="selecionarEstrategiaRota('mais_longe_casa')"
-                      class="p-2.5 rounded-xl border text-left transition active:scale-95"
-                      :class="estrategiaRota === 'mais_longe_casa' ? 'bg-orange-600/20 border-orange-500 text-white shadow-md' : 'bg-black border-gray-800 text-gray-400'">
-                <span class="text-[11px] font-black block">🚀 Mais Longe ➔ Casa</span>
-                <span class="text-[9px] leading-tight block opacity-80 mt-0.5">Vai pro fim e volta varrendo sentido casa</span>
-              </button>
-              <button type="button" @click="selecionarEstrategiaRota('padrao_cd')"
-                      class="p-2.5 rounded-xl border text-left transition active:scale-95"
-                      :class="estrategiaRota === 'padrao_cd' ? 'bg-cyan-600/20 border-cyan-500 text-white shadow-md' : 'bg-black border-gray-800 text-gray-400'">
-                <span class="text-[11px] font-black block">🔄 Contínuo CD ➔ Casa</span>
-                <span class="text-[9px] leading-tight block opacity-80 mt-0.5">Laço padrão partindo direto do galpão</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- 2º PASSO (CENTRO): SUBIR O ARQUIVO .XLSX DIRETO NO APP -->
+      <!-- 2º PASSO: SUBIR O ARQUIVO .XLSX DIRETO DO CELULAR -->
       <div class="space-y-2 bg-gray-950 p-4 rounded-2xl border-2 transition-all"
            :class="temPartidaEChegadaValida ? 'border-orange-500/70 shadow-lg' : 'border-gray-800 opacity-50 pointer-events-none'">
         <div class="flex items-center justify-between">
@@ -1478,28 +1459,6 @@
           <span class="text-[10px] text-gray-400 block mt-0.5">Formatos aceitos: .xlsx, .xls, .csv</span>
           <input type="file" accept=".xlsx, .xls, .csv, .txt" @change="processarArquivoExcelComValidacao($event)" class="hidden">
         </label>
-      </div>
-
-      <!-- 3º PASSO (EMBAIXO): O ZAP DAS ROTAS (WHATSAPP) -->
-      <div class="bg-gradient-to-r from-emerald-950/40 via-gray-950 to-gray-950 border-2 rounded-2xl p-4 space-y-2.5 shadow-md transition-all"
-           :class="temPartidaEChegadaValida ? 'border-emerald-500/70 opacity-100' : 'border-gray-800 opacity-50 pointer-events-none'">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="text-2xl">💬</span>
-            <div>
-              <h4 class="text-sm font-black text-white leading-tight">Ou envie via Zap das Rotas</h4>
-              <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider">Zero pastas do Android</span>
-            </div>
-          </div>
-        </div>
-        <p class="text-[11px] text-gray-300 leading-snug">
-          Mande a planilha no WhatsApp do SPXrotas. O robô calcula usando sua partida e chegada acima e abre pronta!
-        </p>
-        <a :href="`https://wa.me/5513988082105?text=${encodeURIComponent('Oi SPXrotas! Segue meu romaneio da Shopee para calcular a rota:')}`" 
-           target="_blank" 
-           class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider text-center block shadow-md active:scale-95 transition">
-          📲 Enviar Romaneio no WhatsApp Oficial
-        </a>
       </div>
 
     </div>
@@ -1524,13 +1483,9 @@
             <span class="text-orange-400 font-bold uppercase text-[10px]">📍 Partida:</span>
             <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoPartidaTexto || 'Galpão / Início'"></span>
           </div>
-          <div class="flex items-center justify-between border-b border-gray-800/80 pb-1.5">
+          <div class="flex items-center justify-between">
             <span class="text-emerald-400 font-bold uppercase text-[10px]">🏠 Retorno:</span>
             <span class="text-white font-mono font-medium truncate max-w-[190px]" x-text="resumoChegadaTexto || 'Residência / Final'"></span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-cyan-400 font-bold uppercase text-[10px]">🧭 Sentido:</span>
-            <span class="text-white font-bold text-[11px]" x-text="estrategiaRota === 'mais_longe_casa' ? '🚀 Mais Longe ➔ Casa' : '🔄 Contínuo CD ➔ Casa'"></span>
           </div>
         </div>
 
@@ -1734,7 +1689,7 @@
           <input type="text" x-model="inputNome" placeholder="Seu nome e sobrenome" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
         </div>
         <div>
-          <label class="text-[10px] text-gray-300 font-bold block mb-1">WhatsApp com DDD (Zap das Rotas) *</label>
+          <label class="text-[10px] text-gray-300 font-bold block mb-1">WhatsApp com DDD *</label>
           <input type="tel" x-model="inputTelefone" placeholder="Ex: 11999999999" maxlength="15" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 font-mono">
         </div>
         <div>
@@ -1802,12 +1757,12 @@
         </div>
       </template>
 
-      <!-- Passo 3: O Zap das Rotas -->
+      <!-- Passo 3: Importação Direta do Romaneio -->
       <template x-if="passoTutorial === 3">
         <div class="space-y-3.5">
-          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">💬</div>
-          <h3 class="text-2xl font-black text-white">O Zap das Rotas</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Não precisa caçar arquivos na pasta Downloads do Android! No app da Shopee, escolha Compartilhar no WhatsApp do SPXrotas e a rota abre pronta!</p>
+          <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-500/40">📊</div>
+          <h3 class="text-2xl font-black text-white">Importação do Romaneio</h3>
+          <p class="text-xs text-gray-300 leading-relaxed">Baixe o arquivo (.xlsx) no app da Shopee, escolha ele nas pastas do celular no 2º Passo (ou use "Compartilhar com SPXrotas") e sua rota abre pronta em segundos!</p>
         </div>
       </template>
 

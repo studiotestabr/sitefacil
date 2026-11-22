@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPXrotas | Roteirizador Inteligente, Bipador com Voz, Volumosos, Radares Offline & GPS 3D para Shopee Express</title>
+  
+  <meta name="description" content="O super app definitivo do motorista Shopee Express (SPX). Receba sua rota no WhatsApp, ajuste a ordem com o dedo antes de bipar, bipe caixas ouvindo o Canetão, gerencie objetos volumosos por voz, rode 100% offline nas chácaras e fuja de multas em 40 mil radares.">
+  <meta name="theme-color" content="#ea580c">
+  
+  <!-- REDIRECIONAMENTO INSTANTÂNEO: SE O MOTORISTA ABRIR PELO ATALHO DO CELULAR, ENTRA DIRETO NO APP -->
+  <script>
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      window.location.replace('./app/');
+    }
+  </script>
+
+  <!-- Open Graph / Meta Compartilhamento -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SPXrotas">
+  <meta property="og:title" content="SPXrotas - O Super Aplicativo do Motorista Shopee Express">
+  <meta property="og:description" content="Economize até 2 horas de rua e R$ 25 de gasolina por dia. Otimização via WhatsApp, Reordenação com o dedo, Bipador por voz, Controle de Volumosos, Navegação Offline e Alerta de Radares.">
+  <meta property="og:image" content="./app/icon-512.png">
+  <meta property="og:url" content="https://studiotesta.com.br/spxrotas/">
+
+  <link rel="icon" type="image/png" href="./app/icon-192.png">
+
+  <!-- Fontes Google e Tailwind CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              orange: '#ea580c',
+              orangeHover: '#c2410c',
+              cyan: '#38bdf8',
+              emerald: '#10b981',
+              dark: '#050811',
+              card: '#0c1322',
+              cardBorder: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #050811;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+    }
+    .bg-grid {
+      background-image: radial-gradient(rgba(234, 88, 12, 0.09) 1px, transparent 0);
+      background-size: 30px 30px;
+    }
+    .glow-orange {
+      box-shadow: 0 0 50px -10px rgba(234, 88, 12, 0.35);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 45px -10px rgba(56, 189, 248, 0.35);
+    }
+    .glow-radar {
+      box-shadow: 0 0 35px -5px rgba(239, 68, 68, 0.5);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.4);
+    }
+    .glow-amber {
+      box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-grid antialiased selection:bg-orange-600 selection:text-white">
+
+  <!-- 1. BARRA SUPERIOR DE AVISO COM GATILHO DE TESTE LIVRE -->
+  <aside class="bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 text-white text-[11px] sm:text-xs font-black tracking-wide py-2.5 px-4 text-center select-none shadow-lg" aria-label="Aviso">
+    🎁 7 DIAS GRÁTIS NA 1ª ROTA • BIPADOR POR VOZ • REORDENAÇÃO POR TOQUE • MÓDULO VOLUMOSOS • FUNCIONA 100% OFFLINE
+  </aside>
+
+  <!-- 2. NAVBAR MODERNA -->
+  <header class="sticky top-0 z-50 bg-[#050811]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5 group">
+        <img src="./app/icon-192.png" alt="SPXrotas" class="w-9 h-9 rounded-xl shadow-lg border border-orange-500/40 group-hover:scale-105 transition">
+        <div>
+          <span class="font-heading font-black text-xl text-white tracking-wider flex items-center">
+            SPX<span class="text-orange-500">rotas</span>
+          </span>
+        </div>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-5 text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+        <a href="#zap-rotas" class="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1"><span>💬</span> Zap & Endereço</a>
+        <a href="#bipador" class="text-amber-400 hover:text-amber-300 transition flex items-center gap-1"><span>📸</span> Bipador & Ordem</a>
+        <a href="#volumosos" class="text-orange-400 hover:text-orange-300 transition flex items-center gap-1"><span>📦</span> Volumosos</a>
+        <a href="#offline" class="text-cyan-400 hover:text-cyan-300 transition flex items-center gap-1"><span>📡</span> Offline</a>
+        <a href="#radares" class="text-red-400 hover:text-red-300 transition flex items-center gap-1"><span>📷</span> Radares</a>
+        <a href="#relatorio" class="hover:text-orange-400 transition">PDF Real</a>
+        <a href="#planos" class="hover:text-orange-400 transition">Planos</a>
+        <a href="#faq" class="hover:text-orange-400 transition">Dúvidas</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="./app/" class="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center gap-1.5">
+          <span>📲 Abrir o App</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. HERO SECTION (IMPACTO BRUTAL COM MOCKUP FIEL DO COCKPIT) -->
+  <section class="relative pt-12 pb-20 overflow-hidden">
+    <div class="max-w-5xl mx-auto px-4 text-center space-y-6 relative z-10">
+      
+      <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 px-4 py-1.5 rounded-full text-orange-400 text-xs font-black uppercase tracking-wider">
+        <span>⚡</span> O Super Aplicativo Definitivo do Motorista Shopee Express (SPX)
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-heading font-black text-white tracking-tight leading-[1.1] max-w-4xl mx-auto">
+        Termine sua rota até <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300">2 horas mais cedo</span>. Feito para quem carrega na calçada e roda até sem sinal de 4G.
+      </h1>
+
+      <p class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+        Ajuste qualquer parada fora de mão <strong class="text-cyan-400">segurando e arrastando o card antes de bipar</strong>, separe 80 caixas em 15 minutos no <strong class="text-amber-400">Bipador por Voz</strong>, evite pacotes trocados com o <strong class="text-green-400">Ciclo Laranja ➔ Verde Vivo</strong>, controle <strong class="text-white">Volumosos</strong> por voz, fuja de multas em <strong class="text-red-400">40 mil radares</strong> e rode <strong class="text-cyan-400">100% Offline</strong>.
+      </p>
+
+      <!-- BOTÕES DE AÇÃO HERO -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+        <a href="./app/" class="w-full sm:w-auto px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/40 active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📲 Começar Grátis (7 Dias na 1ª Rota)</span>
+        </a>
+        <a href="#bipador" class="w-full sm:w-auto px-6 py-4 bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 border border-amber-500/40 font-bold text-xs uppercase tracking-wider rounded-2xl active:scale-95 transition flex items-center justify-center gap-2 shadow-lg">
+          <span>📸 Ver Como Funciona na Pista</span>
+        </a>
+      </div>
+
+      <p class="text-[11px] text-slate-500 font-medium">
+        🔒 Sem cartão de crédito • Testado em rotas reais de 100+ pacotes e estradas de chácaras • Android & iPhone
+      </p>
+
+      <!-- MOCKUP VISUAL FIEL DO COCKPIT 3D COM A FIORINO LARANJA OFICIAL DO APP -->
+      <div class="pt-8 max-w-sm sm:max-w-md mx-auto">
+        <div class="bg-[#050811] border-2 border-orange-500/60 rounded-[2.5rem] p-4 shadow-2xl glow-orange text-left space-y-2.5 relative overflow-hidden">
+          
+          <!-- Banner Superior da Tela com Próxima Manobra -->
+          <div class="bg-black/90 border border-slate-800 rounded-2xl p-3 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-xl font-black text-cyan-400">
+                ⬆️
+              </div>
+              <div>
+                <span class="text-2xl font-black font-mono leading-none">280 m</span>
+                <span class="text-[9px] text-slate-400 block font-bold uppercase">até o destino</span>
+                <h4 class="text-xs font-black text-cyan-400 truncate max-w-[165px]">Av. Princesa Isabel, 450</h4>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 text-[9px]">
+              <span class="px-2 py-1 bg-emerald-950 border border-emerald-500/40 text-emerald-400 rounded-lg font-mono font-bold">TELA ACESA</span>
+            </div>
+          </div>
+
+          <!-- Alerta de Radar na Pista R-19 -->
+          <div class="bg-slate-950/90 border border-red-500/80 rounded-2xl px-3 py-1.5 flex items-center justify-between shadow-lg glow-radar">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-white border-2 border-red-600 flex items-center justify-center font-mono font-black text-slate-950 text-xs">
+                50
+              </div>
+              <div class="leading-none">
+                <span class="text-[9px] font-black uppercase text-red-400 block">Radar na sua via</span>
+                <span class="text-xs font-mono font-bold text-white">a 210 metros</span>
+              </div>
+            </div>
+            <span class="text-xs text-amber-400 animate-pulse font-mono font-black">BIP-BIP!</span>
+          </div>
+
+          <!-- Janela do Mapa 3D com Asfalto, Radar, Pinos e FIORINO LARANJA OFICIAL -->
+          <div class="h-64 bg-[#141c2b] rounded-2xl relative overflow-hidden border border-slate-800/80 flex items-center justify-center">
+            
+            <!-- Ruas Transversais de Fundo -->
+            <div class="absolute top-16 left-0 right-0 h-5 bg-[#1b2638] border-y border-slate-700/30"></div>
+            <div class="absolute top-36 left-0 right-0 h-4 bg-[#1b2638] border-y border-slate-700/30"></div>
+
+            <!-- Linha da Rota Ciano no Asfalto Escuro -->
+            <div class="absolute top-0 bottom-0 w-9 bg-[#25334a] flex items-center justify-center">
+              <div class="w-2.5 h-full bg-[#38bdf8] shadow-[0_0_15px_#38bdf8]"></div>
+            </div>
+
+            <!-- Placa de Radar R-19 Fincada no Asfalto 3D -->
+            <div class="absolute top-6 flex flex-col items-center z-20">
+              <div class="w-7 h-7 rounded-full bg-white border-2 border-red-600 flex items-center justify-center font-mono font-black text-[10px] text-slate-950 shadow-lg">
+                50
+              </div>
+              <div class="w-1 h-2 bg-slate-400"></div>
+            </div>
+
+            <!-- Pino do Canetão no Destino (Verde Vivo Unificado) -->
+            <div class="absolute top-3 right-12 flex flex-col items-center">
+              <div class="bg-green-500 text-white font-black font-mono text-[10px] w-7 h-7 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                #4
+              </div>
+            </div>
+
+            <!-- 🚐 FIORINO LARANJA OFICIAL DO APP (EXATA COM ACABAMENTO REFINADO) -->
+            <div class="absolute bottom-5 flex flex-col items-center z-20">
+              <!-- Aura Azul GPS característica do app -->
+              <div class="w-12 h-12 rounded-full bg-cyan-400/20 border-2 border-cyan-400/60 absolute top-6"></div>
+              
+              <!-- SVG Fiorino Laranja Top-Down fiel ao App -->
+              <svg width="36" height="62" viewBox="0 0 48 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_6px_10px_rgba(0,0,0,0.9)] relative z-10">
+                <!-- Facho Suave dos Faróis -->
+                <path d="M12 8 L7 0 L19 0 Z" fill="#fef08a" opacity="0.35"/>
+                <path d="M36 8 L29 0 L41 0 Z" fill="#fef08a" opacity="0.35"/>
+
+                <!-- Rodas Dianteiras e Traseiras -->
+                <rect x="4" y="13" width="4" height="13" rx="2" fill="#0f172a"/>
+                <rect x="40" y="13" width="4" height="13" rx="2" fill="#0f172a"/>
+                <rect x="4" y="54" width="4" height="13" rx="2" fill="#0f172a"/>
+                <rect x="40" y="54" width="4" height="13" rx="2" fill="#0f172a"/>
+
+                <!-- Retrovisores Laterais (Para dar silhueta real de carro) -->
+                <path d="M6 21 L1 23 L1.5 26.5 L7 25 Z" fill="#c2410c" stroke="#1e293b" stroke-width="0.6"/>
+                <path d="M42 21 L47 23 L46.5 26.5 L41 25 Z" fill="#c2410c" stroke="#1e293b" stroke-width="0.6"/>
+
+                <!-- Carroceria Principal Laranja Shopee -->
+                <rect x="6" y="7" width="36" height="68" rx="7" fill="#ea580c" stroke="#9a3412" stroke-width="0.8"/>
+
+                <!-- Faróis Dianteiros -->
+                <rect x="9" y="5.5" width="7" height="3" rx="1.5" fill="#fef08a"/>
+                <rect x="32" y="5.5" width="7" height="3" rx="1.5" fill="#fef08a"/>
+
+                <!-- Para-brisa Escuro Panorâmico -->
+                <path d="M9 21 L39 21 L36.5 30 L11.5 30 Z" fill="#0f172a" stroke="#334155" stroke-width="0.8"/>
+                <path d="M12 22.5 L20 22.5 L15 28.5 L12 28.5 Z" fill="#38bdf8" opacity="0.25"/>
+
+                <!-- Teto do Baú Furgão (Laranja Escuro como no App) -->
+                <rect x="9" y="32" width="30" height="34" rx="3" fill="#c2410c"/>
+                <line x1="15" y1="35" x2="15" y2="63" stroke="#9a3412" stroke-width="1" opacity="0.6"/>
+                <line x1="24" y1="35" x2="24" y2="63" stroke="#9a3412" stroke-width="1" opacity="0.6"/>
+                <line x1="33" y1="35" x2="33" y2="63" stroke="#9a3412" stroke-width="1" opacity="0.6"/>
+
+                <!-- Para-choque Traseiro e Friso -->
+                <rect x="12" y="69" width="24" height="3" rx="1" fill="#1e293b"/>
+
+                <!-- Lanternas Traseiras Vermelhas -->
+                <rect x="9" y="72.5" width="6" height="3" rx="1" fill="#ef4444"/>
+                <rect x="33" y="72.5" width="6" height="3" rx="1" fill="#ef4444"/>
+              </svg>
+
+              <!-- Pílula da Rua Atual idêntica ao App -->
+              <span class="bg-slate-950/95 text-white border border-white/25 font-bold text-[10px] px-3 py-0.5 rounded-full shadow-lg mt-1">Avenida Princesa Isabel</span>
+            </div>
+
+            <!-- Velocímetro Ergonômico -->
+            <div class="absolute bottom-3 left-3 w-12 h-12 rounded-full bg-slate-950/95 border-2 border-cyan-400 flex flex-col items-center justify-center shadow-xl">
+              <span class="text-sm font-black font-mono text-white leading-none">42</span>
+              <span class="text-[7px] text-slate-400 font-bold leading-none mt-0.5">km/h</span>
+            </div>
+
+            <!-- 3 Botões Empilhados à Direita (Pingo Azul + SOS + Mira) -->
+            <div class="absolute bottom-3 right-3 flex flex-col gap-1.5 items-center z-30">
+              <div class="w-9 h-9 rounded-full bg-[#0284c7] text-white flex items-center justify-center text-sm shadow-lg border-2 border-white">
+                📍
+              </div>
+              <div class="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center text-[9px] font-black shadow-lg border-2 border-white animate-pulse">
+                SOS
+              </div>
+              <div class="w-9 h-9 rounded-full bg-slate-900 border-2 border-orange-500 text-white flex items-center justify-center text-sm shadow-lg">
+                🎯
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarja de Objeto Volumoso -->
+          <div class="bg-amber-500/20 border border-amber-500/70 p-2 rounded-xl flex items-center justify-between text-[10px] text-amber-300">
+            <div class="flex items-center gap-1.5 truncate">
+              <span class="text-sm">📦</span>
+              <span class="truncate"><strong>VOLUMOSO:</strong> Porta-Malas (Caixa Grande)</span>
+            </div>
+            <span class="text-[8px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded font-black shrink-0">FORA DA SACOLA</span>
+          </div>
+
+          <!-- Cards Dinâmicos na Nova Ordem Oficial: CANETÃO, ORDEM, PARADA SPX, SACOLA -->
+          <div class="grid grid-cols-4 gap-1.5 text-center pt-0.5">
+            <div class="bg-[#1c1815] border border-orange-500/80 rounded-xl py-1.5">
+              <span class="text-[8px] text-orange-400 font-black block leading-none">CANETÃO</span>
+              <span class="text-base font-black text-orange-400 font-mono mt-0.5 block leading-none">#4</span>
+            </div>
+            <div class="bg-[#1c2430] border border-slate-700 rounded-xl py-1.5">
+              <span class="text-[8px] text-slate-400 font-black block leading-none">ORDEM</span>
+              <span class="text-base font-black text-white font-mono mt-0.5 block leading-none">2</span>
+            </div>
+            <div class="bg-[#1c2430] border border-slate-700 rounded-xl py-1.5">
+              <span class="text-[8px] text-slate-400 font-black block leading-none">PARADA SPX</span>
+              <span class="text-base font-black text-white font-mono mt-0.5 block leading-none">12</span>
+            </div>
+            <div class="bg-[#1c1815] border border-orange-500/80 rounded-xl py-1.5">
+              <span class="text-[8px] text-orange-400 font-black block leading-none">SACOLA</span>
+              <span class="text-base font-black text-orange-400 font-mono mt-0.5 block leading-none">1</span>
+            </div>
+          </div>
+
+          <!-- Endereço Limpo com Botão Entregue -->
+          <div class="p-2.5 bg-black/50 border border-slate-800 rounded-xl flex items-center justify-between gap-2">
+            <div class="min-w-0 pr-1">
+              <h5 class="text-xs font-black text-white truncate">Av. Princesa Isabel, 450 - Casa</h5>
+              <p class="text-[10px] text-slate-400 truncate">Montemagno - São Paulo</p>
+            </div>
+            <span class="bg-emerald-600 text-white font-black text-[10px] py-1.5 px-3 rounded-lg shadow shrink-0">
+              ✅ Entregue
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. AS 4 MAIORES DORES DO MOTORISTA NA PISTA -->
+  <section class="py-16 bg-[#080d18] border-t border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-8">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Testado e Forjado no Campo</span>
+        <h2 class="text-2xl sm:text-3xl font-heading font-black text-white">Chega de passar perrengue no pátio e na estrada de terra</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">📁</span>
+          <h3 class="text-base font-black text-white">Pasta "Downloads" Oculta</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Acabou o sofrimento de ficar caçando arquivo perdido no Android. No SPXrotas você compartilha direto no Zap e em 2s a rota está na tela.
+          </p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">🔀</span>
+          <h3 class="text-base font-black text-white">Pacote Trocado na Gaiola</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Descobrir às 17h na porta do cliente que uma caixa não veio na sua gaiola destrói seu dia. Nossa conferência Laranja ➔ Verde Vivo acusa na hora antes de sair!
+          </p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">📦</span>
+          <h3 class="text-base font-black text-white">Volumoso Perdido no Carro</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Chegou no cliente e ficou revirando a sacola tentando achar uma caixa grande que jogou no porta-malas? O app avisa por voz exatamente onde você guardou!
+          </p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">📡</span>
+          <h3 class="text-base font-black text-white">Sombra de 4G nas Chácaras</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Outros apps travam, apagam as entregas que você já fez e traçam linha reta por cima das casas sem internet. O SPXrotas é 100% blindado offline!
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-r from-orange-950/30 via-slate-900 to-slate-900 border border-orange-500/30 rounded-3xl p-6 text-center sm:text-left flex flex-col sm:flex-row items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-orange-600/20 text-orange-400 border border-orange-500/40 flex items-center justify-center font-black text-2xl shrink-0">
+          💡
+        </div>
+        <div class="space-y-1">
+          <h4 class="text-sm font-black text-white">O SPXrotas nasceu da poeira de entregas reais de 100+ pacotes.</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Não foi feito por gente de escritório que nunca segurou uma caixa no sol. Cada botão foi desenhado para você sair mais rápido do galpão, dirigir sem stress e voltar pra casa com lucro líquido no bolso.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 1: ZAP DAS ROTAS + BUSCA EXATA DE PORTÃO (ESTILO UBER/WAZE) -->
+  <section id="zap-rotas" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          💬 Entrada Instantânea & Endereço Exato
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Zap das Rotas & Busca de Partida Padrão Uber/Waze
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Mande a planilha no WhatsApp ou suba no app. Na partida e retorno, nosso motor encontra o número exato do portão digitado — sem te jogar no meio da avenida!
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-black text-xl">
+            1
+          </div>
+          <h3 class="text-base font-black text-white">Auto-Complete com Número Exato</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Digite onde sai e onde encerra (ex: <em>Av. Princesa Isabel, 450</em>). O app exibe sugestões em tempo real e calcula a metragem exata da casa na rua, cravando o pino no portão certo!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border-2 border-emerald-500/60 p-6 rounded-3xl space-y-4 shadow-xl glow-emerald">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-lg">
+            2
+          </div>
+          <h3 class="text-base font-black text-white">Envie no Zap das Rotas em 2s</h3>
+          <p class="text-slate-300 leading-relaxed">
+            No app da Shopee, clique em Exportar e compartilhe direto com o WhatsApp do SPXrotas. Em 2 segundos o robô calcula a melhor sequência viária e devolve pronta no seu app!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-orange-600/20 text-orange-400 border border-orange-500/40 flex items-center justify-center font-black text-xl">
+            3
+          </div>
+          <h3 class="text-base font-black text-white">Otimização Limpa + Ajuste com o Dedo</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Motor matemático VROOM + OSRM calibrado para fluxo real de trânsito, economizando até R$ 25 de combustível por dia. E se algum número da Shopee ficar fora de mão, você reordena com o dedo antes de bipar!
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 2: NOVO BIPADOR AMPLO + CONFERÊNCIA 4 CORES + REORDENAÇÃO POR TOQUE -->
+  <section id="bipador" class="py-20 bg-[#080d18] border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-14">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          📸 Visor Amplo + Ajuste por Toque + Segurança na Gaiola
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Bipador por Voz, Reordenação com o Dedo & Conferência em 4 Cores
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Corrija qualquer casa fora de ordem com um toque antes de escrever nas caixas, bipe de pé ouvindo o Canetão e acompanhe cada pacote em tempo real na nuvem e no Mapa.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        
+        <div class="space-y-4 text-xs">
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2">
+            <span class="text-amber-400 font-black text-sm flex items-center gap-2">
+              <span>🔊</span> Câmera Ampla + Áudio Imediato
+            </span>
+            <p class="text-slate-300 leading-relaxed">
+              Visor grande com mira laser e cantoneiras laranjas. Apontou para a etiqueta: o celular vibra, acende o badge <strong>"✅ Canetão #10 identificado!"</strong> e fala no som: <strong>"Canetão 10! Sacola 1!"</strong>.
+            </p>
+          </div>
+
+          <div class="bg-slate-900 border border-green-500/60 p-5 rounded-2xl space-y-2">
+            <span class="text-green-400 font-black text-sm flex items-center gap-2">
+              <span>🎨</span> Ciclo de 4 Cores Vivo & Sincronizado na Nuvem
+            </span>
+            <p class="text-slate-300 leading-relaxed">
+              • <strong>🟠 Laranja:</strong> Aguardando bipagem no galpão.<br>
+              • <strong>🟢 Verde Vivo:</strong> Bipado e pronto na sacola (gravado direto no banco!).<br>
+              • <strong>🟡 Amarelo:</strong> Cliente ausente / tentativa na volta.<br>
+              • <strong>🔴 Vermelho:</strong> Entregue e baixado no sistema.<br>
+              Sobrou algum card Laranja quando a gaiola acabou? Você descobre na hora antes de sair do CD!
+            </p>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2">
+            <span class="text-cyan-400 font-black text-sm flex items-center gap-2">
+              <span>🏷️</span> Ordem Física & Pacotes Avulsos (+ +)
+            </span>
+            <p class="text-slate-300 leading-relaxed">
+              Os 4 cards padrão na base da tela mostram: <strong>[CANETÃO] [ORDEM] [PARADA SPX] [SACOLA]</strong>. Se for pacote avulso sem sequência, exibe os 4 dígitos finais em destaque garrafal e avisa por voz!
+            </p>
+          </div>
+        </div>
+
+        <!-- Card Visual do Novo Bipador -->
+        <div class="bg-[#050811] border-2 border-orange-500/70 rounded-3xl p-4 space-y-3 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
+            <span class="font-black text-white">📸 Bipador de Sacolas com Voz</span>
+            <div class="flex gap-1.5 text-[11px]">
+              <span class="bg-slate-800 px-2 py-1 rounded-lg">🔦</span>
+              <span class="bg-slate-800 px-2 py-1 rounded-lg">🔄</span>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <span class="inline-block bg-slate-900 border border-green-500/70 text-white text-[11px] font-black px-4 py-1.5 rounded-full">
+              ✅ Canetão #10 identificado!
+            </span>
+          </div>
+
+          <div class="h-36 bg-black rounded-2xl border-2 border-dashed border-orange-500/60 relative flex items-center justify-center">
+            <div class="w-4/5 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_10px_#ef4444]"></div>
+            <span class="text-[10px] text-slate-500 font-mono absolute bottom-2">VISOR AMPLO DE LEITURA LASER</span>
+          </div>
+
+          <div class="bg-[#0b111e] border border-orange-500 rounded-2xl p-3 space-y-2 text-center">
+            <span class="text-[9px] font-black text-amber-400 uppercase tracking-wider block">PACOTE LOCALIZADO! ESCREVA NA CAIXA:</span>
+            <div class="grid grid-cols-4 gap-1.5">
+              <div class="bg-[#1c1815] border border-orange-500 rounded-xl py-1.5">
+                <span class="text-[7px] text-orange-400 font-black block">CANETÃO</span>
+                <span class="text-base font-black text-orange-400 font-mono">#10</span>
+              </div>
+              <div class="bg-[#1c2430] border border-slate-700 rounded-xl py-1.5">
+                <span class="text-[7px] text-slate-400 font-black block">ORDEM</span>
+                <span class="text-base font-black text-white font-mono">27</span>
+              </div>
+              <div class="bg-[#1c2430] border border-slate-700 rounded-xl py-1.5">
+                <span class="text-[7px] text-slate-400 font-black block">PARADA SPX</span>
+                <span class="text-base font-black text-white font-mono">22</span>
+              </div>
+              <div class="bg-[#1c1815] border border-orange-500 rounded-xl py-1.5">
+                <span class="text-[7px] text-orange-400 font-black block">SACOLA</span>
+                <span class="text-base font-black text-orange-400 font-mono">1</span>
+              </div>
+            </div>
+            <div class="bg-amber-500/15 border border-amber-500/60 text-amber-300 text-[10px] font-black py-1.5 rounded-xl">
+              📦 + MARCAR COMO VOLUMOSO / NOTA NO CARRO
+            </div>
+          </div>
+
+          <div class="bg-orange-600 text-white text-center py-2.5 rounded-xl text-[10px] font-black uppercase">
+            ✅ CONCLUIR E VER SACOLAS
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ✨ DESTAQUE NOVO: REORDENAÇÃO FLUIDA POR TOQUE ANTES DA BIPAGEM -->
+      <div class="bg-gradient-to-br from-[#0e1729] via-slate-900 to-[#0c1322] border-2 border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl glow-cyan">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          
+          <div class="space-y-4 text-left">
+            <span class="inline-flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
+              <span>✋</span> Fim do Ziguezague na Mesma Rua
+            </span>
+            <h3 class="text-2xl sm:text-3xl font-heading font-black text-white leading-tight">
+              Número de casa fora de mão? <span class="text-cyan-400">Segure e arraste</span> o card antes de bipar!
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Às vezes a própria numeração da rua na Shopee vem bagunçada (jogando a casa nº 40 lá no fim da fila depois do nº 300). No SPXrotas você corrige isso em segundos antes de riscar as caixas com o canetão:
+            </p>
+            <ul class="space-y-2.5 text-xs text-slate-300">
+              <li class="flex items-start gap-2.5">
+                <span class="text-orange-400 font-black text-sm shrink-0">👆</span>
+                <span><strong>Segure e Arraste com o Dedo:</strong> Pressione qualquer card laranja por 1 segundo, arraste para a posição ideal (com rolagem automática suave) e solte para encaixar.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-cyan-400 font-black text-sm shrink-0">⇅</span>
+                <span><strong>Atalho "Mover para #...":</strong> Precisa trazer o pacote #85 direto para o #12? Toque em <strong>⇅ Mover</strong>, digite <strong>12</strong> e pronto — sem precisar arrastar a lista inteira!</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-black text-sm shrink-0">🗺️</span>
+                <span><strong>Tudo Sincronizado na Hora:</strong> Ao soltar, o app recalcula o <strong>#Canetão</strong>, a <strong>Sacola</strong>, os <strong>Pinos no Mapa</strong> e grava tudo no banco de dados automaticamente.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-green-400 font-black text-sm shrink-0">🔒</span>
+                <span><strong>Trava Anti-Confusão Pós-Bipagem:</strong> Assim que você bipa a 1ª caixa e escreve o Canetão físico nela, a edição trava automaticamente para ninguém bagunçar a carga depois de etiquetada!</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Mockup Comparativo Visual: Card Laranja Editável vs Card Verde Travado -->
+          <div class="space-y-3">
+            
+            <!-- Faixa de Aviso antes de bipar -->
+            <div class="bg-orange-500/10 border border-dashed border-orange-500/60 text-orange-300 rounded-2xl px-3.5 py-2 text-[11px] font-bold flex items-center justify-between">
+              <span>↕️ Antes de bipar: segure um card ou toque em ⇅ Mover</span>
+            </div>
+
+            <!-- Card em Modo Arraste (Laranja) -->
+            <div class="bg-[#14111a] border-2 border-orange-500 border-l-[6px] rounded-2xl p-3.5 space-y-2.5 shadow-2xl transform sm:scale-[1.02] relative">
+              <div class="absolute -top-2.5 right-3 bg-orange-600 text-white text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full shadow">
+                ✋ Arrastando para #12
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 text-center">
+                <div class="bg-[#1c1815] border border-orange-500 rounded-xl py-1.5">
+                  <span class="text-[8px] text-orange-400 font-black block">CANETÃO</span>
+                  <span class="text-lg font-black text-orange-400 font-mono">#12</span>
+                </div>
+                <div class="bg-[#1c2430] border border-[#2b394a] rounded-xl py-1.5">
+                  <span class="text-[8px] text-slate-400 font-black block">ORDEM</span>
+                  <span class="text-lg font-black text-white font-mono">45</span>
+                </div>
+                <div class="bg-[#1c2430] border border-[#2b394a] rounded-xl py-1.5">
+                  <span class="text-[8px] text-slate-400 font-black block">PARADA SPX</span>
+                  <span class="text-lg font-black text-white font-mono">38</span>
+                </div>
+                <div class="bg-[#1c1815] border border-orange-500 rounded-xl py-1.5">
+                  <span class="text-[8px] text-orange-400 font-black block">SACOLA</span>
+                  <span class="text-lg font-black text-orange-400 font-mono">2</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="font-bold text-white truncate pr-2">Rua das Flores, 40 - Centro</span>
+                <span class="bg-cyan-500/15 border border-cyan-400/50 text-cyan-300 px-2.5 py-1 rounded-lg font-black text-[10px] shrink-0">⇅ Mover</span>
+              </div>
+            </div>
+
+            <!-- Seta de Transição -->
+            <div class="flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-wider py-0.5">
+              <span>⬇️</span>
+              <span>Bipou o 1º pacote na esteira? Trava automática + Verde Vivo!</span>
+              <span>⬇️</span>
+            </div>
+
+            <!-- Card Conferido em Verde Vivo (Travado) -->
+            <div class="bg-[#0b1f16] border border-green-500/80 border-l-[6px] border-l-green-500 rounded-2xl p-3.5 space-y-2 shadow-xl">
+              <div class="grid grid-cols-4 gap-1.5 text-center">
+                <div class="bg-[#0f261b] border border-green-500 rounded-xl py-1.5">
+                  <span class="text-[8px] text-green-400 font-black block">CANETÃO</span>
+                  <span class="text-lg font-black text-green-400 font-mono">#12</span>
+                </div>
+                <div class="bg-[#1c2430] border border-[#2b394a] rounded-xl py-1.5">
+                  <span class="text-[8px] text-slate-400 font-black block">ORDEM</span>
+                  <span class="text-lg font-black text-white font-mono">45</span>
+                </div>
+                <div class="bg-[#1c2430] border border-[#2b394a] rounded-xl py-1.5">
+                  <span class="text-[8px] text-slate-400 font-black block">PARADA SPX</span>
+                  <span class="text-lg font-black text-white font-mono">38</span>
+                </div>
+                <div class="bg-[#0f261b] border border-green-500 rounded-xl py-1.5">
+                  <span class="text-[8px] text-green-400 font-black block">SACOLA</span>
+                  <span class="text-lg font-black text-green-400 font-mono">2</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="bg-green-500/20 border border-green-400/70 text-green-400 font-black px-2 py-0.5 rounded-md uppercase">🟢 Pronto / Conferido</span>
+                <span class="text-green-300 font-bold">🔒 Ordem travada na caixa</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 3 (NOVO!): OBJETOS VOLUMOSOS COM PÍLULAS DE 1 TOQUE & VOZ NO GPS -->
+  <section id="volumosos" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-orange-500/10 text-orange-400 border border-orange-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          📦 Exclusividade Absoluta SPXrotas
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Controle de Objetos Volumosos: Saiba exatamente onde guardou no carro
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Aquela caixa gigante que não cabe na sacola não fica mais perdida no carro. Com 1 toque no Bipador você anota onde ela está e o GPS te avisa falando no som!
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-black text-2xl">
+            👆
+          </div>
+          <h3 class="text-base font-black text-white">Pílulas Rápidas de 1 Toque</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Sem perder tempo digitando na calçada! Toque em 1 segundo:<br>
+            <strong>Onde:</strong> <em>Banco Traseiro, Porta-Malas, Assoalho ou Tampa</em>.<br>
+            <strong>Tipo:</strong> <em>Caixa Full, Caixa Grande, Saco ou Pesado</em> (mais campo opcional livre).
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border-2 border-orange-500/60 p-6 rounded-3xl space-y-3 shadow-xl glow-amber">
+          <div class="w-12 h-12 rounded-2xl bg-orange-600 text-white flex items-center justify-center font-black text-2xl shadow-lg">
+            🏷️
+          </div>
+          <h3 class="text-base font-black text-white">Selo "FORA DA SACOLA"</h3>
+          <p class="text-slate-300 leading-relaxed">
+            Na aba Sacolas, o pacote ganha o destaque <strong>📦 FORA DA SACOLA • PORTA-MALAS</strong>. Você não perde nem 1 segundo abrindo e revirando a sacola achando que o pacote sumiu!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-black text-2xl">
+            🗣️
+          </div>
+          <h3 class="text-base font-black text-white">O GPS Fala Onde a Caixa Está</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Ao iniciar a rota e ao chegar na porta do cliente, o aplicativo avisa por voz no carro: <em>"Atenção: Canetão 87 é pacote volumoso! Guardado em: Porta-Malas!"</em>.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 4 (NOVO!): ARQUITETURA OFFLINE-FIRST (IMUNIDADE TOTAL NAS CHÁCARAS) -->
+  <section id="offline" class="py-20 bg-[#080d18] border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          📡 À Prova de Área de Sombra
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Blindagem 100% Offline: Imparável até sem sinal no meio do mato
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Entregar em regiões de chácaras, sítios e rodovias onde o 4G morre não é mais problema. Seu celular se torna um cofre de segurança da rota.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-black text-2xl">
+            💾
+          </div>
+          <h3 class="text-base font-black text-white">Zero Reset de Entregas</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Deu baixa em 20 entregas sem sinal de internet? Tudo é gravado no aparelho pela <strong>Fila de Sincronização (SyncQueue)</strong>. Nunca mais o app zera sua rota e te obriga a dar baixa tudo de novo!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border-2 border-cyan-500/60 p-6 rounded-3xl space-y-3 shadow-xl glow-cyan">
+          <div class="w-12 h-12 rounded-2xl bg-cyan-600 text-white flex items-center justify-center font-black text-2xl shadow-lg">
+            🛣️
+          </div>
+          <h3 class="text-base font-black text-white">Navegação Viária Offline</h3>
+          <p class="text-slate-300 leading-relaxed">
+            Sem internet, os concorrentes desenham uma linha reta inútil por cima das casas. O SPXrotas extrai as curvas da polilinha mestra gravada no aparelho e continua seguindo as ruas e estradas reais!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-red-600/20 text-red-400 border border-red-500/40 flex items-center justify-center font-black text-2xl">
+            📷
+          </div>
+          <h3 class="text-base font-black text-white">Radares Salvos no Celular</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Os radares da sua região ficam salvos no cache offline. Mesmo em áreas rurais sem sinal de torre de celular, o velocímetro apita e a voz avisa o radar à frente!
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 5: ALERTA DE RADARES AUDITADOS COM TRAVA DE VIA -->
+  <section id="radares" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-red-500/10 text-red-400 border border-red-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          📷 Proteção Real Contra Multas (Sem Falso Alarme)
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          39.976 Radares Auditados com Trava de Pista (Padrão Waze)
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Esqueça aplicativo amador que fica apitando radar de rodovia de 80 km/h enquanto você está andando na marginal ou dentro do bairro a 40 km/h. O SPXrotas tem precisão cirúrgica de via.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center font-black text-2xl">
+            🛣️
+          </div>
+          <h3 class="text-base font-black text-white">Trava de Corredor Calibrada</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Se você estiver andando na rua do bairro paralela a uma rodovia expressa, o app <strong>ignora o radar da rodovia</strong>. Calibrado também para estradas de terra e curvas fechadas!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border-2 border-red-500/60 p-6 rounded-3xl space-y-3 shadow-xl glow-radar">
+          <div class="w-12 h-12 rounded-2xl bg-red-600 text-white flex items-center justify-center font-black text-2xl shadow-lg">
+            🚨
+          </div>
+          <h3 class="text-base font-black text-white">Bipe Sonoro e Velocímetro Vermelho</h3>
+          <p class="text-slate-300 leading-relaxed">
+            Se você estiver acima do limite da via a menos de 350 metros, o velocímetro fica vermelho vivo pulsante e o app emite bipes sonoros contínuos e vibração até você desacelerar com segurança.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-black text-2xl">
+            🗣️
+          </div>
+          <h3 class="text-base font-black text-white">Avisos de Voz Antecipados</h3>
+          <p class="text-slate-400 leading-relaxed">
+            O aplicativo avisa pelo som do carro: <em>"Atenção: Radar à frente, limite 50 por hora"</em>, dando tempo confortável para ajustar a velocidade sem freadas bruscas.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 6: COCKPIT 3D, PINGO INTELIGENTE NO GPS, S.O.S E WAKE LOCK -->
+  <section id="navegador" class="py-20 bg-[#080d18] border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          🧭 O Cockpit Definitivo da Rua
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Fiorino 3D, Pingo Azul direto no GPS, S.O.S e Tela Sempre Acesa
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Ergonomia pensada para o suporte do para-brisa com botões rápidos sempre visíveis e livres de sobreposição.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">💡</span>
+          <h3 class="text-base font-black text-emerald-400">Tela Sempre Acesa (Wake Lock)</h3>
+          <p class="text-slate-400 leading-relaxed">
+            O celular nunca mais apaga a tela sozinho no suporte do carro. O mapa fica aceso e brilhando enquanto você entrega, sem precisar ficar desbloqueando o celular.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">🆘</span>
+          <h3 class="text-base font-black text-red-400">Botão de Emergência S.O.S</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Passou por algum aperto na rua? Um toque no botão vermelho <strong>SOS</strong> envia sua localização exata no WhatsApp da sua família ou contato de confiança.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">📍</span>
+          <h3 class="text-base font-black text-cyan-400">Pingo Azul direto no GPS</h3>
+          <p class="text-slate-400 leading-relaxed">
+            A Shopee errou o portão? Chegou na casa do cliente, toque no botão azul 📍 direto na tela do GPS! Com trava de segurança de 450m, ele salva o portão exato para nunca mais errar.
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2.5">
+          <span class="text-2xl">⚠️</span>
+          <h3 class="text-base font-black text-amber-400">Alerta de Múltiplos Pacotes</h3>
+          <p class="text-slate-400 leading-relaxed">
+            Se uma mesma casa tiver 2, 3 ou mais pacotes juntos, o celular vibra na hora e acende um aviso amarelo gigante para você não esquecer nenhum pacote no carro.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 7: MÉTODO CANETÃO + RELATÓRIO CAIXA-PRETA EM PDF -->
+  <section id="relatorio" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto px-4 space-y-12">
+      
+      <div class="text-center space-y-3">
+        <span class="inline-block bg-orange-500/10 text-orange-400 border border-orange-500/30 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          ✍️ Organização Física & Auditoria Real
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+          Do Método Canetão (10 em 10) ao Relatório Caixa-Preta em PDF
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Organize a carga em lotes de 10 em 10 e, ao encerrar o dia, gere um PDF profissional com seus números reais de KM, combustível e devoluções.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-orange-600/20 text-orange-400 border border-orange-500/40 flex items-center justify-center font-black text-xl">
+            1
+          </div>
+          <h3 class="text-base font-black text-white">Método Canetão (10 em 10)</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            • Pacotes <strong>#1 ao #10</strong> vão na <strong>Sacola 1</strong>.<br>
+            • Pacotes <strong>#11 ao #20</strong> vão na <strong>Sacola 2</strong>.<br>
+            • Na rua, o porta-malas fica trancado e você só trabalha com 1 sacola aberta no banco do carona!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border-2 border-orange-500/60 rounded-3xl p-6 space-y-4 shadow-xl">
+          <div class="flex justify-between items-center">
+            <div class="w-12 h-12 rounded-2xl bg-orange-600 text-white flex items-center justify-center font-black text-xl shadow-lg">
+              2
+            </div>
+            <span class="text-[10px] font-black bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 uppercase">Caixa-Preta Real</span>
+          </div>
+          <h3 class="text-base font-black text-white">Hodômetro Real & Gasto por Pacote</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            O app mede silenciosamente a quilometragem real rodada pelo seu GPS e o tempo gasto dirigindo vs. atendendo no portão. Calcula automaticamente quantos litros e reais custou a rota!
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-black text-xl">
+            3
+          </div>
+          <h3 class="text-base font-black text-white">Relatório PDF de Devoluções</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Teve clientes ausentes? O relatório em PDF separa uma tabela exclusiva de conferência para devolução no galpão CD com o código de rastreio e os 4 dígitos finais!
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 🌟 MÓDULO 8: TABELA COMPARATIVA LADO A LADO -->
+  <section class="py-20 bg-[#080d18] border-b border-slate-800/80">
+    <div class="max-w-4xl mx-auto px-4 space-y-10">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Comparativo Real</span>
+        <h2 class="text-3xl font-heading font-black text-white">Seu dia com e sem o SPXrotas</h2>
+      </div>
+
+      <div class="overflow-x-auto rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] font-black border-b border-slate-800">
+            <tr>
+              <th class="p-4 sm:p-5">Situação na Rotina</th>
+              <th class="p-4 sm:p-5 text-red-400">Modo Comum</th>
+              <th class="p-4 sm:p-5 text-emerald-400 bg-emerald-500/5 border-l border-emerald-500/20">Com SPXrotas</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 font-medium">
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Entrada da Planilha</td>
+              <td class="p-4 sm:p-5 text-slate-400">Se perder na pasta Downloads do Android</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Zap das Rotas ou Upload com Partida/Retorno exatos</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Casa Fora de Sequência (Ziguezague)</td>
+              <td class="p-4 sm:p-5 text-slate-400">Ter que ir e voltar na mesma rua ou anotar papel à parte</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Segure e arraste o card (ou ⇅ Mover) antes de bipar; atualiza Canetão, Sacolas e Mapa</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Conferência na Gaiola</td>
+              <td class="p-4 sm:p-5 text-slate-400">Descobrir pacote faltando/trocado só na rua às 17h</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Bipador por Voz + Ciclo Laranja ➔ Verde Vivo gravado no banco acusa na hora</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Caixas Volumosas</td>
+              <td class="p-4 sm:p-5 text-slate-400">Revirar a sacola procurando o que está solto no carro</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Pílula de 1 toque + Voz no GPS: "Está no Porta-Malas!"</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Sombra de 4G / Chácaras</td>
+              <td class="p-4 sm:p-5 text-slate-400">App reseta entregas feitas e traça linha reta sobre casas</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Memória local SyncQueue + Polilinha viária offline + Radares em cache</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Radares de Velocidade</td>
+              <td class="p-4 sm:p-5 text-slate-400">Falsos alarmes apitando rodovia no bairro ou multas</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">Trava de pista: 40 mil radares reais só na sua via</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-bold text-white">Horário de Voltar pra Casa</td>
+              <td class="p-4 sm:p-5 text-slate-400">19h30 às 21h moído, estressado e com o tanque vazio</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/5 border-l border-emerald-500/20">16h30 com carga entregue e combustível economizado</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CALCULADORA INTERATIVA DE ECONOMIA -->
+  <section id="calculadora" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="bg-gradient-to-b from-slate-900 to-[#0e1626] border-2 border-orange-500/40 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div class="text-center space-y-1">
+          <span class="text-xs font-black uppercase text-orange-400 tracking-wider">Calculadora do Entregador</span>
+          <h2 class="text-2xl font-heading font-black text-white">Quanto você deixa de queimar no tanque?</h2>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1.5">
+              <span class="text-slate-400">Quantos dias você roda por semana na Shopee?</span>
+              <span id="diasTexto" class="text-orange-400 font-mono font-black text-sm">6 dias</span>
+            </div>
+            <input type="range" id="inputDias" min="1" max="7" value="6" oninput="atualizarCalculo()" class="w-full accent-orange-500 bg-slate-950 rounded-lg cursor-pointer">
+          </div>
+
+          <div class="bg-black/60 p-5 rounded-2xl border border-slate-800 space-y-3 font-mono">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Combustível economizado por mês:</span>
+              <span id="gasolinaMes" class="text-emerald-400 font-black text-base">R$ 520,80</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Horas a menos preso no trânsito:</span>
+              <span id="horasMes" class="text-amber-400 font-black text-base">36 horas</span>
+            </div>
+            <div class="flex justify-between items-center text-xs pt-2 border-t border-slate-800">
+              <span class="text-white font-sans font-bold">Investimento no Plano Mensal:</span>
+              <span class="text-slate-300 font-bold text-sm">R$ 19,90/mês</span>
+            </div>
+          </div>
+
+          <div class="bg-emerald-500/10 border border-emerald-500/30 p-3.5 rounded-xl text-center">
+            <span class="text-xs text-emerald-400 font-black block">
+              💰 Sobra líquido no seu bolso: + <span id="lucroLimpo">R$ 500,90</span> todo mês só de combustível não queimado!
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. TABELA DE PLANOS (TRANSPARENTE E ACESSÍVEL) -->
+  <section id="planos" class="py-20 bg-[#080d18] border-b border-slate-800/80">
+    <div class="max-w-4xl mx-auto px-4 space-y-10">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Acesso Ilimitado</span>
+        <h2 class="text-3xl font-heading font-black text-white">Menos que o troco do pedágio por dia</h2>
+        <p class="text-xs text-slate-400">Comece hoje com 7 dias grátis na sua primeira rota gerada. Pague via PIX com ativação imediata.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        
+        <!-- Plano Semanal -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 flex flex-col justify-between">
+          <div class="space-y-3">
+            <span class="text-[10px] font-black uppercase text-orange-400 bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20">Mais Flexível</span>
+            <h3 class="text-xl font-black text-white">Plano Semanal</h3>
+            <p class="text-xs text-slate-400">Ideal para quem quer testar e pagar semana a semana sem compromisso.</p>
+            <div class="pt-2">
+              <span class="text-3xl font-black text-white">R$ 6,90</span>
+              <span class="text-xs text-slate-400 font-bold">/ semana</span>
+              <span class="block text-[11px] text-slate-500 mt-0.5">Apenas R$ 0,98 por dia</span>
+            </div>
+          </div>
+          <a href="./app/" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-orange-400 border border-orange-500/40 text-xs font-black uppercase tracking-wider rounded-xl text-center active:scale-95 transition">
+            📲 Testar 7 Dias Grátis
+          </a>
+        </div>
+
+        <!-- Plano Mensal (Campeão de Vendas) -->
+        <div class="bg-gradient-to-b from-[#131d31] to-slate-900 border-2 border-orange-500 rounded-3xl p-6 space-y-5 flex flex-col justify-between relative shadow-xl shadow-orange-500/15">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-600 to-amber-500 text-white text-[10px] font-black uppercase px-4 py-1 rounded-full tracking-wider shadow">
+            Maior Economia (Preferido dos Motoristas)
+          </div>
+          <div class="space-y-3 pt-1">
+            <span class="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">Economize 30%</span>
+            <h3 class="text-xl font-black text-white">Plano Mensal</h3>
+            <p class="text-xs text-slate-400">Para quem roda todo dia e quer paz na mente e no bolso o mês inteiro.</p>
+            <div class="pt-2">
+              <span class="text-3xl font-black text-white">R$ 19,90</span>
+              <span class="text-xs text-slate-400 font-bold">/ mês</span>
+              <span class="block text-[11px] text-emerald-400 font-bold mt-0.5">Apenas R$ 0,66 por dia de rota!</span>
+            </div>
+          </div>
+          <a href="./app/" class="w-full py-3.5 bg-orange-600 hover:bg-orange-500 text-white text-xs font-black uppercase tracking-wider rounded-xl text-center shadow-lg shadow-orange-600/30 active:scale-95 transition">
+            📲 Testar 7 Dias Grátis
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. FAQ BLINDADO (DESTRUIDOR DE DÚVIDAS) -->
+  <section id="faq" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-3xl mx-auto px-4 space-y-10">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black uppercase text-orange-500 tracking-wider">Perguntas Frequentes</span>
+        <h2 class="text-3xl font-heading font-black text-white">Tire suas dúvidas antes de rodar</h2>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>A Shopee pode bloquear minha conta por usar o SPXrotas?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>NÃO! Nunca.</strong> O SPXrotas não pede sua senha da Shopee, não acessa o sistema interno da SPX e não altera o aplicativo oficial. Ele apenas organiza os dados da rota que o próprio app da Shopee exporta. É uma ferramenta de apoio 100% legal, segura e independente.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>E se o otimizador jogar algum número de casa fora da ordem na rua? Posso mudar?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>SIM! Antes de bipar os pacotes você manda na ordem!</strong> Na aba <strong>Sacolas</strong>, basta <strong>segurar qualquer card laranja por 1 segundo e arrastar</strong> para o lugar certo (ou tocar em <strong>⇅ Mover</strong> e digitar o número da nova posição). O app recalcula automaticamente o <strong>#Canetão</strong>, a <strong>Sacola</strong>, os <strong>Pinos no Mapa</strong> e salva tudo na nuvem. Assim que você bipar o 1º pacote, a ordem trava sozinha para nunca dar confusão com o número escrito na caixa!
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>O que acontece se o sinal de internet 4G cair no meio das chácaras?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Nada para!</strong> O SPXrotas possui arquitetura <em>Offline-First</em>: todas as baixas de entrega e ajustes de ordem ficam gravados no aparelho pela <strong>SyncQueue</strong> e sincronizam sozinhos quando o 4G voltar (nunca zera suas entregas). Além disso, o mapa 3D puxa a polilinha viária da memória do celular para continuar desenhando as estradas reais sem linha reta, e os radares permanecem ativos via cache offline!
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Como funciona o Controle de Objetos Volumosos?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            Ao bipar uma caixa grande que não cabe na sacola, toque no botão <strong>"+ Marcar como Volumoso"</strong> e clique em 1 segundo onde guardou no carro (ex: Banco Traseiro ou Porta-Malas). O card ganha a tarja <strong>FORA DA SACOLA</strong> e, quando chegar a vez da entrega no GPS, a voz do aplicativo te lembra em alto e bom som onde a caixa está!
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Como funciona a conferência Laranja ➔ Verde Vivo no galpão?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            Quando você sobe a rota, todas as entregas nascem na cor <strong>Laranja (⏳ Aguardando Bipagem)</strong>. Conforme você bipa as caixas na esteira, o celular fala o Canetão/Sacola e muda o card e o pino no Mapa para <strong>Verde Vivo (🟢 Pronto / Conferido)</strong>, gravando tudo direto no banco de dados. Se no final sobrar algum pacote Laranja na lista, você descobre na hora que faltou caixa ou veio pacote trocado antes de sair do pátio!
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>O detector de radares vai ficar apitando se eu estiver numa rua de bairro perto de rodovia?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Não!</strong> Nosso sistema possui a exclusiva <strong>Trava de Corredor Viário</strong>. Se você estiver numa rua interna de bairro a 30 ou 100 metros de uma rodovia paralela, o app sabe que você está no bairro e descarta o radar da rodovia. Ele só apita se o radar estiver na via em que você realmente vai passar.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>A tela do celular vai ficar apagando enquanto eu dirijo?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Não apaga de jeito nenhum!</strong> O SPXrotas conta com o recurso nativo de <strong>Wake Lock Automático</strong>. Enquanto você estiver no modo de navegação ou entrega, a tela fica 100% acesa e brilhando no suporte do carro.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>O que é o Pingo Azul no GPS?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            Se a Shopee jogou o pino no lugar errado, basta chegar no portão correto e tocar no botão azul 📍 direto na tela do GPS 3D. O app grava a coordenada exata no banco (com trava de segurança de 450m) para que nas próximas rotas aquele endereço nunca mais caia errado.
+          </p>
+        </details>
+
+        <details class="bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-pointer group">
+          <summary class="font-bold text-white text-sm list-none flex justify-between items-center">
+            <span>Preciso colocar cartão de crédito para testar?</span>
+            <span class="text-orange-400 font-black text-base group-open:rotate-180 transition">▼</span>
+          </summary>
+          <p class="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-800">
+            <strong>Zero cartão de crédito.</strong> Seus 7 dias grátis começam quando você gerar sua primeira rota. Quando acabar, nada é cobrado automaticamente. Você só assina via PIX se o aplicativo realmente tiver economizado seu tempo e dinheiro.
+          </p>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. CTA FINAL -->
+  <section class="py-20 bg-gradient-to-t from-orange-950/40 via-transparent to-transparent text-center">
+    <div class="max-w-2xl mx-auto px-4 space-y-6">
+      <div class="w-16 h-16 bg-orange-600/20 text-orange-400 border border-orange-500/40 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-xl">
+        🏁
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-heading font-black text-white">
+        Sua próxima rota pode terminar 2 horas mais cedo.
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
+        Cada dia rodando sem o SPXrotas são R$ 25 de gasolina queimados à toa, risco de multa de radar e tempo perdido procurando caixa na calçada. Teste grátis agora mesmo!
+      </p>
+      <div class="pt-2">
+        <a href="./app/" class="inline-flex items-center gap-2 px-9 py-4 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/40 active:scale-95 transition">
+          <span>📲 Abrir o SPXrotas & Rodar Grátis</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. FOOTER ELEGANTE -->
+  <footer class="py-10 bg-[#03050a] border-t border-slate-900 text-center text-xs text-slate-500 space-y-3">
+    <p class="font-bold text-slate-400">© 2026 SPXrotas • Sistema Profissional de Otimização Logística.</p>
+    <p class="text-[10px] text-slate-600">
+      Desenvolvido e mantido por <a href="https://studiotesta.com.br/" target="_blank" class="text-amber-400 font-bold hover:underline">STUDIOTESTA</a> (CNPJ: 54.404.992/0001-41).
+    </p>
+    <p class="text-[9px] text-slate-600 max-w-md mx-auto">
+      Este produto é uma ferramenta independente desenvolvida para motoristas autônomos e não possui vínculo institucional com a Shopee Express ou Sea Group.
+    </p>
+  </footer>
+
+  <!-- 12. BOTÃO FLUTUANTE DO WHATSAPP -->
+  <aside class="fixed bottom-5 right-5 z-50">
+    <a href="https://wa.me/5513974251486?text=Fala%20Sidnei!%20Vim%20pelo%20site%20do%20SPXrotas%20e%20queria%20tirar%20uma%20d%C3%BAvida" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl active:scale-95 transition-all">
+      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+      </svg>
+      <span class="text-xs hidden sm:inline">Dúvidas? Fale comigo</span>
+    </a>
+  </aside>
+
+  <!-- JAVASCRIPT DA CALCULADORA INTERATIVA -->
+  <script>
+    function atualizarCalculo() {
+      const dias = parseInt(document.getElementById('inputDias').value);
+      document.getElementById('diasTexto').innerText = dias + (dias === 1 ? ' dia' : ' dias');
+
+      const economiaDiariaReais = 21.70;
+      const horasDiariasSalvas = 1.5;
+
+      const diasNoMes = dias * 4;
+      const totalGasolina = diasNoMes * economiaDiariaReais;
+      const totalHoras = Math.round(diasNoMes * horasDiariasSalvas);
+      const lucroLimpo = totalGasolina - 19.90;
+
+      document.getElementById('gasolinaMes').innerText = 'R$ ' + totalGasolina.toFixed(2).replace('.', ',');
+      document.getElementById('horasMes').innerText = totalHoras + ' horas';
+      document.getElementById('lucroLimpo').innerText = 'R$ ' + lucroLimpo.toFixed(2).replace('.', ',');
+    }
+  </script>
+</body>
+</html>
