@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SPXrotas Admin • Central de Comando & Frota Ao Vivo</title>
+  <meta name="theme-color" content="#050811">
+  <link rel="icon" type="image/png" href="../app/icon-192.png">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet 2D para Mapa da Frota Ao Vivo -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    [x-cloak] { display: none !important; }
+    body { background-color: #050811; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+    .leaflet-popup-content-wrapper { background: #0f172a !important; color: #fff !important; border: 1px solid #334155; border-radius: 14px !important; }
+    .leaflet-popup-tip { background: #0f172a !important; }
+    .mapa-escuro .leaflet-tile-pane { filter: brightness(0.72) invert(1) contrast(2.6) hue-rotate(200deg) saturate(0.35); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 999px; }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-orange-600 selection:text-white" x-data="painelAdmin()">
+
+  <!-- =======================================================================
+       1. TELA DE LOGIN DO PAINEL (BASIC AUTH N8N)
+       ======================================================================= -->
+  <div x-show="!autenticado" class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(circle_at_top,rgba(234,88,12,0.14),transparent_55%)]" x-cloak>
+    <div class="w-full max-w-sm bg-[#0c1322] border-2 border-orange-500/50 rounded-3xl p-7 shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <img src="../app/icon-192.png" alt="SPXrotas" class="w-16 h-16 rounded-2xl mx-auto border border-orange-500/40 shadow-lg">
+        <h1 class="text-2xl font-black text-white tracking-wide">SPX<span class="text-orange-500">rotas</span> <span class="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full border border-orange-500/30 align-middle ml-1">ADMIN</span></h1>
+        <p class="text-xs text-slate-400">Acesso exclusivo da central StudioTesta</p>
+      </div>
+
+      <form @submit.prevent="fazerLogin()" class="space-y-4">
+        <div>
+          <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Usuário</label>
+          <input type="text" x-model="loginUser" required autocomplete="username" placeholder="Usuário do Painel" class="w-full bg-black/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
+        <div>
+          <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Senha</label>
+          <input type="password" x-model="loginPass" required autocomplete="current-password" placeholder="••••••••" class="w-full bg-black/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500">
+        </div>
+
+        <div x-show="erroLogin" class="bg-red-500/15 border border-red-500/50 text-red-300 text-xs font-bold p-3 rounded-xl text-center" x-text="erroLogin"></div>
+
+        <button type="submit" :disabled="carregando" class="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-orange-600/30 active:scale-95 transition">
+          <span x-show="!carregando">🔓 Entrar na Central</span>
+          <span x-show="carregando">⏳ Validando...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       2. PAINEL PRINCIPAL AUTENTICADO
+       ======================================================================= -->
+  <div x-show="autenticado" class="min-h-screen flex flex-col" x-cloak>
+
+    <!-- CABEÇALHO FIXO -->
+    <header class="sticky top-0 z-40 bg-[#080d18]/95 backdrop-blur-md border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-3 sm:px-5 h-16 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <img src="../app/icon-192.png" alt="SPXrotas" class="w-9 h-9 rounded-xl border border-orange-500/40">
+          <div>
+            <div class="font-black text-lg text-white leading-none flex items-center gap-1.5">
+              SPX<span class="text-orange-500">rotas</span>
+              <span class="text-[10px] bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full">CENTRAL</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono" x-text="ultimaAtualizacao ? 'Atualizado às ' + ultimaAtualizacao : 'Sincronizando...'"></span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button @click="carregarDashboard(true)" :disabled="carregandoDados" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 active:scale-95 transition">
+            <span :class="{'animate-spin': carregandoDados}">🔄</span>
+            <span class="hidden sm:inline">Atualizar</span>
+          </button>
+          <button @click="sair()" class="bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/30 px-3 py-2 rounded-xl text-xs font-bold active:scale-95 transition">
+            🚪 <span class="hidden sm:inline">Sair</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MENU DE ABAS -->
+      <nav class="max-w-7xl mx-auto px-3 sm:px-5 pb-2.5 flex items-center gap-1.5 overflow-x-auto whitespace-nowrap">
+        <button @click="trocarAba('visao')" :class="aba === 'visao' ? 'bg-orange-600 text-white shadow-lg' : 'bg-slate-900 text-slate-300 border border-slate-800'" class="px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 shrink-0">
+          <span>📊</span> Visão Geral
+        </button>
+        <button @click="trocarAba('mapa')" :class="aba === 'mapa' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-slate-900 text-slate-300 border border-slate-800'" class="px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 shrink-0">
+          <span>🗺️</span> Mapa Ao Vivo
+          <span class="bg-black/40 text-[10px] font-mono px-1.5 py-0.5 rounded-full" x-text="motoristasOnlineCount"></span>
+        </button>
+        <button @click="trocarAba('motoristas')" :class="aba === 'motoristas' ? 'bg-orange-600 text-white shadow-lg' : 'bg-slate-900 text-slate-300 border border-slate-800'" class="px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 shrink-0">
+          <span>👥</span> Motoristas & Pix
+          <span class="bg-black/40 text-[10px] font-mono px-1.5 py-0.5 rounded-full" x-text="usuarios.length"></span>
+        </button>
+        <button @click="trocarAba('rotas')" :class="aba === 'rotas' ? 'bg-orange-600 text-white shadow-lg' : 'bg-slate-900 text-slate-300 border border-slate-800'" class="px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 shrink-0">
+          <span>🚚</span> Rotas
+          <span class="bg-black/40 text-[10px] font-mono px-1.5 py-0.5 rounded-full" x-text="rotas.length"></span>
+        </button>
+        <button @click="trocarAba('mensagens')" :class="aba === 'mensagens' ? 'bg-cyan-600 text-white shadow-lg' : 'bg-slate-900 text-slate-300 border border-slate-800'" class="px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 shrink-0">
+          <span>💬</span> Mensagens & Leads
+        </button>
+        <button @click="trocarAba('pingos')" :class="aba === 'pingos' ? 'bg-orange-600 text-white shadow-lg' : 'bg-slate-900 text-slate-300 border border-slate-800'" class="px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 shrink-0">
+          <span>📍</span> Pingos
+          <span class="bg-black/40 text-[10px] font-mono px-1.5 py-0.5 rounded-full" x-text="pingos.length"></span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 space-y-5">
+
+      <!-- ===================================================================
+           ABA 1: VISÃO GERAL
+           =================================================================== -->
+      <section x-show="aba === 'visao'" class="space-y-5">
+        <!-- CARDS DE KPI -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4">
+            <span class="text-[10px] font-black uppercase text-slate-400 block">Total Cadastros</span>
+            <span class="text-2xl font-black font-mono text-white mt-1 block" x-text="kpis.totalUsuarios"></span>
+            <span class="text-[10px] text-slate-500" x-text="`${kpis.semPrimeiraRota} sem 1ª rota`"></span>
+          </div>
+
+          <div class="bg-[#0b1f16] border border-emerald-500/40 rounded-2xl p-4">
+            <span class="text-[10px] font-black uppercase text-emerald-400 block">Pagos Ativos</span>
+            <span class="text-2xl font-black font-mono text-emerald-300 mt-1 block" x-text="kpis.pagosAtivos"></span>
+            <span class="text-[10px] text-emerald-400/80 font-mono" x-text="`~R$ ${kpis.receitaEstimada.toFixed(2).replace('.', ',')}`"></span>
+          </div>
+
+          <div class="bg-[#17150c] border border-amber-500/40 rounded-2xl p-4">
+            <span class="text-[10px] font-black uppercase text-amber-400 block">Em Teste (7d)</span>
+            <span class="text-2xl font-black font-mono text-amber-300 mt-1 block" x-text="kpis.emTrial"></span>
+            <span class="text-[10px] text-amber-400/80" x-text="`${kpis.vencendo48h} vencendo em 48h`"></span>
+          </div>
+
+          <div class="bg-[#1c0f14] border border-red-500/40 rounded-2xl p-4">
+            <span class="text-[10px] font-black uppercase text-red-400 block">Vencidos</span>
+            <span class="text-2xl font-black font-mono text-red-300 mt-1 block" x-text="kpis.vencidos"></span>
+            <span class="text-[10px] text-red-400/80">Potencial de cobrança</span>
+          </div>
+
+          <div class="bg-[#0c1322] border border-cyan-500/40 rounded-2xl p-4">
+            <span class="text-[10px] font-black uppercase text-cyan-400 block">Rotas Hoje</span>
+            <span class="text-2xl font-black font-mono text-cyan-300 mt-1 block" x-text="kpis.rotasHoje"></span>
+            <span class="text-[10px] text-cyan-400/80" x-text="`${kpis.pacotesHoje} pacotes hoje`"></span>
+          </div>
+
+          <div @click="trocarAba('mapa')" class="bg-[#0c1322] border border-green-500/50 rounded-2xl p-4 cursor-pointer hover:border-green-400 transition">
+            <span class="text-[10px] font-black uppercase text-green-400 block">Frota Ao Vivo</span>
+            <span class="text-2xl font-black font-mono text-green-300 mt-1 block" x-text="motoristasOnlineCount"></span>
+            <span class="text-[10px] text-green-400/80">Abrir Mapa ➔</span>
+          </div>
+        </div>
+
+        <!-- ALERTAS DE VENCIMENTO + ÚLTIMAS ROTAS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          
+          <!-- VENCENDO / VENCIDOS PARA COBRAR -->
+          <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+              <h2 class="text-sm font-black text-amber-400 flex items-center gap-2"><span>⏳</span> Vencendo em 48h ou Expirados</h2>
+              <button @click="filtroMotorista = 'vencendo'; trocarAba('motoristas')" class="text-[11px] text-orange-400 font-bold hover:underline">Ver todos →</button>
+            </div>
+            <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
+              <template x-if="listaParaCobrar.length === 0">
+                <p class="text-xs text-slate-500 py-6 text-center">Nenhum motorista vencendo agora.</p>
+              </template>
+              <template x-for="u in listaParaCobrar" :key="u.id">
+                <div class="bg-black/50 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
+                  <div class="min-w-0">
+                    <div class="font-black text-white truncate" x-text="u.nome || u.email || 'Sem nome'"></div>
+                    <div class="text-[11px] text-slate-400 font-mono" x-text="`${u.telefone || 'Sem Zap'} • ${formatarSituacaoUsuario(u).texto}`"></div>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button @click="abrirModalMensagemRapida(u, 'cobranca')" class="bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] border border-[#25D366]/40 px-2.5 py-1.5 rounded-lg font-black text-[11px]">💬 Cobrar</button>
+                    <button @click="acaoAssinatura(u, 'renovar_mensal')" class="bg-orange-600 hover:bg-orange-500 text-white px-2.5 py-1.5 rounded-lg font-black text-[11px]">+30d</button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- ÚLTIMAS ROTAS GERADAS -->
+          <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+              <h2 class="text-sm font-black text-cyan-400 flex items-center gap-2"><span>🚚</span> Últimas Rotas na Rua</h2>
+              <button @click="trocarAba('rotas')" class="text-[11px] text-orange-400 font-bold hover:underline">Ver todas →</button>
+            </div>
+            <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
+              <template x-for="r in rotas.slice(0, 8)" :key="r.id">
+                <div @click="abrirDetalhesRota(r)" class="bg-black/50 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-3 flex items-center justify-between gap-2 text-xs cursor-pointer transition">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono font-black text-orange-400" x-text="`#${r.id}`"></span>
+                      <span class="font-black text-white truncate" x-text="r.motorista_nome || 'Motorista SPX'"></span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 mt-0.5" x-text="`${formatarDataBR(r.data)} • ${r.qtd_entregues}/${r.total_pacotes} entregues (${r.qtd_conferidos} conf.)`"></div>
+                  </div>
+                  <span class="text-[10px] font-mono font-black px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-cyan-300 shrink-0" x-text="`${r.total_pacotes} pct`"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ABA 2: MAPA AO VIVO DA FROTA (TEMPO REAL)
+           =================================================================== -->
+      <section x-show="aba === 'mapa'" class="space-y-3">
+        <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-black text-white flex items-center gap-1.5"><span>🛰️</span> Monitoramento Ao Vivo</span>
+            <button @click="filtroMapa = 'todos'; renderizarFrotaNoMapa()" :class="filtroMapa === 'todos' ? 'bg-orange-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-700'" class="px-2.5 py-1 rounded-lg text-[11px] font-black">Todos (<span x-text="frotaNormalizada.length"></span>)</button>
+            <button @click="filtroMapa = 'online'; renderizarFrotaNoMapa()" :class="filtroMapa === 'online' ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-700'" class="px-2.5 py-1 rounded-lg text-[11px] font-black">🟢 Ao Vivo (<span x-text="motoristasOnlineCount"></span>)</button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button @click="autoRefreshMapa = !autoRefreshMapa; gerenciarAutoRefreshMapa()" :class="autoRefreshMapa ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/50' : 'bg-slate-900 text-slate-400 border-slate-700'" class="border px-3 py-1.5 rounded-xl text-[11px] font-black">
+              <span x-text="autoRefreshMapa ? '🟢 Auto 15s ON' : '⏸️ Auto 15s OFF'"></span>
+            </button>
+            <button @click="enquadrarTodosMotoristas()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 px-3 py-1.5 rounded-xl text-[11px] font-black">🎯 Enquadrar</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <!-- MAPA LEAFLET -->
+          <div class="lg:col-span-2 h-[58vh] lg:h-[70vh] rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl mapa-escuro relative">
+            <div id="mapaFrotaAdmin" class="w-full h-full z-10"></div>
+          </div>
+
+          <!-- LISTA LATERAL DOS MOTORISTAS NO MAPA -->
+          <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-3 space-y-2.5 h-[40vh] lg:h-[70vh] overflow-y-auto">
+            <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider pb-1 border-b border-slate-800">Motoristas Rastreados</h3>
+            <template x-if="frotaFiltrada.length === 0">
+              <div class="text-center py-10 text-xs text-slate-500">
+                Nenhum motorista transmitiu posição GPS ainda.<br>Assim que rodarem com o app atualizado, aparecerão aqui!
+              </div>
+            </template>
+            <template x-for="m in frotaFiltrada" :key="m.rota_id">
+              <div @click="focarMotoristaNoMapa(m)" class="bg-black/60 hover:bg-slate-900 border border-slate-800 hover:border-orange-500/60 rounded-xl p-3 space-y-2 cursor-pointer transition">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="m.statusSinal === 'online' ? 'bg-emerald-400 animate-pulse' : (m.statusSinal === 'recente' ? 'bg-amber-400' : 'bg-slate-500')"></span>
+                    <span class="font-black text-xs text-white truncate" x-text="m.motorista_nome"></span>
+                  </div>
+                  <span class="text-[10px] font-mono font-black px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-cyan-300 shrink-0" x-text="`${m.velocidade || 0} km/h`"></span>
+                </div>
+                <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                  <span x-text="`Rota #${m.rota_id} • ${m.qtd_entregues}/${m.total_pacotes} entr.`"></span>
+                  <span class="font-mono text-[10px]" x-text="m.tempoAtrasTexto"></span>
+                </div>
+                <div class="flex items-center gap-1.5 pt-1">
+                  <button @click.stop="abrirDetalhesRota({ id: m.rota_id, motorista_nome: m.motorista_nome, total_pacotes: m.total_pacotes })" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-1.5 rounded-lg text-[10px] font-bold">📦 Ver Rota</button>
+                  <button x-show="m.motorista_telefone" @click.stop="abrirModalMensagemRapida({ nome: m.motorista_nome, telefone: m.motorista_telefone }, 'livre')" class="bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] px-2.5 py-1.5 rounded-lg text-[10px] font-black">💬 Zap</button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ABA 3: MOTORISTAS, PAGAMENTOS & VENCIMENTOS
+           =================================================================== -->
+      <section x-show="aba === 'motoristas'" class="space-y-4">
+        <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row gap-2.5 justify-between">
+            <input type="text" x-model="buscaMotorista" placeholder="🔍 Buscar por nome, telefone ou e-mail..." class="flex-1 bg-black border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
+            <div class="flex flex-wrap gap-1.5 text-[11px] font-black">
+              <button @click="filtroMotorista = 'todos'" :class="filtroMotorista === 'todos' ? 'bg-orange-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800'" class="px-3 py-2 rounded-xl">Todos</button>
+              <button @click="filtroMotorista = 'ativo'" :class="filtroMotorista === 'ativo' ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800'" class="px-3 py-2 rounded-xl">Pagos Ativos</button>
+              <button @click="filtroMotorista = 'trial'" :class="filtroMotorista === 'trial' ? 'bg-amber-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800'" class="px-3 py-2 rounded-xl">Em Trial</button>
+              <button @click="filtroMotorista = 'vencendo'" :class="filtroMotorista === 'vencendo' ? 'bg-red-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800'" class="px-3 py-2 rounded-xl">Vencendo / Vencidos</button>
+              <button @click="filtroMotorista = 'sem_rota'" :class="filtroMotorista === 'sem_rota' ? 'bg-cyan-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800'" class="px-3 py-2 rounded-xl">Sem 1ª Rota</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <template x-for="u in motoristasFiltrados" :key="u.id">
+            <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <h3 class="text-sm font-black text-white truncate" x-text="u.nome || 'Sem nome cadastrado'"></h3>
+                  <p class="text-[11px] text-slate-400 truncate" x-text="u.email || 'Sem e-mail'"></p>
+                  <p class="text-xs font-mono text-cyan-400 mt-0.5" x-text="u.telefone || 'Sem WhatsApp'"></p>
+                </div>
+                <div class="text-right shrink-0 space-y-1">
+                  <span class="inline-block text-[10px] font-black uppercase px-2.5 py-1 rounded-full border" :class="formatarSituacaoUsuario(u).classe" x-text="formatarSituacaoUsuario(u).texto"></span>
+                  <span class="block text-[10px] text-slate-400 font-mono" x-text="`Plano: ${(u.plano_ativo || 'gratuito').toUpperCase()} • ${u.total_rotas || 0} rotas`"></span>
+                </div>
+              </div>
+
+              <div class="bg-black/40 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between text-[11px]">
+                <span class="text-slate-400">Vencimento:</span>
+                <span class="font-mono font-bold text-white" x-text="u.trial_expira_em ? (u.plano_ativo === 'vitalicio' ? 'VITALÍCIO ♾️' : formatarDataHoraBR(u.trial_expira_em)) : 'Aguardando 1ª rota'"></span>
+              </div>
+
+              <!-- AÇÕES DE ASSINATURA & ZAP EM 1 CLIQUE -->
+              <div class="flex flex-wrap gap-1.5 pt-1 text-[11px] font-black">
+                <button @click="acaoAssinatura(u, 'renovar_semanal')" class="bg-orange-600/20 hover:bg-orange-600 text-orange-300 hover:text-white border border-orange-500/40 px-2.5 py-1.5 rounded-lg transition">+7d Semanal</button>
+                <button @click="acaoAssinatura(u, 'renovar_mensal')" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 px-2.5 py-1.5 rounded-lg transition">+30d Mensal</button>
+                <button @click="acaoAssinatura(u, 'vitalicio')" class="bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 px-2.5 py-1.5 rounded-lg transition">Vitalício</button>
+                <button @click="acaoAssinatura(u, 'bloquear')" class="bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/40 px-2.5 py-1.5 rounded-lg transition">Bloquear</button>
+                <button @click="abrirEditarUsuario(u)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg">✏️ Editar</button>
+                <button x-show="u.telefone" @click="abrirModalMensagemRapida(u, 'cobranca')" class="bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] border border-[#25D366]/40 px-2.5 py-1.5 rounded-lg ml-auto">💬 Zap</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ABA 4: ROTAS & ENTREGAS
+           =================================================================== -->
+      <section x-show="aba === 'rotas'" class="space-y-4">
+        <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4">
+          <input type="text" x-model="buscaRota" placeholder="🔍 Buscar rota por #ID, motorista, telefone ou código AT..." class="w-full bg-black border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <template x-for="r in rotasFiltradas" :key="r.id">
+            <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg flex flex-col justify-between">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono font-black text-base text-orange-400" x-text="`Rota #${r.id}`"></span>
+                  <span class="text-[10px] font-mono bg-slate-900 border border-slate-700 px-2 py-0.5 rounded text-slate-300" x-text="r.codigo_at || 'Sem AT ID'"></span>
+                </div>
+                <div>
+                  <h3 class="text-sm font-black text-white truncate" x-text="r.motorista_nome || 'Motorista SPX'"></h3>
+                  <p class="text-[11px] font-mono text-cyan-400" x-text="`${r.motorista_telefone || 'Sem telefone'} • ${formatarDataBR(r.data)}`"></p>
+                </div>
+
+                <!-- BARRA DE PROGRESSO -->
+                <div class="space-y-1 pt-1">
+                  <div class="flex justify-between text-[10px] font-bold">
+                    <span class="text-emerald-400" x-text="`Entregues: ${r.qtd_entregues}/${r.total_pacotes}`"></span>
+                    <span class="text-cyan-400 font-mono" x-text="`KM GPS: ${extrairKmTelemetria(r.telemetria)} km`"></span>
+                  </div>
+                  <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden flex border border-slate-800">
+                    <div class="bg-red-500 h-full" :style="`width: ${pct(r.qtd_entregues, r.total_pacotes)}%`" title="Entregues"></div>
+                    <div class="bg-green-500 h-full" :style="`width: ${pct(r.qtd_conferidos, r.total_pacotes)}%`" title="Conferidos"></div>
+                    <div class="bg-amber-400 h-full" :style="`width: ${pct(r.qtd_ausentes, r.total_pacotes)}%`" title="Ausentes"></div>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-slate-400">
+                    <span x-text="`🟢 Conf: ${r.qtd_conferidos}`"></span>
+                    <span x-text="`🟡 Aus: ${r.qtd_ausentes}`"></span>
+                    <span x-text="`🟠 Pend: ${r.qtd_pendentes}`"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex gap-2 pt-2 border-t border-slate-800/80">
+                <button @click="abrirDetalhesRota(r)" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white py-2.5 rounded-xl text-xs font-black transition">📦 Ver Pacotes</button>
+                <button x-show="r.motorista_telefone" @click="abrirModalMensagemRapida({ nome: r.motorista_nome, telefone: r.motorista_telefone }, 'livre')" class="bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] border border-[#25D366]/40 px-3 py-2.5 rounded-xl text-xs font-black">💬</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ABA 5: MENSAGENS (EVOLUTION STUDIOTESTA) & LEADS
+           =================================================================== -->
+      <section x-show="aba === 'mensagens'" class="space-y-4">
+        <div class="flex gap-2">
+          <button @click="subAbaMsg = 'conversas'; carregarConversasZap()" :class="subAbaMsg === 'conversas' ? 'bg-cyan-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800'" class="px-4 py-2.5 rounded-xl text-xs font-black">💬 Conversas WhatsApp (studiotesta)</button>
+          <button @click="subAbaMsg = 'leads'" :class="subAbaMsg === 'leads' ? 'bg-orange-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800'" class="px-4 py-2.5 rounded-xl text-xs font-black">🎯 Leads Prospecção (<span x-text="leadsResumo.pendentes || 0"></span> pend.)</button>
+        </div>
+
+        <!-- SUB-ABA CONVERSAS EVOLUTION -->
+        <div x-show="subAbaMsg === 'conversas'" class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-3 space-y-2 h-[65vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+              <span class="text-xs font-black text-cyan-400">Chats Recentes</span>
+              <button @click="carregarConversasZap()" class="text-[11px] text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg font-bold">🔄</button>
+            </div>
+            <template x-if="carregandoChats">
+              <p class="text-xs text-slate-400 text-center py-8">Carregando conversas da Evolution...</p>
+            </template>
+            <template x-for="c in chatsZap" :key="c.remoteJid">
+              <div @click="selecionarChatZap(c)" :class="chatAtivo?.remoteJid === c.remoteJid ? 'border-cyan-500 bg-cyan-500/10' : 'border-slate-800 bg-black/50'" class="border rounded-xl p-2.5 cursor-pointer transition space-y-1">
+                <div class="flex justify-between items-center gap-2">
+                  <span class="text-xs font-black text-white truncate" x-text="c.nome"></span>
+                  <span class="text-[10px] font-mono text-slate-500" x-text="c.numero"></span>
+                </div>
+                <p class="text-[11px] text-slate-400 truncate" x-text="c.ultimaMensagem"></p>
+              </div>
+            </template>
+          </div>
+
+          <!-- JANELA DE CHAT -->
+          <div class="lg:col-span-2 bg-[#0c1322] border border-slate-800 rounded-2xl flex flex-col h-[65vh] overflow-hidden">
+            <div class="p-3.5 border-b border-slate-800 bg-black/40 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-black text-white" x-text="chatAtivo ? chatAtivo.nome : 'Selecione uma conversa'"></h3>
+                <span class="text-[11px] font-mono text-cyan-400" x-text="chatAtivo ? chatAtivo.numero : 'Instância: studiotesta'"></span>
+              </div>
+              <button x-show="chatAtivo" @click="selecionarChatZap(chatAtivo)" class="text-xs bg-slate-800 px-3 py-1.5 rounded-lg font-bold text-slate-200">🔄</button>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto space-y-2.5" id="boxMensagensChat">
+              <template x-if="!chatAtivo">
+                <div class="text-center text-xs text-slate-500 pt-16">Clique em uma conversa à esquerda para visualizar o histórico e responder.</div>
+              </template>
+              <template x-for="m in mensagensChat" :key="m.id">
+                <div class="flex" :class="m.fromMe ? 'justify-end' : 'justify-start'">
+                  <div class="max-w-[80%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed" :class="m.fromMe ? 'bg-orange-600 text-white rounded-br-sm' : 'bg-slate-800 text-slate-100 rounded-bl-sm'">
+                    <p class="whitespace-pre-wrap break-words" x-text="m.texto"></p>
+                    <span class="text-[9px] opacity-70 block text-right mt-1 font-mono" x-text="m.timestamp ? new Date(Number(m.timestamp) * 1000).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : ''"></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <form x-show="chatAtivo" @submit.prevent="enviarRespostaChat()" class="p-3 border-t border-slate-800 bg-black/50 flex gap-2">
+              <input type="text" x-model="textoRespostaChat" placeholder="Digite sua resposta pelo WhatsApp..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <button type="submit" :disabled="enviandoZap" class="bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs uppercase active:scale-95 transition">Enviar</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- SUB-ABA LEADS -->
+        <div x-show="subAbaMsg === 'leads'" class="space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-3.5">
+              <span class="text-[10px] font-black uppercase text-slate-400 block">Total Leads</span>
+              <span class="text-xl font-black font-mono text-white" x-text="leadsResumo.total || 0"></span>
+            </div>
+            <div class="bg-[#0c1322] border border-amber-500/40 rounded-2xl p-3.5">
+              <span class="text-[10px] font-black uppercase text-amber-400 block">Pendentes</span>
+              <span class="text-xl font-black font-mono text-amber-300" x-text="leadsResumo.pendentes || 0"></span>
+            </div>
+            <div class="bg-[#0c1322] border border-emerald-500/40 rounded-2xl p-3.5">
+              <span class="text-[10px] font-black uppercase text-emerald-400 block">Enviados Hoje</span>
+              <span class="text-xl font-black font-mono text-emerald-300" x-text="`${leadsResumo.enviados_hoje || 0} / 35`"></span>
+            </div>
+            <div class="bg-[#0c1322] border border-cyan-500/40 rounded-2xl p-3.5">
+              <span class="text-[10px] font-black uppercase text-cyan-400 block">Total Enviados</span>
+              <span class="text-xl font-black font-mono text-cyan-300" x-text="leadsResumo.enviados_total || 0"></span>
+            </div>
+          </div>
+
+          <form @submit.prevent="adicionarLeadManual()" class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-2.5">
+            <input type="text" x-model="novoLeadNome" placeholder="Nome do motorista" class="flex-1 bg-black border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white">
+            <input type="tel" x-model="novoLeadNumero" required placeholder="WhatsApp com 55+DDD (ex: 5513999999999)" class="flex-1 bg-black border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono">
+            <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase">+ Adicionar Lead</button>
+          </form>
+
+          <div class="bg-[#0c1322] border border-slate-800 rounded-2xl overflow-hidden">
+            <div class="divide-y divide-slate-800 max-h-[55vh] overflow-y-auto">
+              <template x-for="l in leads" :key="l.id">
+                <div class="p-3.5 flex items-center justify-between gap-3 text-xs">
+                  <div class="min-w-0">
+                    <span class="font-black text-white block truncate" x-text="l.nome || 'Motorista Parceiro'"></span>
+                    <span class="font-mono text-[11px] text-cyan-400" x-text="l.numero"></span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full border" :class="l.status === 'enviado' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40' : 'bg-amber-500/15 text-amber-400 border-amber-500/40'" x-text="l.status"></span>
+                    <button @click="abrirModalMensagemRapida({ nome: l.nome, telefone: l.numero }, 'livre')" class="bg-[#25D366]/20 text-[#25D366] px-2.5 py-1 rounded-lg font-black text-[11px]">💬</button>
+                    <button @click="gerenciarLead(l.id, 'excluir')" class="bg-red-600/20 text-red-400 px-2.5 py-1 rounded-lg font-black text-[11px]">🗑️</button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ABA 6: PINGOS INTELIGENTES (AUDITORIA)
+           =================================================================== -->
+      <section x-show="aba === 'pingos'" class="space-y-3">
+        <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-white">📍 Correções de Portão Gravadas pelos Motoristas</h2>
+            <p class="text-[11px] text-slate-400">Cada endereço abaixo já cai corrigido automaticamente nas próximas rotas.</p>
+          </div>
+          <span class="font-mono font-black text-orange-400 text-lg" x-text="pingos.length"></span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <template x-for="p in pingos" :key="p.id">
+            <div class="bg-[#0c1322] border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3 text-xs">
+              <div class="min-w-0 space-y-1">
+                <h4 class="font-black text-white truncate" x-text="p.endereco"></h4>
+                <p class="text-[11px] text-slate-400" x-text="`${p.bairro || ''} - ${p.cidade || ''} • ${formatarDataHoraBR(p.criado_em)}`"></p>
+                <span class="text-[10px] font-mono text-cyan-400 block" x-text="`${p.latitude}, ${p.longitude}`"></span>
+              </div>
+              <div class="flex flex-col gap-1.5 shrink-0">
+                <a :href="`https://www.google.com/maps?q=${p.latitude},${p.longitude}`" target="_blank" class="bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded-lg font-black text-[11px] text-center">🗺️ Maps</a>
+                <button @click="excluirPingo(p.id)" class="bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/40 px-3 py-1.5 rounded-lg font-black text-[11px]">🗑️ Excluir</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 1: DETALHES DA ROTA (ENTREGAS AO VIVO)
+       ======================================================================= -->
+  <div x-show="modalRotaAberto" class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-3 backdrop-blur-sm" x-cloak>
+    <div class="bg-[#0c1322] border-2 border-orange-500/60 rounded-3xl w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl" @click.away="modalRotaAberto = false">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-black/40">
+        <div>
+          <h3 class="text-base font-black text-white" x-text="`Rota #${rotaSelecionada?.id || ''} • ${rotaSelecionada?.motorista_nome || ''}`"></h3>
+          <span class="text-xs text-slate-400" x-text="`${entregasModal.length} pacotes carregados`"></span>
+        </div>
+        <button @click="modalRotaAberto = false" class="text-2xl text-slate-400 hover:text-white px-2">&times;</button>
+      </div>
+      <div class="p-4 overflow-y-auto space-y-2 flex-1 text-xs">
+        <template x-if="carregandoEntregas">
+          <p class="text-center text-slate-400 py-10">Carregando paradas...</p>
+        </template>
+        <template x-for="e in entregasModal" :key="e.id">
+          <div class="bg-black/50 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-black text-orange-400" x-text="`#${e.ordem_entrega}`"></span>
+                <span class="font-bold text-white truncate" x-text="e.endereco"></span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5 font-mono" x-text="`${e.bairro || ''} • ${e.codigo_rastreio || ''}`"></p>
+            </div>
+            <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full shrink-0" :class="{
+              'bg-red-500/20 text-red-400': e.status === 'entregue',
+              'bg-green-500/20 text-green-400': e.status === 'conferido',
+              'bg-amber-500/20 text-amber-400': e.status === 'ausente',
+              'bg-orange-500/20 text-orange-400': e.status === 'pendente' || !e.status
+            }" x-text="e.status || 'pendente'"></span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 2: ENVIAR WHATSAPP RÁPIDO (COBRANÇA / BOAS-VINDAS / SUPORTE)
+       ======================================================================= -->
+  <div x-show="modalMsgRapida" class="fixed inset-0 bg-black/85 z-50 flex items-end sm:items-center justify-center p-3 backdrop-blur-sm" x-cloak>
+    <div class="bg-[#0c1322] border-2 border-[#25D366]/60 rounded-3xl w-full max-w-md p-5 space-y-4 shadow-2xl" @click.away="modalMsgRapida = false">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-black text-white">💬 Enviar WhatsApp (studiotesta)</h3>
+          <span class="text-xs text-cyan-400 font-mono" x-text="`${alvoMsgRapida?.nome || ''} • ${alvoMsgRapida?.telefone || ''}`"></span>
+        </div>
+        <button @click="modalMsgRapida = false" class="text-2xl text-slate-400 hover:text-white">&times;</button>
+      </div>
+
+      <div class="flex flex-wrap gap-1.5 text-[10px] font-black">
+        <button @click="aplicarTemplateMsg('boas_vindas')" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1.5 rounded-lg">👋 Boas-vindas</button>
+        <button @click="aplicarTemplateMsg('vencendo')" class="bg-slate-800 hover:bg-slate-700 text-amber-300 px-2.5 py-1.5 rounded-lg">⏳ Vencendo</button>
+        <button @click="aplicarTemplateMsg('cobranca')" class="bg-slate-800 hover:bg-slate-700 text-orange-300 px-2.5 py-1.5 rounded-lg">💰 Vencido / PIX</button>
+      </div>
+
+      <textarea x-model="textoMsgRapida" rows="5" class="w-full bg-black border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-[#25D366]"></textarea>
+
+      <div class="flex gap-2">
+        <a :href="`https://wa.me/${formatarZapLink(alvoMsgRapida?.telefone)}?text=${encodeURIComponent(textoMsgRapida)}`" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 px-4 rounded-xl text-xs text-center">Abrir no Meu Zap</a>
+        <button @click="dispararMsgRapidaEvolution()" :disabled="enviandoZap" class="flex-1 bg-[#25D366] hover:bg-[#20ba5a] text-slate-950 font-black py-3 rounded-xl text-xs uppercase active:scale-95 transition">
+          <span x-show="!enviandoZap">🚀 Enviar Direto pelo Painel</span>
+          <span x-show="enviandoZap">⏳ Enviando...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 3: EDITAR NOME E TELEFONE DO MOTORISTA
+       ======================================================================= -->
+  <div x-show="modalEditarUser" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
+    <div class="bg-[#0c1322] border-2 border-orange-500/60 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl" @click.away="modalEditarUser = false">
+      <h3 class="text-base font-black text-white">✏️ Editar Dados do Motorista</h3>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Nome Completo</label>
+          <input type="text" x-model="editUserNome" class="w-full bg-black border border-slate-700 rounded-xl px-3 py-2.5 text-white">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">WhatsApp com DDD</label>
+          <input type="tel" x-model="editUserTel" class="w-full bg-black border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono">
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button @click="modalEditarUser = false" class="flex-1 bg-slate-800 text-slate-300 font-bold py-3 rounded-xl text-xs">Cancelar</button>
+        <button @click="salvarEdicaoUsuario()" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-black py-3 rounded-xl text-xs">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div x-show="toast" x-text="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 border-2 border-orange-500 text-white text-xs font-black px-5 py-2.5 rounded-full shadow-2xl" x-cloak></div>
+
+  <script>
+    function painelAdmin() {
+      return {
+        API_URL: 'https://n8n.studiotesta.com.br/webhook/spxrotas-painel-api',
+        autenticado: false,
+        authHeader: localStorage.getItem('spx_admin_auth') || '',
+        loginUser: '',
+        loginPass: '',
+        erroLogin: '',
+        carregando: false,
+        carregandoDados: false,
+        ultimaAtualizacao: '',
+        toast: '',
+
+        aba: 'visao',
+        usuarios: [],
+        rotas: [],
+        frotaAoVivo: [],
+        leads: [],
+        leadsResumo: {},
+        pingos: [],
+
+        // Filtros
+        buscaMotorista: '',
+        filtroMotorista: 'todos',
+        buscaRota: '',
+        filtroMapa: 'todos',
+        autoRefreshMapa: true,
+        timerMapa: null,
+
+        // Mapa Frota
+        mapaFrota: null,
+        grupoFrota: null,
+
+        // Modal Rota
+        modalRotaAberto: false,
+        rotaSelecionada: null,
+        entregasModal: [],
+        carregandoEntregas: false,
+
+        // Mensagens & Leads
+        subAbaMsg: 'conversas',
+        chatsZap: [],
+        carregandoChats: false,
+        chatAtivo: null,
+        mensagensChat: [],
+        textoRespostaChat: '',
+        enviandoZap: false,
+        novoLeadNome: '',
+        novoLeadNumero: '',
+
+        // Modal Mensagem Rápida & Edição
+        modalMsgRapida: false,
+        alvoMsgRapida: null,
+        textoMsgRapida: '',
+        modalEditarUser: false,
+        editUserId: null,
+        editUserNome: '',
+        editUserTel: '',
+
+        async init() {
+          if (this.authHeader) {
+            this.autenticado = true;
+            await this.carregarDashboard(false);
+          }
+        },
+
+        mostrarToast(msg) {
+          this.toast = msg;
+          setTimeout(() => { this.toast = ''; }, 3000);
+        },
+
+        async callApi(body) {
+          const res = await fetch(this.API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.authHeader
+            },
+            body: JSON.stringify(body)
+          });
+
+          if (res.status === 401) {
+            this.sair();
+            throw new Error('Sessão expirada ou credenciais inválidas.');
+          }
+          if (!res.ok) throw new Error('Erro HTTP ' + res.status);
+          return await res.json();
+        },
+
+        async fazerLogin() {
+          this.erroLogin = '';
+          this.carregando = true;
+          try {
+            const token = 'Basic ' + btoa(unescape(encodeURIComponent(this.loginUser + ':' + this.loginPass)));
+            this.authHeader = token;
+            await this.callApi({ acao: 'login' });
+            localStorage.setItem('spx_admin_auth', token);
+            this.autenticado = true;
+            await this.carregarDashboard(false);
+          } catch (e) {
+            this.authHeader = '';
+            localStorage.removeItem('spx_admin_auth');
+            this.erroLogin = 'Usuário ou senha incorretos!';
+          } finally {
+            this.carregando = false;
+          }
+        },
+
+        sair() {
+          if (this.timerMapa) clearInterval(this.timerMapa);
+          localStorage.removeItem('spx_admin_auth');
+          this.authHeader = '';
+          this.autenticado = false;
+        },
+
+        async carregarDashboard(silencioso = false) {
+          if (!silencioso) this.carregandoDados = true;
+          try {
+            const d = await this.callApi({ acao: 'dashboard' });
+            this.usuarios = d.usuarios || [];
+            this.rotas = d.rotas || [];
+            this.frotaAoVivo = d.frota_ao_vivo || [];
+            this.leads = d.leads || [];
+            this.leadsResumo = d.leads_resumo || {};
+            this.pingos = d.pingos || [];
+            this.ultimaAtualizacao = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            if (this.aba === 'mapa' && this.mapaFrota) {
+              this.renderizarFrotaNoMapa();
+            }
+          } catch (e) {
+            if (!silencioso) this.mostrarToast('❌ ' + e.message);
+          } finally {
+            this.carregandoDados = false;
+          }
+        },
+
+        trocarAba(nova) {
+          this.aba = nova;
+          if (nova === 'mapa') {
+            setTimeout(() => { this.inicializarMapaFrota(); }, 150);
+            this.gerenciarAutoRefreshMapa();
+          } else {
+            if (this.timerMapa) { clearInterval(this.timerMapa); this.timerMapa = null; }
+          }
+          if (nova === 'mensagens' && this.subAbaMsg === 'conversas' && this.chatsZap.length === 0) {
+            this.carregarConversasZap();
+          }
+        },
+
+        gerenciarAutoRefreshMapa() {
+          if (this.timerMapa) { clearInterval(this.timerMapa); this.timerMapa = null; }
+          if (this.aba === 'mapa' && this.autoRefreshMapa) {
+            this.timerMapa = setInterval(() => {
+              this.carregarDashboard(true);
+            }, 15000);
+          }
+        },
+
+        // =====================================================================
+        // COMPUTEDS DE KPI & STATUS DE ASSINATURA
+        // =====================================================================
+        formatarSituacaoUsuario(u) {
+          if (u.plano_ativo === 'vitalicio') {
+            return { tipo: 'ativo', texto: 'Vitalício', classe: 'bg-purple-500/20 text-purple-300 border-purple-500/50' };
+          }
+          if (!u.trial_expira_em) {
+            return { tipo: 'sem_rota', texto: 'Sem 1ª Rota', classe: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' };
+          }
+          const diffMs = new Date(u.trial_expira_em).getTime() - Date.now();
+          const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+          if (diffMs <= 0) {
+            return { tipo: 'vencido', texto: `Vencido há ${Math.abs(diffDias)}d`, classe: 'bg-red-500/20 text-red-300 border-red-500/50' };
+          }
+          if (u.status_assinatura === 'ativo') {
+            return { tipo: 'ativo', texto: `Pago (${diffDias}d)`, classe: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' };
+          }
+          if (diffDias <= 2) {
+            return { tipo: 'vencendo', texto: `Trial (${diffDias}d)`, classe: 'bg-red-500/20 text-amber-300 border-amber-500/60' };
+          }
+          return { tipo: 'trial', texto: `Trial (${diffDias}d)`, classe: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
+        },
+
+        get kpis() {
+          let pagosAtivos = 0, emTrial = 0, vencendo48h = 0, vencidos = 0, semPrimeiraRota = 0, receitaEstimada = 0;
+          const agora = Date.now();
+
+          this.usuarios.forEach(u => {
+            if (u.plano_ativo === 'vitalicio') { pagosAtivos++; return; }
+            if (!u.trial_expira_em) { semPrimeiraRota++; return; }
+            const exp = new Date(u.trial_expira_em).getTime();
+            const diffDias = Math.ceil((exp - agora) / (1000 * 60 * 60 * 24));
+            if (exp <= agora) {
+              vencidos++;
+            } else if (u.status_assinatura === 'ativo') {
+              pagosAtivos++;
+              receitaEstimada += (u.plano_ativo === 'mensal' ? 19.90 : 6.90);
+              if (diffDias <= 2) vencendo48h++;
+            } else {
+              emTrial++;
+              if (diffDias <= 2) vencendo48h++;
+            }
+          });
+
+          const hojeStr = new Date().toISOString().slice(0, 10);
+          const rotasHojeList = this.rotas.filter(r => String(r.data || '').slice(0, 10) === hojeStr);
+          const pacotesHoje = rotasHojeList.reduce((acc, r) => acc + (Number(r.total_pacotes) || 0), 0);
+
+          return {
+            totalUsuarios: this.usuarios.length,
+            pagosAtivos, emTrial, vencendo48h, vencidos, semPrimeiraRota, receitaEstimada,
+            rotasHoje: rotasHojeList.length,
+            pacotesHoje
+          };
+        },
+
+        get listaParaCobrar() {
+          const agora = Date.now();
+          const em48h = agora + (2 * 24 * 60 * 60 * 1000);
+          return this.usuarios.filter(u => {
+            if (u.plano_ativo === 'vitalicio' || !u.trial_expira_em) return false;
+            return new Date(u.trial_expira_em).getTime() <= em48h;
+          }).slice(0, 20);
+        },
+
+        get motoristasFiltrados() {
+          const q = (this.buscaMotorista || '').toLowerCase().trim();
+          return this.usuarios.filter(u => {
+            const sit = this.formatarSituacaoUsuario(u);
+            if (this.filtroMotorista === 'ativo' && sit.tipo !== 'ativo') return false;
+            if (this.filtroMotorista === 'trial' && sit.tipo !== 'trial' && sit.tipo !== 'vencendo') return false;
+            if (this.filtroMotorista === 'sem_rota' && sit.tipo !== 'sem_rota') return false;
+            if (this.filtroMotorista === 'vencendo') {
+              if (!u.trial_expira_em || u.plano_ativo === 'vitalicio') return false;
+              const diffDias = Math.ceil((new Date(u.trial_expira_em).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+              if (diffDias > 2) return false;
+            }
+            if (!q) return true;
+            return (u.nome || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q) || (u.telefone || '').includes(q);
+          });
+        },
+
+        get rotasFiltradas() {
+          const q = (this.buscaRota || '').toLowerCase().trim();
+          if (!q) return this.rotas;
+          return this.rotas.filter(r =>
+            String(r.id).includes(q) ||
+            (r.motorista_nome || '').toLowerCase().includes(q) ||
+            (r.motorista_telefone || '').includes(q) ||
+            (r.codigo_at || '').toLowerCase().includes(q)
+          );
+        },
+
+        // =====================================================================
+        // FROTA AO VIVO & MAPA LEAFLET
+        // =====================================================================
+        parseTelemetria(t) {
+          if (!t) return null;
+          if (typeof t === 'object') return t;
+          try { return JSON.parse(t); } catch (e) { return null; }
+        },
+
+        get frotaNormalizada() {
+          const agora = Date.now();
+          return (this.frotaAoVivo || []).map(f => {
+            const tel = this.parseTelemetria(f.telemetria);
+            const gps = tel?.gps_ao_vivo || null;
+            if (!gps || !gps.lat || !gps.lng) return null;
+
+            const ts = gps.atualizado_em ? new Date(gps.atualizado_em).getTime() : 0;
+            const min = ts ? Math.max(0, Math.round((agora - ts) / 60000)) : 999;
+            let statusSinal = 'offline';
+            if (min <= 3) statusSinal = 'online';
+            else if (min <= 20) statusSinal = 'recente';
+
+            let tempoAtrasTexto = 'há muito tempo';
+            if (min < 1) tempoAtrasTexto = 'agora';
+            else if (min < 60) tempoAtrasTexto = `há ${min} min`;
+            else tempoAtrasTexto = `há ${Math.round(min / 60)}h`;
+
+            return {
+              ...f,
+              lat: Number(gps.lat),
+              lng: Number(gps.lng),
+              velocidade: Number(gps.velocidade) || 0,
+              modo: gps.modo || 'app',
+              statusSinal,
+              tempoAtrasTexto
+            };
+          }).filter(Boolean);
+        },
+
+        get motoristasOnlineCount() {
+          return this.frotaNormalizada.filter(m => m.statusSinal === 'online').length;
+        },
+
+        get frotaFiltrada() {
+          if (this.filtroMapa === 'online') return this.frotaNormalizada.filter(m => m.statusSinal === 'online');
+          return this.frotaNormalizada;
+        },
+
+        inicializarMapaFrota() {
+          const el = document.getElementById('mapaFrotaAdmin');
+          if (!el) return;
+          if (!this.mapaFrota) {
+            this.mapaFrota = L.map('mapaFrotaAdmin', { zoomControl: true }).setView([-24.1667, -46.7800], 11);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.mapaFrota);
+            this.grupoFrota = L.featureGroup().addTo(this.mapaFrota);
+          }
+          this.mapaFrota.invalidateSize();
+          this.renderizarFrotaNoMapa(true);
+        },
+
+        renderizarFrotaNoMapa(enquadrar = false) {
+          if (!this.mapaFrota || !this.grupoFrota) return;
+          this.grupoFrota.clearLayers();
+
+          this.frotaFiltrada.forEach(m => {
+            const cor = m.statusSinal === 'online' ? '#22c55e' : (m.statusSinal === 'recente' ? '#f59e0b' : '#64748b');
+            const primeiroNome = (m.motorista_nome || 'Motorista').split(' ')[0];
+
+            const icon = L.divIcon({
+              className: 'pin-frota',
+              html: `
+                <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);">
+                  <div style="background:${cor};color:#fff;font-weight:900;font-size:10px;padding:2px 7px;border-radius:999px;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.8);white-space:nowrap;">
+                    🚚 ${primeiroNome} • ${m.velocidade}km/h
+                  </div>
+                </div>
+              `,
+              iconSize: [120, 26],
+              iconAnchor: [0, 0]
+            });
+
+            const popup = `
+              <div style="font-family:sans-serif;min-width:170px;font-size:12px;">
+                <strong style="color:#fb923c;font-size:13px;">${m.motorista_nome}</strong><br>
+                <span style="color:#94a3b8;">Rota #${m.rota_id} • ${m.qtd_entregues}/${m.total_pacotes} entregues</span><br>
+                <span style="color:#38bdf8;">Velocidade: ${m.velocidade} km/h (${m.tempoAtrasTexto})</span>
+              </div>
+            `;
+
+            L.marker([m.lat, m.lng], { icon }).bindPopup(popup).addTo(this.grupoFrota);
+          });
+
+          if (enquadrar) this.enquadrarTodosMotoristas();
+        },
+
+        enquadrarTodosMotoristas() {
+          if (this.mapaFrota && this.grupoFrota && this.grupoFrota.getLayers().length > 0) {
+            this.mapaFrota.fitBounds(this.grupoFrota.getBounds(), { padding: [50, 50], maxZoom: 15 });
+          }
+        },
+
+        focarMotoristaNoMapa(m) {
+          if (this.mapaFrota && m.lat && m.lng) {
+            this.mapaFrota.flyTo([m.lat, m.lng], 16, { duration: 0.7 });
+          }
+        },
+
+        // =====================================================================
+        // AÇÕES DE ASSINATURA, ROTAS, LEADS, PINGOS & WHATSAPP
+        // =====================================================================
+        async acaoAssinatura(u, operacao) {
+          const labels = {
+            renovar_semanal: 'Renovar +7 dias (Semanal)',
+            renovar_mensal: 'Renovar +30 dias (Mensal)',
+            vitalicio: 'Tornar VITALÍCIO',
+            bloquear: 'Bloquear / Expirar acesso'
+          };
+          if (!confirm(`Confirmar "${labels[operacao] || operacao}" para ${u.nome || u.email}?`)) return;
+          try {
+            await this.callApi({ acao: 'atualizar_assinatura', id: u.id, operacao });
+            this.mostrarToast('✅ Assinatura atualizada!');
+            await this.carregarDashboard(true);
+          } catch (e) {
+            this.mostrarToast('❌ ' + e.message);
+          }
+        },
+
+        abrirEditarUsuario(u) {
+          this.editUserId = u.id;
+          this.editUserNome = u.nome || '';
+          this.editUserTel = u.telefone || '';
+          this.modalEditarUser = true;
+        },
+
+        async salvarEdicaoUsuario() {
+          try {
+            await this.callApi({
+              acao: 'atualizar_assinatura',
+              id: this.editUserId,
+              operacao: 'editar_dados',
+              nome: this.editUserNome,
+              telefone: this.editUserTel
+            });
+            this.modalEditarUser = false;
+            this.mostrarToast('✅ Dados atualizados!');
+            await this.carregarDashboard(true);
+          } catch (e) {
+            this.mostrarToast('❌ ' + e.message);
+          }
+        },
+
+        async abrirDetalhesRota(r) {
+          this.rotaSelecionada = r;
+          this.entregasModal = [];
+          this.modalRotaAberto = true;
+          this.carregandoEntregas = true;
+          try {
+            const d = await this.callApi({ acao: 'detalhes_rota', rota_id: r.id });
+            this.entregasModal = d.entregas || [];
+          } catch (e) {
+            this.mostrarToast('❌ Erro ao carregar entregas.');
+          } finally {
+            this.carregandoEntregas = false;
+          }
+        },
+
+        async excluirPingo(id) {
+          if (!confirm('Remover esta correção de portão?')) return;
+          try {
+            await this.callApi({ acao: 'excluir_pingo', pingo_id: id });
+            this.mostrarToast('🗑️ Pingo removido!');
+            await this.carregarDashboard(true);
+          } catch (e) {
+            this.mostrarToast('❌ ' + e.message);
+          }
+        },
+
+        async adicionarLeadManual() {
+          try {
+            await this.callApi({ acao: 'gerenciar_lead', operacao: 'adicionar', nome: this.novoLeadNome, numero: this.novoLeadNumero });
+            this.novoLeadNome = '';
+            this.novoLeadNumero = '';
+            this.mostrarToast('✅ Lead adicionado!');
+            await this.carregarDashboard(true);
+          } catch (e) {
+            this.mostrarToast('❌ ' + e.message);
+          }
+        },
+
+        async gerenciarLead(id, operacao, status = '') {
+          if (operacao === 'excluir' && !confirm('Apagar este lead?')) return;
+          try {
+            await this.callApi({ acao: 'gerenciar_lead', operacao, id, status });
+            await this.carregarDashboard(true);
+          } catch (e) {
+            this.mostrarToast('❌ ' + e.message);
+          }
+        },
+
+        // =====================================================================
+        // MENSAGENS WHATSAPP (EVOLUTION STUDIOTESTA)
+        // =====================================================================
+        async carregarConversasZap() {
+          this.carregandoChats = true;
+          try {
+            const d = await this.callApi({ acao: 'listar_conversas' });
+            this.chatsZap = d.chats || [];
+          } catch (e) {
+            this.mostrarToast('❌ Erro ao buscar conversas.');
+          } finally {
+            this.carregandoChats = false;
+          }
+        },
+
+        async selecionarChatZap(c) {
+          this.chatAtivo = c;
+          this.mensagensChat = [];
+          try {
+            const d = await this.callApi({ acao: 'listar_mensagens', remoteJid: c.remoteJid });
+            this.mensagensChat = d.mensagens || [];
+            this.$nextTick(() => {
+              const box = document.getElementById('boxMensagensChat');
+              if (box) box.scrollTop = box.scrollHeight;
+            });
+          } catch (e) {
+            this.mostrarToast('❌ Erro ao carregar mensagens.');
+          }
+        },
+
+        async enviarRespostaChat() {
+          if (!this.chatAtivo || !this.textoRespostaChat.trim()) return;
+          this.enviandoZap = true;
+          const texto = this.textoRespostaChat.trim();
+          try {
+            await this.callApi({ acao: 'enviar_whatsapp', remoteJid: this.chatAtivo.remoteJid, texto });
+            this.textoRespostaChat = '';
+            this.mensagensChat.push({ id: Date.now(), fromMe: true, texto, timestamp: Math.floor(Date.now() / 1000) });
+            this.$nextTick(() => {
+              const box = document.getElementById('boxMensagensChat');
+              if (box) box.scrollTop = box.scrollHeight;
+            });
+          } catch (e) {
+            this.mostrarToast('❌ Falha ao enviar.');
+          } finally {
+            this.enviandoZap = false;
+          }
+        },
+
+        abrirModalMensagemRapida(pessoa, tipo) {
+          this.alvoMsgRapida = pessoa;
+          this.aplicarTemplateMsg(tipo);
+          this.modalMsgRapida = true;
+        },
+
+        aplicarTemplateMsg(tipo) {
+          const nome = (this.alvoMsgRapida?.nome || 'Motorista').split(' ')[0];
+          if (tipo === 'boas_vindas') {
+            this.textoMsgRapida = `Fala ${nome}, tudo bem? Aqui é o Sidnei do SPXrotas! Vi que você se cadastrou no app. Qualquer dúvida para subir o romaneio ou usar o Bipador por voz, pode me chamar aqui!`;
+          } else if (tipo === 'vencendo') {
+            this.textoMsgRapida = `Opa ${nome}, tudo certo? Passando só pra avisar que seu acesso no SPXrotas vence em breve! Pra não ficar sem o roteirizador e os radares na pista, dá pra renovar rapidinho por PIX direto lá no app. Qualquer coisa me avisa!`;
+          } else if (tipo === 'cobranca') {
+            this.textoMsgRapida = `Fala ${nome}, beleza? Vi aqui que o seu período no SPXrotas venceu. Se o app te ajudou a economizar gasolina e tempo na rua, já dá pra liberar mais uma semana (R$ 6,90) ou o mês inteiro (R$ 19,90) direto no botão "Ver Planos" via PIX!`;
+          } else {
+            this.textoMsgRapida = `Olá ${nome}, tudo bem? Aqui é o Sidnei do SPXrotas.`;
+          }
+        },
+
+        async dispararMsgRapidaEvolution() {
+          if (!this.alvoMsgRapida?.telefone || !this.textoMsgRapida.trim()) return;
+          this.enviandoZap = true;
+          try {
+            const num = this.formatarZapLink(this.alvoMsgRapida.telefone);
+            await this.callApi({ acao: 'enviar_whatsapp', numero: num, texto: this.textoMsgRapida.trim() });
+            this.modalMsgRapida = false;
+            this.mostrarToast('🚀 Mensagem enviada pelo WhatsApp!');
+          } catch (e) {
+            this.mostrarToast('❌ Erro ao enviar: ' + e.message);
+          } finally {
+            this.enviandoZap = false;
+          }
+        },
+
+        // =====================================================================
+        // UTILITÁRIOS DE FORMATAÇÃO
+        // =====================================================================
+        formatarZapLink(tel) {
+          const d = String(tel || '').replace(/\D/g, '');
+          if (!d) return '';
+          return d.startsWith('55') ? d : '55' + d;
+        },
+
+        formatarDataBR(dt) {
+          if (!dt) return '--';
+          try {
+            const s = String(dt).slice(0, 10).split('-');
+            if (s.length === 3) return `${s[2]}/${s[1]}/${s[0]}`;
+            return new Date(dt).toLocaleDateString('pt-BR');
+          } catch (e) { return dt; }
+        },
+
+        formatarDataHoraBR(dt) {
+          if (!dt) return '--';
+          try {
+            return new Date(dt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+          } catch (e) { return dt; }
+        },
+
+        extrairKmTelemetria(t) {
+          const obj = this.parseTelemetria(t);
+          if (!obj || !obj.odometroMetros) return '0.0';
+          return (Number(obj.odometroMetros) / 1000).toFixed(1);
+        },
+
+        pct(parte, total) {
+          const t = Number(total) || 0;
+          if (t <= 0) return 0;
+          return Math.min(100, Math.round(((Number(parte) || 0) / t) * 100));
+        }
+      };
+    }
+  </script>
+</body>
+</html>
