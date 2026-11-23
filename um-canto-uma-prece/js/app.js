@@ -1301,10 +1301,10 @@ function umCantoApp() {
       if (!confirm(`Deseja excluir definitivamente o ponto "${ponto.titulo}"?\n\nIsso apagará o registro e o arquivo MP3 do servidor.`)) return;
 
       try {
-        // 1. Pega o file_id do áudio para apagar do Directus Files
+        // 1. Extrai o file_id do áudio com segurança (tratando se veio como string UUID ou objeto)
         let fileId = null;
         if (ponto.audio_file_id) {
-          fileId = typeof ponto.audio_file_id === 'object' ? ponto.audio_file_id.id : ponto.audio_file_id;
+          fileId = typeof ponto.audio_file_id === 'object' ? (ponto.audio_file_id.id || ponto.audio_file_id.file_id) : ponto.audio_file_id;
         }
 
         // 2. Deleta o registro na tabela pontos_umbanda
@@ -1312,15 +1312,15 @@ function umCantoApp() {
           method: 'DELETE'
         }, true);
 
-        if (resDel.ok) {
-          // 3. Se tiver arquivo MP3 vinculado, deleta também do storage do Directus
+        if (resDel.ok || resDel.status === 204 || resDel.status === 200) {
+          // 3. Se tiver arquivo MP3 vinculado, deleta também do storage do Directus com segurança
           if (fileId) {
             try {
               await this.fetchDirectus(`/files/${fileId}`, {
                 method: 'DELETE'
               }, true);
             } catch (errFile) {
-              console.warn('[Um Canto] Arquivo MP3 já foi removido ou não encontrado:', errFile);
+              console.warn('[Um Canto] Arquivo MP3 já removido ou sem permissão de storage:', errFile);
             }
           }
 
