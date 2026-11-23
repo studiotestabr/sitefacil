@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Um Canto, Uma Prece! v1.2.0 - Núcleo Reativo Oficial Colaborativo
-   Login Google + Cadastro Obrigatório, Envio Colaborativo por Qualquer Membro,
-   Assinatura (Nome + Terreiro), Karaokê Sincronizado, Áudio Offline & Admin
+   Um Canto, Uma Prece! v1.3.0 - Núcleo Reativo Oficial Colaborativo
+   Login Google + Cadastro, Envio Colaborativo, Exclusão Segura (Postgres + MP3 Directus),
+   Karaokê Sincronizado, Áudio Offline & Permissões de Autor/Admin
    Arquivo: /um-canto-uma-prece/js/app.js
    ========================================================================== */
 
@@ -1092,54 +1092,6 @@ function umCantoApp() {
     // =========================================================================
     // ENVIO COLABORATIVO (QUALQUER MEMBRO) + MODERAÇÃO ADMIN
     // =========================================================================
-    async loginDirectusEmailSenha() {
-      const email = (this.loginEmailInput || '').trim();
-      const password = this.loginSenhaInput || '';
-      if (!email || !password) {
-        this.erroLogin = 'Informe o e-mail e a senha do Directus.';
-        return;
-      }
-
-      this.carregandoLogin = true;
-      this.erroLogin = '';
-      localStorage.removeItem('canto_deslogado');
-
-      try {
-        const res = await fetch(`${this.DIRECTUS_URL}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ email, password, mode: 'json' })
-        });
-        const data = await res.json();
-        if (res.ok && data?.data?.access_token) {
-          this.tokenAcesso = data.data.access_token;
-          localStorage.setItem('directus_token', this.tokenAcesso);
-          if (data.data.refresh_token) {
-            localStorage.setItem('directus_refresh_token', data.data.refresh_token);
-          }
-          this.loginSenhaInput = '';
-          await this.verificarAutenticacao();
-          await this.sincronizarPerfilUsuario();
-          await this.carregarPontos();
-        } else {
-          this.erroLogin = 'E-mail ou senha inválidos.';
-        }
-      } catch (e) {
-        this.erroLogin = 'Erro ao conectar ao servidor Directus.';
-      } finally {
-        this.carregandoLogin = false;
-      }
-    },
-
-    loginGoogleAdmin() {
-      this.loginGoogle();
-    },
-
-    async deslogarAdmin() {
-      await this.deslogar();
-    },
-
     selecionarArquivoAudioAdmin(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1340,27 +1292,49 @@ function umCantoApp() {
       }
     },
 
+    // =========================================================================
+    // EXCLUSÃO SEGURA NO DIRECTUS (APAGA REGISTRO + ARQUIVO MP3 DO STORAGE)
+    // =========================================================================
     async excluirPontoAdmin(ponto, event) {
       if (event) event.stopPropagation();
-      if (!ponto || !this.adminLogado) return;
-      if (!confirm(`Deseja excluir definitivamente o ponto "${ponto.titulo}"?`)) return;
+      if (!ponto || !this.podeEditarPonto(ponto)) return;
+      if (!confirm(`Deseja excluir definitivamente o ponto "${ponto.titulo}"?\n\nIsso apagará o registro e o arquivo MP3 do servidor.`)) return;
 
       try {
-        const res = await this.fetchDirectus(`/items/pontos_umbanda/${ponto.id}`, {
+        // 1. Pega o file_id do áudio para apagar do Directus Files
+        let fileId = null;
+        if (ponto.audio_file_id) {
+          fileId = typeof ponto.audio_file_id === 'object' ? ponto.audio_file_id.id : ponto.audio_file_id;
+        }
+
+        // 2. Deleta o registro na tabela pontos_umbanda
+        const resDel = await this.fetchDirectus(`/items/pontos_umbanda/${ponto.id}`, {
           method: 'DELETE'
         }, true);
 
-        if (res.ok) {
+        if (resDel.ok) {
+          // 3. Se tiver arquivo MP3 vinculado, deleta também do storage do Directus
+          if (fileId) {
+            try {
+              await this.fetchDirectus(`/files/${fileId}`, {
+                method: 'DELETE'
+              }, true);
+            } catch (errFile) {
+              console.warn('[Um Canto] Arquivo MP3 já foi removido ou não encontrado:', errFile);
+            }
+          }
+
           if (this.pontoAtual && String(this.pontoAtual.id) === String(ponto.id)) {
             const audio = document.getElementById('audioPlayerPrincipal');
             if (audio) audio.pause();
             this.pontoAtual = null;
             this.abaAtual = 'repertorio';
           }
+
           await this.carregarPontos();
-          alert('🗑️ Ponto excluído!');
+          alert('🗑️ Ponto e arquivo de áudio excluídos com sucesso!');
         } else {
-          alert('Não foi possível excluir este ponto.');
+          alert('Não foi possível excluir este ponto no servidor.');
         }
       } catch (e) {
         alert('Erro ao excluir: ' + e.message);
