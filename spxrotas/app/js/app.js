@@ -1,11 +1,11 @@
 /* ==========================================================================
-   SPXrotas Pro v3.2.0 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v3.2.1 - Núcleo Mestre Reativo Oficial
    GPS Ao Vivo da Frota (telemetria.gps_ao_vivo), Isolamento Estrito por
    user_created (App + Cache), Motorista Nome/Telefone, Interpolação Métrica
    de Número Predial, Volumosos com Voz, Radares Otimizados, Pinagem Inteligente
    em 3 Camadas, GPS Pós-Rota (Casa & Modo Waze Livre), Swipe Lateral na Aba Rua,
    Economia de Bateria, Status Conferido no Banco, Reordenação por Toque,
-   Trava AT ID & Sessão Blindada
+   Recálculo de Rota Instantâneo e Silencioso (Estilo Waze), Trava AT ID & Sessão Blindada
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -184,6 +184,7 @@ function spxRotasApp() {
     recalculandoRota: false,
     contadorForaDaRota: 0,
     ultimoRecalculoTimestamp: 0,
+    _ultPosOffRoadRecalc: null,
 
     // 9. MOTOR DE RADARES NACIONAL AUDITADO COM CACHE LOCAL
     listaRadares: [],
@@ -2614,7 +2615,7 @@ function spxRotasApp() {
 
     projetarPontoNaRota(lat, lng, headingCarro) {
       if (!this.coordenadasRotaAtual || this.coordenadasRotaAtual.length < 2) {
-        return { lat, lng, distRota: 0, headingSegmento: null, indiceSegmento: 0 };
+        return { lat, lng, distRota: 0, headingSegmento: null, indiceSegmento: 0, sentidoOposto: false };
       }
 
       let menorDist = Infinity;
@@ -2666,7 +2667,14 @@ function spxRotasApp() {
         let diff = Math.abs(headingCarro - headingDoSegmento);
         if (diff > 180) diff = 360 - diff;
         if (diff > 55) {
-          return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: indiceMaisProximo };
+          return {
+            lat,
+            lng,
+            distRota: menorDist,
+            headingSegmento: null,
+            indiceSegmento: indiceMaisProximo,
+            sentidoOposto: diff > 100
+          };
         }
       }
 
@@ -2676,11 +2684,12 @@ function spxRotasApp() {
           lng: pontoProjetado.lng,
           distRota: menorDist,
           headingSegmento: headingDoSegmento,
-          indiceSegmento: indiceMaisProximo
+          indiceSegmento: indiceMaisProximo,
+          sentidoOposto: false
         };
       }
 
-      return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: indiceMaisProximo };
+      return { lat, lng, distRota: menorDist, headingSegmento: null, indiceSegmento: indiceMaisProximo, sentidoOposto: false };
     },
 
     async iniciarNavegacaoNativa(entrega) {
@@ -2732,6 +2741,7 @@ function spxRotasApp() {
       this.coordenadasRotaAtual = [];
       this.contadorForaDaRota = 0;
       this.recalculandoRota = false;
+      this._ultPosOffRoadRecalc = null;
       this.radarProximoAlerta = null;
       this.radarExcessoVelocidade = false;
       this.radarVozAnunciadaId = null;
@@ -2867,7 +2877,7 @@ function spxRotasApp() {
           this.distanciaProximaManobra = 'LIVRE';
           this.falarTexto('Modo copiloto ativado. Radares monitorados na via!');
         } else {
-          await this.calcularRotaRuaARua(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude);
+          await this.calcularRotaRuaARua(sLat, sLng, this.entregaNavegacao.latitude, this.entregaNavegacao.longitude, false);
         }
 
         this.watchPositionId = navigator.geolocation.watchPosition(
@@ -2889,25 +2899,42 @@ function spxRotasApp() {
       }
     },
 
-    async calcularRotaRuaARua(sLat, sLng, eLat, eLng) {
+    async calcularRotaRuaARua(sLat, sLng, eLat, eLng, isRecalculo = false) {
       if (!sLat || !sLng || !eLat || !eLng) return;
       let coordsLngLat = [];
       let routeEncontrada = null;
 
       if (navigator.onLine) {
-        try {
-          const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
-          const resLocal = await fetch(urlLocal, { signal: AbortSignal.timeout(3000) });
-          if (resLocal.ok) {
-            const dataLocal = await resLocal.json();
-            if (dataLocal.routes && dataLocal.routes.length > 0) routeEncontrada = dataLocal.routes[0];
-          }
-        } catch (e) {}
+        const baseQuery = `overview=full&geometries=geojson&steps=true`;
+        const usarBearing = isRecalculo && this.velocidadeGPS >= 8 && this.headingAtual !== null && !isNaN(this.headingAtual);
+        const dirArredondada = usarBearing ? ((Math.round(this.headingAtual) % 360) + 360) % 360 : null;
+
+        if (usarBearing && dirArredondada !== null) {
+          try {
+            const urlComBearing = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?${baseQuery}&bearings=${dirArredondada},75;`;
+            const resBearing = await fetch(urlComBearing, { signal: AbortSignal.timeout(2200) });
+            if (resBearing.ok) {
+              const dataBearing = await resBearing.json();
+              if (dataBearing.routes && dataBearing.routes.length > 0) routeEncontrada = dataBearing.routes[0];
+            }
+          } catch (e) {}
+        }
 
         if (!routeEncontrada) {
           try {
-            const urlPub = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?overview=full&geometries=geojson&steps=true`;
-            const resPub = await fetch(urlPub, { signal: AbortSignal.timeout(3000) });
+            const urlLocal = `${this.OSRM_ROUTER_URL}/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?${baseQuery}`;
+            const resLocal = await fetch(urlLocal, { signal: AbortSignal.timeout(2500) });
+            if (resLocal.ok) {
+              const dataLocal = await resLocal.json();
+              if (dataLocal.routes && dataLocal.routes.length > 0) routeEncontrada = dataLocal.routes[0];
+            }
+          } catch (e) {}
+        }
+
+        if (!routeEncontrada) {
+          try {
+            const urlPub = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${eLng},${eLat}?${baseQuery}`;
+            const resPub = await fetch(urlPub, { signal: AbortSignal.timeout(2500) });
             if (resPub.ok) {
               const dataPub = await resPub.json();
               if (dataPub.routes && dataPub.routes.length > 0) routeEncontrada = dataPub.routes[0];
@@ -2931,7 +2958,6 @@ function spxRotasApp() {
         const distMetros = Math.round(routeEncontrada.distance);
         this.distanciaProximaManobra = distMetros > 1000 ? (distMetros / 1000).toFixed(1) + ' km' : distMetros + ' m';
         this.passosRota = routeEncontrada.legs[0]?.steps || [];
-        this.passoAtualIndex = 0;
 
         if (this.passosRota.length > 0) {
           const viaSaida = this.passosRota[0].name || this.passosRota[0].ref;
@@ -2941,8 +2967,15 @@ function spxRotasApp() {
           }
         }
 
-        this.avaliarManobraSaida(coordsLngLat);
-        this.atualizarInstrucaoUI();
+        if (isRecalculo) {
+          this.passoAtualIndex = (this.passosRota.length > 1 && this.passosRota[0]?.maneuver?.type === 'depart') ? 1 : 0;
+          if (this.iconeManobraNav === '↩️') this.iconeManobraNav = '⬆️';
+          this.atualizarInstrucaoUI();
+        } else {
+          this.passoAtualIndex = 0;
+          this.avaliarManobraSaida(coordsLngLat);
+          this.atualizarInstrucaoUI();
+        }
       }
 
       if (!coordsLngLat || coordsLngLat.length === 0) {
@@ -2955,7 +2988,7 @@ function spxRotasApp() {
       this.atualizarLinhaNavGL(coordsLngLat);
       this.atualizarMarcadorDestinoGL(eLat, eLng);
 
-      if (coordsLngLat.length > 1) {
+      if (!isRecalculo && coordsLngLat.length > 1) {
         const bearingInicialSeguro = (this.ultimoHeadingEmMovimento !== null) ? this.ultimoHeadingEmMovimento : this.headingAtual;
         if (!this.mapaArrastadoPeloUsuario) this.centralizarNoCarroGL(sLat, sLng, bearingInicialSeguro, 500);
       }
@@ -3148,7 +3181,7 @@ function spxRotasApp() {
       }
 
       const snap = isSemDestino
-        ? { lat: rawLat, lng: rawLng, distRota: 0, headingSegmento: null }
+        ? { lat: rawLat, lng: rawLng, distRota: 0, headingSegmento: null, sentidoOposto: false }
         : this.projetarPontoNaRota(rawLat, rawLng, headingMovimento);
       const lat = snap.lat;
       const lng = snap.lng;
@@ -3216,19 +3249,60 @@ function spxRotasApp() {
         if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
       }
 
+      // RECÁLCULO INSTANTÂNEO E SILENCIOSO ESTILO WAZE (SEM FALA ESTRESSANTE)
       const agora = Date.now();
-      const foraDaLinha = snap.distRota > 22;
-      if (foraDaLinha) this.contadorForaDaRota++;
-      else this.contadorForaDaRota = 0;
+      const foraDaLinhaForte = snap.distRota > 25;
+      const foraDaLinhaLeve = snap.distRota > 18;
+      const indoSentidoOposto = Boolean(snap.sentidoOposto && this.velocidadeGPS >= 10 && accuracy <= 35);
 
-      if (this.contadorForaDaRota >= 2 && !this.recalculandoRota && (agora - this.ultimoRecalculoTimestamp > 2500)) {
+      if (foraDaLinhaForte || foraDaLinhaLeve || indoSentidoOposto) {
+        this.contadorForaDaRota++;
+      } else {
+        this.contadorForaDaRota = 0;
+        this._ultPosOffRoadRecalc = null;
+      }
+
+      const deveRecalcularPorDistancia = foraDaLinhaForte && (this.velocidadeGPS >= 3 || snap.distRota > 45);
+      const deveRecalcularPorDriftOuOposto = (foraDaLinhaLeve || indoSentidoOposto) && this.contadorForaDaRota >= 2;
+      const precisaoOk = accuracy <= 50;
+
+      let liberadoOffRoad = true;
+      if (this._ultPosOffRoadRecalc) {
+        const distDesdeUltOffRoad = this.calcularDistancia(
+          this._ultPosOffRoadRecalc.lat,
+          this._ultPosOffRoadRecalc.lng,
+          rawLat,
+          rawLng
+        );
+        if (distDesdeUltOffRoad < 60) {
+          liberadoOffRoad = false;
+        }
+      }
+
+      if (
+        precisaoOk &&
+        liberadoOffRoad &&
+        (deveRecalcularPorDistancia || deveRecalcularPorDriftOuOposto) &&
+        !this.recalculandoRota &&
+        (agora - this.ultimoRecalculoTimestamp > 1500)
+      ) {
         this.recalculandoRota = true;
         this.ultimoRecalculoTimestamp = agora;
         this.contadorForaDaRota = 0;
-        this.falarTexto('Recalculando rota...');
-        await this.calcularRotaRuaARua(rawLat, rawLng, destLat, destLng);
-        this.recalculandoRota = false;
-        return;
+
+        try {
+          await this.calcularRotaRuaARua(rawLat, rawLng, destLat, destLng, true);
+          this.ultimoRecalculoTimestamp = Date.now();
+
+          const checkNovoSnap = this.projetarPontoNaRota(rawLat, rawLng, headingMovimento);
+          if (checkNovoSnap.distRota > 25) {
+            this._ultPosOffRoadRecalc = { lat: rawLat, lng: rawLng };
+          } else {
+            this._ultPosOffRoadRecalc = null;
+          }
+        } finally {
+          this.recalculandoRota = false;
+        }
       }
 
       if (this.passosRota.length > 0 && this.passoAtualIndex < this.passosRota.length) {
@@ -3400,6 +3474,7 @@ function spxRotasApp() {
       this._ultimaCamBearing = null;
       this._ultimoRadaresRenderLat = null;
       this._ultimoRadaresRenderLng = null;
+      this._ultPosOffRoadRecalc = null;
 
       if (!this.entregaNavegacao?.is_gps_livre) {
         this.sincronizarTelemetriaRotaBanco(true);
