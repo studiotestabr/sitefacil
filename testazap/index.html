@@ -94,13 +94,13 @@
               <i data-lucide="sun" class="hidden dark:block w-5 h-5"></i>
               <i data-lucide="moon" class="block dark:hidden w-5 h-5"></i>
             </button>
-            <button onclick="abrirModalAjuda()" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition" title="Suporte">
+            <button onclick="alert('Precisa de ajuda? Fale conosco no suporte da StudioTesta!')" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition" title="Suporte">
               <i data-lucide="help-circle" class="w-5 h-5"></i>
             </button>
           </div>
         </header>
 
-        <!-- Filtros Rápidos (Estilo WhatsApp: Tudo, Não Lidas, etc) -->
+        <!-- Filtros Rápidos (Estilo WhatsApp) -->
         <div class="p-3 border-b border-wa-borderLight dark:border-wa-borderDark flex gap-2 overflow-x-auto no-scrollbar">
           <button onclick="mudarAba('conexao')" id="tab-btn-conexao" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-wa-green text-white transition">
             1. Conectar WhatsApp
@@ -113,7 +113,7 @@
           </button>
         </div>
 
-        <!-- Lista de "Conversas" / Menus Interativos -->
+        <!-- Lista de Módulos (Cards de Navegação) -->
         <div class="flex-1 overflow-y-auto no-scrollbar divide-y divide-wa-borderLight dark:divide-wa-borderDark">
           
           <!-- Item 1: Conexão -->
@@ -126,7 +126,7 @@
                 <h2 class="font-medium text-sm truncate">Conectar WhatsApp</h2>
                 <span id="badge-status-conexao" class="text-[10px] text-amber-500 font-semibold">Pendente</span>
               </div>
-              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Gere o QR Code para parear o número</p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Pareamento via QR Code seguro</p>
             </div>
           </div>
 
@@ -154,7 +154,7 @@
                 <h2 class="font-medium text-sm truncate">Tabela de Preços & PIX</h2>
                 <span class="text-[10px] text-neutral-400">Catálogo</span>
               </div>
-              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Cadastre cortes, unhas, produtos e chave PIX</p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Cadastre cortes, unhas, produtos e PIX</p>
             </div>
           </div>
 
@@ -212,7 +212,7 @@
               <div class="text-center space-y-2">
                 <h3 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">1. Escaneie o QR Code no seu WhatsApp</h3>
                 <p class="text-xs text-neutral-500 max-w-md mx-auto">
-                  Abra o WhatsApp no seu celular > Toque em <b>Aparelhos Conectados</b> > <b>Conectar Aparelho</b> e aponte a câmera para a imagem abaixo:
+                  Abra o WhatsApp no celular > Toque nos três pontinhos ou Ajustes > <b>Aparelhos Conectados</b> > <b>Conectar um Aparelho</b>:
                 </p>
               </div>
 
@@ -227,8 +227,8 @@
                 </div>
               </div>
 
-              <!-- Card QR Code -->
-              <div class="flex flex-col items-center justify-center p-6 bg-wa-sidebarLight dark:bg-wa-sidebarDark rounded-xl border border-dashed border-wa-borderLight dark:border-wa-borderDark min-h-[280px]">
+              <!-- Card QR Code / Status da Conexão -->
+              <div id="qr-box-container" class="flex flex-col items-center justify-center p-6 bg-wa-sidebarLight dark:bg-wa-sidebarDark rounded-xl border border-dashed border-wa-borderLight dark:border-wa-borderDark min-h-[280px]">
                 <div id="qr-loading" class="hidden flex flex-col items-center space-y-3">
                   <div class="w-8 h-8 border-4 border-wa-green border-t-transparent rounded-full animate-spin"></div>
                   <span class="text-xs text-neutral-400">Falando com a Evolution API...</span>
@@ -255,7 +255,7 @@
 
               <div class="space-y-4">
                 <div>
-                  <label class="text-xs font-semibold text-neutral-500 uppercase">Nome do Assistente / Pessoa:</label>
+                  <label class="text-xs font-semibold text-neutral-500 uppercase">Nome do Assistente:</label>
                   <input type="text" id="ai-nome" value="Carlos" placeholder="Ex: Bia, Rafael, Atendente Virtual" class="w-full mt-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark px-4 py-2.5 rounded-lg border border-wa-borderLight dark:border-wa-borderDark text-sm focus:outline-none focus:border-wa-green">
                 </div>
 
@@ -322,7 +322,7 @@
               <div id="chat-messages" class="h-64 overflow-y-auto p-3 space-y-3 bg-wa-bgLight dark:bg-wa-bgDark rounded-xl border border-wa-borderLight dark:border-wa-borderDark text-xs">
                 <div class="flex items-start gap-2">
                   <div class="bg-wa-panelLight dark:bg-wa-panelDark p-2.5 rounded-lg shadow-sm max-w-[80%] border border-wa-borderLight dark:border-wa-borderDark">
-                    Olá! Sou o atendente virtual do TestaZap. Como posso te ajudar hoje?
+                    Olá! Sou o assistente virtual do TestaZap. Como posso te ajudar hoje?
                   </div>
                 </div>
               </div>
@@ -344,16 +344,16 @@
     </div>
   </div>
 
-  <!-- Scripts de Lógica e Integração com n8n -->
+  <!-- ============================================== -->
+  <!-- SCRIPTS DE LÓGICA E INTEGRAÇÃO N8N -->
+  <!-- ============================================== -->
   <script>
-    // Inicializa os ícones do Lucide
     lucide.createIcons();
 
-    // 🌟 URL DO SEU N8N (Ajuste para o seu domínio real se necessário)
     const N8N_WEBHOOK_QR = "https://n8n.studiotesta.com.br/webhook/instancia-qrcode";
-    const N8N_WEBHOOK_PAINEL = "https://n8n.studiotesta.com.br/webhook/gerencia-painel";
+    let intervalChecagem = null;
 
-    // 1. Controle de Tema Claro / Escuro (Toggle)
+    // 1. Alternador de Tema Claro/Escuro
     function toggleTheme() {
       const html = document.documentElement;
       if (html.classList.contains('dark')) {
@@ -364,21 +364,17 @@
         localStorage.setItem('theme', 'dark');
       }
     }
-    // Aplica preferência salva
     if (localStorage.getItem('theme') === 'light') {
       document.documentElement.classList.remove('dark');
     }
 
     // 2. Navegação entre Abas
     function mudarAba(aba) {
-      // Esconde todas as seções
       ['conexao', 'agente', 'servicos', 'simulador'].forEach(a => {
         document.getElementById(`aba-${a}`)?.classList.add('hidden');
       });
-      // Mostra a aba selecionada
       document.getElementById(`aba-${aba}`)?.classList.remove('hidden');
 
-      // Atualiza o Header
       const headerTitle = document.getElementById('header-title');
       const headerSubtitle = document.getElementById('header-subtitle');
       const headerAvatar = document.getElementById('header-avatar');
@@ -411,6 +407,8 @@
         return;
       }
 
+      if (intervalChecagem) clearInterval(intervalChecagem);
+
       const qrImage = document.getElementById('qr-image');
       const qrLoading = document.getElementById('qr-loading');
       const qrPlaceholder = document.getElementById('qr-placeholder');
@@ -431,48 +429,130 @@
         });
 
         const data = await response.json();
-        
         qrLoading.classList.add('hidden');
+
         if (data.qrcode) {
           qrImage.src = data.qrcode;
           qrImage.classList.remove('hidden');
-          document.getElementById('badge-status-conexao').innerText = "Aguardando Leitura";
-          document.getElementById('badge-status-conexao').className = "text-[10px] text-blue-500 font-semibold";
+          
+          const badge = document.getElementById('badge-status-conexao');
+          badge.innerText = "Aguardando Leitura";
+          badge.className = "text-[10px] text-amber-500 font-semibold animate-pulse";
+
+          // Inicia o Polling automático a cada 3 segundos
+          iniciarVerificacaoStatus(instance);
+
+        } else if (data.status === 'open' || data.status === 'connected') {
+          exibirTelaConectado(instance);
         } else {
-          alert("Instância já conectada ou erro ao obter QR Code!");
+          alert("Não foi possível gerar o QR Code. Tente novamente.");
           qrPlaceholder.classList.remove('hidden');
         }
       } catch (err) {
         qrLoading.classList.add('hidden');
         qrPlaceholder.classList.remove('hidden');
-        alert("Erro de comunicação com o servidor n8n. Verifique se o fluxo está ativo!");
+        alert("Erro de comunicação com o servidor n8n!");
       }
     }
 
-    // 4. Salvar Configurações no Directus/Postgres via n8n
+    // 4. Polling que verifica se o celular escaneou o QR Code
+    function iniciarVerificacaoStatus(instance) {
+      intervalChecagem = setInterval(async () => {
+        try {
+          const response = await fetch(N8N_WEBHOOK_QR, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "get_instance_status",
+              instanceName: instance
+            })
+          });
+
+          const res = await response.json();
+          const status = (res.status || '').toLowerCase();
+
+          // Quando conectar com sucesso na Evolution API
+          if (status === 'open' || status === 'connected') {
+            clearInterval(intervalChecagem);
+            localStorage.setItem('testazap_instance', instance);
+            exibirTelaConectado(instance);
+          }
+        } catch (e) {
+          console.log("Aguardando leitura do QR Code...");
+        }
+      }, 3000);
+    }
+
+    // 5. Exibe a tela verde com o card oficial de "Conectado"
+    function exibirTelaConectado(instance) {
+      const container = document.getElementById('qr-box-container');
+      
+      const badge = document.getElementById('badge-status-conexao');
+      badge.innerText = "Conectado";
+      badge.className = "text-[10px] text-wa-green font-semibold";
+
+      container.innerHTML = `
+        <div class="w-full max-w-sm bg-wa-panelLight dark:bg-wa-panelDark p-6 rounded-2xl border border-wa-borderLight dark:border-wa-borderDark shadow-xl text-center space-y-4">
+          <div class="h-16 w-16 bg-wa-green/10 text-wa-green rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner font-bold">
+            ✓
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-neutral-900 dark:text-neutral-100">${instance}</h4>
+            <p class="text-xs text-wa-green font-medium mt-0.5">● WhatsApp Conectado com Sucesso</p>
+          </div>
+          <p class="text-xs text-neutral-500">Seu atendente inteligente já está ativo e pronto para responder mensagens!</p>
+          
+          <div class="pt-2 flex flex-col gap-2">
+            <button onclick="mudarAba('agente')" class="w-full bg-wa-green hover:bg-wa-greenDark text-white py-2.5 rounded-lg text-xs font-semibold shadow-md transition">
+              Próximo: Configurar Respostas da IA →
+            </button>
+            <button onclick="desconectarInstancia('${instance}')" class="text-xs text-red-500 hover:underline pt-2">
+              Desconectar este WhatsApp
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 6. Desconectar Instância se o usuário desejar
+    async function desconectarInstancia(instance) {
+      if (!confirm(`Deseja realmente desconectar o WhatsApp da empresa ${instance}?`)) return;
+
+      try {
+        await fetch(N8N_WEBHOOK_QR, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "logout_instance",
+            instanceName: instance
+          })
+        });
+        localStorage.removeItem('testazap_instance');
+        alert("WhatsApp desconectado com sucesso!");
+        location.reload();
+      } catch (err) {
+        alert("Erro ao desconectar instância.");
+      }
+    }
+
+    // 7. Salvar Configurações
     async function salvarConfigIA() {
       const nome = document.getElementById('ai-nome').value;
       const nicho = document.getElementById('ai-nicho').value;
-      const prompt = document.getElementById('ai-prompt').value;
-      const instance = document.getElementById('instanceName').value.trim().toLowerCase() || 'studiotesta';
-
-      alert(`Configurações de ${nome} (${nicho}) salvas com sucesso para a instância ${instance}!`);
+      alert(`Configurações salvas com sucesso!`);
     }
 
     async function salvarServicos() {
-      const pix = document.getElementById('pix-chave').value;
-      const tabela = document.getElementById('lista-precos').value;
       alert("Catálogo e Chave PIX atualizados com sucesso!");
     }
 
-    // 5. Teste de Simulação
+    // 8. Simulador
     function enviarSimulacao() {
       const input = document.getElementById('simulador-input');
       const msg = input.value.trim();
       if (!msg) return;
 
       const chat = document.getElementById('chat-messages');
-      // Balão do Usuário
       chat.innerHTML += `
         <div class="flex justify-end">
           <div class="bg-wa-green text-white p-2.5 rounded-lg max-w-[80%] shadow-sm">
@@ -483,7 +563,6 @@
       input.value = "";
       chat.scrollTop = chat.scrollHeight;
 
-      // Resposta Simulada da IA
       setTimeout(() => {
         chat.innerHTML += `
           <div class="flex items-start gap-2">
@@ -495,6 +574,15 @@
         chat.scrollTop = chat.scrollHeight;
       }, 1000);
     }
+
+    // Verifica se já existia uma instância conectada salva no navegador
+    window.addEventListener('DOMContentLoaded', () => {
+      const salva = localStorage.getItem('testazap_instance');
+      if (salva) {
+        document.getElementById('instanceName').value = salva;
+        exibirTelaConectado(salva);
+      }
+    });
   </script>
 </body>
 </html>
