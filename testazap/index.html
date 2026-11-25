@@ -576,13 +576,30 @@
     }
 
     // Verifica se já existia uma instância conectada salva no navegador
-    window.addEventListener('DOMContentLoaded', () => {
-      const salva = localStorage.getItem('testazap_instance');
-      if (salva) {
-        document.getElementById('instanceName').value = salva;
+window.addEventListener('DOMContentLoaded', async () => {
+  const salva = localStorage.getItem('testazap_instance');
+  if (salva) {
+    document.getElementById('instanceName').value = salva;
+    
+    // Pergunta pro n8n se essa instância ainda está conectada
+    try {
+      const response = await fetch(N8N_WEBHOOK_QR, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "get_instance_status",
+          instanceName: salva
+        })
+      });
+      const res = await response.json();
+      if ((res.status || '').toLowerCase() === 'open') {
         exibirTelaConectado(salva);
       }
-    });
+    } catch (e) {
+      console.log("Erro ao checar status inicial");
+    }
+  }
+});
   </script>
 </body>
 </html>
