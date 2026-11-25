@@ -1,11 +1,12 @@
 /* ==========================================================================
-   SPXrotas Pro v3.2.1 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v3.3.0 - Núcleo Mestre Reativo Oficial
    GPS Ao Vivo da Frota (telemetria.gps_ao_vivo), Isolamento Estrito por
    user_created (App + Cache), Motorista Nome/Telefone, Interpolação Métrica
    de Número Predial, Volumosos com Voz, Radares Otimizados, Pinagem Inteligente
    em 3 Camadas, GPS Pós-Rota (Casa & Modo Waze Livre), Swipe Lateral na Aba Rua,
    Economia de Bateria, Status Conferido no Banco, Reordenação por Toque,
-   Recálculo de Rota Instantâneo e Silencioso (Estilo Waze), Trava AT ID & Sessão Blindada
+   Recálculo Instantâneo Silencioso (Waze), Trava Botão Voltar Android (popstate),
+   Renovação de Sessão Directus Corrigida & Sync Blindado Entre Celulares
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -35,6 +36,12 @@ function spxRotasApp() {
     modalConfirmarPingo: false,
     modalGpsLivre: false,
     dadosRelatorio: null,
+
+    // Controle da Trava do Botão Voltar (Android) & Keep-Alive de Sessão
+    _travaVoltarInstalada: false,
+    _ultimoRefreshSessaoMs: 0,
+    _ultimoSyncVisibilityMs: 0,
+    intervaloKeepAliveSessao: null,
 
     // Dados da Pinagem Inteligente (> 450m até 4 km)
     pingoPendenteDados: null,
@@ -127,7 +134,9 @@ function spxRotasApp() {
       tempoAtendimentoMs: 0,
       momentoChegadaUltimaParada: null,
       momentoSaidaUltimaParada: null,
-      gps_ao_vivo: null
+      gps_ao_vivo: null,
+      conferidos_ids: [],
+      volumosos: {}
     },
     _ultimoTickMovimentoMs: null,
     _ultimoSyncTelemetriaBancoMs: 0,
@@ -231,6 +240,103 @@ function spxRotasApp() {
     isStandalone: false,
     isIOS: false,
     isMobile: false,
+
+    // =========================================================================
+    // TRAVA DO BOTÃO VOLTAR DO ANDROID (IMPEDE VOLTAR PARA DIRECTUS / GOOGLE)
+    // =========================================================================
+    garantirEstadoGuardaHistorico() {
+      try {
+        if (!window.history.state || !window.history.state.spxGuard) {
+          window.history.pushState({ spxGuard: true }, '', window.location.pathname);
+        }
+      } catch (e) {}
+    },
+
+    instalarTravaBotaoVoltar() {
+      if (this._travaVoltarInstalada) return;
+      this._travaVoltarInstalada = true;
+
+      this.garantirEstadoGuardaHistorico();
+
+      // Chrome/Android exige interação para consolidar guarda de histórico em PWAs
+      const ativarNaInteracao = () => {
+        this.garantirEstadoGuardaHistorico();
+      };
+      window.addEventListener('touchstart', ativarNaInteracao, { passive: true, once: true });
+      window.addEventListener('pointerdown', ativarNaInteracao, { passive: true, once: true });
+
+      window.addEventListener('popstate', () => {
+        this.tratarBotaoVoltarAndroid();
+      });
+    },
+
+    tratarBotaoVoltarAndroid() {
+      // Sempre reempilha o estado de guarda para NUNCA voltar para banco.studiotesta.com.br ou Google
+      try {
+        window.history.pushState({ spxGuard: true }, '', window.location.pathname);
+      } catch (e) {}
+
+      if (this.buscaAberta) {
+        this.buscaAberta = false;
+        return;
+      }
+      if (this.menuAberto) {
+        this.menuAberto = false;
+        return;
+      }
+      if (this.modalConfirmarPingo) {
+        this.fecharModalConfirmarPingo();
+        return;
+      }
+      if (this.modalGpsLivre) {
+        this.fecharModalGpsLivre();
+        return;
+      }
+      if (this.modalMoverPosicao) {
+        this.fecharModalMoverPosicao();
+        return;
+      }
+      if (this.modalVolumoso) {
+        this.fecharModalVolumoso();
+        return;
+      }
+      if (this.modalRelatorio) {
+        this.modalRelatorio = false;
+        return;
+      }
+      if (this.modalResumoImportacao) {
+        this.modalResumoImportacao = false;
+        return;
+      }
+      if (this.modalImportar) {
+        this.modalImportar = false;
+        return;
+      }
+      if (this.modalAssinatura) {
+        this.fecharModalAssinatura();
+        return;
+      }
+      if (this.tutorialAberto) {
+        this.concluirTutorial();
+        return;
+      }
+      if (this.modo === 'navegacao') {
+        this.pararNavegacao();
+        return;
+      }
+      if (this.modo === 'bipador') {
+        this.fecharBipadorVoz();
+        return;
+      }
+      if (this.modo !== 'carregamento') {
+        this.modo = 'carregamento';
+        return;
+      }
+
+      if (this.usuarioLogado) {
+        this.mostrarToast('🔒 Use o botão central (●) do celular para sair ou minimizar o app', 2400);
+      }
+    },
 
     // =========================================================================
     // SWIPE LATERAL NA ABA RUA
@@ -930,6 +1036,7 @@ function spxRotasApp() {
       }
 
       this.salvarCacheLocal();
+      this.sincronizarEstadoAuxiliarRota(true);
 
       const fala = `Volumoso anotado! Guardado em: ${p.nota_local}!`;
       this.falarTexto(fala);
@@ -954,6 +1061,7 @@ function spxRotasApp() {
       }
 
       this.salvarCacheLocal();
+      this.sincronizarEstadoAuxiliarRota(true);
       this.fecharModalVolumoso();
       if ('vibrate' in navigator) navigator.vibrate(40);
     },
@@ -996,6 +1104,7 @@ function spxRotasApp() {
         this.salvarCacheLocal();
       }
 
+      this.sincronizarEstadoAuxiliarRota(true);
       if ('vibrate' in navigator) navigator.vibrate(50);
     },
 
@@ -1009,7 +1118,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // CAIXA-PRETA DE TELEMETRIA REAL + GPS AO VIVO DA FROTA
+    // CAIXA-PRETA DE TELEMETRIA REAL + GPS AO VIVO + ESPELHO ENTRE CELULARES
     // =========================================================================
     carregarTelemetriaLocal() {
       if (!this.rotaAtivaId) return;
@@ -1024,6 +1133,25 @@ function spxRotasApp() {
     salvarTelemetriaLocal() {
       if (!this.rotaAtivaId) return;
       localStorage.setItem(`spxrotas_telemetria_${this.rotaAtivaId}`, JSON.stringify(this.telemetria));
+    },
+
+    sincronizarEstadoAuxiliarRota(forcar = false) {
+      if (!this.rotaAtivaId) return;
+      this.telemetria.conferidos_ids = Array.from(this.idsConferidos);
+      const vols = {};
+      (this.entregas || []).forEach(e => {
+        if (e.is_volumoso) {
+          vols[String(e.id)] = {
+            is_volumoso: true,
+            nota_local: e.nota_local || '',
+            nota_tipo: e.nota_tipo || '',
+            nota_volumoso: e.nota_volumoso || ''
+          };
+        }
+      });
+      this.telemetria.volumosos = vols;
+      this.salvarTelemetriaLocal();
+      this.sincronizarTelemetriaRotaBanco(forcar);
     },
 
     salvarAuditoriaEntregaLocal(rotaId, entregaId, dados) {
@@ -1090,7 +1218,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // ARQUITETURA OFFLINE-FIRST (SYNCQUEUE & GRAVAÇÃO NO DIRECTUS)
+    // ARQUITETURA OFFLINE-FIRST (SYNCQUEUE & GRAVAÇÃO BLINDADA NO DIRECTUS)
     // =========================================================================
     get totalFilaSync() {
       return (this.syncQueue || []).length;
@@ -1103,6 +1231,8 @@ function spxRotasApp() {
     enfileirarSincronizacao(metodo, endpoint, payload) {
       if (metodo === 'PATCH' && endpoint.startsWith('/items/rotas/') && payload.telemetria) {
         this.syncQueue = this.syncQueue.filter(q => !(q.metodo === 'PATCH' && q.endpoint === endpoint && q.payload?.telemetria));
+      } else if (metodo === 'PATCH' && endpoint.startsWith('/items/entregas/') && payload.status !== undefined) {
+        this.syncQueue = this.syncQueue.filter(q => !(q.metodo === 'PATCH' && q.endpoint === endpoint && q.payload?.status !== undefined));
       }
 
       const itemFila = {
@@ -1133,13 +1263,25 @@ function spxRotasApp() {
 
       for (const item of filaCopia) {
         try {
-          const res = await this.fetchDirectus(item.endpoint, {
+          let res = await this.fetchDirectus(item.endpoint, {
             method: item.metodo,
             body: JSON.stringify(item.payload)
           });
 
+          // Se falhar por campo extra não permitido (400/403), tenta salvar ao menos o status puro!
+          if (res && (res.status === 400 || res.status === 403) && item.metodo === 'PATCH' && item.endpoint.startsWith('/items/entregas/') && item.payload?.status !== undefined && Object.keys(item.payload).length > 1) {
+            res = await this.fetchDirectus(item.endpoint, {
+              method: 'PATCH',
+              body: JSON.stringify({ status: item.payload.status })
+            });
+          }
+
           if (res && (res.ok || res.status === 404)) {
             if (res.ok) this.estaOnline = true;
+            this.syncQueue = this.syncQueue.filter(q => q.id !== item.id);
+            this.salvarFilaSyncLocal();
+          } else if (res && (res.status === 400 || res.status === 403)) {
+            // Não deixa um item rejeitado travar o resto da fila de sincronização
             this.syncQueue = this.syncQueue.filter(q => q.id !== item.id);
             this.salvarFilaSyncLocal();
           } else {
@@ -1537,6 +1679,7 @@ function spxRotasApp() {
         } else {
           this.salvarCacheLocal();
         }
+        this.sincronizarEstadoAuxiliarRota(false);
 
         this.tocarBipScanner();
         if ('vibrate' in navigator) navigator.vibrate([80, 40, 80]);
@@ -1609,6 +1752,10 @@ function spxRotasApp() {
     fecharBipadorVoz() {
       this.pararCameraBipador();
       this.modo = 'carregamento';
+      this.sincronizarEstadoAuxiliarRota(true);
+      if (navigator.onLine) {
+        this.processarFilaSync();
+      }
     },
 
     // =========================================================================
@@ -1751,18 +1898,20 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // COMUNICAÇÃO DIRECTUS (COM BLINDAGEM DE SINAL OFFLINE & ANTI-ERROR 1033)
+    // COMUNICAÇÃO DIRECTUS (COM RENOVAÇÃO CORRIGIDA DE SESSÃO & BLINDAGEM)
     // =========================================================================
     async fetchDirectus(path, options = {}) {
       const url = path.startsWith('http') ? path : `${this.DIRECTUS_URL}${path}`;
-      const headers = options.headers || {};
+      const headers = { ...(options.headers || {}) };
       headers['Content-Type'] = headers['Content-Type'] || 'application/json';
 
       const token = this.tokenAcesso || localStorage.getItem('directus_token');
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
       const fetchOpts = { ...options, headers, credentials: 'include' };
-      
+
       try {
         let res = await fetch(url, fetchOpts);
 
@@ -1774,7 +1923,12 @@ function spxRotasApp() {
         if (res.status === 401) {
           const renovou = await this.tentarRenovarTokenDirectus();
           if (renovou) {
-            headers['Authorization'] = `Bearer ${this.tokenAcesso}`;
+            const novoToken = this.tokenAcesso || localStorage.getItem('directus_token');
+            if (novoToken) {
+              headers['Authorization'] = `Bearer ${novoToken}`;
+            } else {
+              delete headers['Authorization'];
+            }
             res = await fetch(url, { ...fetchOpts, headers });
           }
         }
@@ -1791,27 +1945,54 @@ function spxRotasApp() {
 
     async tentarRenovarTokenDirectus() {
       const refreshToken = localStorage.getItem('directus_refresh_token');
-      try {
-        const bodyPayload = refreshToken ? { refresh_token: refreshToken, mode: 'json' } : { mode: 'session' };
+
+      const tentarComModo = async (payload) => {
         const res = await fetch(`${this.DIRECTUS_URL}/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify(bodyPayload)
+          body: JSON.stringify(payload)
         });
         if (res.ok) {
-          const data = await res.json();
+          let data = null;
+          try { data = await res.json(); } catch (e) {}
           if (data?.data?.access_token) {
             this.tokenAcesso = data.data.access_token;
             localStorage.setItem('directus_token', this.tokenAcesso);
             if (data.data.refresh_token) {
               localStorage.setItem('directus_refresh_token', data.data.refresh_token);
             }
-            return true;
+          } else {
+            // Modo session via HttpOnly cookie: limpa eventual token Bearer antigo em conflito
+            this.tokenAcesso = null;
+            localStorage.removeItem('directus_token');
           }
+          this._ultimoRefreshSessaoMs = Date.now();
+          return true;
+        }
+        return false;
+      };
+
+      try {
+        if (refreshToken) {
+          const okJson = await tentarComModo({ refresh_token: refreshToken, mode: 'json' });
+          if (okJson) return true;
+        }
+        const okSession = await tentarComModo({ mode: 'session' });
+        if (okSession) {
+          if (refreshToken) localStorage.removeItem('directus_refresh_token');
+          return true;
         }
       } catch (e) {}
       return false;
+    },
+
+    async manterSessaoViva(forcar = false) {
+      if (!this.usuarioLogado || !navigator.onLine) return;
+      const agora = Date.now();
+      if (!forcar && (agora - this._ultimoRefreshSessaoMs < 600000)) return;
+      this._ultimoRefreshSessaoMs = agora;
+      await this.tentarRenovarTokenDirectus();
     },
 
     // =========================================================================
@@ -1932,7 +2113,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // INICIALIZAÇÃO DO APP (COM ISOLAMENTO DE CACHE & HEARTBEAT GPS AO VIVO)
+    // INICIALIZAÇÃO DO APP (COM TRAVA VOLTAR, KEEP-ALIVE & SYNC CROSS-DEVICE)
     // =========================================================================
     limparCacheRotasLocal() {
       this.rotaAtivaId = null;
@@ -1951,12 +2132,14 @@ function spxRotasApp() {
     async init() {
       this.aplicarTemaVisual();
       this.checarInstalacaoPWA();
+      this.instalarTravaBotaoVoltar();
 
       this.ativarWakeLock();
 
-      window.addEventListener('online', () => {
+      window.addEventListener('online', async () => {
         this.estaOnline = true;
-        this.processarFilaSync();
+        await this.manterSessaoViva(false);
+        await this.processarFilaSync();
       });
 
       window.addEventListener('offline', () => {
@@ -1968,6 +2151,13 @@ function spxRotasApp() {
           this.processarFilaSync();
         }
       }, 10000);
+
+      // Keep-Alive automático da sessão Directus a cada 12 minutos
+      this.intervaloKeepAliveSessao = setInterval(() => {
+        if (navigator.onLine && this.usuarioLogado) {
+          this.manterSessaoViva(false);
+        }
+      }, 720000);
 
       // Heartbeat leve de posição ao vivo (para quem usa o app na rua ou com Waze/Maps)
       this.intervaloGpsAoVivo = setInterval(() => {
@@ -2010,6 +2200,7 @@ function spxRotasApp() {
         localStorage.setItem('spxrotas_cache_owner_id', String(this.usuarioId));
         this.carregarConferidosLocal();
 
+        await this.processarFilaSync();
         await this.sincronizarAssinaturaSaaS();
         if (this.rotaAtivaId) {
           await this.carregarEntregasPorId(this.rotaAtivaId);
@@ -2025,11 +2216,18 @@ function spxRotasApp() {
 
       this.escutarArquivosCompartilhados();
 
-      document.addEventListener('visibilitychange', () => {
+      document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
           this.ativarWakeLock();
-          if (navigator.onLine) {
-            this.processarFilaSync();
+          this.garantirEstadoGuardaHistorico();
+          if (navigator.onLine && this.usuarioLogado) {
+            await this.manterSessaoViva(false);
+            await this.processarFilaSync();
+            const agoraVis = Date.now();
+            if (this.rotaAtivaId && this.modo !== 'navegacao' && this.modo !== 'bipador' && (agoraVis - this._ultimoSyncVisibilityMs > 45000)) {
+              this._ultimoSyncVisibilityMs = agoraVis;
+              await this.carregarEntregasPorId(this.rotaAtivaId);
+            }
             if (this.modo !== 'navegacao') {
               this.capturarPosicaoAoVivoSilenciosa(false);
             }
@@ -2454,11 +2652,20 @@ function spxRotasApp() {
 
       if (navigator.onLine) {
         try {
-          const res = await this.fetchDirectus(`/items/entregas/${id}`, {
+          let res = await this.fetchDirectus(`/items/entregas/${id}`, {
             method: 'PATCH',
             body: JSON.stringify(payloadBanco)
           });
           if (res && res.ok) return;
+
+          // Fallback imediato: se Directus rejeitar campos extras (400/403), garante a gravação do status puro
+          if (res && (res.status === 400 || res.status === 403) && Object.keys(payloadBanco).length > 1) {
+            const resPuro = await this.fetchDirectus(`/items/entregas/${id}`, {
+              method: 'PATCH',
+              body: JSON.stringify({ status: novoStatus })
+            });
+            if (resPuro && resPuro.ok) return;
+          }
         } catch (e) {}
       }
 
@@ -3556,20 +3763,33 @@ function spxRotasApp() {
           if (data.data && data.data.length > 0) {
             const entregasServidor = data.data;
 
-            const mapaStatusLocal = new Map();
-            const mapaVolumososLocal = new Map();
-            const mapaOrdemPendenteSync = new Map();
-            let auditoriaLocal = {};
-            try {
-              auditoriaLocal = JSON.parse(localStorage.getItem(`spxrotas_auditoria_${rotaId}`) || '{}');
-            } catch (e) {}
+            let telNuvem = dataR?.data?.telemetria || null;
+            if (typeof telNuvem === 'string') {
+              try { telNuvem = JSON.parse(telNuvem); } catch (e) { telNuvem = null; }
+            }
 
-            (this.entregas || []).forEach(e => {
-              if (e.status === 'entregue' || e.status === 'ausente' || e.status === 'conferido') {
-                mapaStatusLocal.set(e.id, e.status);
+            // Só permite que cache local sobrescreva o servidor se houver alteração PENDENTE na syncQueue deste aparelho
+            const mapaStatusPendenteSync = new Map();
+            const mapaOrdemPendenteSync = new Map();
+            (this.syncQueue || []).forEach(q => {
+              if (q.endpoint && q.endpoint.startsWith('/items/entregas/') && q.payload) {
+                const idStr = q.endpoint.replace('/items/entregas/', '');
+                if (q.payload.status !== undefined) {
+                  mapaStatusPendenteSync.set(idStr, q.payload.status);
+                }
+                if (q.payload.ordem_entrega !== undefined) {
+                  mapaOrdemPendenteSync.set(idStr, {
+                    ordem_entrega: q.payload.ordem_entrega,
+                    ordem_carregamento: q.payload.ordem_carregamento
+                  });
+                }
               }
+            });
+
+            const mapaVolumososLocal = new Map();
+            (this.entregas || []).forEach(e => {
               if (e.is_volumoso) {
-                mapaVolumososLocal.set(e.id, {
+                mapaVolumososLocal.set(String(e.id), {
                   is_volumoso: true,
                   nota_local: e.nota_local,
                   nota_tipo: e.nota_tipo,
@@ -3578,58 +3798,66 @@ function spxRotasApp() {
               }
             });
 
-            (this.syncQueue || []).forEach(q => {
-              if (q.endpoint && q.endpoint.startsWith('/items/entregas/') && q.payload && q.payload.ordem_entrega !== undefined) {
-                const idStr = q.endpoint.replace('/items/entregas/', '');
-                mapaOrdemPendenteSync.set(idStr, {
-                  ordem_entrega: q.payload.ordem_entrega,
-                  ordem_carregamento: q.payload.ordem_carregamento
-                });
-              }
-            });
+            const conferidosNuvemSet = new Set(Array.isArray(telNuvem?.conferidos_ids) ? telNuvem.conferidos_ids : []);
+            const volumososNuvem = (telNuvem?.volumosos && typeof telNuvem.volumosos === 'object') ? telNuvem.volumosos : {};
+
+            let auditoriaLocal = {};
+            try {
+              auditoriaLocal = JSON.parse(localStorage.getItem(`spxrotas_auditoria_${rotaId}`) || '{}');
+            } catch (e) {}
+
+            // Reconstruir idsConferidos fielmente a partir do banco/nuvem (e pendências locais)
+            const novosConferidos = new Set();
 
             entregasServidor.forEach(e => {
-              if (e.status === 'conferido') {
-                this.idsConferidos.add(e.id);
-              } else if (mapaStatusLocal.has(e.id)) {
-                const stLocal = mapaStatusLocal.get(e.id);
-                if (e.status === 'pendente' || stLocal === 'entregue' || stLocal === 'ausente') {
-                  e.status = stLocal;
-                }
-              } else if (this.idsConferidos.has(e.id) && e.status === 'pendente') {
+              const idStr = String(e.id);
+
+              // Se há atualização pendente na fila offline deste celular, aplica por cima do servidor
+              if (mapaStatusPendenteSync.has(idStr)) {
+                e.status = mapaStatusPendenteSync.get(idStr);
+              } else if (e.status === 'pendente' && conferidosNuvemSet.has(e.id)) {
                 e.status = 'conferido';
               }
 
-              if (mapaOrdemPendenteSync.has(String(e.id))) {
-                const ord = mapaOrdemPendenteSync.get(String(e.id));
+              if (e.status === 'conferido' || conferidosNuvemSet.has(e.id)) {
+                novosConferidos.add(e.id);
+              } else if (mapaStatusPendenteSync.has(idStr) && this.idsConferidos.has(e.id)) {
+                novosConferidos.add(e.id);
+              }
+
+              if (mapaOrdemPendenteSync.has(idStr)) {
+                const ord = mapaOrdemPendenteSync.get(idStr);
                 e.ordem_entrega = ord.ordem_entrega;
                 e.ordem_carregamento = ord.ordem_carregamento;
               }
 
-              const audItem = auditoriaLocal[String(e.id)];
+              const audItem = auditoriaLocal[idStr];
               if (audItem) {
                 if (!e.entregue_em && audItem.entregue_em) e.entregue_em = audItem.entregue_em;
                 if (!e.tempo_atendimento_seg && audItem.tempo_atendimento_seg) e.tempo_atendimento_seg = audItem.tempo_atendimento_seg;
               }
 
-              if (mapaVolumososLocal.has(e.id)) {
-                const v = mapaVolumososLocal.get(e.id);
+              const volNuvem = volumososNuvem[idStr];
+              const volLocal = mapaVolumososLocal.get(idStr);
+              if (volNuvem && volNuvem.is_volumoso) {
                 e.is_volumoso = true;
-                e.nota_local = v.nota_local;
-                e.nota_tipo = v.nota_tipo;
-                e.nota_volumoso = v.nota_volumoso;
+                e.nota_local = volNuvem.nota_local;
+                e.nota_tipo = volNuvem.nota_tipo;
+                e.nota_volumoso = volNuvem.nota_volumoso;
+              } else if (volLocal) {
+                e.is_volumoso = true;
+                e.nota_local = volLocal.nota_local;
+                e.nota_tipo = volLocal.nota_tipo;
+                e.nota_volumoso = volLocal.nota_volumoso;
               }
             });
 
+            this.idsConferidos = novosConferidos;
             this.salvarConferidosLocal();
             this.entregas = entregasServidor.sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
             this.rotaGeometria = dataR?.data?.geometria || this.rotaGeometria;
 
-            let telNuvem = dataR?.data?.telemetria || null;
-            if (typeof telNuvem === 'string') {
-              try { telNuvem = JSON.parse(telNuvem); } catch (e) { telNuvem = null; }
-            }
-            if (telNuvem && (telNuvem.odometroMetros > (this.telemetria.odometroMetros || 0) || (!this.telemetria.inicioTimestamp && telNuvem.inicioTimestamp))) {
+            if (telNuvem && (telNuvem.odometroMetros > (this.telemetria.odometroMetros || 0) || (!this.telemetria.inicioTimestamp && telNuvem.inicioTimestamp) || telNuvem.conferidos_ids || telNuvem.volumosos)) {
               this.telemetria = { ...this.telemetria, ...telNuvem };
               this.salvarTelemetriaLocal();
             }
@@ -4023,7 +4251,9 @@ function spxRotasApp() {
             tempoAtendimentoMs: 0,
             momentoChegadaUltimaParada: null,
             momentoSaidaUltimaParada: null,
-            gps_ao_vivo: null
+            gps_ao_vivo: null,
+            conferidos_ids: [],
+            volumosos: {}
           };
 
           await this.sincronizarAssinaturaSaaS();
@@ -4050,7 +4280,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // AUTENTICAÇÃO E SAAS (BLINDADO CONTRA QUEDA DO SERVIDOR / ERROR 1033)
+    // AUTENTICAÇÃO E SAAS (BLINDADO CONTRA QUEDA DO SERVIDOR & EXPIRAÇÃO)
     // =========================================================================
     async verificarAutenticacao() {
       if (localStorage.getItem('usuario_deslogado') === 'true') {
@@ -4070,7 +4300,9 @@ function spxRotasApp() {
       if (refreshUrl) localStorage.setItem('directus_refresh_token', refreshUrl);
 
       if (window.location.search && !window.location.search.includes('arquivo_compartilhado')) {
-        window.history.replaceState({}, document.title, window.location.pathname);
+        try {
+          window.history.replaceState({ spxGuard: true }, document.title, window.location.pathname);
+        } catch (e) {}
       }
 
       const extrair = (u) => {
@@ -4110,7 +4342,13 @@ function spxRotasApp() {
         const res = await this.fetchDirectus('/users/me');
         if (res && res.ok) {
           const d = await res.json();
-          if (d?.data?.id) { extrair(d.data); return; }
+          if (d?.data?.id) {
+            extrair(d.data);
+            this._ultimoRefreshSessaoMs = Date.now();
+            // Renova preventivamente logo após confirmar login para estender validade do cookie
+            setTimeout(() => this.manterSessaoViva(true), 2000);
+            return;
+          }
         }
 
         if (res && res.status >= 500) {
@@ -4359,12 +4597,13 @@ function spxRotasApp() {
     loginGoogle() {
       localStorage.removeItem('usuario_deslogado');
       const urlLimpa = window.location.origin + window.location.pathname;
-      window.location.href = `${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`;
+      window.location.replace(`${this.DIRECTUS_URL}/auth/login/google?redirect=${encodeURIComponent(urlLimpa)}`);
     },
 
     async deslogar() {
       if (this.intervaloPollingPagamento) clearInterval(this.intervaloPollingPagamento);
       if (this.intervaloGpsAoVivo) clearInterval(this.intervaloGpsAoVivo);
+      if (this.intervaloKeepAliveSessao) clearInterval(this.intervaloKeepAliveSessao);
       localStorage.setItem('usuario_deslogado', 'true');
       localStorage.removeItem('directus_token');
       localStorage.removeItem('directus_user_id');
