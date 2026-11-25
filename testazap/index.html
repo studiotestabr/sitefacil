@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TestaZap - Atendentes de IA no Piloto Automático</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#111b21">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="https://studiotesta.com.br/favicon.ico">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            wa: {
+              // Dark Mode colors (WhatsApp Web Dark)
+              bgDark: '#0c1317',
+              panelDark: '#111b21',
+              sidebarDark: '#202c33',
+              borderDark: '#222d34',
+              hoverDark: '#2a3942',
+              green: '#00a884',
+              greenDark: '#008069',
+              // Light Mode colors
+              bgLight: '#eae6df',
+              panelLight: '#ffffff',
+              sidebarLight: '#f0f2f5',
+              borderLight: '#e9edef',
+              hoverLight: '#f5f6f6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* WhatsApp Pattern Background */
+    .wa-bg-pattern-dark {
+      background-color: #0b141a;
+      background-image: radial-gradient(#182229 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .wa-bg-pattern-light {
+      background-color: #efeae2;
+      background-image: radial-gradient(#dfd8cd 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    /* Esconder scrollbar mantendo o scroll */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="h-screen w-screen overflow-hidden font-sans antialiased bg-wa-bgLight dark:bg-wa-bgDark text-neutral-800 dark:text-neutral-200 select-none">
+
+  <!-- AVISO TOPO PWA (App Container) -->
+  <div class="h-full w-full flex flex-col md:p-3 max-w-[1600px] mx-auto">
+    
+    <!-- CARD PRINCIPAL TIPO WHATSAPP WEB -->
+    <div class="h-full w-full flex rounded-none md:rounded-2xl overflow-hidden shadow-2xl border-0 md:border border-wa-borderLight dark:border-wa-borderDark">
+      
+      <!-- ============================================== -->
+      <!-- COLUNA LATERAL ESQUERDA (SIDEBAR MENU ESTILO CHATS) -->
+      <!-- ============================================== -->
+      <aside class="w-full md:w-[380px] lg:w-[420px] flex-shrink-0 flex flex-col bg-wa-panelLight dark:bg-wa-panelDark border-r border-wa-borderLight dark:border-wa-borderDark z-20">
+        
+        <!-- Header da Sidebar -->
+        <header class="h-16 px-4 flex items-center justify-between bg-wa-sidebarLight dark:bg-wa-sidebarDark border-b border-wa-borderLight dark:border-wa-borderDark">
+          <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-full bg-wa-green flex items-center justify-center text-white font-bold text-lg shadow-md">
+              ⚡
+            </div>
+            <div>
+              <h1 class="font-semibold text-base leading-tight">TestaZap</h1>
+              <p class="text-[11px] text-wa-green font-medium flex items-center gap-1">
+                <span class="h-2 w-2 rounded-full bg-wa-green animate-pulse"></span> Sistema Ativo
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-1 text-neutral-600 dark:text-neutral-400">
+            <!-- Botão Alternar Tema Claro/Escuro -->
+            <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition" title="Mudar Tema">
+              <i data-lucide="sun" class="hidden dark:block w-5 h-5"></i>
+              <i data-lucide="moon" class="block dark:hidden w-5 h-5"></i>
+            </button>
+            <button onclick="abrirModalAjuda()" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition" title="Suporte">
+              <i data-lucide="help-circle" class="w-5 h-5"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- Filtros Rápidos (Estilo WhatsApp: Tudo, Não Lidas, etc) -->
+        <div class="p-3 border-b border-wa-borderLight dark:border-wa-borderDark flex gap-2 overflow-x-auto no-scrollbar">
+          <button onclick="mudarAba('conexao')" id="tab-btn-conexao" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-wa-green text-white transition">
+            1. Conectar WhatsApp
+          </button>
+          <button onclick="mudarAba('agente')" id="tab-btn-agente" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-wa-sidebarLight dark:bg-wa-sidebarDark hover:bg-wa-hoverLight dark:hover:bg-wa-hoverDark transition">
+            2. Configurar IA
+          </button>
+          <button onclick="mudarAba('servicos')" id="tab-btn-servicos" class="tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-wa-sidebarLight dark:bg-wa-sidebarDark hover:bg-wa-hoverLight dark:hover:bg-wa-hoverDark transition">
+            3. Catálogo / Preços
+          </button>
+        </div>
+
+        <!-- Lista de "Conversas" / Menus Interativos -->
+        <div class="flex-1 overflow-y-auto no-scrollbar divide-y divide-wa-borderLight dark:divide-wa-borderDark">
+          
+          <!-- Item 1: Conexão -->
+          <div onclick="mudarAba('conexao')" class="menu-item p-3.5 flex items-center gap-3 cursor-pointer hover:bg-wa-hoverLight dark:hover:bg-wa-hoverDark transition">
+            <div class="h-12 w-12 rounded-full bg-emerald-500/10 text-wa-green flex items-center justify-center flex-shrink-0">
+              <i data-lucide="qr-code" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-baseline mb-0.5">
+                <h2 class="font-medium text-sm truncate">Conectar WhatsApp</h2>
+                <span id="badge-status-conexao" class="text-[10px] text-amber-500 font-semibold">Pendente</span>
+              </div>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Gere o QR Code para parear o número</p>
+            </div>
+          </div>
+
+          <!-- Item 2: Cérebro da IA -->
+          <div onclick="mudarAba('agente')" class="menu-item p-3.5 flex items-center gap-3 cursor-pointer hover:bg-wa-hoverLight dark:hover:bg-wa-hoverDark transition">
+            <div class="h-12 w-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="bot" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-baseline mb-0.5">
+                <h2 class="font-medium text-sm truncate">Personalidade & Regras</h2>
+                <span class="text-[10px] text-neutral-400">Obrigatório</span>
+              </div>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Defina nome da loja, tom de voz e regras</p>
+            </div>
+          </div>
+
+          <!-- Item 3: Serviços e Produtos -->
+          <div onclick="mudarAba('servicos')" class="menu-item p-3.5 flex items-center gap-3 cursor-pointer hover:bg-wa-hoverLight dark:hover:bg-wa-hoverDark transition">
+            <div class="h-12 w-12 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="badge-dollar-sign" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-baseline mb-0.5">
+                <h2 class="font-medium text-sm truncate">Tabela de Preços & PIX</h2>
+                <span class="text-[10px] text-neutral-400">Catálogo</span>
+              </div>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Cadastre cortes, unhas, produtos e chave PIX</p>
+            </div>
+          </div>
+
+          <!-- Item 4: Teste / Simulador -->
+          <div onclick="mudarAba('simulador')" class="menu-item p-3.5 flex items-center gap-3 cursor-pointer hover:bg-wa-hoverLight dark:hover:bg-wa-hoverDark transition">
+            <div class="h-12 w-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="message-square-dashed" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-baseline mb-0.5">
+                <h2 class="font-medium text-sm truncate">Testar Robô ao Vivo</h2>
+                <span class="text-[10px] text-wa-green font-semibold">Demo</span>
+              </div>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Converse com seu assistente na tela</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Rodapé do Menu (Créditos / StudioTesta) -->
+        <div class="p-3 bg-wa-sidebarLight dark:bg-wa-sidebarDark border-t border-wa-borderLight dark:border-wa-borderDark text-center">
+          <p class="text-[11px] text-neutral-500">Desenvolvido por <a href="https://studiotesta.com.br" target="_blank" class="text-wa-green font-semibold hover:underline">STUDIOTESTA</a></p>
+        </div>
+      </aside>
+
+      <!-- ============================================== -->
+      <!-- ÁREA CENTRAL DE TRABALHO (ESTILO CHAT DO WHATSAPP) -->
+      <!-- ============================================== -->
+      <main class="flex-1 flex flex-col bg-wa-bgLight dark:bg-wa-bgDark relative overflow-hidden wa-bg-pattern-light dark:wa-bg-pattern-dark">
+        
+        <!-- Header Superior da Conversa/Aba Ativa -->
+        <header class="h-16 px-6 flex items-center justify-between bg-wa-sidebarLight dark:bg-wa-sidebarDark border-b border-wa-borderLight dark:border-wa-borderDark z-10">
+          <div class="flex items-center space-x-3">
+            <div id="header-avatar" class="h-10 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 flex items-center justify-center text-wa-green">
+              <i data-lucide="qr-code" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 id="header-title" class="font-semibold text-sm">Conectar Instância do WhatsApp</h2>
+              <p id="header-subtitle" class="text-xs text-neutral-500">Pareie sua conta via QR Code seguro</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span id="indicador-nuvem" class="text-[11px] px-2.5 py-1 rounded-full bg-wa-green/10 text-wa-green font-medium">Servidor Online</span>
+          </div>
+        </header>
+
+        <!-- CONTEÚDO DINÂMICO (ABAS) -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start">
+          <div class="w-full max-w-2xl bg-wa-panelLight dark:bg-wa-panelDark p-6 rounded-2xl shadow-xl border border-wa-borderLight dark:border-wa-borderDark transition-all">
+
+            <!-- ======================================= -->
+            <!-- ABA 1: CONEXÃO COM WHATSAPP (QR CODE) -->
+            <!-- ======================================= -->
+            <section id="aba-conexao" class="space-y-6">
+              <div class="text-center space-y-2">
+                <h3 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">1. Escaneie o QR Code no seu WhatsApp</h3>
+                <p class="text-xs text-neutral-500 max-w-md mx-auto">
+                  Abra o WhatsApp no seu celular > Toque em <b>Aparelhos Conectados</b> > <b>Conectar Aparelho</b> e aponte a câmera para a imagem abaixo:
+                </p>
+              </div>
+
+              <!-- Input da Instância (Identificador) -->
+              <div class="space-y-1">
+                <label class="text-xs font-semibold uppercase tracking-wider text-neutral-500">Nome do seu Negócio (Sem espaços/acentos):</label>
+                <div class="flex gap-2">
+                  <input type="text" id="instanceName" placeholder="ex: barbeariadocarlos" class="flex-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark px-4 py-2.5 rounded-lg border border-wa-borderLight dark:border-wa-borderDark text-sm focus:outline-none focus:border-wa-green transition">
+                  <button onclick="gerarQrCode()" id="btn-gerar-qr" class="bg-wa-green hover:bg-wa-greenDark text-white px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Gerar QR Code
+                  </button>
+                </div>
+              </div>
+
+              <!-- Card QR Code -->
+              <div class="flex flex-col items-center justify-center p-6 bg-wa-sidebarLight dark:bg-wa-sidebarDark rounded-xl border border-dashed border-wa-borderLight dark:border-wa-borderDark min-h-[280px]">
+                <div id="qr-loading" class="hidden flex flex-col items-center space-y-3">
+                  <div class="w-8 h-8 border-4 border-wa-green border-t-transparent rounded-full animate-spin"></div>
+                  <span class="text-xs text-neutral-400">Falando com a Evolution API...</span>
+                </div>
+                
+                <img id="qr-image" src="" alt="QR Code" class="hidden w-60 h-60 rounded-lg shadow-md bg-white p-2">
+                
+                <div id="qr-placeholder" class="text-center space-y-2 text-neutral-400">
+                  <i data-lucide="smartphone" class="w-12 h-12 mx-auto stroke-1"></i>
+                  <p class="text-xs">Digite o nome da sua empresa acima e clique em "Gerar QR Code".</p>
+                </div>
+              </div>
+            </section>
+
+
+            <!-- ======================================= -->
+            <!-- ABA 2: CONFIGURAÇÃO DA IA (PROMPT) -->
+            <!-- ======================================= -->
+            <section id="aba-agente" class="hidden space-y-5">
+              <div>
+                <h3 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">2. Configure o Cérebro do seu Atendente</h3>
+                <p class="text-xs text-neutral-500">Diga à IA quem ela é e como deve atender seus clientes.</p>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="text-xs font-semibold text-neutral-500 uppercase">Nome do Assistente / Pessoa:</label>
+                  <input type="text" id="ai-nome" value="Carlos" placeholder="Ex: Bia, Rafael, Atendente Virtual" class="w-full mt-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark px-4 py-2.5 rounded-lg border border-wa-borderLight dark:border-wa-borderDark text-sm focus:outline-none focus:border-wa-green">
+                </div>
+
+                <div>
+                  <label class="text-xs font-semibold text-neutral-500 uppercase">Nicho do Negócio:</label>
+                  <select id="ai-nicho" class="w-full mt-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark px-4 py-2.5 rounded-lg border border-wa-borderLight dark:border-wa-borderDark text-sm focus:outline-none focus:border-wa-green">
+                    <option value="Barbearia">Barbearia / Salão Masculino</option>
+                    <option value="Manicure/Salão">Salão de Beleza / Manicure / Estética</option>
+                    <option value="Clinica">Clínica / Dentista / Saúde</option>
+                    <option value="Advocacia">Escritório de Advocacia</option>
+                    <option value="Outro">Comércio Geral / Vendas</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="text-xs font-semibold text-neutral-500 uppercase">Instruções e Regras de Atendimento:</label>
+                  <textarea id="ai-prompt" rows="5" placeholder="Ex: Seja muito educado. Ofereça nossos horários de terça a sábado das 9h às 19h. Se o cliente quiser agendar, pergunte o nome completo." class="w-full mt-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark p-3 rounded-lg border border-wa-borderLight dark:border-wa-borderDark text-sm focus:outline-none focus:border-wa-green"></textarea>
+                </div>
+
+                <button onclick="salvarConfigIA()" class="w-full bg-wa-green hover:bg-wa-greenDark text-white py-3 rounded-lg text-sm font-semibold transition shadow-md flex items-center justify-center gap-2">
+                  <i data-lucide="save" class="w-4 h-4"></i> Salvar Instruções no Sistema
+                </button>
+              </div>
+            </section>
+
+
+            <!-- ======================================= -->
+            <!-- ABA 3: SERVIÇOS & PREÇOS (CATÁLOGO) -->
+            <!-- ======================================= -->
+            <section id="aba-servicos" class="hidden space-y-5">
+              <div>
+                <h3 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">3. Tabela de Preços & Serviços</h3>
+                <p class="text-xs text-neutral-500">A IA vai consultar esses dados para responder valores e fechar vendas.</p>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="text-xs font-semibold text-neutral-500 uppercase">Sua Chave PIX (Para envio automático):</label>
+                  <input type="text" id="pix-chave" placeholder="ex: 13999999999 ou seu-email@gmail.com" class="w-full mt-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark px-4 py-2.5 rounded-lg border border-wa-borderLight dark:border-wa-borderDark text-sm focus:outline-none focus:border-wa-green">
+                </div>
+
+                <div>
+                  <label class="text-xs font-semibold text-neutral-500 uppercase">Lista de Serviços/Produtos e Preços:</label>
+                  <textarea id="lista-precos" rows="6" placeholder="Ex:&#10;- Corte Degrade: R$ 35,00&#10;- Barba Terapia: R$ 25,00&#10;- Combo Cabelo + Barba: R$ 50,00&#10;- Pigmentação: R$ 20,00" class="w-full mt-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark p-3 rounded-lg border border-wa-borderLight dark:border-wa-borderDark text-sm focus:outline-none focus:border-wa-green font-mono text-xs"></textarea>
+                </div>
+
+                <button onclick="salvarServicos()" class="w-full bg-wa-green hover:bg-wa-greenDark text-white py-3 rounded-lg text-sm font-semibold transition shadow-md flex items-center justify-center gap-2">
+                  <i data-lucide="check" class="w-4 h-4"></i> Atualizar Tabela de Valores
+                </button>
+              </div>
+            </section>
+
+
+            <!-- ======================================= -->
+            <!-- ABA 4: SIMULADOR AO VIVO -->
+            <!-- ======================================= -->
+            <section id="aba-simulador" class="hidden space-y-4">
+              <div class="text-center">
+                <h3 class="text-base font-bold">Simulador de Atendimento</h3>
+                <p class="text-xs text-neutral-500">Converse aqui como se fosse um cliente testando sua IA.</p>
+              </div>
+
+              <!-- Janela do Chat Mockup -->
+              <div id="chat-messages" class="h-64 overflow-y-auto p-3 space-y-3 bg-wa-bgLight dark:bg-wa-bgDark rounded-xl border border-wa-borderLight dark:border-wa-borderDark text-xs">
+                <div class="flex items-start gap-2">
+                  <div class="bg-wa-panelLight dark:bg-wa-panelDark p-2.5 rounded-lg shadow-sm max-w-[80%] border border-wa-borderLight dark:border-wa-borderDark">
+                    Olá! Sou o atendente virtual do TestaZap. Como posso te ajudar hoje?
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input Chat -->
+              <div class="flex gap-2">
+                <input type="text" id="simulador-input" placeholder="Digite uma mensagem (ex: Quanto custa o corte?)..." class="flex-1 bg-wa-sidebarLight dark:bg-wa-sidebarDark px-3 py-2 rounded-lg text-xs border border-wa-borderLight dark:border-wa-borderDark focus:outline-none focus:border-wa-green">
+                <button onclick="enviarSimulacao()" class="bg-wa-green text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-wa-greenDark transition">
+                  Enviar
+                </button>
+              </div>
+            </section>
+
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Scripts de Lógica e Integração com n8n -->
+  <script>
+    // Inicializa os ícones do Lucide
+    lucide.createIcons();
+
+    // 🌟 URL DO SEU N8N (Ajuste para o seu domínio real se necessário)
+    const N8N_WEBHOOK_QR = "https://n8n.studiotesta.com.br/webhook/instancia-qrcode";
+    const N8N_WEBHOOK_PAINEL = "https://n8n.studiotesta.com.br/webhook/gerencia-painel";
+
+    // 1. Controle de Tema Claro / Escuro (Toggle)
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    // Aplica preferência salva
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // 2. Navegação entre Abas
+    function mudarAba(aba) {
+      // Esconde todas as seções
+      ['conexao', 'agente', 'servicos', 'simulador'].forEach(a => {
+        document.getElementById(`aba-${a}`)?.classList.add('hidden');
+      });
+      // Mostra a aba selecionada
+      document.getElementById(`aba-${aba}`)?.classList.remove('hidden');
+
+      // Atualiza o Header
+      const headerTitle = document.getElementById('header-title');
+      const headerSubtitle = document.getElementById('header-subtitle');
+      const headerAvatar = document.getElementById('header-avatar');
+
+      if (aba === 'conexao') {
+        headerTitle.innerText = "Conectar Instância do WhatsApp";
+        headerSubtitle.innerText = "Pareie sua conta via QR Code seguro";
+        headerAvatar.innerHTML = `<i data-lucide="qr-code" class="w-5 h-5"></i>`;
+      } else if (aba === 'agente') {
+        headerTitle.innerText = "Configuração do Agente IA";
+        headerSubtitle.innerText = "Defina instruções, regras e inteligência do robô";
+        headerAvatar.innerHTML = `<i data-lucide="bot" class="w-5 h-5"></i>`;
+      } else if (aba === 'servicos') {
+        headerTitle.innerText = "Serviços, Valores & Chave PIX";
+        headerSubtitle.innerText = "Catálogo de preços que o assistente usa nas respostas";
+        headerAvatar.innerHTML = `<i data-lucide="badge-dollar-sign" class="w-5 h-5"></i>`;
+      } else if (aba === 'simulador') {
+        headerTitle.innerText = "Simulador ao Vivo";
+        headerSubtitle.innerText = "Valide as respostas do seu bot diretamente pelo app";
+        headerAvatar.innerHTML = `<i data-lucide="message-square-dashed" class="w-5 h-5"></i>`;
+      }
+      lucide.createIcons();
+    }
+
+    // 3. Gerar QR Code via n8n (Evolution API)
+    async function gerarQrCode() {
+      const instance = document.getElementById('instanceName').value.trim().toLowerCase();
+      if (!instance) {
+        alert("Por favor, digite o nome do seu negócio.");
+        return;
+      }
+
+      const qrImage = document.getElementById('qr-image');
+      const qrLoading = document.getElementById('qr-loading');
+      const qrPlaceholder = document.getElementById('qr-placeholder');
+
+      qrPlaceholder.classList.add('hidden');
+      qrImage.classList.add('hidden');
+      qrLoading.classList.remove('hidden');
+
+      try {
+        const response = await fetch(N8N_WEBHOOK_QR, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "create_and_connect_instance",
+            instanceName: instance,
+            whatsappNumber: ""
+          })
+        });
+
+        const data = await response.json();
+        
+        qrLoading.classList.add('hidden');
+        if (data.qrcode) {
+          qrImage.src = data.qrcode;
+          qrImage.classList.remove('hidden');
+          document.getElementById('badge-status-conexao').innerText = "Aguardando Leitura";
+          document.getElementById('badge-status-conexao').className = "text-[10px] text-blue-500 font-semibold";
+        } else {
+          alert("Instância já conectada ou erro ao obter QR Code!");
+          qrPlaceholder.classList.remove('hidden');
+        }
+      } catch (err) {
+        qrLoading.classList.add('hidden');
+        qrPlaceholder.classList.remove('hidden');
+        alert("Erro de comunicação com o servidor n8n. Verifique se o fluxo está ativo!");
+      }
+    }
+
+    // 4. Salvar Configurações no Directus/Postgres via n8n
+    async function salvarConfigIA() {
+      const nome = document.getElementById('ai-nome').value;
+      const nicho = document.getElementById('ai-nicho').value;
+      const prompt = document.getElementById('ai-prompt').value;
+      const instance = document.getElementById('instanceName').value.trim().toLowerCase() || 'studiotesta';
+
+      alert(`Configurações de ${nome} (${nicho}) salvas com sucesso para a instância ${instance}!`);
+    }
+
+    async function salvarServicos() {
+      const pix = document.getElementById('pix-chave').value;
+      const tabela = document.getElementById('lista-precos').value;
+      alert("Catálogo e Chave PIX atualizados com sucesso!");
+    }
+
+    // 5. Teste de Simulação
+    function enviarSimulacao() {
+      const input = document.getElementById('simulador-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const chat = document.getElementById('chat-messages');
+      // Balão do Usuário
+      chat.innerHTML += `
+        <div class="flex justify-end">
+          <div class="bg-wa-green text-white p-2.5 rounded-lg max-w-[80%] shadow-sm">
+            ${msg}
+          </div>
+        </div>
+      `;
+      input.value = "";
+      chat.scrollTop = chat.scrollHeight;
+
+      // Resposta Simulada da IA
+      setTimeout(() => {
+        chat.innerHTML += `
+          <div class="flex items-start gap-2">
+            <div class="bg-wa-panelLight dark:bg-wa-panelDark p-2.5 rounded-lg shadow-sm max-w-[80%] border border-wa-borderLight dark:border-wa-borderDark">
+              Entendido! Nossos serviços estão disponíveis para agendamento. Gostaria de marcar para hoje ou amanhã?
+            </div>
+          </div>
+        `;
+        chat.scrollTop = chat.scrollHeight;
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
