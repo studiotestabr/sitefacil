@@ -1,7 +1,7 @@
 /* ==========================================================================
-   SPXrotas Pro v2.7.0 - Folha de Estilos Modular Oficial
+   SPXrotas Pro v2.8.0 - Folha de Estilos Modular Oficial
    Navegador 3D (Elevação Dinâmica com Volumosos), Bipador Amplo, Radares,
-   Verde Vivo Unificado, Reordenação Fluida por Toque & Swipe Lateral na Rua
+   Verde Vivo Unificado, Reordenação Fluida por Toque & Rodapé Fixo Aba Rua
    Arquivo: /spxrotas/app/css/styles.css
    ========================================================================== */
 
@@ -922,7 +922,7 @@ body.theme-claro .badge-verde-vivo {
 /* Toast Flutuante Não-Bloqueante (Feedback instantâneo sem travar a tela) */
 .toast-spx-flutuante {
   position: fixed;
-  bottom: 24px;
+  bottom: 76px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 350;
@@ -941,7 +941,7 @@ body.theme-claro .badge-verde-vivo {
 }
 
 /* ==========================================================================
-   11. NAVEGAÇÃO POR SWIPE LATERAL NA ABA RUA (#1 <-> #2 <-> #3)
+   11. NAVEGAÇÃO POR SWIPE LATERAL & RODAPÉ FIXO NA ABA RUA (#1 <-> #2 <-> #3)
    ========================================================================== */
 
 .cockpit-rua-swipe {
@@ -957,9 +957,33 @@ body.theme-claro .badge-verde-vivo {
   padding: 4px 2px 2px;
 }
 
+/* Rodapé fixo da aba Rua (◀ Deslize para trocar ▶) */
+.rodape-swipe-rua {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  background: rgba(5, 8, 17, 0.96);
+  border-top: 1px solid #1e293b;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.75);
+}
+
+body.theme-claro .rodape-swipe-rua {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-top-color: #cbd5e1 !important;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-claro .rodape-swipe-rua span {
+  color: #334155 !important;
+}
+
 .btn-seta-rua {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 12px;
   background: #1e293b;
   border: 1px solid #334155;
@@ -973,10 +997,17 @@ body.theme-claro .badge-verde-vivo {
   transition: transform 0.12s ease, background-color 0.15s ease;
 }
 
+body.theme-claro .btn-seta-rua {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
 .btn-seta-rua:active:not(:disabled) {
   transform: scale(0.92);
   background: #ea580c;
   border-color: #f97316;
+  color: #ffffff !important;
 }
 
 .btn-seta-rua:disabled {
