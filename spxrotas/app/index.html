@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- Estilos com Cache-Busting -->
-  <link rel="stylesheet" href="./css/styles.css?v=8.8.0">
+  <link rel="stylesheet" href="./css/styles.css?v=8.9.0">
 
   <!-- Leaflet 2D -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -39,7 +39,7 @@
   <script src="./js/relatorio.js?v=8.8.0"></script>
 
   <!-- Script Principal Unificado SPXrotas -->
-  <script src="./js/app.js?v=9.0.0"></script>
+  <script src="./js/app.js?v=9.1.0"></script>
 
   <!-- Alpine.js -->
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -459,6 +459,25 @@
           </button>
         </div>
 
+        <!-- FAIXA DE STATUS DE CONFERÊNCIA (AVISO VISUAL CLARO DE FALTANTES OU 100%) -->
+        <template x-if="entregas.length > 0 && (idsConferidos.size > 0 || entregas.some(e => e.status === 'conferido'))">
+          <div>
+            <div x-show="pacotesAguardandoBipagem.length > 0"
+                 @click="abrirModalResumoBipagem()"
+                 class="bg-amber-500/15 border border-amber-500/70 rounded-2xl px-3.5 py-2.5 flex items-center justify-between gap-2 cursor-pointer active:scale-[0.99] transition shadow-md">
+              <div class="text-xs text-amber-200 font-bold leading-snug">
+                ⚠️ Faltam <strong class="text-amber-400 font-mono" x-text="pacotesAguardandoBipagem.length"></strong> pacote(s) sem bipar!
+              </div>
+              <span class="text-[10px] bg-amber-500 text-slate-950 font-black px-2.5 py-1 rounded-xl uppercase shrink-0">Ver Lista</span>
+            </div>
+            <div x-show="pacotesAguardandoBipagem.length === 0"
+                 class="bg-green-500/15 border border-green-500/70 rounded-2xl px-3.5 py-2.5 flex items-center justify-center gap-2 text-xs text-green-300 font-black shadow-md">
+              <span>🟢</span>
+              <span x-text="`100% Conferido! Todos os ${entregas.length} pacotes foram bipados.`"></span>
+            </div>
+          </div>
+        </template>
+
         <!-- FAIXA DE ORIENTAÇÃO / TRAVA DA REORDENAÇÃO -->
         <template x-if="entregas.length > 1">
           <div>
@@ -624,7 +643,7 @@
         </div>
       </main>
 
-      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM SWIPE LATERAL + ALERTA VOLUMOSOS + GPS PÓS-ROTA) -->
+      <!-- MODO 2: RUA (COCKPIT INTELIGENTE COM SWIPE LATERAL + CONTROLES NO RODAPÉ + ALERTA VOLUMOSOS + GPS PÓS-ROTA) -->
       <main x-show="modo === 'rua'" class="p-4 max-w-xl mx-auto w-full relative">
         <template x-if="entregaAtual">
           <div @touchstart="iniciarSwipeRua($event)"
@@ -633,13 +652,6 @@
                @touchcancel="finalizarSwipeRua($event)"
                :style="ruaSwipeDeltaX ? `transform: translateX(${ruaSwipeDeltaX}px)` : ''"
                class="cockpit-rua-swipe bg-[#121824] rounded-3xl p-5 border border-gray-800 space-y-4 shadow-2xl mt-2">
-            
-            <!-- BARRA DISCRETA DE NAVEGAÇÃO LATERAL ENTRE PACOTES -->
-            <div x-show="naoEntreguesOrdenados.length > 1" class="barra-swipe-rua">
-              <button @click="navegarPacoteRua(-1)" :disabled="indiceEntregaAtualNaRua <= 0" class="btn-seta-rua" title="Pacote Anterior">◀</button>
-              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider" x-text="`◀ Deslize para trocar • ${indiceEntregaAtualNaRua + 1} de ${naoEntreguesOrdenados.length} ▶`"></span>
-              <button @click="navegarPacoteRua(1)" :disabled="indiceEntregaAtualNaRua >= naoEntreguesOrdenados.length - 1" class="btn-seta-rua" title="Próximo Pacote">▶</button>
-            </div>
 
             <div class="bg-orange-500/10 border border-orange-500/40 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-orange-300 shadow-md">
               <div class="flex items-center gap-2 truncate pr-2">
@@ -850,6 +862,17 @@
 
     </div>
 
+    <!-- RODAPÉ FIXO DE TROCA RÁPIDA NA ABA RUA (◀ DESLIZE PARA TROCAR ▶) -->
+    <div x-show="modo === 'rua' && entregaAtual && naoEntreguesOrdenados.length > 1"
+         class="rodape-swipe-rua"
+         x-cloak>
+      <div class="max-w-xl mx-auto flex items-center justify-between gap-2">
+        <button @click="navegarPacoteRua(-1)" :disabled="indiceEntregaAtualNaRua <= 0" class="btn-seta-rua" title="Pacote Anterior">◀</button>
+        <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider" x-text="`◀ Deslize para trocar • ${indiceEntregaAtualNaRua + 1} de ${naoEntreguesOrdenados.length} ▶`"></span>
+        <button @click="navegarPacoteRua(1)" :disabled="indiceEntregaAtualNaRua >= naoEntreguesOrdenados.length - 1" class="btn-seta-rua" title="Próximo Pacote">▶</button>
+      </div>
+    </div>
+
     <!-- MODO 6: NAVEGAÇÃO 3D NATIVA (OTIMIZADA PARA ECONOMIA DE BATERIA SEM BLUR SOBRE WEBGL) -->
     <main x-show="modo === 'navegacao'" class="fixed inset-0 z-[250] bg-gray-950 flex flex-col justify-between overflow-hidden" x-cloak>
       
@@ -993,7 +1016,7 @@
       </div>
     </main>
 
-    <!-- MODO 7: BIPADOR DE SACOLAS COM VOZ (COM BOTÃO DE VOLUMOSOS) -->
+    <!-- MODO 7: BIPADOR DE SACOLAS COM VOZ (MÁX. 20-30CM + BOTÃO DE VOLUMOSOS) -->
     <main x-show="modo === 'bipador'" class="fixed inset-0 z-[260] bg-black flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden select-none" x-cloak>
       
       <div class="flex items-center justify-between border-b border-gray-800/80 pb-2.5 shrink-0">
@@ -1001,7 +1024,7 @@
           <span class="text-2xl">📸</span>
           <div>
             <h3 class="text-sm font-black text-white leading-tight">Bipador de Sacolas com Voz</h3>
-            <span class="text-[10px] text-amber-400 font-bold block mt-0.5">Aponte para o código de barras da caixa</span>
+            <span class="text-[10px] text-amber-400 font-bold block mt-0.5">Aproxime 20 a 30 cm do código de barras</span>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -1011,7 +1034,7 @@
           <button type="button" @click="alternarCameraBipador()" class="btn-scanner-ctrl" title="Trocar Câmera">
             🔄
           </button>
-          <button type="button" @click="fecharBipadorVoz()" class="btn-scanner-ctrl text-red-400 hover:text-white" title="Fechar Bipador">
+          <button type="button" @click="fecharBipadorVoz(false)" class="btn-scanner-ctrl text-red-400 hover:text-white" title="Fechar Bipador">
             &times;
           </button>
         </div>
@@ -1023,7 +1046,7 @@
             <span class="text-xs sm:text-sm font-black text-white flex items-center gap-1.5" x-text="`✅ Canetão #${ultimoPacoteBipado.ordem_entrega} identificado!`"></span>
           </template>
           <template x-if="!ultimoPacoteBipado">
-            <span class="text-xs sm:text-sm font-bold text-gray-300 flex items-center gap-1.5" x-text="statusTextoBipador || '🎯 Enquadre o código de barras'"></span>
+            <span class="text-xs sm:text-sm font-bold text-gray-300 flex items-center gap-1.5" x-text="statusTextoBipador || '🎯 Enquadre a etiqueta (20-30cm)'"></span>
           </template>
         </div>
       </div>
@@ -1102,13 +1125,80 @@
           </div>
         </div>
 
-        <button @click="fecharBipadorVoz()" class="w-full bg-[#ea580c] hover:bg-orange-500 text-white font-black py-3.5 sm:py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+        <button @click="fecharBipadorVoz(true)" class="w-full bg-[#ea580c] hover:bg-orange-500 text-white font-black py-3.5 sm:py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center justify-center gap-2">
           <span>✅</span> CONCLUIR E VER SACOLAS
         </button>
       </div>
 
     </main>
 
+  </div>
+
+  <!-- MODAL DE RESUMO DE CONFERÊNCIA DA BIPAGEM (SUCESSO OU PACOTES FALTANTES) -->
+  <div x-show="modalResumoBipagem" class="fixed inset-0 bg-black/90 z-[345] flex items-end sm:items-center justify-center p-3 sm:p-4 backdrop-blur-md" x-cloak>
+    <div class="bg-gray-900 border-2 rounded-3xl w-full max-w-md p-5 space-y-4 shadow-2xl text-left max-h-[88vh] flex flex-col justify-between"
+         :class="(resumoBipagemDados?.faltantes?.length || 0) === 0 ? 'border-emerald-500' : 'border-amber-500'"
+         @click.away="modalResumoBipagem = false">
+      
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-3xl" x-text="(resumoBipagemDados?.faltantes?.length || 0) === 0 ? '✅' : '⚠️'"></span>
+          <div>
+            <h3 class="text-base font-black text-white leading-tight" x-text="(resumoBipagemDados?.faltantes?.length || 0) === 0 ? 'Bipagem 100% Concluída!' : `Faltam ${resumoBipagemDados?.faltantes?.length || 0} Pacote(s)!`"></h3>
+            <span class="text-xs font-bold block mt-0.5"
+                  :class="(resumoBipagemDados?.faltantes?.length || 0) === 0 ? 'text-emerald-400' : 'text-amber-400'"
+                  x-text="`${resumoBipagemDados?.conferidos || 0} de ${resumoBipagemDados?.total || 0} pacotes bipados`"></span>
+          </div>
+        </div>
+        <button @click="modalResumoBipagem = false" class="text-gray-400 hover:text-white text-2xl font-bold leading-none p-1">&times;</button>
+      </div>
+
+      <template x-if="(resumoBipagemDados?.faltantes?.length || 0) === 0">
+        <div class="bg-emerald-500/15 border border-emerald-500/50 rounded-2xl p-4 text-center space-y-1.5">
+          <p class="text-sm font-black text-emerald-300">Sucesso em todos os pacotes!</p>
+          <p class="text-xs text-gray-200 leading-relaxed">Nenhuma caixa ficou para trás. Todas as sacolas estão conferidas e prontas para ir para a rua!</p>
+        </div>
+      </template>
+
+      <template x-if="(resumoBipagemDados?.faltantes?.length || 0) > 0">
+        <div class="space-y-2.5 overflow-y-auto flex-1 pr-1">
+          <div class="bg-amber-500/15 border border-amber-500/50 rounded-2xl p-3 text-xs text-amber-200 font-bold leading-snug">
+            Atenção: os pacotes abaixo ainda estão em laranja (não foram bipados):
+          </div>
+          <div class="space-y-2">
+            <template x-for="f in resumoBipagemDados?.faltantes || []" :key="f.id">
+              <div class="bg-gray-950 border border-orange-500/50 rounded-2xl p-3 flex items-center justify-between gap-2.5">
+                <div class="bg-orange-500/20 text-orange-400 border border-orange-500/40 px-2.5 py-1.5 rounded-xl text-center shrink-0">
+                  <span class="text-[8px] font-black uppercase block leading-none">Canetão</span>
+                  <span class="text-base font-black font-mono leading-tight" x-text="`#${f.ordem_entrega}`"></span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs font-black text-white truncate" x-text="f.endereco"></p>
+                  <div class="flex items-center gap-2 text-[10px] text-gray-400 font-mono mt-0.5">
+                    <span class="text-orange-300 font-bold" x-text="`Sacola ${Math.ceil(f.ordem_entrega / 10)}`"></span>
+                    <span>•</span>
+                    <span x-text="`Final ${f.codigo_rastreio ? f.codigo_rastreio.slice(-4) : '----'}`"></span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+
+      <div class="flex flex-col sm:flex-row gap-2 pt-1 shrink-0">
+        <button x-show="(resumoBipagemDados?.faltantes?.length || 0) > 0"
+                @click="modalResumoBipagem = false; abrirBipadorVoz();"
+                class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition">
+          📸 Voltar e Bipar Faltantes
+        </button>
+        <button @click="modalResumoBipagem = false"
+                class="flex-1 font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider active:scale-95 transition"
+                :class="(resumoBipagemDados?.faltantes?.length || 0) === 0 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg' : 'bg-gray-800 hover:bg-gray-700 text-gray-300'">
+          <span x-text="(resumoBipagemDados?.faltantes?.length || 0) === 0 ? '👍 Ver Sacolas' : 'Ver Sacolas Assim Mesmo'"></span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL DE CONFIRMAÇÃO INTELIGENTE DO PINGO (DESVIOS > 450m ATÉ 4km) -->
@@ -1789,7 +1879,7 @@
         <div class="space-y-3.5">
           <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-blue-500/40">🚗</div>
           <h3 class="text-2xl font-black text-white">Cockpit da Rua & Radares</h3>
-          <p class="text-xs text-gray-300 leading-relaxed">Na aba Rua, deslize pro lado para trocar rapidamente de Canetão! O app avisa radares na sua via sem alarmes falsos e vibra se tiver múltiplos pacotes juntos.</p>
+          <p class="text-xs text-gray-300 leading-relaxed">Na aba Rua, deslize pro lado (ou use o rodapé) para trocar rapidamente de Canetão! O app avisa radares na sua via sem alarmes falsos e vibra se tiver múltiplos pacotes juntos.</p>
         </div>
       </template>
 
