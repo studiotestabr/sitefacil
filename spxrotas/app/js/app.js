@@ -1,12 +1,13 @@
 /* ==========================================================================
-   SPXrotas Pro v3.3.0 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v3.4.0 - Núcleo Mestre Reativo Oficial
    GPS Ao Vivo da Frota (telemetria.gps_ao_vivo), Isolamento Estrito por
    user_created (App + Cache), Motorista Nome/Telefone, Interpolação Métrica
    de Número Predial, Volumosos com Voz, Radares Otimizados, Pinagem Inteligente
    em 3 Camadas, GPS Pós-Rota (Casa & Modo Waze Livre), Swipe Lateral na Aba Rua,
    Economia de Bateria, Status Conferido no Banco, Reordenação por Toque,
    Recálculo Instantâneo Silencioso (Waze), Trava Botão Voltar Android (popstate),
-   Renovação de Sessão Directus Corrigida & Sync Blindado Entre Celulares
+   Renovação de Sessão Directus Corrigida, Sync Blindado Entre Celulares,
+   Scanner 20-30cm & Conferência Visual/Áudio de Conclusão da Bipagem
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -28,6 +29,8 @@ function spxRotasApp() {
     termoBusca: '',
     modalImportar: false,
     modalResumoImportacao: false,
+    modalResumoBipagem: false,
+    resumoBipagemDados: null,
     modalAssinatura: false,
     modalCadastroObrigatorio: false,
     modalRelatorio: false,
@@ -208,12 +211,12 @@ function spxRotasApp() {
     wakeLockSentinel: null,
     wakeLockAtivo: false,
 
-    // 11. BIPADOR DE SACOLAS COM VOZ (NOVO LAYOUT FOTO 1)
+    // 11. BIPADOR DE SACOLAS COM VOZ (NOVO LAYOUT FOTO 1 + LIMITE 20-30CM)
     streamCameraBipador: null,
     cameraFacingMode: 'environment',
     lanternaAtiva: false,
     intervaloScanBipador: null,
-    statusTextoBipador: '🎯 Enquadre o código de barras',
+    statusTextoBipador: '🎯 Enquadre a etiqueta (20-30cm)',
     ultimoPacoteBipado: null,
     detectorCodigoBarras: null,
     ultimoCodigoLido: '',
@@ -284,6 +287,10 @@ function spxRotasApp() {
         this.menuAberto = false;
         return;
       }
+      if (this.modalResumoBipagem) {
+        this.modalResumoBipagem = false;
+        return;
+      }
       if (this.modalConfirmarPingo) {
         this.fecharModalConfirmarPingo();
         return;
@@ -325,7 +332,7 @@ function spxRotasApp() {
         return;
       }
       if (this.modo === 'bipador') {
-        this.fecharBipadorVoz();
+        this.fecharBipadorVoz(false);
         return;
       }
       if (this.modo !== 'carregamento') {
@@ -1577,7 +1584,7 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // BIPADOR DE SACOLAS COM VOZ (BARCODE DETECTOR - FOTO 1)
+    // BIPADOR DE SACOLAS COM VOZ (LIMITE DE DISTÂNCIA 20-30CM + RESUMO FINAL)
     // =========================================================================
     async abrirBipadorVoz() {
       if (!this.entregas || this.entregas.length === 0) {
@@ -1585,6 +1592,7 @@ function spxRotasApp() {
         return;
       }
 
+      this.modalResumoBipagem = false;
       this.modo = 'bipador';
       this.ultimoPacoteBipado = null;
       this.ultimoCodigoLido = '';
@@ -1625,7 +1633,7 @@ function spxRotasApp() {
         video.srcObject = stream;
         await video.play();
 
-        this.statusTextoBipador = '🎯 Enquadre o código de barras da caixa';
+        this.statusTextoBipador = '🎯 Enquadre a etiqueta (20-30cm)';
         this.iniciarLoopLeituraBipador();
       } catch (err) {
         this.statusTextoBipador = '❌ Erro ao acessar câmera';
@@ -1640,13 +1648,52 @@ function spxRotasApp() {
       const video = document.getElementById('videoScannerBipador');
       this.intervaloScanBipador = setInterval(async () => {
         if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+        const vw = video.videoWidth || 0;
+        const vh = video.videoHeight || 0;
+        if (!vw || !vh) return;
 
         if (this.detectorCodigoBarras) {
           try {
             const codigos = await this.detectorCodigoBarras.detect(video);
-            if (codigos && codigos.length > 0) {
-              const valor = (codigos[0].rawValue || '').toUpperCase().trim();
-              this.processarLeituraEtiqueta(valor);
+            if (!codigos || codigos.length === 0) return;
+
+            // Filtro de proximidade (20 a 30 cm) + área central da mira: ignora caixas no chão ao abaixar o celular
+            const minDim = Math.min(vw, vh);
+            let melhorCandidato = null;
+            let melhorRazao = 0;
+
+            for (const c of codigos) {
+              const raw = (c.rawValue || '').toUpperCase().trim();
+              if (!raw || raw.length < 4) continue;
+
+              const box = c.boundingBox;
+              if (box && box.width > 0 && box.height > 0) {
+                const cx = box.x + box.width / 2;
+                const cy = box.y + box.height / 2;
+
+                // Deve estar dentro da zona central da mira (14% a 86%)
+                const naMiraCentro = cx >= vw * 0.14 && cx <= vw * 0.86 && cy >= vh * 0.14 && cy <= vh * 0.86;
+                if (!naMiraCentro) continue;
+
+                const maiorLado = Math.max(box.width, box.height);
+                const razao = maiorLado / minDim;
+
+                const fmt = (c.format || '').toLowerCase();
+                const is2D = fmt === 'qr_code' || fmt === 'data_matrix';
+                // A ~20-30cm: código de barras 1D ocupa >= 13.5% da largura útil; QR Code >= 7%
+                const limiarMinimo = is2D ? 0.07 : 0.135;
+
+                if (razao >= limiarMinimo && razao > melhorRazao) {
+                  melhorRazao = razao;
+                  melhorCandidato = raw;
+                }
+              }
+            }
+
+            if (melhorCandidato) {
+              this.processarLeituraEtiqueta(melhorCandidato);
+            } else if (!this.ultimoPacoteBipado && (Date.now() - this.timestampUltimoBip > 1500)) {
+              this.statusTextoBipador = '📏 Aproxime a câmera (20 a 30 cm)';
             }
           } catch (e) {}
         }
@@ -1749,12 +1796,45 @@ function spxRotasApp() {
       this.lanternaAtiva = false;
     },
 
-    fecharBipadorVoz() {
+    abrirModalResumoBipagem(comAudio = false) {
+      const faltantes = [...this.pacotesAguardandoBipagem].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
+      const total = (this.entregas || []).length;
+      const conferidos = Math.max(0, total - faltantes.length);
+
+      this.resumoBipagemDados = {
+        total,
+        conferidos,
+        faltantes
+      };
+      this.modalResumoBipagem = true;
+
+      if (comAudio && total > 0) {
+        if (faltantes.length === 0) {
+          if ('vibrate' in navigator) navigator.vibrate([70, 40, 70]);
+          this.falarTexto(`Sucesso! Todos os ${total} pacotes foram bipados e conferidos nas sacolas!`);
+        } else {
+          if ('vibrate' in navigator) navigator.vibrate([120, 60, 120, 60, 120]);
+          if (faltantes.length <= 5) {
+            const listaCanetoes = faltantes.map(p => `Canetão ${p.ordem_entrega}`).join(', ');
+            this.falarTexto(`Atenção! Ainda faltam ${faltantes.length} pacotes sem bipar: ${listaCanetoes}.`);
+          } else {
+            this.falarTexto(`Atenção! Ainda faltam ${faltantes.length} pacotes sem bipar! Verifique a lista na tela.`);
+          }
+        }
+      }
+    },
+
+    fecharBipadorVoz(verificarConclusao = false) {
       this.pararCameraBipador();
       this.modo = 'carregamento';
       this.sincronizarEstadoAuxiliarRota(true);
       if (navigator.onLine) {
         this.processarFilaSync();
+      }
+      if (verificarConclusao && this.entregas && this.entregas.length > 0) {
+        setTimeout(() => {
+          this.abrirModalResumoBipagem(true);
+        }, 120);
       }
     },
 
