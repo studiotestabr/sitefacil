@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SPXrotas Pro v3.4.0 - Núcleo Mestre Reativo Oficial
+   SPXrotas Pro v3.4.1 - Núcleo Mestre Reativo Oficial
    GPS Ao Vivo da Frota (telemetria.gps_ao_vivo), Isolamento Estrito por
    user_created (App + Cache), Motorista Nome/Telefone, Interpolação Métrica
    de Número Predial, Volumosos com Voz, Radares Otimizados, Pinagem Inteligente
@@ -7,7 +7,7 @@
    Economia de Bateria, Status Conferido no Banco, Reordenação por Toque,
    Recálculo Instantâneo Silencioso (Waze), Trava Botão Voltar Android (popstate),
    Renovação de Sessão Directus Corrigida, Sync Blindado Entre Celulares,
-   Scanner 20-30cm & Conferência Visual/Áudio de Conclusão da Bipagem
+   Scanner 20-30cm, Conferência Visual/Áudio & Fila Amarelos Pós-Verdes
    Arquivo: /spxrotas/app/js/app.js
    ========================================================================== */
 
@@ -346,10 +346,16 @@ function spxRotasApp() {
     },
 
     // =========================================================================
-    // SWIPE LATERAL NA ABA RUA
+    // SWIPE LATERAL NA ABA RUA (AMARELOS APÓS OS VERDES PARA REENTREGA)
     // =========================================================================
     get naoEntreguesOrdenados() {
-      return [...this.naoEntregues].sort((a, b) => (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0));
+      const rank = (e) => (e.status === 'ausente' ? 1 : 0);
+      return [...this.naoEntregues].sort((a, b) => {
+        const rA = rank(a);
+        const rB = rank(b);
+        if (rA !== rB) return rA - rB;
+        return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
+      });
     },
 
     get indiceEntregaAtualNaRua() {
@@ -2096,9 +2102,15 @@ function spxRotasApp() {
     },
 
     get entregasOrdenadasParaSacola() {
+      const rank = (e) => {
+        if (e.status === 'entregue') return 2; // Vermelhos por último
+        if (e.status === 'ausente') return 1;  // Amarelos após os verdes, acima dos vermelhos
+        return 0;                              // Laranjas / Verdes no topo
+      };
       return [...this.entregas].sort((a, b) => {
-        if (a.status === 'entregue' && b.status !== 'entregue') return 1;
-        if (a.status !== 'entregue' && b.status === 'entregue') return -1;
+        const rA = rank(a);
+        const rB = rank(b);
+        if (rA !== rB) return rA - rB;
         return (Number(a.ordem_entrega) || 0) - (Number(b.ordem_entrega) || 0);
       });
     },
